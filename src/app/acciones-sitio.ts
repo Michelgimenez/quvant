@@ -1,12 +1,9 @@
 "use server"
 
-import { appendFile, mkdir } from "node:fs/promises"
-import path from "node:path"
 import { headers } from "next/headers"
-import { createClient } from "@supabase/supabase-js"
 import { z } from "zod"
 import { RUBROS } from "@/config/sitio"
-import { modoActual } from "@/lib/modo"
+import { guardarSolicitud } from "@/lib/solicitudes"
 
 export type EstadoSolicitud = { ok?: boolean; error?: string; errores?: Partial<Record<string, string>> }
 
@@ -24,9 +21,9 @@ const esquema = z.object({
 const intentos = new Map<string, number[]>()
 
 /**
- * Formulario "Pedir una demo" / socios fundadores.
- * Con Supabase: se guarda en public.solicitudes_demo (anon solo puede insertar).
- * Sin Supabase (modo demo): se guarda en .data/solicitudes-demo.jsonl.
+ * Formulario "Pedir una demo" / socios fundadores. Se guarda en la tabla
+ * solicitudes_demo (Supabase, o la base local en modo demo; ver src/lib/solicitudes)
+ * y el equipo la ve en /panel.
  */
 export async function pedirDemo(_: EstadoSolicitud, form: FormData): Promise<EstadoSolicitud> {
   // Campo trampa: los bots lo completan, las personas no lo ven.
@@ -59,15 +56,7 @@ export async function pedirDemo(_: EstadoSolicitud, form: FormData): Promise<Est
   }
 
   try {
-    if (modoActual() === "supabase") {
-      const sb = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!, { auth: { persistSession: false } })
-      const { error } = await sb.from("solicitudes_demo").insert(fila)
-      if (error) throw error
-    } else {
-      const dir = path.join(process.cwd(), ".data")
-      await mkdir(dir, { recursive: true })
-      await appendFile(path.join(dir, "solicitudes-demo.jsonl"), JSON.stringify({ ...fila, creada_en: new Date().toISOString() }) + "\n", "utf8")
-    }
+    await guardarSolicitud(fila)
   } catch (e) {
     console.error(JSON.stringify({ nivel: "error", servicio: "yunque", evento: "solicitud_demo", mensaje: (e as Error).message }))
     return { error: "No pudimos guardar tu solicitud. Probá de nuevo en un rato." }

@@ -1,31 +1,5 @@
-import { expect, test, type Page } from "@playwright/test"
-import { ingresar } from "./utiles"
-
-async function agregarProducto(page: Page, busqueda: string) {
-  const buscador = page.getByTestId("buscador-productos")
-  await buscador.fill(busqueda)
-  await expect(page.getByRole("option").first()).toBeVisible()
-  await buscador.press("Enter")
-  await expect(page.getByTestId("carrito")).toBeVisible()
-}
-
-/** Si la caja del puesto está cerrada (p. ej. antes de las 8), la abre. */
-async function asegurarCaja(page: Page) {
-  const abrir = page.getByRole("button", { name: "Abrir caja para cobrar" })
-  if (await abrir.isVisible()) {
-    await abrir.click()
-    await page.getByRole("dialog").getByRole("button", { name: "Abrir caja" }).click()
-    await expect(page.getByTestId("cobrar")).toBeVisible()
-  }
-}
-
-async function cobrarEnEfectivo(page: Page) {
-  await asegurarCaja(page)
-  await page.getByTestId("cobrar").click()
-  await expect(page.getByTestId("total-cobro")).toBeVisible()
-  await page.getByTestId("confirmar-venta").click()
-  await expect(page.getByRole("heading", { name: "Venta registrada" })).toBeVisible()
-}
+import { expect, test } from "@playwright/test"
+import { agregarProducto, cobrarEnEfectivo, ingresar } from "./utiles"
 
 test.describe("mostrador", () => {
   test("venta de mostrador de punta a punta", async ({ page }) => {

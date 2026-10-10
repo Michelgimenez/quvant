@@ -1,5 +1,45 @@
 # Yunque — reporte de trabajo
 
+## Resumen · revisión final (10/10/2026)
+
+**Estado real:** demo funcional / piloto. Primer piloto en negociación, sin clientes pagando. Pagos, facturación y WhatsApp **emulados**. Sin despliegue a producción.
+
+### Listo y probado
+- **App (`/app`)**: inventario multisucursal con escaneo y conteos, precios con aumento masivo, mostrador y caja, presupuestos → venta, servicio técnico, clientes y cuentas corrientes, compras, entregas, reportes, usuarios y permisos, co-branding, importador y auditoría. Recorrida con **los 9 usuarios de prueba**, cada módulo de su rol, en escritorio y celular, sin errores.
+- **Sin conexión**: se corta la red, se vende, se recarga sin internet y al volver sincroniza solo. Un test e2e verifica que **cada venta llega una sola vez** al servidor, con número definitivo único, y que **el stock baja exactamente lo vendido** (validado con controles negativos).
+- **Datos y acceso**: aislamiento entre empresas con RLS forzado y privilegios explícitos (48 tests sobre PostgreSQL real, emulando a Supabase). Doble factor exigido para dueño y administración en la app y en la base. `.env` fuera de git. `service_role` solo en el servidor.
+- **Sitio (`/`)** con la demo "cortá la conexión"; **`/inversores`** (12 escenas, con clave); **`/demo/ferremix`** (7 escenas, sello `PROPUESTA` en todas; Ferremix no aparece en ningún otro lado: lo controla un test).
+- **"Pedir una demo"**: se guarda en la base y aparece en el panel interno **`/panel`** (clave `PANEL_KEY`) con aviso de solicitudes nuevas.
+- **Verificación**: typecheck, lint y build sin errores; **111 tests** unitarios y de RLS y **23 e2e** en verde. Recorrido de revisión: **216 pantallas, 0 fallas, 0 errores de consola** ([`capturas/revision/RESULTADO.md`](capturas/revision/RESULTADO.md)).
+
+### Corregido en esta revisión
+1. **Privilegios en Supabase real**: las tablas creadas después de la migración 0300 heredaban los privilegios de fábrica de Supabase. RLS evitaba la fuga, pero la defensa era de una sola capa. Ahora la migración 0800 deja solo lo necesario, y los tests emulan a Supabase.
+2. **"Pedir una demo"** iba a un archivo que nadie leía: ahora va a la base (`solicitudes_demo`) y al panel.
+3. **Cabeceras HSTS y `upgrade-insecure-requests`** se enviaban también por http: con `npm start` en una PC rompían pedidos. Ahora solo van con https.
+4. Tests nuevos: mostrador sin conexión sin duplicados; doble factor de administración; privilegios; solicitudes.
+5. `/marca` y la demo de Ferremix tenían `[COMPLETAR]` escritos a mano; ahora salen de `src/config/`.
+
+### No está listo
+- **Supabase real**: preparado, sin probar; la función SQL cubre 7 de 33 operaciones y falta el adaptador del cliente.
+- **Integraciones reales**: ARCA, Mercado Pago, WhatsApp y Mercado Libre.
+- **Para producción**: auditoría externa, CSP con nonces, revocación de sesiones, recuperación del 2FA, backups con restauración probada, CI, panel con usuarios individuales y aviso de privacidad en el formulario.
+- **Rendimiento del sitio en celular**: Lighthouse simulado 77–89 (objetivo 90).
+
+### Los `[COMPLETAR]` que tenés que llenar
+
+| Dónde se ve | Qué falta | Dónde se edita |
+|---|---|---|
+| `/inversores` · 2 El problema | 3 datos de mercado **con su fuente**: ferreterías, corralones y repuestos; distribuidores de maquinaria; negocios con sistemas de escritorio o planillas | `src/config/inversores.ts` → `MERCADO.datos` |
+| `/inversores` · 3 El terreno | 5 hallazgos (sistema, precios y listas, stock y sucursales, presupuestos y clientes, sitio web) y la conclusión | `src/config/inversores.ts` → `TERRENO` |
+| `/inversores` · 10 Inversión | monto y plan definitivo (hoy 25/40/20/15 %, preliminar) | `src/config/inversion.ts` → `INVERSION` |
+| `/inversores` · 11 Equipo | rol y bio de Michel; nombre, rol y bio del socio; dos fotos | `src/config/inversion.ts` → `EQUIPO` (fotos en `public/`) |
+| `/inversores` · 12 Cierre | nombre, email y teléfono de contacto | `src/config/inversion.ts` → `CONTACTO_INVERSORES` |
+| `/` · "Pedir una demo" y pie | email y WhatsApp comercial | `src/config/sitio.ts` → `contacto` |
+| `/demo/ferremix` | categorías reales y su fuente, 4 problemas del relevamiento, sucursales, plazo estimado y contacto | `src/config/clientes/ferremix.ts` |
+| No se muestran (solo configuración) | LinkedIn; validar la implementación promedio (USD 1.500) y los supuestos de la proyección | `src/config/sitio.ts`, `src/config/proyecciones.ts` |
+
+---
+
 > Bitácora viva. Se completa al cerrar cada fase. Al final del documento: cómo levantar el proyecto,
 > usuarios de prueba y teclas de las presentaciones.
 
@@ -47,6 +87,10 @@
 | D38 | `/demo/[cliente]` es pública por enlace (sin clave), `noindex`, fuera del sitemap y bloqueada en `robots.txt`. Los prospectos no configurados responden **404 real** desde el proxy. | No contiene datos sensibles (su marca pública + datos ficticios) y se comparte con el prospecto sin fricción. |
 | D39 | El tablero pasó de `src/app/app/tablero.tsx` a `src/components/app/tablero.tsx`. | Importar un módulo de la carpeta de otra ruta provocaba un bucle de recargas de Fast Refresh en desarrollo. |
 | D40 | Con "reducir movimiento", las películas de las presentaciones mantienen los tiempos del guion y solo dejan de deslizar el cursor y los elementos. | Comprimir el guion lo convertía en un parpadeo constante, peor para quien pidió menos movimiento. |
+| D41 | "Pedir una demo" se guarda en la **base**: en Supabase, `solicitudes_demo`; sin Supabase, una base PostgreSQL local (PGlite en `.data/base-local`) creada con el shim y las **mismas migraciones**, con los mismos roles (el sitio inserta como `anon`). Antes iba a un archivo `.jsonl` que nadie leía. | Pedido de la revisión final. La base local evita depender de claves y mantiene las reglas de producción. No sirve en serverless: en producción va Supabase. |
+| D42 | El aviso de solicitudes va en un **panel interno** nuevo (`/panel`) con clave propia (`PANEL_KEY`), no en `/app`. | `/app` es el panel de cada empresa cliente y sus usuarios de prueba son públicos: mostrar ahí nombres y WhatsApp de interesados expondría datos personales. |
+| D43 | El shim de Supabase de los tests replica los **privilegios por defecto** de Supabase, y la migración `0800_privilegios_api` los revoca y deja solo lo necesario. | La revisión encontró que, en Supabase real, las tablas creadas después de la 0300 quedaban con privilegios de más para `anon`/`authenticated` (RLS evitaba la fuga, pero era una sola capa). |
+| D44 | Test e2e de "sin conexión sin duplicados" que lee la cola, lo confirmado y el log del servidor demo en IndexedDB y compara el stock antes y después. Se validó con controles negativos (rompiendo las dos defensas contra duplicados el test falla). | El test anterior solo verificaba que sincronizara. |
 
 ## Fases
 
@@ -172,3 +216,12 @@ Contraseña **`demo1234`** para todos. Dueño y administración pasan por el dob
 Clave de `/inversores`: `INVERSORES_KEY` (en desarrollo, si falta, `yunque-demo`). `/demo/ferremix` no lleva clave.
 
 **P** reproducir/pausar · **H** ocultar controles y cursor · **R** reiniciar · **1/2/3** velocidad 0,75×/1×/1,25× · **→ ↓ AvPág Espacio** siguiente · **← ↑ RePág** anterior · **Inicio/Fin** primera/última · **F** pantalla completa · **`#N`** en la URL va a la escena N.
+
+### Revisión final (10/10/2026)
+Pedido: verificar y corregir, sin funciones nuevas (salvo el destino de "Pedir una demo"). Resultado resumido al principio de este documento.
+- **Tests**: los de RLS primero (40/40 al empezar). Se agregaron 8 (privilegios de la API y solicitudes) y el *shim* ahora replica los privilegios por defecto de Supabase: **48/48**. Total 111 unitarios + RLS y 23 e2e.
+- **Mostrador sin conexión**: test nuevo `tests/e2e/sin-conexion.spec.ts`. Lee de IndexedDB la cola, lo confirmado y el log del servidor demo: tres ventas sin red, recarga, reconexión y sincronización forzada → cada operación una vez en el servidor y en el dispositivo, cola vacía, números definitivos únicos, stock −2 y −1 exactos. Controles negativos: sin la limpieza de la cola falla; sin las dos defensas contra duplicados (idempotencia por operación en el servidor y rechazo de venta repetida en el reductor) el servidor registra 2 y el test falla.
+- **Honestidad**: sin clientes, métricas, testimonios, certificaciones ni logos inventados (búsqueda en todo `src/` y `public/`). Ferremix solo en `src/config/clientes/` y `/demo/ferremix`, con sello `PROPUESTA` en todas las escenas. Los `[COMPLETAR]` visibles se listan en el resumen y en `capturas/revision/RESULTADO.md`.
+- **"Pedir una demo"**: antes iba a `.data/solicitudes-demo.jsonl` (nadie lo leía; en serverless no se puede escribir). Ahora va a la base y al panel `/panel` (D41, D42). El archivo viejo solo tenía envíos de los tests e2e.
+- **Seguridad**: `.env.local` nunca estuvo en git; ningún archivo del navegador menciona `service_role`, secretos ni claves; 2FA verificado para dueño y administración. Corregidos los privilegios de fábrica de Supabase (D43) y las cabeceras HSTS/`upgrade-insecure-requests` por http. `SEGURIDAD.md` actualizado.
+- **Recorrido**: `scripts/revision.ts` → 216 pantallas (sitio con la demo de corte, los 9 usuarios de prueba en cada módulo de su rol, 12 escenas de inversores y 7 de Ferremix) en 1440×900 y 390×844. La primera pasada encontró 32 errores en la demo de Ferremix (pedidos subidos a `https://localhost`); corregido, la segunda dio **0 errores**. Capturas en `docs/capturas/revision/`.

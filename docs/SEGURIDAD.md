@@ -2,18 +2,19 @@
 
 > Estado honesto: **demo funcional, sin auditoría externa y sin despliegue a producción.** Este documento dice
 > qué existe hoy, qué falta y qué tiene que revisar una auditoría profesional antes del primer cliente real.
-> Arquitectura general en [`ARQUITECTURA.md`](ARQUITECTURA.md).
+> Arquitectura general en [`ARQUITECTURA.md`](ARQUITECTURA.md). Última revisión: 10/10/2026 (revisión final).
 
 ## Lo que existe hoy
 
 ### Aislamiento entre empresas (multiempresa)
 - Todas las tablas de negocio llevan `org_id`, con **claves foráneas compuestas** (`org_id`, `id`): una fila no puede referenciar datos de otra empresa.
 - **RLS activado y forzado** (`force row level security`) en todas las tablas, también para el dueño de las tablas.
-- El rol `authenticated` solo tiene **`SELECT`**, filtrado por organización y, donde aplica, por sucursal permitida.
+- El rol `authenticated` solo tiene **`SELECT`**, filtrado por organización y, donde aplica, por sucursal permitida. `anon` no tiene ningún privilegio de tabla (solo puede insertar columnas puntuales de `solicitudes_demo`).
+- **Privilegios explícitos, no los de fábrica**: Supabase otorga por defecto todos los privilegios a `anon` y `authenticated` sobre cada tabla nueva de `public`. La migración `0800_privilegios_api` los revoca (también para las tablas futuras) y deja solo lo necesario. RLS sigue como segunda capa. *Hallazgo de la revisión final*: antes de esa migración, auditoría, operaciones e intentos de ingreso quedaban con privilegios de más (RLS ya impedía ver o cambiar filas, así que no había fuga, pero la defensa dependía de una sola capa).
 - **Escrituras solo por `public.aplicar_operacion()`** (security definer, `search_path` fijo): valida el permiso del rol y la sucursal, aplica en una subtransacción y deja registro. Las funciones internas (`app.*`) tienen `execute` revocado para `public`.
 - **Columnas protegidas**: costos de productos y de ítems de venta no se otorgan; se leen con `app.costos_productos()` solo con el permiso `costos.ver`.
 - **Doble factor exigido en la base**: dueño y administración sin `aal2` en el JWT no tienen permisos.
-- **Tests**: 27+ pruebas de aislamiento sobre PostgreSQL real (PGlite) con un control negativo (una fuga plantada a propósito que el detector tiene que encontrar). Los tests encontraron y se corrigió un bug real: `app.puede_sucursal()` no comparaba la sucursal pedida.
+- **Tests**: 48 pruebas sobre PostgreSQL real (PGlite) con un *shim* que replica a Supabase, **incluidos sus privilegios por defecto**: aislamiento entre empresas, alcance por sucursal y rol, columnas protegidas, 2FA, auditoría, función de operaciones, matriz de privilegios de la API y solicitudes de demo. Tienen controles negativos (una fuga plantada a propósito; sin la migración 0800 los tests de privilegios fallan). Encontraron dos problemas reales, ya corregidos: `app.puede_sucursal()` no comparaba la sucursal pedida, y los privilegios de fábrica de Supabase descriptos arriba.
 
 ### Auditoría
 - Trigger de auditoría en las tablas de negocio (quién, qué, cuándo, antes y después).
@@ -25,7 +26,7 @@
 - **Límite de intentos**: 5 fallos por email y 20 por IP cada 15 minutos (`app.ingreso_permitido()` en la base; en memoria en modo demo). El email se guarda solo como hash.
 - Sesión en cookie **`httpOnly`**, `SameSite=Lax`, `Secure` en producción, firmada con HS256 (`SESION_SECRETO`, mínimo 32 caracteres; en producción sin secreto la app no arranca la sesión), 12 h. Pre-sesión de 5 min para el doble factor.
 - Redirección posterior al ingreso solo a rutas internas de `/app` (sin redirecciones abiertas).
-- Doble factor TOTP para dueño y administración.
+- Doble factor TOTP para dueño y administración, exigido en tres lugares: el proxy (sin `aal2` no entran a `/app`), la base (sin `aal2` no tienen permisos) y los tests (e2e para dueño y administración, RLS para la base). En la demo el autenticador está emulado: el código se muestra en pantalla a quien ya pasó la contraseña.
 - Las server actions de Next validan el origen (protección CSRF incorporada).
 
 ### Presentaciones
@@ -33,17 +34,23 @@
 - Monto, destino de la inversión, equipo y contacto están en un módulo `server-only` y viajan **solo después** de validar la clave (test e2e lo verifica).
 - `/demo/[cliente]`: pública por enlace, sin datos sensibles, `noindex`; prospectos no configurados → 404.
 
+### Panel interno (`/panel`)
+- Lista las solicitudes de "Pedir una demo" (nombre, negocio, WhatsApp: **datos personales**). Clave propia (`PANEL_KEY`), con el mismo mecanismo que `/inversores`: tiempo constante, límite por IP, cookie firmada `httpOnly` + `SameSite=Strict` solo para `/panel`, 8 h. En producción sin `PANEL_KEY` queda cerrado.
+- Sin la clave no se entrega ningún dato (test e2e). La acción "marcar como contactada" vuelve a verificar la clave del lado servidor (las server actions son endpoints públicos).
+- Lee y actualiza con `service_role` solo del lado servidor; los usuarios de la app (incluidos los de prueba, que son públicos) **no pueden** leer solicitudes (test de RLS).
+
 ### Navegador y cabeceras
-- `Content-Security-Policy` (`default-src 'self'`, `frame-ancestors 'none'`, `connect-src` limitado a la propia app y a Supabase), `X-Frame-Options: DENY`, `X-Content-Type-Options: nosniff`, `Referrer-Policy: strict-origin-when-cross-origin`, `Permissions-Policy` (cámara solo propia; micrófono, geolocalización y pagos desactivados), `Cross-Origin-Opener-Policy: same-origin` y **HSTS** en producción.
-- `robots.txt` excluye `/app`, `/api`, `/ingresar`, `/inversores`, `/demo` y `/marca`.
+- `Content-Security-Policy` (`default-src 'self'`, `frame-ancestors 'none'`, `connect-src` limitado a la propia app y a Supabase), `X-Frame-Options: DENY`, `X-Content-Type-Options: nosniff`, `Referrer-Policy: strict-origin-when-cross-origin`, `Permissions-Policy` (cámara solo propia; micrófono, geolocalización y pagos desactivados), `Cross-Origin-Opener-Policy: same-origin`, y **HSTS** + `upgrade-insecure-requests` cuando el sitio se publica por https (`NEXT_PUBLIC_SITIO_URL` con `https://`). *Hallazgo de la revisión final*: antes se enviaban en cualquier build de producción, y con `npm start` por http el navegador subía pedidos a `https://localhost` y fallaban.
+- `robots.txt` excluye `/app`, `/api`, `/ingresar`, `/inversores`, `/demo`, `/marca` y `/panel`.
 
 ### Formularios y endpoints públicos
-- "Pedir una demo": validación con zod, **campo trampa** contra bots y límite de 5 envíos cada 10 minutos por IP. En Supabase, `solicitudes_demo` solo permite `INSERT` anónimo (sin lectura).
+- "Pedir una demo": validación con zod (y `check` en la base), **campo trampa** contra bots y límite de 5 envíos cada 10 minutos por IP. Se guarda en `solicitudes_demo`: en Supabase, o en modo demo en una base PostgreSQL local (PGlite en `.data/base-local`, mismo esquema y mismas reglas). Desde el sitio solo se pueden insertar columnas puntuales: ni el id, ni las fechas, ni el estado.
 - `/api/errores` (reporte de errores del cliente) con límite por IP y tamaño acotado.
 
 ### Secretos
 - Sin claves reales en el repositorio. `.env.local` está en `.gitignore`; `.env.example` documenta las variables.
-- La clave de servicio de Supabase (`SUPABASE_SERVICE_ROLE_KEY`) solo se usa en módulos `server-only`.
+- La clave de servicio de Supabase (`SUPABASE_SERVICE_ROLE_KEY`) solo se usa en módulos `server-only` (límite de intentos y panel). Verificado en la revisión final: ningún archivo de `.next/static` (lo que baja al navegador) menciona `service_role`, `SESION_SECRETO`, `INVERSORES_KEY`, `PANEL_KEY` ni las claves de desarrollo. Las únicas variables públicas son la URL del sitio y la URL + clave anónima de Supabase.
+- `.env.local` nunca estuvo en el historial de git (verificado).
 - Integraciones de pago, facturación y mensajería **emuladas**: no hay credenciales de terceros.
 
 ### Monitoreo
@@ -57,6 +64,9 @@
 | CSP | Usa `'unsafe-inline'` para scripts (con nonces todas las páginas pasan a render dinámico) | Nonces o hashes; medir el costo en el sitio público |
 | Modo Supabase | Preparado pero **no probado** contra una instancia real; la función de operaciones cubre 7 de 33 tipos | Staging con Supabase, mismos tests de RLS, completar operaciones |
 | Datos en el dispositivo | La réplica local y la cola (IndexedDB) **quedan en el equipo** al salir; no están cifradas | Borrar la base local al salir en equipos compartidos; política de dispositivos; evaluar cifrado |
+| Panel interno | Una clave compartida para todo el equipo; no queda registro de quién marcó cada solicitud | Usuarios individuales del equipo (Supabase Auth) y auditoría de cambios |
+| Datos personales de las solicitudes | Sin política de retención ni aviso de privacidad en el formulario | Texto de privacidad, plazo de borrado y pedido de baja |
+| Base local del modo demo | PGlite en disco: sirve en una PC o un servidor con disco; **no** en plataformas serverless | En producción, Supabase (ya preparado) |
 | Revocación de sesión | JWT sin estado: una sesión robada vale hasta que vence (12 h) | Lista de revocación o sesiones de Supabase con refresh corto |
 | Bloqueo por email | 5 fallos bloquean ese email 15 min: un tercero puede bloquear a un usuario a propósito | CAPTCHA tras fallos, avisos al usuario, bloqueo progresivo |
 | Recuperación del 2FA | No hay códigos de respaldo | Códigos de recuperación y proceso de soporte verificado |
@@ -82,6 +92,7 @@
 
 **Base de datos y RLS**
 - [ ] Todas las tablas con RLS forzado; ninguna política `using (true)` para `authenticated`.
+- [ ] Privilegios de tabla de `anon` y `authenticated` en la instancia real iguales a los del test `tests/rls/privilegios.test.ts` (Supabase otorga ALL por defecto; la migración 0800 lo corrige).
 - [ ] `security definer` con `search_path` fijo y `execute` revocado donde corresponde.
 - [ ] Columnas protegidas (costos) inaccesibles por la API REST de Supabase.
 - [ ] Exigencia de `aal2` para dueño y administración.

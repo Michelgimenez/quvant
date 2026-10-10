@@ -25,6 +25,7 @@ export const FERREMIX: ClienteDemo = {
     { area: "Presupuestos y clientes", detalle: "[COMPLETAR: cómo arman y siguen presupuestos]" },
   ],
   sucursales: ["[COMPLETAR: sucursales]"],
+  plazo: "[COMPLETAR: según sucursales y migración]",
   contacto: {
     nombre: "[COMPLETAR: nombre y apellido]",
     email: "[COMPLETAR: email]",

@@ -1,6 +1,9 @@
 import type { NextConfig } from "next"
 
 const esDev = process.env.NODE_ENV === "development"
+// HSTS y upgrade-insecure-requests solo si el sitio se publica por https: servidos por
+// http (p. ej. `npm start` en una PC) hacen que el navegador pida a https://localhost y falle.
+const conHttps = (process.env.NEXT_PUBLIC_SITIO_URL ?? "").startsWith("https://")
 const supabase = process.env.NEXT_PUBLIC_SUPABASE_URL ?? ""
 const supabaseWs = supabase.replace(/^http/, "ws")
 
@@ -23,7 +26,7 @@ const csp = [
   "base-uri 'self'",
   "form-action 'self'",
   "frame-ancestors 'none'",
-  ...(esDev ? [] : ["upgrade-insecure-requests"]),
+  ...(conHttps ? ["upgrade-insecure-requests"] : []),
 ].join("; ")
 
 const encabezadosSeguridad = [
@@ -34,7 +37,7 @@ const encabezadosSeguridad = [
   // La cámara se usa para escanear códigos en inventario y mostrador.
   { key: "Permissions-Policy", value: "camera=(self), microphone=(), geolocation=(), payment=()" },
   { key: "Cross-Origin-Opener-Policy", value: "same-origin" },
-  ...(esDev ? [] : [{ key: "Strict-Transport-Security", value: "max-age=63072000; includeSubDomains; preload" }]),
+  ...(conHttps ? [{ key: "Strict-Transport-Security", value: "max-age=63072000; includeSubDomains; preload" }] : []),
 ]
 
 const nextConfig: NextConfig = {
@@ -42,6 +45,8 @@ const nextConfig: NextConfig = {
   partialPrefetching: true,
   poweredByHeader: false,
   reactStrictMode: true,
+  // PGlite (base local del modo demo) carga WASM y archivos de datos: no se empaqueta
+  serverExternalPackages: ["@electric-sql/pglite"],
   experimental: {
     // Navegaciones y Server Actions quedan pendientes (no fallan) sin conexión.
     useOffline: true,

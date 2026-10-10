@@ -2,7 +2,7 @@ import type { Metadata } from "next"
 import { Suspense } from "react"
 import { PuertaClave } from "@/components/presentacion/puerta-clave"
 import { CONTACTO_INVERSORES, EQUIPO, INVERSION } from "@/config/inversion"
-import { claveInversores, tieneAccesoInversores } from "@/lib/auth/presentaciones"
+import { ACCESO_INVERSORES } from "@/lib/auth/presentaciones"
 import { entrarInversores } from "./acciones"
 import { DeckInversores } from "./deck"
 
@@ -20,13 +20,13 @@ export default function PaginaInversores() {
 }
 
 async function Contenido() {
-  if (!(await tieneAccesoInversores())) {
+  if (!(await ACCESO_INVERSORES.tiene())) {
     return (
       <PuertaClave
         titulo="Presentación para inversores"
         bajada="Contenido confidencial. Ingresá la clave que te compartimos."
         accion={entrarInversores}
-        habilitada={claveInversores() !== null}
+        habilitada={ACCESO_INVERSORES.clave() !== null}
       />
     )
   }

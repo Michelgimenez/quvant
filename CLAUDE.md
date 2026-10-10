@@ -22,6 +22,7 @@ Al terminar o cambiar una funcionalidad:
 - Código, rutas y nombres de dominio en español (`producto`, `sucursal`, `venta`). Componentes de shadcn en `src/components/ui` (no editar salvo estilo).
 - Lógica de negocio pura en `src/dominio/` (sin React, sin IO) y con tests en `tests/unit/`.
 - Toda tabla de negocio lleva `org_id`; las políticas RLS viven en `supabase/migrations/` y se prueban en `tests/rls/`.
+- Toda tabla nueva de `public` necesita privilegios explícitos para `anon`/`authenticated` (Supabase otorga ALL por defecto; la 0800 lo revoca a futuro y `tests/rls/privilegios.test.ts` lo controla).
 - La app es local-first: la UI lee de la réplica local y escribe operaciones en la cola (`src/sync/`). Nunca escribir directo al servidor desde un componente.
 - Animación solo con `transform`, `opacity` y trazos SVG. Respetar `prefers-reduced-motion`.
 - Componentes compartidos en `src/components/`, nunca importados desde la carpeta de otra ruta de `src/app/` (provoca recargas en bucle en desarrollo).

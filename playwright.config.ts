@@ -29,6 +29,6 @@ export default defineConfig({
     url: `http://localhost:${PUERTO}/api/salud`,
     reuseExistingServer: !process.env.CI,
     timeout: 120_000,
-    env: { INVERSORES_KEY: "yunque-demo", SESION_SECRETO: "secreto-de-pruebas-e2e-no-usar-en-produccion" },
+    env: { INVERSORES_KEY: "yunque-demo", PANEL_KEY: "yunque-panel", SESION_SECRETO: "secreto-de-pruebas-e2e-no-usar-en-produccion" },
   },
 })

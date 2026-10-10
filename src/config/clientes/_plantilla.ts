@@ -16,5 +16,6 @@ export const PLANTILLA: ClienteDemo = {
   fuenteCategorias: "[COMPLETAR: de dónde salen]",
   problemas: [{ area: "[COMPLETAR: área]", detalle: "[COMPLETAR: problema detectado]" }],
   sucursales: ["[COMPLETAR: sucursales]"],
+  plazo: "[COMPLETAR: plazo estimado]",
   contacto: { nombre: "[COMPLETAR]", email: "[COMPLETAR]", telefono: "[COMPLETAR]" },
 }

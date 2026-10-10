@@ -47,3 +47,4 @@ Mercado Pago, Mercado Libre y WhatsApp Business conectados de verdad (hoy emulad
 - Completar los `[COMPLETAR]` de la presentación (mercado con fuente, hallazgos del terreno, monto, equipo, contacto) y de la demo de Ferremix (categorías, problemas, sucursales).
 - Comparar con el proyecto de Ferremix cuando haya acceso e integrar lo mejor de ese código.
 - Aprobación intermedia en el cierre de conteos si un cliente la pide.
+- Panel interno (`/panel`): usuarios individuales del equipo en lugar de una clave compartida, registro de quién contactó cada solicitud y aviso de privacidad en el formulario "Pedir una demo".

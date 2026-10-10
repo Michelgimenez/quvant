@@ -34,6 +34,18 @@ test.describe("ingreso", () => {
     await expect(page).toHaveURL(/\/app$/)
   })
 
+  test("administración también exige doble factor: sin código no entra a la app", async ({ page }) => {
+    await page.goto("/ingresar")
+    await page.getByLabel("Email").fill("admin@demo.yunque.app")
+    await page.getByLabel("Contraseña").fill("demo1234")
+    await page.getByRole("button", { name: "Ingresar" }).click()
+    await expect(page).toHaveURL(/\/ingresar\/verificar/)
+    // Saltear la verificación yendo directo a la app vuelve a pedir el ingreso
+    await page.goto("/app")
+    await expect(page).toHaveURL(/\/ingresar/)
+    await expect(page).not.toHaveURL(/\/app$/)
+  })
+
   test("bloquea tras 5 intentos fallidos", async ({ page }) => {
     await page.goto("/ingresar")
     for (let i = 0; i < 5; i++) {

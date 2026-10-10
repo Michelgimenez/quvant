@@ -3,6 +3,7 @@ import { ConYunque } from "@/components/marca/con-yunque"
 import { Chispa, Isotipo, Logo, Wordmark } from "@/components/marca/marca"
 import { EstadoFeatureBadge, Ficha, Sello, TextoConfig } from "@/components/base/sellos"
 import { Button } from "@/components/ui/button"
+import { SITIO } from "@/config/sitio"
 import { Kbd } from "@/components/ui/kbd"
 import { DemoAnimaciones } from "./demo-animaciones"
 
@@ -86,7 +87,7 @@ export default function PaginaMarca() {
             <Chispa className="size-5" titulo="Chispa" />
           </div>
           <p>
-            <TextoConfig texto="Contacto: [COMPLETAR: email de contacto]" />
+            <TextoConfig texto={`Contacto: ${SITIO.contacto.email}`} />
           </p>
         </section>
 

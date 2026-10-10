@@ -26,6 +26,8 @@ export type ClienteDemo = {
   problemas: { area: string; detalle: string }[]
   /** Sucursales o puntos de venta, si se conocen. */
   sucursales: string[]
+  /** Plazo estimado de implementación (escena "Cómo empezamos"). */
+  plazo: string
   /** Quién presenta la demo (vendedor de Yunque). */
   contacto: { nombre: string; email: string; telefono: string }
 }

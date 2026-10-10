@@ -309,7 +309,7 @@ function ComoEmpezamos() {
         </ol>
       </div>
       <Aparecer demora={2.4} className="mt-20 text-[26px] text-acero">
-        Plazo estimado: <TextoConfig texto="[COMPLETAR: según sucursales y migración]" />. Sucursales: {cliente.sucursales.map((s, i) => (
+        Plazo estimado: <TextoConfig texto={cliente.plazo} />. Sucursales: {cliente.sucursales.map((s, i) => (
           <span key={s}>
             {i > 0 && ", "}
             <TextoConfig texto={s} />

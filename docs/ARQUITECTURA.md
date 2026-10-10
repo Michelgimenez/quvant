@@ -32,6 +32,7 @@ src/
     ingresar/          ingreso, doble factor
     inversores/        presentación con clave
     demo/[cliente]/    demo comercial por prospecto
+    panel/             panel interno del equipo (solicitudes de demo, con clave)
     api/               salud, sesión, errores, código 2FA de la demo
   components/
     app/               shell, tablero, tablas, escáner, paleta de comandos
@@ -80,6 +81,7 @@ flowchart LR
 | Servidor de sincronización | `ServidorDemo`: log en IndexedDB + Web Locks; varias pestañas = varios dispositivos | `public.aplicar_operacion()` |
 | Ingreso | usuarios de prueba, contraseña `demo1234`, TOTP emulado | Supabase Auth + miembros |
 | Límite de intentos | en memoria (una instancia) | `app.ingreso_permitido()` en la base |
+| Solicitudes de "Pedir una demo" | base PostgreSQL local (PGlite en `.data/base-local`, con el shim de Supabase y las mismas migraciones) | tabla `solicitudes_demo` |
 
 ## Modelo de datos multiempresa
 
@@ -89,6 +91,8 @@ flowchart LR
 - **RLS**: activado y forzado en todas las tablas. `authenticated` solo tiene `SELECT` filtrado por organización (y sucursal donde aplica). Las columnas de costo (`productos.costo`, `venta_items.costo_unitario`) no se otorgan: se leen con `app.costos_productos()` si el rol tiene `costos.ver`.
 - **Escrituras**: solo por `public.aplicar_operacion(op jsonb)` (security definer). Valida permiso y sucursal, aplica la operación en una subtransacción y registra en `operaciones`; los rechazos de negocio (SQLSTATE propio `YQ001`) van a `operaciones_rechazadas`.
 - **Auditoría**: trigger `app.auditar()` en las tablas de negocio; `auditoria`, `movimientos_stock`, `movimientos_cuenta` y `operaciones` son de **solo agregar** (trigger que impide update/delete/truncate).
+- **Privilegios explícitos**: la migración `0800_privilegios_api` revoca los privilegios que Supabase otorga por defecto a `anon` y `authenticated` sobre las tablas de `public` (también las futuras). El shim de los tests (`supabase/local/shim-supabase.sql`) replica ese comportamiento de Supabase para que los tests prueben el caso real.
+- **Solicitudes de demo** (`solicitudes_demo`): el sitio inserta columnas puntuales como `anon`; el panel interno (`/panel`, con clave) lee y marca como contactadas con `service_role`, solo del lado servidor.
 - **Importes en centavos** (enteros) en todo el sistema; cantidades con 3 decimales.
 
 ## Sincronización sin conexión
@@ -137,9 +141,10 @@ flowchart LR
 | Suite | Qué cubre | Comando |
 |---|---|---|
 | Unitarios | dinero, precios, importación, permisos, motor de sincronización y conflictos, honestidad | `npm test` |
-| RLS (PGlite) | aislamiento entre empresas, columnas protegidas, 2FA en la base, función de operaciones; incluye control negativo | `npm test` |
+| RLS (PGlite) | aislamiento entre empresas, columnas protegidas, 2FA en la base, función de operaciones, matriz de privilegios de la API, solicitudes de demo; incluye controles negativos | `npm test` |
 | E2E (Playwright) | ingreso y 2FA, venta de mostrador, presupuesto → venta, venta sin conexión con recarga, módulos por rol, sitio, presentaciones | `npm run build && npm run test:e2e` |
 | Capturas | todas las pantallas en 1440×900 y 390×844 | `npm run build && npm run capturas` |
+| Revisión | recorrido completo (sitio, cada usuario de prueba y cada módulo, presentaciones) con registro de errores | `npm run build && npx tsx scripts/revision.ts` |
 
 `npm run verificar` corre typecheck + lint + tests + build.
 
@@ -151,7 +156,7 @@ flowchart LR
 | Falta el adaptador `ServidorSupabase` del lado del cliente y la carga inicial (snapshot) desde la base | El modo Supabase no sincroniza todavía | Implementar `Servidor` con `rpc('aplicar_operacion')` y lectura paginada por `seq` |
 | Modo Supabase sin probar contra una instancia real | Riesgo de diferencias de configuración (esquema `app` expuesto para las RPC de servicio, políticas de Auth) | Staging con Supabase y los mismos tests de RLS |
 | Ids de operaciones del importador no son UUID | Inconsistente con el resto | Generar UUID por fila |
-| Límite de intentos en memoria en modo demo; solicitudes de demo en `.data/*.jsonl` | No sirve con varias instancias ni en serverless | En producción ya existe la versión en la base |
+| Límite de intentos en memoria en modo demo; base local (PGlite) para las solicitudes en modo demo | No sirve con varias instancias ni en serverless | En producción, Supabase (ya preparado para ambos) |
 | CSP con `'unsafe-inline'` | Menor defensa ante XSS | Nonces (implica render dinámico) — ver SEGURIDAD.md |
 | En modo demo los datos viven en el navegador | La autorización por rol en la demo es solo de interfaz | Es intencional para la demo; en producción manda RLS |
 | Cierre de conteos | Ajusta todas las diferencias de una vez, sin aprobación intermedia | Flujo de aprobación si el cliente lo pide |

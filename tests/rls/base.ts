@@ -8,7 +8,7 @@ import path from "node:path"
  */
 export async function crearBase() {
   const db = new PGlite()
-  await db.exec(readFileSync(path.join(__dirname, "shim-supabase.sql"), "utf8"))
+  await db.exec(readFileSync(path.join(process.cwd(), "supabase", "local", "shim-supabase.sql"), "utf8"))
   const dir = path.join(process.cwd(), "supabase", "migrations")
   for (const archivo of readdirSync(dir).filter((f) => f.endsWith(".sql")).sort()) {
     try {

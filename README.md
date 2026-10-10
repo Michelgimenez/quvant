@@ -28,6 +28,7 @@ conexión, usar "simular corte" en el indicador de conexión de la app.
 | `npm test` | tests unitarios y de RLS (PostgreSQL en WASM, sin Docker) |
 | `npm run build && npm run test:e2e` | tests de punta a punta con Playwright (levanta `next start` en el puerto 3100) |
 | `npm run build && npm run capturas` | capturas de todas las pantallas en `docs/capturas/` (1440×900 y 390×844) |
+| `npm run build && npx tsx scripts/revision.ts` | recorrido de revisión con registro de errores de consola (`docs/capturas/revision/`) |
 
 La primera vez que se corren los e2e o las capturas: `npx playwright install chromium`.
 
@@ -39,6 +40,7 @@ La primera vez que se corren los e2e o las capturas: `npx playwright install chr
 | `/ingresar` → `/app` | la app (usuarios de prueba abajo) |
 | `/inversores` | presentación para inversores (con clave) |
 | `/demo/ferremix` | demo comercial "Así se vería Yunque en Ferremix" (sello PROPUESTA) |
+| `/panel` | panel interno del equipo: solicitudes de "Pedir una demo" (con clave) |
 | `/estado` | página de estado |
 | `/marca` | identidad: logo, colores, sello "con yunque" |
 
@@ -77,6 +79,11 @@ En producción, sin `INVERSORES_KEY` la presentación queda cerrada.
 | **Inicio / Fin** | primera / última escena |
 | **F** | pantalla completa |
 | `#N` en la URL | ir a la escena N (por ejemplo `/inversores#5`) |
+
+**Clave de `/panel`:** la variable `PANEL_KEY` (en desarrollo, si falta, `yunque-panel`; en producción sin
+`PANEL_KEY` queda cerrado). Muestra cada solicitud de "Pedir una demo" con su WhatsApp, avisa cuántas hay
+nuevas y permite marcarlas como contactadas. Sin Supabase, las solicitudes se guardan en una base PostgreSQL
+local (`.data/base-local`, mismo esquema que producción).
 
 Para sumar un prospecto a la demo comercial: copiar `src/config/clientes/_plantilla.ts`, poner sus logos en
 `public/clientes/<slug>/` y registrarlo en `src/config/clientes/index.ts`. La demo queda en `/demo/<slug>`.
