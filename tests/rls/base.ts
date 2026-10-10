@@ -33,6 +33,8 @@ export async function como<T>(
   fn: (tx: Transaction) => Promise<T>,
   /** SQL a ejecutar como superusuario antes de cambiar de rol (se revierte al final). */
   preparar?: string,
+  /** true: confirma la transacción en vez de revertirla (para pruebas en varios pasos). */
+  confirmar = false,
 ): Promise<T> {
   let resultado: T
   let error: unknown
@@ -56,7 +58,7 @@ export async function como<T>(
       } catch (e) {
         error = e
       }
-      await tx.rollback()
+      if (!confirmar || error) await tx.rollback()
     })
     .catch(() => {})
   if (error) throw error

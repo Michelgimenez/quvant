@@ -19,6 +19,7 @@ const PUERTO = Number(process.env.PUERTO_CAPTURAS ?? 3200)
 const BASE = `http://localhost:${PUERTO}`
 const SALIDA = path.join(process.cwd(), "docs", "capturas")
 const PUBLICAS = path.join(process.cwd(), "public", "capturas")
+const RELOJ = process.env.RELOJ_CAPTURAS ?? "2026-10-07T16:30:00-03:00"
 
 const VISTAS = [
   { nombre: "escritorio", width: 1440, height: 900, escala: 1 },
@@ -84,6 +85,8 @@ async function capturar(browser: Browser, p: Pantalla) {
       colorScheme: p.tema === "claro" ? "light" : "dark",
     })
     const page = await ctx.newPage()
+    // Reloj fijo (miércoles 16:30 en Argentina): datos de demo idénticos en todas las capturas.
+    await page.clock.install({ time: new Date(RELOJ) })
     if (p.usuario) await ingresar(page, p.usuario)
     if (p.tema === "claro") {
       await page.addInitScript(() => localStorage.setItem("theme", "light"))

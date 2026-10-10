@@ -1,4 +1,8 @@
-// Provisorio: la app se construye en la fase 3.
-export default function App() {
-  return <main className="p-8">Yunque · app en construcción</main>
+import type { Metadata } from "next"
+import { Tablero } from "./tablero"
+
+export const metadata: Metadata = { title: "Tablero" }
+
+export default function PaginaTablero() {
+  return <Tablero />
 }

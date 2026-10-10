@@ -37,6 +37,11 @@
   --color-superficie: var(--superficie);
   --color-superficie-2: var(--superficie-2);
   --color-linea: var(--linea);
+  --color-serie-1: var(--serie-1);
+  --color-serie-2: var(--serie-2);
+  --color-serie-3: var(--serie-3);
+  --color-serie-4: var(--serie-4);
+  --color-serie-tenue: var(--serie-tenue);
 
   /* Color de la organización (co-branding), lo define el AppShell */
   --color-marca: var(--marca);
@@ -130,10 +135,17 @@
   --linea: #d5dae0;
   --grilla: rgb(14 17 22 / 0.045);
 
-  --chart-1: #3466f0;
-  --chart-2: #d08700;
-  --chart-3: #17794a;
-  --chart-4: #8a5cf6;
+  /* Series de gráficos (validadas con el validador de dataviz, modo claro sobre #fff).
+     El aqua queda bajo 3:1: los gráficos llevan etiquetas o vista de tabla. */
+  --serie-1: #3466f0;
+  --serie-2: #eb6834;
+  --serie-3: #1baf7a;
+  --serie-4: #c98500;
+  --serie-tenue: #c9cfd6;
+  --chart-1: var(--serie-1);
+  --chart-2: var(--serie-2);
+  --chart-3: var(--serie-3);
+  --chart-4: var(--serie-4);
   --chart-5: #5b6470;
 
   --sidebar: #ffffff;
@@ -176,10 +188,16 @@
   --linea: rgb(154 163 174 / 0.16);
   --grilla: rgb(238 241 244 / 0.035);
 
-  --chart-1: #6e93f8;
-  --chart-2: #ffb224;
-  --chart-3: #3fc580;
-  --chart-4: #b197fc;
+  /* Series de gráficos, modo oscuro (validadas sobre #1a1f27 y #0e1116). */
+  --serie-1: #5b83f6;
+  --serie-2: #d95926;
+  --serie-3: #199e70;
+  --serie-4: #c98500;
+  --serie-tenue: #3a414c;
+  --chart-1: var(--serie-1);
+  --chart-2: var(--serie-2);
+  --chart-3: var(--serie-3);
+  --chart-4: var(--serie-4);
   --chart-5: #9aa3ae;
 
   --sidebar: #12161c;
@@ -318,5 +336,21 @@
   100% {
     opacity: 0;
     transform: translate(-50%, -4px);
+  }
+}
+
+/* Impresión de comprobantes: solo se imprime el área de impresión. */
+.area-impresion {
+  display: none;
+}
+@media print {
+  body > *:not(.area-impresion) {
+    display: none !important;
+  }
+  .area-impresion {
+    display: block !important;
+  }
+  @page {
+    margin: 8mm;
   }
 }

@@ -23,6 +23,15 @@
 | D14 | Modo demo: autenticador TOTP emulado; el código vigente se muestra en pantalla **solo en modo demo** y solo a quien ya pasó la contraseña. | Permite mostrar el flujo de 2FA sin un teléfono. En modo Supabase ese endpoint no existe (404). |
 | D15 | Ingreso: mismo mensaje para email inexistente y contraseña incorrecta; límite de 5 fallos por email y 20 por IP cada 15 minutos (en memoria en demo; en la base con `app.ingreso_permitido()` en producción). | Evita enumeración de usuarios y fuerza bruta. |
 | D16 | Importes en **centavos** (enteros) en todo el sistema; cantidades con 3 decimales. | Sin errores de redondeo de punto flotante en totales y saldos. |
+| D17 | Arquitectura **local-first**: la app lee de una réplica local y escribe operaciones idempotentes en una cola (IndexedDB). Estado visible = base confirmada + pendientes reaplicadas (*rebase*). | El mostrador sin conexión no es un modo especial: es como funciona siempre. |
+| D18 | Un **mismo reductor** (`src/sync/reductores.ts`) aplica las operaciones en el navegador (optimista) y en el servidor demo (autoritativo). En producción, la función SQL `aplicar_operacion` implementa las mismas reglas. | Una sola definición de las reglas de negocio y de conflicto, testeada en ambos lados. |
+| D19 | Reglas de conflicto: las ventas siempre se aceptan (stock negativo, precio distinto de lista, límite excedido y caja cerrada quedan como **advertencias**); stock por deltas; una sola conversión de presupuesto gana; cerrar una caja ya cerrada se rechaza; fichas con última escritura por campo e informe de conflicto. | En un mostrador la venta ya ocurrió: rechazarla al sincronizar sería perder plata. |
+| D20 | Servidor demo **emulado en el navegador** con su log en IndexedDB y Web Locks: varias pestañas se comportan como varios dispositivos. | Permite mostrar conflictos y sincronización reales sin backend. |
+| D21 | La empresa demo se ancla al primer uso del día y se **renueva cada día** (avisa). | Los ids de ventas/presupuestos dependen del día de la semilla. |
+| D22 | Números **provisorios** locales (`CC1-L0007`) y **definitivos** asignados por el servidor al sincronizar; al reaplicar operaciones confirmadas se usa el número que asignó el servidor. | La numeración fiscal no puede depender de un dispositivo desconectado. |
+| D23 | La función SQL implementa hoy 7 tipos de operación (venta, presupuesto guardar/convertir, ajuste, transferencia, cierre de caja, cobro). El resto devuelve **error temporal**: la operación queda en la cola del dispositivo, no se pierde. | Honestidad sobre el alcance; deuda documentada. |
+| D24 | Gráficos en SVG propio con la paleta de series **validada** con el validador de dataviz (modo claro y oscuro); vista de tabla en cada gráfico. | Control total de accesibilidad y peso. |
+| D25 | Service worker escrito a mano (`public/sw.js`): precarga las rutas clave y sus chunks; estáticos cache-first; páginas de `/app` network-first con respaldo. | Serwist y similares dependen de webpack; con Turbopack, un SW chico es más predecible. |
 
 ## Fases
 
@@ -46,3 +55,16 @@
 - Empresa demo determinística (`src/datos/demo/`): 2 negocios, 3 sucursales, 290 productos en 16 categorías, 3 listas de precios, 120 clientes, ~4.300 ventas en 6 meses, ~400 presupuestos, ~200 órdenes de servicio, reposición automática, transferencias, conteos, cajas, entregas y 3 aumentos de precios históricos coherentes con los precios de cada venta. Se genera en ~300 ms en el navegador.
 - Ingreso: pantalla con la marca del cliente y "con yunque" discreto, usuarios de prueba, 2FA para Dueño/Administración, límite de intentos, sesión firmada (cookie httpOnly) y `proxy.ts` que protege `/app`.
 - Tests e2e de ingreso (Playwright): redirección sin sesión, error genérico, 2FA, bloqueo por intentos.
+
+### Fase 3 — App: tablero, inventario, precios, mostrador sin conexión, presupuestos
+- **Motor de sincronización** (`src/sync/`): operaciones idempotentes, cola en IndexedDB, rebase, eventos; servidor demo emulado; 31 tipos de operación con validación previa (si se rechaza, el estado no cambia).
+- **Función de producción** `public.aplicar_operacion(op)` (security definer): idempotencia, autor = `auth.uid()`, permiso y sucursal, subtransacción (todo o nada), log `operaciones` con RLS y `operaciones_rechazadas`.
+- **Shell**: co-branding (logo y color de acento de la organización, "con yunque" al pie), navegación por rol y módulos activos, barra inferior en celular, selector de sucursal, indicador de conexión con la cola y "simular corte", ⌘K (módulos, productos, clientes, acciones), atajos `g + letra`, `?`, `/`.
+- **Tablero** por rol: dirección (ventas de hoy por negocio y sucursal, 30 días por negocio, mes, ticket, margen, presupuestos, lo más vendido, "para atender hoy", actividad), mostrador/depósito y taller.
+- **Inventario**: tabla virtualizada con stock por sucursal, filtros, ficha de producto (stock, precios por lista y márgenes, movimientos), ajustes con motivo, transferencias, alta de productos, **escaneo con la cámara** (BarcodeDetector o ZXing; "simular lectura" en la demo) y **conteos** (chispa si cierra sin diferencias).
+- **Precios**: aumento masivo por marca/categoría/proveedor con vista previa (productos afectados, aumento real tras redondeo, márgenes bajos, impacto en stock valorizado), historial y reversión.
+- **Mostrador**: lector/teclado (F2, F4, F8, Esc, +/−), descuentos, cliente con cuenta corriente, entrega a domicilio, cobro con varios medios (Mercado Pago **emulado** con QR), vuelto, ticket imprimible ("sin validez fiscal" mientras ARCA esté emulado), caja (apertura, retiros, **cierre con arqueo y chispa**), venta en curso que sobrevive a una recarga.
+- **Presupuestos**: lista con filtros, editor, envío por WhatsApp (**emulado**), aceptado/rechazado, **conversión a venta con chispa**, impresión.
+- **PWA**: manifiesto y service worker; la app abre sin conexión.
+- Tests: 85 unitarios + RLS (incluye 9 de sincronización y conflictos, 13 de la función SQL de operaciones) y 7 e2e (incluye venta sin conexión con recarga sin internet).
+- Bug encontrado por los tests y corregido: `app.puede_sucursal()` no comparaba la sucursal pedida (respondía "sí" si el usuario tenía el permiso en cualquier sucursal).

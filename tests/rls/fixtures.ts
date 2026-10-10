@@ -53,7 +53,6 @@ export async function sembrar(db: PGlite) {
       insert into movimientos_cuenta (org_id, cliente_id, tipo, importe) values ('${org}', '${cli}', 'venta', 180000);
       insert into aumentos_precio (org_id, usuario_id, descripcion, porcentaje, lista_ids)
         values ('${org}', '${id(`u${letra}`, 1)}', 'Aumento ${letra}', 10, array['${lista}']::uuid[]);
-      insert into numeradores (org_id, clave, ultimo) values ('${org}', 'venta', 1);
     `)
 
     for (const [i, s] of suc.entries()) {
@@ -62,6 +61,7 @@ export async function sembrar(db: PGlite) {
       const caja = id(`k${letra}`, i + 1)
       await db.exec(`
         insert into sucursales (id, org_id, negocio_id, nombre, codigo) values ('${s}', '${org}', '${n}', 'Suc ${i}', '${letra.toUpperCase()}${i + 1}');
+        insert into numeradores (org_id, clave, ultimo) values ('${org}', 'venta:${letra.toUpperCase()}${i + 1}', 100), ('${org}', 'presupuesto:${letra.toUpperCase()}${i + 1}', 100);
         insert into stock (org_id, sucursal_id, producto_id, cantidad) values ('${org}', '${s}', '${prod}', 10);
         insert into movimientos_stock (org_id, sucursal_id, producto_id, tipo, cantidad) values ('${org}', '${s}', '${prod}', 'inicial', 10);
         insert into ventas (id, org_id, negocio_id, sucursal_id, numero, numero_local, fecha, lista_id, total, vendedor_id)

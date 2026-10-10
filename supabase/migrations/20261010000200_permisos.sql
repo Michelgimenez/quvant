@@ -106,7 +106,7 @@ returns boolean
 language sql stable security definer
 set search_path = ''
 as $$
-  select exists (select 1 from app.orgs_con_permiso(p_permiso) o where o = p_org)
+  select exists (select 1 from app.orgs_con_permiso(p_permiso) as o (id) where o.id = p_org)
 $$;
 
 create or replace function app.puede_sucursal(p_org uuid, p_sucursal uuid, p_permiso text)
@@ -115,8 +115,10 @@ language sql stable security definer
 set search_path = ''
 as $$
   select exists (
-    select 1 from app.sucursales_con_permiso(p_permiso) s
-    join public.sucursales su on su.id = s and su.org_id = p_org
+    select 1
+    from app.sucursales_con_permiso(p_permiso) as s (id)
+    join public.sucursales su on su.id = s.id
+    where s.id = p_sucursal and su.org_id = p_org
   )
 $$;
 

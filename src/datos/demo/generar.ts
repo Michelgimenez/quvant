@@ -525,8 +525,8 @@ export function generarEmpresaDemo(opciones: OpcionesDemo = {}): EstadoEmpresa {
         const porProveedor: Record<Id, OrdenCompra["items"]> = {}
         for (const p of listaProductos) {
           const st = stock[claveStock(s.id, p.id)]
-          if (!st || st.cantidad > st.minimo) continue
-          const cant = Math.max(st.minimo * 2 - st.cantidad, info[p.id].maquina ? 1 : 5)
+          if (!st || st.cantidad > st.minimo * 1.4) continue
+          const cant = Math.max(st.minimo * 3 - st.cantidad, info[p.id].maquina ? 1 : 5)
           ;(porProveedor[p.proveedorId] ??= []).push({ productoId: p.id, cantidad: Math.ceil(cant), costoUnitario: costoEnDia(p, d), recibido: 0 })
         }
         for (const [provId, items] of Object.entries(porProveedor)) {

@@ -298,3 +298,22 @@ describe("límite de intentos de ingreso", () => {
     expect(estado).toEqual({ permitido: true, restantes: 4 })
   })
 })
+
+describe("funciones de permiso", () => {
+  it("puede_sucursal distingue sucursales y organizaciones", async () => {
+    const r = await como(db, { sub: USR.mostradorA1 }, async (tx) => {
+      const q = async (org: string, suc: string) =>
+        (await tx.query<{ p: boolean }>(`select app.puede_sucursal($1, $2, 'mostrador.vender') as p`, [org, suc])).rows[0].p
+      return { propia: await q(ORG.A, SUC.A1), otraSucursal: await q(ORG.A, SUC.A2), otraOrg: await q(ORG.B, SUC.B1), cruzada: await q(ORG.B, SUC.A1) }
+    })
+    expect(r).toEqual({ propia: true, otraSucursal: false, otraOrg: false, cruzada: false })
+  })
+
+  it("tiene_permiso respeta organización y rol", async () => {
+    const r = await como(db, { sub: USR.tecnicoA }, async (tx) => {
+      const q = async (org: string, p: string) => (await tx.query<{ p: boolean }>(`select app.tiene_permiso($1, $2) as p`, [org, p])).rows[0].p
+      return { servicio: await q(ORG.A, "servicio.editar"), vender: await q(ORG.A, "mostrador.vender"), otraOrg: await q(ORG.B, "servicio.editar") }
+    })
+    expect(r).toEqual({ servicio: true, vender: false, otraOrg: false })
+  })
+})
