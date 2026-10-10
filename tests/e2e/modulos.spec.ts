@@ -49,6 +49,8 @@ test.describe("módulos", () => {
   })
 
   test("taller: el equipo pasa a listo y queda el aviso por WhatsApp (emulado)", async ({ page }) => {
+    // La demo se genera según la fecha: con reloj fijo siempre hay equipos en reparación
+    await page.clock.install({ time: new Date("2026-10-07T15:30:00-03:00") })
     await ingresar(page, "tecnico@demo.yunque.app", "/app/servicio")
     await page.getByLabel("Solo mis órdenes").uncheck()
     const tarjeta = page.getByRole("region", { name: "En reparación" }).getByRole("button").first()

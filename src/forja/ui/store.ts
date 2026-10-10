@@ -3,6 +3,7 @@
 import { createStore, useStore } from "zustand"
 import { createContext, useContext } from "react"
 import type { Id } from "@/dominio/tipos"
+import type { TipoZona } from "@/forja/dominio/plano"
 
 /**
  * Estado de la escena de Forja (no los datos: esos vienen de la fuente).
@@ -18,8 +19,12 @@ export type EstadoEscena = {
   /** Nodo bajo el cursor o con foco de teclado (tarjeta). */
   resaltado: Id | null
   transferenciaId: Id | null
-  /** Zona del taller seleccionada (panel lateral). */
-  zona: { tipo: "mostrador" | "deposito" | "servicio" | "muelle"; id: string } | null
+  /** Zona del taller seleccionada (panel lateral); `id` elige un rack o una orden dentro de la zona. */
+  zona: { tipo: TipoZona; id: string | null } | null
+  /** Zona bajo el cursor o con foco (contorno --temple). */
+  zonaResaltada: TipoZona | null
+  /** Rack bajo el cursor (tooltip con productos y cantidades). */
+  rackResaltado: string | null
   /** Producto o máquina del nivel 3. */
   pieza: { tipo: "producto" | "maquina"; id: Id } | null
   /** Transición en curso entre niveles (bloquea la entrada). */
@@ -31,6 +36,8 @@ export type EstadoEscena = {
   volverARed: () => void
   setTransicion: (t: EstadoEscena["transicion"]) => void
   elegirZona: (z: EstadoEscena["zona"]) => void
+  resaltarZona: (z: TipoZona | null) => void
+  resaltarRack: (id: string | null) => void
   verPieza: (p: EstadoEscena["pieza"]) => void
 }
 
@@ -42,15 +49,19 @@ export function crearStoreEscena() {
     resaltado: null,
     transferenciaId: null,
     zona: null,
+    zonaResaltada: null,
+    rackResaltado: null,
     pieza: null,
     transicion: null,
     setVista: (vista) => set({ vista, transferenciaId: null }),
     resaltar: (resaltado) => set({ resaltado }),
     elegirTransferencia: (transferenciaId) => set({ transferenciaId }),
-    entrarSucursal: (sucursalId) => set({ nivel: "taller", sucursalId, resaltado: null, transferenciaId: null, zona: null }),
-    volverARed: () => set({ nivel: "red", zona: null, pieza: null }),
+    entrarSucursal: (sucursalId) => set({ nivel: "taller", sucursalId, resaltado: null, transferenciaId: null, zona: null, zonaResaltada: null, rackResaltado: null }),
+    volverARed: () => set({ nivel: "red", zona: null, zonaResaltada: null, rackResaltado: null, pieza: null }),
     setTransicion: (transicion) => set({ transicion }),
-    elegirZona: (zona) => set({ zona }),
+    elegirZona: (zona) => set({ zona, rackResaltado: null }),
+    resaltarZona: (zonaResaltada) => set({ zonaResaltada }),
+    resaltarRack: (rackResaltado) => set({ rackResaltado }),
     verPieza: (pieza) => set({ pieza, nivel: pieza ? "pieza" : "red" }),
   }))
 }

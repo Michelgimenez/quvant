@@ -11,6 +11,7 @@ import { rgb255Calor } from "@/forja/dominio/calor"
 import { grosorEnlace, layoutConstelacion } from "@/forja/dominio/constelacion"
 import { avanceTransito, puntoEnArco, puntosArco, type Punto3D } from "@/forja/dominio/geo"
 import type { EventoForja, NodoForja, RedForja, TransferenciaForja } from "@/forja/dominio/modelo"
+import { hora } from "../formato"
 import { useEscenaForja } from "../store"
 import { ESTILO_CARTO, teñirMapa } from "./estilo-mapa"
 import { NodoRed } from "./nodo-red"
@@ -35,6 +36,21 @@ type Pulso = { nodoId: Id; t0: number }
 
 const DURACION_PULSO = 1400
 
+/**
+ * Resuelve cuando termina el movimiento de cámara recién iniciado. Se escucha
+ * después de iniciarlo: si cortó otro movimiento, el "moveend" de ese no cuenta.
+ */
+function finDelMovimiento(mapa: maplibregl.Map, duracionMs: number) {
+  if (!mapa.isMoving()) return Promise.resolve()
+  return new Promise<void>((ok) => {
+    const tope = window.setTimeout(ok, duracionMs + 800)
+    mapa.once("moveend", () => {
+      window.clearTimeout(tope)
+      ok()
+    })
+  })
+}
+
 // Worker de MapLibre servido como archivo estático (scripts/copiar-maplibre.mjs)
 maplibregl.setWorkerUrl("/vendor/maplibre/maplibre-gl-worker.mjs")
 const reducirMovimiento = () => typeof window !== "undefined" && window.matchMedia("(prefers-reduced-motion: reduce)").matches
@@ -44,11 +60,14 @@ export function UniversoRed({
   eventos,
   controlRef,
   onEntrar,
+  activa = true,
 }: {
   red: RedForja
   eventos: EventoForja[]
   controlRef?: React.RefObject<ControlRed | null>
   onEntrar?: (id: Id) => void
+  /** Falso mientras se ve el taller: el bucle de animación del mapa descansa. */
+  activa?: boolean
 }) {
   const vista = useEscenaForja((s) => s.vista)
   const resaltado = useEscenaForja((s) => s.resaltado)
@@ -68,10 +87,10 @@ export function UniversoRed({
   const [listo, setListo] = useState(false)
 
   const conCoordenadas = useMemo(() => red.nodos.filter((n) => n.lat !== null && n.lng !== null), [red.nodos])
-  const datos = useRef({ red, conCoordenadas, transferenciaId })
+  const datos = useRef({ red, conCoordenadas, transferenciaId, activa })
   useEffect(() => {
-    datos.current = { red, conCoordenadas, transferenciaId }
-  }, [red, conCoordenadas, transferenciaId])
+    datos.current = { red, conCoordenadas, transferenciaId, activa }
+  }, [red, conCoordenadas, transferenciaId, activa])
 
   // Última venta de cada sucursal: el nodo late cuando cambia
   const ultimaVenta = useMemo(() => {
@@ -149,15 +168,12 @@ export function UniversoRed({
     if (!mapa || !ns.length) return Promise.resolve()
     const bounds = new maplibregl.LngLatBounds()
     for (const n of ns) bounds.extend([n.lng!, n.lat!])
-    return new Promise<void>((ok) => {
-      mapa.once("moveend", () => ok())
-      // Margen proporcional: en un celular 160 px por lado alejaría demasiado el mapa
-      const { clientWidth: ancho, clientHeight: alto } = mapa.getContainer()
-      const mx = Math.round(Math.min(160, ancho * 0.22))
-      const my = Math.round(Math.min(140, alto * 0.16))
-      mapa.fitBounds(bounds, { padding: { top: my, bottom: my + 40, left: mx, right: mx }, pitch: 50, bearing: -14, duration: duracionMs, maxZoom: 13 })
-      if (duracionMs === 0) ok()
-    })
+    // Margen proporcional: en un celular 160 px por lado alejaría demasiado el mapa
+    const { clientWidth: ancho, clientHeight: alto } = mapa.getContainer()
+    const mx = Math.round(Math.min(160, ancho * 0.22))
+    const my = Math.round(Math.min(140, alto * 0.16))
+    mapa.fitBounds(bounds, { padding: { top: my, bottom: my + 40, left: mx, right: mx }, pitch: 50, bearing: -14, duration: duracionMs, maxZoom: 13 })
+    return finDelMovimiento(mapa, duracionMs)
   }
 
   // Control para las transiciones entre niveles
@@ -168,10 +184,8 @@ export function UniversoRed({
         const mapa = mapaRef.current
         const n = datos.current.conCoordenadas.find((x) => x.id === id)
         if (!mapa || !n) return Promise.resolve()
-        return new Promise<void>((ok) => {
-          mapa.once("moveend", () => ok())
-          mapa.flyTo({ center: [n.lng!, n.lat!], zoom: 15.5, pitch: 62, bearing: mapa.getBearing() - 18, duration: duracionMs, essential: true })
-        })
+        mapa.flyTo({ center: [n.lng!, n.lat!], zoom: 15.5, pitch: 62, bearing: mapa.getBearing() - 18, duration: duracionMs, essential: true })
+        return finDelMovimiento(mapa, duracionMs)
       },
       encuadrar,
       posicion: (id) => {
@@ -190,7 +204,7 @@ export function UniversoRed({
     let marco = 0
     const paso = (t: number) => {
       marco = requestAnimationFrame(paso)
-      if (document.hidden) return
+      if (document.hidden || !datos.current.activa) return
       const mapa = mapaRef.current
       const overlay = overlayRef.current
       const { red: r, conCoordenadas: ns, transferenciaId: sel } = datos.current
@@ -419,10 +433,6 @@ function animarEnlaces(svg: SVGSVGElement, t: number, reducir: boolean) {
       c.setAttribute("opacity", String(reducir ? (k === 0 ? 1 : 0) : Math.sin(Math.PI * fase)))
     }
   }
-}
-
-function hora(iso: string) {
-  return new Date(iso).toLocaleTimeString("es-AR", { hour: "2-digit", minute: "2-digit", hourCycle: "h23", timeZone: "America/Argentina/Buenos_Aires" })
 }
 
 /** Lista accesible de transferencias (los arcos del mapa también se pueden tocar). */

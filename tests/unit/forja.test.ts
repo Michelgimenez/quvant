@@ -201,3 +201,94 @@ describe("Forja · operaciones en el reductor", () => {
     expect(lucia.permisosExtra).toContain("forja.ver")
   })
 })
+
+describe("Forja · plano de planta", () => {
+  it("cada elemento cae dentro de su zona y la losa contiene las zonas", async () => {
+    const { planoTaller, ANCHO, FONDO } = await import("@/forja/dominio/plano")
+    const cc = e.sucursales.find((s) => s.codigo === "CC")!
+    const t = tallerForja(e, cc.id, AHORA)
+    const plano = planoTaller(t, "sucursal")
+    const dentro = (x: number, z: number, tipo: string) => {
+      const zona = plano.zonas.find((zz) => zz.tipo === tipo)!
+      return x >= zona.x && x <= zona.x + zona.ancho && z >= zona.z && z <= zona.z + zona.fondo
+    }
+    expect(plano.puestos).toHaveLength(cc.puestos)
+    expect(plano.racks).toHaveLength(t.racks.length)
+    for (const r of plano.racks) expect(dentro(r.x, r.z, "deposito")).toBe(true)
+    for (const b of plano.bancos) expect(dentro(b.x, b.z, "servicio")).toBe(true)
+    for (const r of plano.retiro) expect(dentro(r.x, r.z, "servicio")).toBe(true)
+    for (const p of plano.puestos) expect(dentro(p.x, p.z, "mostrador")).toBe(true)
+    for (const p of plano.palets) expect(dentro(p.x, p.z, "muelle")).toBe(true)
+    for (const z of plano.zonas) {
+      expect(z.x).toBeGreaterThanOrEqual(-ANCHO / 2)
+      expect(z.x + z.ancho).toBeLessThanOrEqual(ANCHO / 2)
+      expect(z.z).toBeGreaterThanOrEqual(-FONDO / 2)
+      expect(z.z + z.fondo).toBeLessThanOrEqual(FONDO / 2)
+    }
+    // Las zonas no se pisan
+    for (const a of plano.zonas)
+      for (const b of plano.zonas) {
+        if (a === b) continue
+        const solapan = a.x < b.x + b.ancho && b.x < a.x + a.ancho && a.z < b.z + b.fondo && b.z < a.z + a.fondo
+        expect(solapan).toBe(false)
+      }
+  })
+
+  it("un bloque por producto ubicado; los racks no se pisan entre sí", async () => {
+    const { planoTaller } = await import("@/forja/dominio/plano")
+    const cc = e.sucursales.find((s) => s.codigo === "CC")!
+    const t = tallerForja(e, cc.id, AHORA)
+    const plano = planoTaller(t, "sucursal")
+    expect(plano.bloques).toHaveLength(t.racks.reduce((a, r) => a + r.productos.length, 0))
+    for (let i = 0; i < plano.racks.length; i++)
+      for (let j = i + 1; j < plano.racks.length; j++) {
+        const a = plano.racks[i]
+        const b = plano.racks[j]
+        const solapan = Math.abs(a.x - b.x) < (a.ancho + b.ancho) / 2 && Math.abs(a.z - b.z) < (a.fondo + b.fondo) / 2
+        expect(solapan, `${a.rack.id} y ${b.rack.id}`).toBe(false)
+      }
+    // Cada bloque queda dentro del ancho de su rack y por debajo del techo del nivel
+    for (const bl of plano.bloques) {
+      const r = plano.racks.find((x) => x.rack.id === bl.rackId)!
+      expect(bl.x - bl.ancho / 2).toBeGreaterThanOrEqual(r.x - r.ancho / 2)
+      expect(bl.x + bl.ancho / 2).toBeLessThanOrEqual(r.x + r.ancho / 2)
+      expect(bl.y + bl.alto / 2).toBeLessThanOrEqual(r.alto)
+    }
+  })
+
+  it("estado y altura de cada bloque siguen al stock", async () => {
+    const { estadoBloque, rellenoBloque, nivelDeEstante, rackDeUbicacion } = await import("@/forja/dominio/plano")
+    expect(estadoBloque({ cantidad: 0, minimo: 5 })).toBe("sin_stock")
+    expect(estadoBloque({ cantidad: -2, minimo: 0 })).toBe("sin_stock")
+    expect(estadoBloque({ cantidad: 5, minimo: 5 })).toBe("critico")
+    expect(estadoBloque({ cantidad: 6, minimo: 5 })).toBe("normal")
+    expect(rellenoBloque({ cantidad: 0, minimo: 5 })).toBe(0)
+    expect(rellenoBloque({ cantidad: 15, minimo: 5 })).toBe(1)
+    expect(rellenoBloque({ cantidad: 1, minimo: 50 })).toBeGreaterThan(0)
+    expect([1, 3, 4, 6, 7, 9, 10, 12].map(nivelDeEstante)).toEqual([0, 0, 1, 1, 2, 2, 3, 3])
+    expect(rackDeUbicacion("HE-A3")).toBe("HE-A")
+    expect(rackDeUbicacion("sin ubicación")).toBeNull()
+  })
+
+  it("los equipos listos van al estante de retiro y el resto a los bancos", async () => {
+    const { planoTaller } = await import("@/forja/dominio/plano")
+    const cc = e.sucursales.find((s) => s.codigo === "CC")!
+    const t = tallerForja(e, cc.id, AHORA)
+    const plano = planoTaller(t, "sucursal")
+    expect(plano.retiro.every((r) => ["listo", "sin_reparacion"].includes(r.banco.estado))).toBe(true)
+    expect(plano.bancos.every((b) => !b.banco || !["listo", "sin_reparacion"].includes(b.banco.estado))).toBe(true)
+    // En la demo entran todas: ninguna orden queda sin dibujar
+    expect(plano.bancos.filter((b) => b.banco).length + plano.retiro.length).toBe(t.bancos.length)
+    // Solo las entregas pendientes están físicamente en el muelle
+    expect(plano.palets.every((p) => p.bulto.tipo === "entrega" && p.bulto.estado === "pendiente")).toBe(true)
+  })
+
+  it("un depósito sin mostrador no tiene puestos ni zona de mostrador", async () => {
+    const { planoTaller } = await import("@/forja/dominio/plano")
+    const cc = e.sucursales.find((s) => s.codigo === "CC")!
+    const plano = planoTaller(tallerForja(e, cc.id, AHORA), "deposito")
+    expect(plano.puestos).toHaveLength(0)
+    expect(plano.mostrador).toBeNull()
+    expect(plano.zonas.some((z) => z.tipo === "mostrador")).toBe(false)
+  })
+})

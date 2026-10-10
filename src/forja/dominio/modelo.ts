@@ -70,8 +70,9 @@ export type ProductoRack = { productoId: Id; nombre: string; sku: string; cantid
 
 export type RackForja = {
   id: string
-  /** Pasillo (letra) y categoría (código) del rack: "HE-A". */
+  /** Sección (código de categoría) y rack (letra): "HE-A". */
   categoria: string
+  categoriaNombre: string
   pasillo: string
   productos: ProductoRack[]
   unidades: number
@@ -241,7 +242,7 @@ export function tallerForja(e: EstadoEmpresa, sucursalId: Id, ahora: Date): Tall
     if (!p) continue
     let r = racks.get(id)
     if (!r) {
-      r = { id, categoria: m[1], pasillo: m[2], productos: [], unidades: 0, criticos: 0, sinStock: 0, niveles: Array(ESTANTES).fill(0), maximos: Array(ESTANTES).fill(0) }
+      r = { id, categoria: m[1], categoriaNombre: e.categorias.find((c) => c.id === p.categoriaId)?.nombre ?? m[1], pasillo: m[2], productos: [], unidades: 0, criticos: 0, sinStock: 0, niveles: Array(ESTANTES).fill(0), maximos: Array(ESTANTES).fill(0) }
       racks.set(id, r)
     }
     r.productos.push({ productoId: p.id, nombre: p.nombre, sku: p.sku, cantidad: st.cantidad, minimo: st.minimo, estante, ilustracion: p.ilustracion })

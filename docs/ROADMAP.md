@@ -40,7 +40,7 @@ Forja convierte los datos de Yunque en un taller conectado: las sucursales en un
 
 1. **Base** ✔︎ — token `--superficie`, paleta de calor, modelo de datos (ubicación de sucursales, transferencias en tránsito, extensiones por empresa, preferencias, permisos extra por persona), lecturas SQL con RLS, canales en vivo por sucursal, simulador para la demo y tests de aislamiento.
 2. **Red en el mapa** ✔︎ — MapLibre + deck.gl, nodos con calor y stock crítico, transferencias animadas, tarjetas y constelación.
-3. Taller isométrico 3D por sucursal.
+3. **Taller isométrico 3D por sucursal** ✔︎ — mostrador, depósito, servicio técnico y muelle desde los datos de Yunque, panel lateral con enlaces a cada módulo y transición de cámara desde el mapa.
 4. Línea de tiempo del día y modo sala de control.
 5. Animación de activación y página de extensiones.
 6. Recorrido de una pieza (SKU o máquina).

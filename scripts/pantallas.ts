@@ -27,6 +27,8 @@ export type Pantalla = {
   tema?: "claro" | "oscuro"
   /** Subcarpeta dentro de docs/capturas (p. ej. "forja"). */
   carpeta?: string
+  /** Captura con animaciones (por defecto se pide movimiento reducido para que salgan estables). */
+  conMovimiento?: boolean
 }
 
 /** Entra a una presentación con clave (si hace falta) y va a la escena n. */
@@ -55,6 +57,17 @@ export async function activarForja(p: Page) {
   await p.getByTestId("forja").waitFor({ timeout: 30_000 })
   await p.locator("[data-testid=forja-red][data-listo=true]").waitFor({ timeout: 60_000 })
   await p.waitForTimeout(3500)
+}
+
+/** Entra a Casa Central (nivel 2) y espera a que la cámara termine de bajar. */
+function entrarAlTaller(despues?: (p: Page) => Promise<void>) {
+  return async (p: Page) => {
+    await activarForja(p)
+    await p.locator("[data-nodo=CC] button").click({ force: true })
+    await p.locator("[data-testid=forja-taller][data-listo=true]").waitFor({ timeout: 60_000 })
+    await p.waitForTimeout(2600)
+    await despues?.(p)
+  }
 }
 
 /** Pantallas a capturar. Se completa a medida que se construye cada fase. */
@@ -215,6 +228,56 @@ export const PANTALLAS: Pantalla[] = [
       await p.getByTestId("vista-constelacion").click()
       await p.waitForTimeout(1600)
     },
+  },
+  {
+    id: "forja-transicion",
+    ruta: "/app",
+    usuario: "dueno@demo.yunque.app",
+    esperar: "#contenido h1",
+    carpeta: "forja",
+    soloEscritorio: true,
+    conMovimiento: true,
+    antes: async (p) => {
+      await activarForja(p)
+      // Reloj en pausa y avance de a 32 ms: la foto cae justo cuando, al final del vuelo,
+      // el brillo del nodo empieza a cubrir el mapa (el render por software no llega a tiempo real)
+      await p.clock.pauseAt((await p.evaluate(() => Date.now())) + 1500)
+      await p.locator("[data-nodo=CC] button").click({ force: true })
+      for (let i = 0; i < 250; i++) {
+        await p.clock.runFor(32)
+        const cubre = await p.evaluate(() => Boolean(document.querySelector("[data-nivel=red]")) && Number(getComputedStyle(document.querySelector("[data-testid=forja-iris]")!).opacity) > 0.4)
+        if (cubre) break
+      }
+      await p.waitForTimeout(500)
+    },
+  },
+  { id: "forja-taller", ruta: "/app", usuario: "dueno@demo.yunque.app", esperar: "#contenido h1", carpeta: "forja", antes: entrarAlTaller() },
+  {
+    id: "forja-taller-zona",
+    ruta: "/app",
+    usuario: "dueno@demo.yunque.app",
+    esperar: "#contenido h1",
+    carpeta: "forja",
+    antes: entrarAlTaller(async (p) => {
+      await p.getByTestId("zona-servicio").click()
+      await p.getByTestId("panel-zona").waitFor()
+      await p.waitForTimeout(800)
+    }),
+  },
+  {
+    id: "forja-taller-rack",
+    ruta: "/app",
+    usuario: "dueno@demo.yunque.app",
+    esperar: "#contenido h1",
+    carpeta: "forja",
+    soloEscritorio: true,
+    antes: entrarAlTaller(async (p) => {
+      // Pasar por un faltante del panel resalta su rack y muestra sus productos
+      await p.getByTestId("zona-deposito").click()
+      await p.getByTestId("faltante").first().hover()
+      await p.getByTestId("tooltip-rack").waitFor()
+      await p.waitForTimeout(400)
+    }),
   },
   ...ESCENAS_INVERSORES.map((nombre, i) => ({
     id: `inversores-${String(i + 1).padStart(2, "0")}-${nombre}`,

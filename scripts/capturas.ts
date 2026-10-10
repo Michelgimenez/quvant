@@ -82,7 +82,7 @@ async function capturar(browser: Browser, p: Pantalla) {
       hasTouch: vista.nombre === "celular",
       locale: "es-AR",
       timezoneId: "America/Argentina/Buenos_Aires",
-      reducedMotion: "reduce",
+      reducedMotion: p.conMovimiento ? "no-preference" : "reduce",
       colorScheme: p.tema === "claro" ? "light" : "dark",
     })
     const page = await ctx.newPage()

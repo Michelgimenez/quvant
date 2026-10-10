@@ -3,7 +3,7 @@
 import Link from "next/link"
 import { useCallback, useMemo, useState } from "react"
 import { useRouter, useSearchParams } from "next/navigation"
-import { ArrowLeftRight, ClipboardCheck, PackageX, Plus, ScanBarcode, Search } from "lucide-react"
+import { ArrowLeftRight, ClipboardCheck, PackageX, Plus, ScanBarcode, Search, X } from "lucide-react"
 import { toast } from "sonner"
 import { useApp, useDatos } from "@/cliente/app-contexto"
 import { EscanerCodigo } from "@/components/app/escaner"
@@ -33,8 +33,13 @@ export function Inventario() {
   const [texto, setTexto] = useState("")
   const [categoria, setCategoria] = useState("todas")
   const [marca, setMarca] = useState("todas")
-  const [sucursal, setSucursal] = useState(usuario.sucursalIds?.length === 1 ? usuario.sucursalIds[0] : "todas")
+  // Desde Forja se llega filtrado por sucursal y ubicación ("HE-A": un rack del depósito)
+  const sucursalPedida = params.get("sucursal")
+  const [sucursal, setSucursal] = useState(
+    sucursalPedida && (usuario.sucursalIds === null || usuario.sucursalIds.includes(sucursalPedida)) ? sucursalPedida : usuario.sucursalIds?.length === 1 ? usuario.sucursalIds[0] : "todas",
+  )
   const [filtroStock, setFiltroStock] = useState<FiltroStock>((params.get("stock") as FiltroStock) ?? "todos")
+  const ubicacion = sucursal === "todas" ? null : params.get("ubicacion")
   const [escaner, setEscaner] = useState(false)
   const [transferir, setTransferir] = useState(false)
   const [nuevo, setNuevo] = useState(false)
@@ -65,9 +70,16 @@ export function Inventario() {
     const sucs = sucursal === "todas" ? sucursales.map((s) => s.id) : [sucursal]
     if (filtroStock !== "todos") base = base.filter((p) => sucs.some((s) => estadoStock(e, s, p.id) === filtroStock))
     if (sucursal !== "todas") base = base.filter((p) => e.stock[claveStock(sucursal, p.id)])
+    if (ubicacion) base = base.filter((p) => e.stock[claveStock(sucursal, p.id)]?.ubicacion.startsWith(ubicacion))
     return base
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [v, texto, categoria, marca, sucursal, filtroStock, sucursales])
+  }, [v, texto, categoria, marca, sucursal, filtroStock, sucursales, ubicacion])
+
+  const quitarUbicacion = () => {
+    const p = new URLSearchParams(params.toString())
+    p.delete("ubicacion")
+    router.replace(`/app/inventario${p.size ? `?${p}` : ""}`, { scroll: false })
+  }
 
   const resumen = useMemo(() => {
     const sucs = sucursal === "todas" ? sucursales.map((s) => s.id) : [sucursal]
@@ -245,6 +257,12 @@ export function Inventario() {
             {n !== null && <span className="num">{n}</span>}
           </button>
         ))}
+        {ubicacion && (
+          <button type="button" onClick={quitarUbicacion} className="inline-flex h-8 items-center gap-1.5 rounded-full border border-foreground/30 bg-muted px-3 text-xs font-semibold" data-testid="filtro-ubicacion">
+            Ubicación {ubicacion}
+            <X className="size-3.5" aria-label="Quitar filtro de ubicación" />
+          </button>
+        )}
         {verCostos && <span className="ml-auto text-xs text-muted-foreground">Stock valorizado a costo: <span className="num font-semibold text-foreground">{formatoPesosCorto(resumen.valorizado)}</span></span>}
       </div>
 

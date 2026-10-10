@@ -94,3 +94,76 @@ test.describe("Forja · red", () => {
     expect(textoForja).toContain("maplibregl-canvas")
   })
 })
+
+test.describe("Forja · taller", () => {
+  test("entrar a una sucursal: taller 3D, zonas, panel con enlaces y vuelta a la red", async ({ page }) => {
+    test.setTimeout(180_000)
+    await ingresar(page, "dueno@demo.yunque.app")
+    const scripts = registrarScripts(page)
+    await activarForja(page)
+    await expect(page.getByTestId("forja-red")).toHaveAttribute("data-listo", "true", { timeout: 60_000 })
+    // three.js baja recién al entrar a una sucursal
+    expect(await scripts()).not.toContain("THREE.WebGLRenderer")
+
+    await page.locator("[data-nodo=CC] button").click({ force: true })
+    const taller = page.getByTestId("forja-taller")
+    await expect(taller).toHaveAttribute("data-listo", "true", { timeout: 60_000 })
+    await expect(taller).toHaveAttribute("data-sucursal", "CC")
+    await expect(page.locator("[data-nivel=taller]")).toBeVisible()
+    expect(await scripts()).toContain("THREE.WebGLRenderer")
+
+    // Depósito: faltantes, rack con sus productos y enlace al inventario filtrado
+    await page.getByTestId("zona-deposito").click()
+    const panel = page.getByTestId("panel-zona")
+    await expect(panel).toHaveAttribute("data-zona", "deposito")
+    await page.getByTestId("faltante").first().hover()
+    await expect(page.getByTestId("tooltip-rack")).toBeVisible()
+    await page.getByTestId("faltante").first().click()
+    await expect(page.getByTestId("productos-rack")).toBeVisible()
+    const enlaceRack = page.getByRole("link", { name: "Ver el rack en inventario" })
+    await expect(enlaceRack).toHaveAttribute("href", /\/app\/inventario\?sucursal=[^&]+&ubicacion=[A-Z0-9]+-[A-Z]$/)
+    const hrefRack = (await enlaceRack.getAttribute("href"))!
+
+    // Servicio técnico: números de orden en los bancos y enlace directo a la orden
+    await expect(page.getByTestId("banco-orden").first()).toBeVisible()
+    await page.getByTestId("zona-servicio").click()
+    await expect(panel).toHaveAttribute("data-zona", "servicio")
+    await page.getByTestId("fila-orden").first().click()
+    await expect(page.getByRole("link", { name: "Abrir la orden" })).toHaveAttribute("href", /\/app\/servicio\?id=/)
+
+    // Mostrador y muelle
+    await page.getByTestId("zona-mostrador").click()
+    await expect(panel).toContainText("Puesto 1")
+    await expect(page.getByRole("link", { name: "Ir al mostrador" })).toHaveAttribute("href", "/app/mostrador")
+    await page.getByTestId("zona-muelle").click()
+    await expect(panel).toHaveAttribute("data-zona", "muelle")
+
+    // Esc cierra el panel; el siguiente vuelve a la red por el camino inverso
+    await page.keyboard.press("Escape")
+    await expect(panel).toHaveCount(0)
+    await page.keyboard.press("Escape")
+    await expect(taller).toHaveCount(0, { timeout: 15_000 })
+    await expect(page.locator("[data-nivel=red]")).toBeVisible()
+    await expect(page.getByTestId("nodo-forja")).toHaveCount(3)
+
+    // El enlace del rack abre el inventario de esa sucursal, filtrado por ubicación
+    await page.goto(hrefRack)
+    await expect(page.getByTestId("filtro-ubicacion")).toBeVisible({ timeout: 30_000 })
+  })
+
+  test("@celular el taller entra en la pantalla con la barra de zonas a mano", async ({ page }) => {
+    test.skip(test.info().project.name !== "celular", "Solo en el proyecto de celular")
+    test.setTimeout(180_000)
+    await ingresar(page, "dueno@demo.yunque.app")
+    await activarForja(page)
+    await expect(page.getByTestId("forja-red")).toHaveAttribute("data-listo", "true", { timeout: 60_000 })
+    await page.locator("[data-nodo=CC] button").click({ force: true })
+    await expect(page.getByTestId("forja-taller")).toHaveAttribute("data-listo", "true", { timeout: 60_000 })
+    // La barra de zonas queda arriba de la navegación inferior de la app
+    const barra = await page.getByTestId("zona-deposito").boundingBox()
+    const nav = await page.getByRole("navigation", { name: "Accesos rápidos" }).boundingBox()
+    expect(barra!.y + barra!.height).toBeLessThanOrEqual(nav!.y)
+    await page.getByTestId("zona-deposito").click()
+    await expect(page.getByTestId("panel-zona")).toBeVisible()
+  })
+})

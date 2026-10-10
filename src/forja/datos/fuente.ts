@@ -21,8 +21,11 @@ export type FuenteForja = {
 }
 
 export type EnlacesForja = {
-  inventario: (sucursalId: Id, filtro?: { rack?: string; producto?: Id }) => string
-  servicio: (ordenId: Id) => string
+  /** Inventario de la sucursal, filtrado por rack ("HE-A"), producto o estado de stock. */
+  inventario: (sucursalId: Id, filtro?: { rack?: string; producto?: Id; stock?: "sin" | "bajo" }) => string
+  /** Una orden de servicio, o el tablero si no se indica. */
+  servicio: (ordenId?: Id) => string
+  presupuestos: () => string
   entregas: () => string
   mostrador: () => string
 }

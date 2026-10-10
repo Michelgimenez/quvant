@@ -20,8 +20,15 @@ export function UniversoForjaApp({ simulacion }: { activacion: boolean; simulaci
       simulacion: sim.activa,
       propuesta: false,
       enlaces: {
-        inventario: (_sucursalId, filtro) => `/app/inventario${filtro?.producto ? `?producto=${filtro.producto}` : filtro?.rack ? `?q=${encodeURIComponent(filtro.rack)}` : ""}`,
-        servicio: (ordenId) => `/app/servicio?orden=${ordenId}`,
+        inventario: (sucursalId, filtro) => {
+          const p = new URLSearchParams({ sucursal: sucursalId })
+          if (filtro?.rack) p.set("ubicacion", filtro.rack)
+          if (filtro?.producto) p.set("producto", filtro.producto)
+          if (filtro?.stock) p.set("stock", filtro.stock)
+          return `/app/inventario?${p}`
+        },
+        servicio: (ordenId) => (ordenId ? `/app/servicio?id=${ordenId}` : "/app/servicio"),
+        presupuestos: () => "/app/presupuestos",
         entregas: () => "/app/entregas",
         mostrador: () => "/app/mostrador",
       },
