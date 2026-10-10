@@ -96,7 +96,8 @@ async function capturar(browser: Browser, p: Pantalla) {
     if (p.esperar) await page.waitForSelector(p.esperar, { timeout: 30_000 })
     if (p.antes) await p.antes(page)
     await page.waitForTimeout(600)
-    const archivo = path.join(SALIDA, `${p.id}--${vista.nombre}.png`)
+    mkdirSync(path.join(SALIDA, p.carpeta ?? ""), { recursive: true })
+    const archivo = path.join(SALIDA, p.carpeta ?? "", `${p.id}--${vista.nombre}.png`)
     await page.screenshot({ path: archivo, fullPage: Boolean(p.paginaCompleta) })
     // El sitio usa solo las de escritorio
     if (p.publica && vista.nombre === "escritorio") {

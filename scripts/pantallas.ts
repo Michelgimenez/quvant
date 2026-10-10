@@ -25,6 +25,8 @@ export type Pantalla = {
   publica?: boolean
   soloEscritorio?: boolean
   tema?: "claro" | "oscuro"
+  /** Subcarpeta dentro de docs/capturas (p. ej. "forja"). */
+  carpeta?: string
 }
 
 /** Entra a una presentación con clave (si hace falta) y va a la escena n. */
@@ -44,6 +46,15 @@ export function escena(n: number, clave = process.env.INVERSORES_KEY ?? "yunque-
 const ESCENAS_CLIENTE = ["portada", "su-problema", "su-marca", "un-dia", "corte", "como-empezamos", "socio-fundador"]
 
 const ESCENAS_INVERSORES = ["apertura", "problema", "terreno", "solucion", "demo", "diferencial", "modelo", "estado", "hoja-de-ruta", "inversion", "equipo", "cierre"]
+
+/** Activa Forja desde Extensiones (los datos de la demo viven en el navegador de cada captura). */
+export async function activarForja(p: Page) {
+  await p.goto(p.url().replace(/\/app.*$/, "/app/extensiones"))
+  await p.getByTestId("activar-forja").click()
+  await p.waitForURL(/\/app\/forja/)
+  await p.getByTestId("forja").waitFor({ timeout: 30_000 })
+  await p.waitForTimeout(1500)
+}
 
 /** Pantallas a capturar. Se completa a medida que se construye cada fase. */
 export const PANTALLAS: Pantalla[] = [
@@ -165,6 +176,8 @@ export const PANTALLAS: Pantalla[] = [
   { id: "app-auditoria", ruta: "/app/auditoria", usuario: "dueno@demo.yunque.app", esperar: "[role=table]" },
   { id: "estado", ruta: "/estado", esperar: "h1" },
   { id: "inversores-clave", ruta: "/inversores", esperar: "#clave" },
+  { id: "forja-extensiones", ruta: "/app/extensiones", usuario: "dueno@demo.yunque.app", esperar: "[data-testid=extension-forja]", carpeta: "forja" },
+  { id: "forja-red-base", ruta: "/app", usuario: "dueno@demo.yunque.app", esperar: "#contenido h1", carpeta: "forja", antes: activarForja },
   ...ESCENAS_INVERSORES.map((nombre, i) => ({
     id: `inversores-${String(i + 1).padStart(2, "0")}-${nombre}`,
     ruta: "/inversores",

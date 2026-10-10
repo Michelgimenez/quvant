@@ -110,7 +110,7 @@ export function Bajada({ children, className }: { children: React.ReactNode; cla
 /** Marco de navegador para mostrar pantallas de la app dentro del escenario. */
 export function Pantalla({ children, className, url = "app.yunque" }: { children: React.ReactNode; className?: string; url?: string }) {
   return (
-    <div className={cn("overflow-hidden rounded-[18px] border border-white/10 bg-forja shadow-[0_40px_120px_-20px_rgba(0,0,0,0.7)]", className)}>
+    <div className={cn("overflow-hidden rounded-[18px] border border-white/10 bg-superficie shadow-[0_40px_120px_-20px_rgba(0,0,0,0.7)]", className)}>
       <div className="flex items-center gap-2 border-b border-white/10 px-4 py-3" aria-hidden>
         <span className="size-3 rounded-full bg-white/15" />
         <span className="size-3 rounded-full bg-white/15" />

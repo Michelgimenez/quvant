@@ -10,7 +10,7 @@ import { useEffect, useRef, useState } from "react"
  */
 function Cargando({ alto, texto }: { alto: number; texto: string }) {
   return (
-    <div className="flex items-center justify-center rounded-2xl border border-white/10 bg-forja/60 text-sm text-acero" style={{ minHeight: alto }} role="status">
+    <div className="flex items-center justify-center rounded-2xl border border-white/10 bg-superficie/60 text-sm text-acero" style={{ minHeight: alto }} role="status">
       {texto}
     </div>
   )

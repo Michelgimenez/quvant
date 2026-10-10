@@ -1,3 +1,4 @@
+import type { Permiso } from "@/dominio/permisos"
 import type { Ilustracion, Rol, Unidad } from "@/dominio/tipos"
 
 /**
@@ -333,22 +334,24 @@ export const NEGOCIOS_DEMO = [
     nombre: "Ferretería Industrial Demo",
     rubro: "Ferretería industrial",
     sucursales: [
-      { nombre: "Casa Central", codigo: "CC", direccion: "Av. del Trabajo 1450, Ciudad Demo", puestos: 3, ventasDia: 16 },
-      { nombre: "Sucursal Norte", codigo: "NO", direccion: "Ruta Provincial 24 km 12, Ciudad Demo", puestos: 2, ventasDia: 9 },
+      // Coordenadas ilustrativas en el Gran Buenos Aires: la empresa es ficticia (sello DEMO).
+      { nombre: "Casa Central", codigo: "CC", direccion: "Av. del Trabajo 1450, Ciudad Demo", puestos: 3, ventasDia: 16, lat: -34.6704, lng: -58.3686 },
+      { nombre: "Sucursal Norte", codigo: "NO", direccion: "Ruta Provincial 24 km 12, Ciudad Demo", puestos: 2, ventasDia: 9, lat: -34.4613, lng: -58.6557 },
     ],
   },
   {
     nombre: "Demo Maquinarias",
     rubro: "Distribuidora de maquinaria",
-    sucursales: [{ nombre: "Salón y depósito de maquinaria", codigo: "DM", direccion: "Parque Industrial Demo, lote 18", puestos: 2, ventasDia: 3 }],
+    sucursales: [{ nombre: "Salón y depósito de maquinaria", codigo: "DM", direccion: "Parque Industrial Demo, lote 18", puestos: 2, ventasDia: 3, lat: -34.4305, lng: -58.8641 }],
   },
 ]
 
-export const USUARIOS_DEMO: { nombre: string; email: string; rol: Rol; sucursales: string[] | null }[] = [
+export const USUARIOS_DEMO: { nombre: string; email: string; rol: Rol; sucursales: string[] | null; permisosExtra?: Permiso[] }[] = [
   { nombre: "Martín Olivera", email: "dueno@demo.yunque.app", rol: "dueno", sucursales: null },
   { nombre: "Carla Benítez", email: "admin@demo.yunque.app", rol: "administracion", sucursales: null },
   { nombre: "Diego Sosa", email: "mostrador@demo.yunque.app", rol: "mostrador", sucursales: ["CC"] },
-  { nombre: "Lucía Romero", email: "mostrador.norte@demo.yunque.app", rol: "mostrador", sucursales: ["NO"] },
+  // A Lucía se le dio permiso para ver Forja: solo ve su sucursal
+  { nombre: "Lucía Romero", email: "mostrador.norte@demo.yunque.app", rol: "mostrador", sucursales: ["NO"], permisosExtra: ["forja.ver"] },
   { nombre: "Pablo Medina", email: "maquinaria@demo.yunque.app", rol: "mostrador", sucursales: ["DM"] },
   { nombre: "Ramón Acosta", email: "deposito@demo.yunque.app", rol: "deposito", sucursales: null },
   { nombre: "Sergio Paz", email: "tecnico@demo.yunque.app", rol: "tecnico", sucursales: ["CC"] },

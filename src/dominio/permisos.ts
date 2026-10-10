@@ -35,6 +35,11 @@ export const PERMISOS = [
   "config.editar",
   "auditoria.ver",
   "importar.datos",
+  // Extensiones
+  "extensiones.gestionar",
+  "forja.ver",
+  // Cualquier persona sobre sus propias preferencias
+  "perfil.editar",
 ] as const
 export type Permiso = (typeof PERMISOS)[number]
 
@@ -58,6 +63,7 @@ export const PERMISOS_POR_ROL: Record<Rol, Permiso[]> = {
     "clientes.editar",
     "cuentas.cobrar",
     "entregas.ver",
+    "perfil.editar",
   ],
   deposito: [
     "tablero.ver",
@@ -71,8 +77,9 @@ export const PERMISOS_POR_ROL: Record<Rol, Permiso[]> = {
     "compras.recibir",
     "entregas.ver",
     "entregas.editar",
+    "perfil.editar",
   ],
-  tecnico: ["tablero.ver", "inventario.ver", "precios.ver", "servicio.ver", "servicio.editar", "clientes.ver"],
+  tecnico: ["tablero.ver", "inventario.ver", "precios.ver", "servicio.ver", "servicio.editar", "clientes.ver", "perfil.editar"],
   compras: [
     "tablero.ver",
     "inventario.ver",
@@ -85,6 +92,7 @@ export const PERMISOS_POR_ROL: Record<Rol, Permiso[]> = {
     "compras.recibir",
     "reportes.ver",
     "importar.datos",
+    "perfil.editar",
   ],
 }
 
@@ -113,8 +121,9 @@ export function exige2FA(rol: Rol) {
   return ROLES_CON_2FA.includes(rol)
 }
 
-export function tienePermiso(rol: Rol, permiso: Permiso) {
-  return PERMISOS_POR_ROL[rol].includes(permiso)
+/** Permisos del rol más los que se le dieron a la persona (p. ej. ver Forja de su sucursal). */
+export function tienePermiso(rol: Rol, permiso: Permiso, extra: readonly Permiso[] = []) {
+  return PERMISOS_POR_ROL[rol].includes(permiso) || extra.includes(permiso)
 }
 
 /** Permiso mínimo para ver cada módulo (navegación y guardas de ruta). */

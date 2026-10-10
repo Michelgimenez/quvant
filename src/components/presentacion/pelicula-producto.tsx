@@ -201,7 +201,7 @@ function Pelicula({ demo, textos, bucle }: { demo: DemoEmbebida; textos: TextosP
       <div className="grid h-full grid-cols-[440px_1fr] items-center gap-16">
         <ol className="space-y-6">
           {pasos.map(([id, titulo, texto], i) => (
-            <li key={id} className={cn("rounded-2xl border p-6 transition-[opacity,transform] duration-500", paso === id ? "border-temple/60 bg-forja opacity-100" : "translate-x-2 border-white/5 opacity-45")}>
+            <li key={id} className={cn("rounded-2xl border p-6 transition-[opacity,transform] duration-500", paso === id ? "border-temple/60 bg-superficie opacity-100" : "translate-x-2 border-white/5 opacity-45")}>
               <p className="font-mono text-[18px] tracking-widest text-acero">0{i + 1}</p>
               <p className="mt-2 text-[32px] font-bold leading-tight text-niebla">{titulo}</p>
               <p className="mt-2 text-[20px] text-acero">{texto}</p>

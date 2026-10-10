@@ -32,6 +32,8 @@ export async function crearMotorDemo(sesion: Sesion) {
   }
 
   const base = generarEmpresaDemo({ ahora: new Date(semillaISO) })
+  // Permisos que se le dieron a la persona además de su rol (p. ej. ver Forja)
+  const permisosExtra = base.usuarios.find((u) => u.id === sesion.sub)?.permisosExtra ?? []
   // El servidor necesita su propia copia intacta (el motor modifica la suya).
   let copiaServidor: ReturnType<typeof generarEmpresaDemo> | null = structuredClone(base)
   let copiaMotor: ReturnType<typeof generarEmpresaDemo> | null = base
@@ -53,7 +55,7 @@ export async function crearMotorDemo(sesion: Sesion) {
       copiaMotor = null
       return s
     },
-    usuario: { id: sesion.sub, rol: sesion.rol, sucursalIds: sesion.sucursales },
+    usuario: { id: sesion.sub, rol: sesion.rol, sucursalIds: sesion.sucursales, permisosExtra },
     hayRed,
   }).iniciar()
 

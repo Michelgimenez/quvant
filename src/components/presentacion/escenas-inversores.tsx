@@ -64,7 +64,7 @@ function Problema() {
       </Aparecer>
       <div className="mt-12 grid grid-cols-3 gap-8">
         {MERCADO.datos.map((d, i) => (
-          <Aparecer key={i} demora={0.5 + i * 0.15} className="rounded-3xl border border-white/10 bg-forja/80 p-7">
+          <Aparecer key={i} demora={0.5 + i * 0.15} className="rounded-3xl border border-white/10 bg-superficie/80 p-7">
             <p className="text-[28px] font-bold text-niebla">
               <TextoConfig texto={d.valor} />
             </p>
@@ -126,7 +126,7 @@ function Solucion() {
           const I = ICONO_PILAR[p.id]
           const disponibles = FEATURES.filter((f) => f.escena === p.id && f.estado === "disponible").length
           return (
-            <Aparecer key={p.id} demora={0.6 + i * 0.14} y={36} className="flex flex-col rounded-3xl border border-white/10 bg-forja/80 p-8">
+            <Aparecer key={p.id} demora={0.6 + i * 0.14} y={36} className="flex flex-col rounded-3xl border border-white/10 bg-superficie/80 p-8">
               <I className="size-14 shrink-0 text-temple" />
               <p className="mt-7 text-[34px] font-bold leading-tight text-niebla">{p.nombre}</p>
               <p className="mt-3 flex-1 text-[22px] leading-snug text-acero">{p.frase}</p>
@@ -192,13 +192,13 @@ function Modelo() {
           <Aparecer>
             <Titulo className="text-[64px]">Licencia mensual por negocio + implementación.</Titulo>
           </Aparecer>
-          <Aparecer demora={0.4} className="rounded-3xl border border-white/10 bg-forja/80 p-7">
+          <Aparecer demora={0.4} className="rounded-3xl border border-white/10 bg-superficie/80 p-7">
             <p className="text-[20px] uppercase tracking-widest text-acero">Ingreso recurrente</p>
             <p className="mt-2 text-[30px] text-niebla">
               negocios activos × <span className="font-bold">USD {PRECIOS.desdePorNegocio}</span> por mes
             </p>
           </Aparecer>
-          <Aparecer demora={0.55} className="rounded-3xl border border-white/10 bg-forja/80 p-7">
+          <Aparecer demora={0.55} className="rounded-3xl border border-white/10 bg-superficie/80 p-7">
             <p className="text-[20px] uppercase tracking-widest text-acero">Ingreso por implementación</p>
             <p className="mt-2 text-[30px] text-niebla">negocios nuevos × implementación (se cotiza por negocio)</p>
           </Aparecer>
@@ -277,7 +277,7 @@ function EstadoActual() {
         {columnas.map((c, i) => {
           const lista = FEATURES.filter((f) => f.estado === c)
           return (
-            <Aparecer key={c} demora={0.5 + i * 0.2} className="rounded-3xl border border-white/10 bg-forja/80 p-7">
+            <Aparecer key={c} demora={0.5 + i * 0.2} className="rounded-3xl border border-white/10 bg-superficie/80 p-7">
               <div className="flex items-center justify-between">
                 <EstadoFeatureBadge estado={c} className="h-9 border-white/10 bg-hierro px-4 text-[16px]" />
                 <span className="font-mono text-[40px] font-bold text-niebla">{lista.length}</span>
@@ -406,7 +406,7 @@ function Equipo() {
       </Aparecer>
       <div className="mt-16 grid grid-cols-2 gap-10">
         {datos.equipo.map((p, i) => (
-          <Aparecer key={i} demora={0.4 + i * 0.2} className="flex gap-8 rounded-3xl border border-white/10 bg-forja/80 p-10">
+          <Aparecer key={i} demora={0.4 + i * 0.2} className="flex gap-8 rounded-3xl border border-white/10 bg-superficie/80 p-10">
             {p.foto ? (
               // eslint-disable-next-line @next/next/no-img-element -- foto cargada en la configuración
               <img src={p.foto} alt={p.nombre} className="size-40 rounded-2xl object-cover" />

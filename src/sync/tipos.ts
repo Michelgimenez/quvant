@@ -1,24 +1,6 @@
 import type { Permiso } from "@/dominio/permisos"
 import type { ParametrosAumento } from "@/dominio/precios"
-import type {
-  Centavos,
-  Cliente,
-  EstadoEntrega,
-  EstadoServicio,
-  FechaISO,
-  Id,
-  Ilustracion,
-  ItemComercial,
-  MedioPago,
-  Modulo,
-  OrdenCompra,
-  Organizacion,
-  Pago,
-  Producto,
-  Rol,
-  Unidad,
-  Usuario,
-} from "@/dominio/tipos"
+import type { Centavos, Cliente, EstadoEntrega, EstadoServicio, FechaISO, Id, Ilustracion, ItemComercial, MedioPago, Modulo, OrdenCompra, Organizacion, Pago, Producto, Rol, Unidad, Usuario, IdExtension, ValorPreferencia } from "@/dominio/tipos"
 
 /**
  * Operaciones de sincronización.
@@ -101,6 +83,11 @@ export type DatosOp = {
   "presupuesto.convertir": { presupuestoId: Id; venta: VentaNueva }
   "stock.ajustar": { sucursalId: Id; productoId: Id; cantidad: number; motivo: string }
   "stock.transferir": { transferenciaId: Id; desdeId: Id; haciaId: Id; items: { productoId: Id; cantidad: number }[]; motivo: string }
+  /** Sale del origen y queda en tránsito hasta que el destino la recibe. */
+  "transferencia.despachar": { transferenciaId: Id; desdeId: Id; haciaId: Id; items: { productoId: Id; cantidad: number }[]; motivo: string; llegadaEstimada: FechaISO }
+  "transferencia.recibir": { transferenciaId: Id }
+  "extension.activar": { extension: IdExtension; activa: boolean }
+  "usuario.preferencia": { clave: string; valor: ValorPreferencia }
   "stock.minimo": { sucursalId: Id; productoId: Id; minimo: number; ubicacion: string }
   "conteo.crear": { conteoId: Id; sucursalId: Id; nombre: string; productoIds: Id[] }
   "conteo.registrar": { conteoId: Id; productoId: Id; contado: number }
@@ -189,7 +176,10 @@ export type Resultado =
     }
   | { ok: false; codigo: CodigoRechazo; error: string }
 
-export type UsuarioContexto = { id: Id; rol: Rol; sucursalIds: Id[] | null }
+/** Dispositivos de simulación (demo): sus operaciones no se anuncian como cambios de otros puestos. */
+export const PREFIJO_DISPOSITIVO_SIMULADO = "simulador"
+
+export type UsuarioContexto = { id: Id; rol: Rol; sucursalIds: Id[] | null; permisosExtra?: Permiso[] }
 
 /** Operación ya procesada por el servidor, con su posición en el orden global. */
 export type OpConfirmada = {
@@ -223,6 +213,10 @@ export const PERMISO_OPERACION: Record<TipoOp, Permiso> = {
   "presupuesto.convertir": "mostrador.vender",
   "stock.ajustar": "stock.ajustar",
   "stock.transferir": "stock.transferir",
+  "transferencia.despachar": "stock.transferir",
+  "transferencia.recibir": "stock.transferir",
+  "extension.activar": "extensiones.gestionar",
+  "usuario.preferencia": "perfil.editar",
   "stock.minimo": "inventario.editar",
   "conteo.crear": "conteo.realizar",
   "conteo.registrar": "conteo.realizar",

@@ -176,7 +176,7 @@ function DialogoUsuario({ usuario, onCerrar }: { usuario: Usuario | null; onCerr
             const sucursalIds = todas ? null : sucursales
             const r = usuario
               ? await ejecutar("usuario.guardar", { usuarioId: usuario.id, cambios: { nombre, rol, sucursalIds, activo } }, null)
-              : await ejecutar("usuario.guardar", { usuarioId: motor.uuid(), nuevo: { id: motor.uuid(), orgId: e.org.id, nombre, email, rol, sucursalIds, activo: true, dosFactor: false, ultimoIngreso: null } }, null)
+              : await ejecutar("usuario.guardar", { usuarioId: motor.uuid(), nuevo: { id: motor.uuid(), orgId: e.org.id, nombre, email, rol, sucursalIds, activo: true, dosFactor: false, ultimoIngreso: null, permisosExtra: [], preferencias: {} } }, null)
             if (!r.ok) return toast.error(r.error)
             toast.success(usuario ? "Usuario actualizado" : "Invitación registrada (envío emulado en la demo)")
             onCerrar()

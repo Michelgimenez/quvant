@@ -33,7 +33,7 @@ export function DemoConexion({ compacta = false, guion }: { compacta?: boolean; 
   }, [])
   if (!demo) {
     return (
-      <div className="flex h-[420px] items-center justify-center rounded-2xl border border-linea bg-forja/60 text-sm text-acero" role="status">
+      <div className="flex h-[420px] items-center justify-center rounded-2xl border border-linea bg-superficie/60 text-sm text-acero" role="status">
         Preparando el mostrador de demostración…
       </div>
     )
@@ -146,12 +146,12 @@ function Mostrador({ demo, compacta, guion }: { demo: DemoEmbebida; compacta: bo
   return (
     // Consultas de contenedor (no de ventana): se ve igual en el sitio y dentro del escenario de las presentaciones
     <div className="@container">
-      <div className={cn("grid gap-4 rounded-2xl border border-linea bg-forja/60 p-4 @xl:p-6", compacta ? "" : "@3xl:grid-cols-[minmax(0,1.25fr)_auto_minmax(0,1fr)]")} data-testid="demo-conexion">
+      <div className={cn("grid gap-4 rounded-2xl border border-linea bg-superficie/60 p-4 @xl:p-6", compacta ? "" : "@3xl:grid-cols-[minmax(0,1.25fr)_auto_minmax(0,1fr)]")} data-testid="demo-conexion">
         {/* Mostrador */}
         <section className="space-y-3 rounded-xl border border-linea bg-hierro/70 p-4" aria-label="Mostrador de demostración">
           <div className="flex items-center justify-between gap-2">
             <p className="ficha">Mostrador · CC · puesto 1</p>
-            <span className={cn("inline-flex h-7 items-center gap-2 rounded-full border px-3 text-xs", sinConexion ? "border-chispa/50 bg-chispa/10" : "border-linea bg-forja")} data-testid="demo-estado">
+            <span className={cn("inline-flex h-7 items-center gap-2 rounded-full border px-3 text-xs", sinConexion ? "border-chispa/50 bg-chispa/10" : "border-linea bg-superficie")} data-testid="demo-estado">
               <Punto tono={sinConexion ? "chispa" : pendientes ? "acero" : "ok"} pulso={sinConexion} />
               {sinConexion ? `Sin conexión${pendientes ? ` · ${pendientes} ${pendientes === 1 ? "venta" : "ventas"} en cola` : ""}` : pendientes ? "Sincronizando" : "Sincronizado"}
             </span>
@@ -163,7 +163,7 @@ function Mostrador({ demo, compacta, guion }: { demo: DemoEmbebida; compacta: bo
                 key={p.id}
                 type="button"
                 onClick={() => vender(p)}
-                className="flex items-center gap-2 rounded-lg border border-linea bg-forja px-2.5 py-2 text-left transition-colors hover:border-temple/60 active:translate-y-px"
+                className="flex items-center gap-2 rounded-lg border border-linea bg-superficie px-2.5 py-2 text-left transition-colors hover:border-temple/60 active:translate-y-px"
               >
                 <MiniaturaProducto tipo={p.ilustracion} className="size-8" />
                 <span className="min-w-0">
@@ -179,7 +179,7 @@ function Mostrador({ demo, compacta, guion }: { demo: DemoEmbebida; compacta: bo
               if (!v) return null
               const enCola = v.numero === null
               return (
-                <li key={id} className="flex items-center gap-2 rounded-md bg-forja px-2.5 py-1.5 text-xs">
+                <li key={id} className="flex items-center gap-2 rounded-md bg-superficie px-2.5 py-1.5 text-xs">
                   <span className={cn("num", enCola ? "text-chispa" : "text-ok")}>{enCola ? v.numeroLocal : `#${v.numero}`}</span>
                   <span className="min-w-0 flex-1 truncate text-acero">{v.items[0]?.descripcion}</span>
                   <span className="num text-niebla">{formatoPesos(v.total, { sinDecimales: true })}</span>
@@ -231,7 +231,7 @@ function Mostrador({ demo, compacta, guion }: { demo: DemoEmbebida; compacta: bo
           <p className="text-sm text-acero">{conectado ? "Recibe cada venta y le pone su número definitivo." : "No le llega nada. El mostrador no se entera: sigue vendiendo."}</p>
           <ul className="space-y-1.5">
             {recibidas.map((r) => (
-              <li key={r.id} className="flex items-center gap-2 rounded-md bg-forja px-2.5 py-1.5 text-xs">
+              <li key={r.id} className="flex items-center gap-2 rounded-md bg-superficie px-2.5 py-1.5 text-xs">
                 <span className="num text-ok">#{r.numero}</span>
                 <span className="flex-1 text-acero">venta recibida</span>
                 <span className="num text-niebla">{formatoPesos(r.total, { sinDecimales: true })}</span>

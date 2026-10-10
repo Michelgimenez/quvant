@@ -25,7 +25,7 @@ export function UsuariosDemo() {
             <button
               type="button"
               onClick={() => window.dispatchEvent(new CustomEvent(EVENTO_USAR_DEMO, { detail: u.email }))}
-              className="group flex w-full items-start gap-3 rounded-lg border border-linea bg-superficie px-3 py-2.5 text-left transition-colors hover:border-temple/60 focus-visible:border-temple"
+              className="group flex w-full items-start gap-3 rounded-lg border border-linea bg-card px-3 py-2.5 text-left transition-colors hover:border-temple/60 focus-visible:border-temple"
             >
               <span className="min-w-0 flex-1">
                 <span className="flex items-center gap-2 text-sm font-semibold">

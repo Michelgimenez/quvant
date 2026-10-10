@@ -8,7 +8,7 @@ import { toast } from "sonner"
 import { Keyboard, LogOut, Menu, Moon, MoreHorizontal, RotateCcw, Search, Sun } from "lucide-react"
 import { ProveedorApp, useApp, useCargaApp } from "@/cliente/app-contexto"
 import { reiniciarDemo } from "@/cliente/motor-demo"
-import { NAVEGACION, NAV_MOVIL, TODOS_LOS_ITEMS, itemActivo } from "@/cliente/navegacion"
+import { NAVEGACION, NAV_MOVIL, TODOS_LOS_ITEMS, itemActivo, itemVisible } from "@/cliente/navegacion"
 import { borrar as borrarSesionLocal } from "@/cliente/sesion"
 import { LogoOrg } from "@/components/base/logo-org"
 import { Sello } from "@/components/base/sellos"
@@ -135,7 +135,7 @@ function Marco({ children, renovada }: { children: React.ReactNode; renovada: bo
 }
 
 function Lateral() {
-  const { motor, puede, moduloActivo, usuario } = useApp()
+  const { motor, puede, moduloActivo, extensionActiva, usuario } = useApp()
   const pathname = usePathname()
   const org = motor.estado.org
   return (
@@ -152,7 +152,7 @@ function Lateral() {
       )}
       <nav className="sin-scrollbar flex-1 space-y-5 overflow-y-auto px-2 py-3" aria-label="Módulos">
         {NAVEGACION.map((g) => {
-          const items = g.items.filter((i) => puede(i.permiso) && (!i.modulo || moduloActivo(i.modulo)))
+          const items = g.items.filter((i) => itemVisible(i, puede, moduloActivo, extensionActiva))
           if (!items.length) return null
           return (
             <div key={g.grupo} className="space-y-0.5">

@@ -1,3 +1,5 @@
+import type { Permiso } from "./permisos"
+
 /**
  * Modelo de dominio de Yunque.
  *
@@ -40,7 +42,14 @@ export type Organizacion = {
   modulos: Record<Modulo, boolean>
   esDemo: boolean
   creadaEn: FechaISO
+  /** Extensiones (Forja, …) activadas por la organización. */
+  extensiones: Partial<Record<IdExtension, EstadoExtension>>
 }
+
+/** Extensiones de Yunque. Cada una se registra en src/extensiones/registro.ts. */
+export const EXTENSIONES = ["forja"] as const
+export type IdExtension = (typeof EXTENSIONES)[number]
+export type EstadoExtension = { activa: boolean; activadaEn: FechaISO | null; activadaPor: Id | null }
 
 export type Negocio = {
   id: Id
@@ -60,6 +69,13 @@ export type Sucursal = {
   direccion: string
   /** Puestos de mostrador (cajas) de la sucursal. */
   puestos: number
+  /** Sucursal con mostrador o depósito sin venta al público. */
+  tipo: "sucursal" | "deposito"
+  /** Ubicación (WGS84) para el mapa de Forja; null si no se cargó. */
+  lat: number | null
+  lng: number | null
+  /** Sucursal ficticia (empresa demo o sucursales de ejemplo de una propuesta): se marca DEMO. */
+  demo: boolean
 }
 
 // ───────────────────────── Usuarios y roles ─────────────────────────
@@ -78,7 +94,13 @@ export type Usuario = {
   activo: boolean
   dosFactor: boolean
   ultimoIngreso: FechaISO | null
+  /** Permisos que se le dan a esta persona además de los de su rol (p. ej. "forja.ver"). */
+  permisosExtra: Permiso[]
+  /** Preferencias guardadas en el servidor (p. ej. animación de Forja ya vista). */
+  preferencias: Record<string, ValorPreferencia>
 }
+
+export type ValorPreferencia = string | number | boolean | null
 
 // ───────────────────────── Catálogo ─────────────────────────
 
@@ -370,6 +392,21 @@ export type OrdenCompra = {
 // ───────────────────────── Entregas ─────────────────────────
 
 export type EstadoEntrega = "pendiente" | "en_camino" | "entregada" | "fallida"
+
+/** Transferencia entre sucursales. En tránsito: el stock salió del origen y todavía no llegó. */
+export type Transferencia = {
+  id: Id
+  orgId: Id
+  desdeId: Id
+  haciaId: Id
+  items: { productoId: Id; cantidad: number }[]
+  estado: "en_transito" | "recibida"
+  motivo: string
+  despachadaEn: FechaISO
+  llegadaEstimada: FechaISO
+  recibidaEn: FechaISO | null
+  usuarioId: Id
+}
 
 export type Entrega = {
   id: Id

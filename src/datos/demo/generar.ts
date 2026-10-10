@@ -1,6 +1,6 @@
 import { Azar, uuidDe } from "@/lib/azar"
 import { claveStock, clavePrecio, type EstadoEmpresa } from "@/dominio/estado"
-import { MODULOS, type AumentoPrecio, type Categoria, type Cliente, type Conteo, type Entrega, type EstadoServicio, type EventoServicio, type Id, type ItemComercial, type ListaPrecio, type Marca, type MedioPago, type MovimientoStock, type OrdenCompra, type OrdenServicio, type Organizacion, type Pago, type Presupuesto, type Producto, type Proveedor, type RegistroAuditoria, type Sucursal, type TipoMovimiento, type Usuario, type Venta } from "@/dominio/tipos"
+import { MODULOS, type AumentoPrecio, type Categoria, type Cliente, type Conteo, type Entrega, type EstadoServicio, type EventoServicio, type Id, type ItemComercial, type ListaPrecio, type Marca, type MedioPago, type MovimientoStock, type OrdenCompra, type OrdenServicio, type Organizacion, type Pago, type Presupuesto, type Producto, type Proveedor, type RegistroAuditoria, type Sucursal, type TipoMovimiento, type Transferencia, type Usuario, type Venta } from "@/dominio/tipos"
 import { formatoPesos } from "@/dominio/dinero"
 import { mensajeAvisoServicio } from "@/dominio/servicio"
 import {
@@ -92,6 +92,7 @@ export function generarEmpresaDemo(opciones: OpcionesDemo = {}): EstadoEmpresa {
     modulos: Object.fromEntries(MODULOS.map((m) => [m, true])) as Organizacion["modulos"],
     esDemo: true,
     creadaEn: iso(enART(sumarDias(hoy, -DIAS - 30), 9)),
+    extensiones: {},
   }
 
   const negocios = NEGOCIOS_DEMO.map((n, i) => ({
@@ -111,6 +112,10 @@ export function generarEmpresaDemo(opciones: OpcionesDemo = {}): EstadoEmpresa {
       codigo: s.codigo,
       direccion: s.direccion,
       puestos: s.puestos,
+      tipo: "sucursal" as const,
+      lat: s.lat,
+      lng: s.lng,
+      demo: true,
       ventasDia: s.ventasDia,
     })),
   )
@@ -126,6 +131,8 @@ export function generarEmpresaDemo(opciones: OpcionesDemo = {}): EstadoEmpresa {
     activo: true,
     dosFactor: u.rol === "dueno" || u.rol === "administracion",
     ultimoIngreso: iso(enART(sumarDias(hoy, -(i % 3)), 8, 5 + i * 3)),
+    permisosExtra: u.permisosExtra ?? [],
+    preferencias: {},
   }))
   const U = (email: string) => usuarios.find((u) => u.email === email)!.id
   const vendedoresPor: Record<string, Id[]> = {
@@ -301,6 +308,7 @@ export function generarEmpresaDemo(opciones: OpcionesDemo = {}): EstadoEmpresa {
     }
   }
 
+  const transferencias: Record<Id, Transferencia> = {}
   const mover = (sucursalId: Id, productoId: Id, cantidad: number, tipo: TipoMovimiento, fecha: Date, refId: Id | null, motivo: string, usuarioId: Id) => {
     const st = stock[claveStock(sucursalId, productoId)]
     if (st) st.cantidad = Math.round((st.cantidad + cantidad) * 1000) / 1000
@@ -560,18 +568,26 @@ export function generarEmpresaDemo(opciones: OpcionesDemo = {}): EstadoEmpresa {
       const no = sucPorCodigo("NO")
       const fecha = enART(dia, 8, 30)
       let n = 0
+      const items: { productoId: Id; cantidad: number }[] = []
       for (const p of listaProductos) {
         const a = stock[claveStock(no.id, p.id)]
         const b = stock[claveStock(cc.id, p.id)]
         if (!a || !b || a.cantidad > a.minimo || b.cantidad < b.minimo * 2 || n >= 8) continue
         const cant = Math.min(Math.ceil(a.minimo), Math.floor(b.cantidad - b.minimo))
         if (cant <= 0) continue
-        const ref = az.uuid()
-        mover(cc.id, p.id, -cant, "transferencia_salida", fecha, ref, "Transferencia a Sucursal Norte", deposito)
-        mover(no.id, p.id, cant, "transferencia_entrada", fecha, ref, "Transferencia desde Casa Central", deposito)
+        items.push({ productoId: p.id, cantidad: cant })
         n++
       }
-      if (n) auditar(fecha, deposito, "stock.transferir", "stock", null, `Transferencia CC → NO · ${n} productos`)
+      if (n) {
+        const ref = az.uuid()
+        const llega = enART(dia, 10, 10)
+        for (const it of items) {
+          mover(cc.id, it.productoId, -it.cantidad, "transferencia_salida", fecha, ref, "Transferencia a Sucursal Norte", deposito)
+          mover(no.id, it.productoId, it.cantidad, "transferencia_entrada", llega, ref, "Transferencia desde Casa Central", deposito)
+        }
+        transferencias[ref] = { id: ref, orgId, desdeId: cc.id, haciaId: no.id, items, estado: "recibida", motivo: "Reposición semanal", despachadaEn: iso(fecha), llegadaEstimada: iso(llega), recibidaEn: iso(llega), usuarioId: deposito }
+        auditar(fecha, deposito, "transferencia.despachar", "stock", ref, `Transferencia CC → NO · ${n} productos`)
+      }
     }
 
     // Ventas del día
@@ -857,6 +873,29 @@ export function generarEmpresaDemo(opciones: OpcionesDemo = {}): EstadoEmpresa {
     if (i === 0 && new Date(e.fechaProgramada) <= ahora) e.estado = "en_camino"
   })
 
+  // Transferencias en tránsito ahora (solo en horario comercial): el stock ya salió del origen
+  const horaHoy = Number(new Intl.DateTimeFormat("en-GB", { hour: "numeric", hour12: false, timeZone: "America/Argentina/Buenos_Aires" }).format(ahora))
+  if (horaHoy >= 9 && horaHoy < 18) {
+    const rutas: [string, string, number, number][] = [
+      ["CC", "NO", 55, 70],
+      ["DM", "CC", 25, 95],
+    ]
+    for (const [i, [desde, hacia, haceMin, faltaMin]] of rutas.entries()) {
+      const o = sucPorCodigo(desde)
+      const dst = sucPorCodigo(hacia)
+      const items = listaProductos
+        .filter((p) => (stock[claveStock(o.id, p.id)]?.cantidad ?? 0) > (stock[claveStock(o.id, p.id)]?.minimo ?? 0) + 4)
+        .slice(i * 5, i * 5 + 3 + i)
+        .map((p) => ({ productoId: p.id, cantidad: 2 + ((i + p.sku.length) % 4) }))
+      if (!items.length) continue
+      const id = uuidDe(`${semilla}:${claveDia(hoy)}:transito:${i}`)
+      const salida = new Date(ahora.getTime() - haceMin * 60_000)
+      for (const it of items) mover(o.id, it.productoId, -it.cantidad, "transferencia_salida", salida, id, `Transferencia a ${dst.nombre}`, deposito)
+      transferencias[id] = { id, orgId, desdeId: o.id, haciaId: dst.id, items, estado: "en_transito", motivo: "Reposición", despachadaEn: iso(salida), llegadaEstimada: iso(new Date(ahora.getTime() + faltaMin * 60_000)), recibidaEn: null, usuarioId: deposito }
+      auditar(salida, deposito, "transferencia.despachar", "stock", id, `Transferencia ${o.codigo} → ${dst.codigo} · ${items.length} productos (en tránsito)`)
+    }
+  }
+
   // Aumentos en auditoría
   for (const a of aumentos) auditar(new Date(a.fecha), a.usuarioId, "precios.aumento", "precios", a.id, `${a.descripcion} · +${a.porcentaje}% · ${a.cambios.length} precios`)
   auditoria.sort((a, b) => b.fecha.localeCompare(a.fecha))
@@ -866,7 +905,7 @@ export function generarEmpresaDemo(opciones: OpcionesDemo = {}): EstadoEmpresa {
   return {
     org,
     negocios,
-    sucursales: sucursales.map((s) => ({ id: s.id, orgId: s.orgId, negocioId: s.negocioId, nombre: s.nombre, codigo: s.codigo, direccion: s.direccion, puestos: s.puestos })),
+    sucursales: sucursales.map((s) => ({ id: s.id, orgId: s.orgId, negocioId: s.negocioId, nombre: s.nombre, codigo: s.codigo, direccion: s.direccion, puestos: s.puestos, tipo: s.tipo, lat: s.lat, lng: s.lng, demo: s.demo })),
     usuarios,
     categorias,
     marcas,
@@ -883,6 +922,7 @@ export function generarEmpresaDemo(opciones: OpcionesDemo = {}): EstadoEmpresa {
     servicio,
     compras: comprasOC,
     entregas,
+    transferencias,
     cajas,
     movimientosCaja,
     conteos,

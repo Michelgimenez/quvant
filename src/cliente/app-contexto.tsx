@@ -4,7 +4,7 @@ import { useRouter } from "next/navigation"
 import { createContext, useCallback, useContext, useEffect, useMemo, useState, useSyncExternalStore } from "react"
 import type { EstadoEmpresa } from "@/dominio/estado"
 import { tienePermiso, type Permiso } from "@/dominio/permisos"
-import type { Id, Modulo, Usuario } from "@/dominio/tipos"
+import type { Id, Modulo, Usuario, IdExtension } from "@/dominio/tipos"
 import type { Sesion } from "@/lib/auth/tipos"
 import type { MotorSync } from "@/sync/motor"
 import type { ServidorDemo } from "@/sync/servidor-demo"
@@ -24,6 +24,7 @@ type ValorApp = {
   sucursalesPermitidas: EstadoEmpresa["sucursales"]
   puede: (p: Permiso) => boolean
   moduloActivo: (m: Modulo) => boolean
+  extensionActiva: (x: IdExtension) => boolean
   /** Ejecuta una operación con la sucursal activa por defecto. */
   ejecutar: <T extends TipoOp>(tipo: T, datos: DatosOp[T], sucursalId?: Id | null) => Promise<Resultado & { opId: Id }>
 }
@@ -97,6 +98,8 @@ export function ProveedorApp({ motor, servidor, sesion, children }: { motor: Mot
     activo: true,
     dosFactor: sesion.aal === "aal2",
     ultimoIngreso: null,
+    permisosExtra: [],
+    preferencias: {},
   }
   const sucursalesPermitidas = useMemo(
     () => e.sucursales.filter((s) => usuario.sucursalIds === null || usuario.sucursalIds.includes(s.id)),
@@ -135,8 +138,9 @@ export function ProveedorApp({ motor, servidor, sesion, children }: { motor: Mot
       sucursalId,
       setSucursalId,
       sucursalesPermitidas,
-      puede: (p) => tienePermiso(usuario.rol, p),
+      puede: (p) => tienePermiso(usuario.rol, p, usuario.permisosExtra),
       moduloActivo: (m) => motor.estado.org.modulos[m] !== false,
+      extensionActiva: (x) => motor.estado.org.extensiones[x]?.activa === true,
       ejecutar: (tipo, datos, suc) => motor.ejecutar(tipo, datos, { sucursalId: suc === undefined ? sucursalId : suc }),
     }),
     // eslint-disable-next-line react-hooks/exhaustive-deps

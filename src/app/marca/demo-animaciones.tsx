@@ -18,7 +18,7 @@ export function DemoAnimaciones() {
             <RotateCcw /> Armar de nuevo
           </Button>
         </div>
-        <div className="flex flex-col items-center justify-center gap-4 rounded-xl border border-linea bg-superficie p-8 text-center">
+        <div className="flex flex-col items-center justify-center gap-4 rounded-xl border border-linea bg-card p-8 text-center">
           <p className="max-w-sm text-sm text-muted-foreground">
             La chispa aparece solo en logros: cola sincronizada, presupuesto convertido, cierre de caja, conteo sin diferencias.
           </p>

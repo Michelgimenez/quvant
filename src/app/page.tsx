@@ -90,7 +90,7 @@ export default function Inicio() {
         <Precios />
 
         <section id="socios" className="diferida mx-auto max-w-6xl scroll-mt-24 px-4 py-20" aria-labelledby="titulo-socios">
-          <div className="grid gap-10 rounded-3xl border border-chispa/30 bg-gradient-to-br from-forja to-hierro p-6 sm:p-10 lg:grid-cols-2">
+          <div className="grid gap-10 rounded-3xl border border-chispa/30 bg-gradient-to-br from-superficie to-hierro p-6 sm:p-10 lg:grid-cols-2">
             <div className="space-y-5">
               <p className="ficha flex items-center gap-2 text-chispa">
                 <Chispa className="size-3" /> 08 · Programa de socios fundadores
@@ -122,7 +122,7 @@ export default function Inicio() {
 
         <section id="pedir-demo" className="diferida mx-auto max-w-3xl scroll-mt-24 px-4 py-20" aria-labelledby="titulo-pedir">
           <Encabezado id="titulo-pedir" ficha="10 · Pedir una demo" titulo="Te mostramos Yunque con tus productos." bajada="Media hora, por videollamada o en tu negocio. Sin compromiso." centrado />
-          <div className="rounded-2xl border border-white/10 bg-forja/70 p-6 sm:p-8">
+          <div className="rounded-2xl border border-white/10 bg-superficie/70 p-6 sm:p-8">
             <FormularioDemo origen="sitio" />
           </div>
           <p className="mt-4 text-center text-sm text-acero">

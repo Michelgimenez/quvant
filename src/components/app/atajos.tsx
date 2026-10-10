@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react"
 import { useRouter } from "next/navigation"
 import { useApp } from "@/cliente/app-contexto"
-import { TODOS_LOS_ITEMS } from "@/cliente/navegacion"
+import { TODOS_LOS_ITEMS, itemVisible } from "@/cliente/navegacion"
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import { Kbd } from "@/components/ui/kbd"
 
@@ -24,7 +24,7 @@ const ATAJOS_MOSTRADOR: [string, string][] = [
 /** Atajos globales: "g" + letra para navegar, "?" para la ayuda, "/" para buscar. */
 export function AtajosGlobales() {
   const router = useRouter()
-  const { puede, moduloActivo } = useApp()
+  const { puede, moduloActivo, extensionActiva } = useApp()
   const [ayuda, setAyuda] = useState(false)
 
   useEffect(() => {
@@ -45,7 +45,7 @@ export function AtajosGlobales() {
       if (prefijo) {
         prefijo = false
         const item = TODOS_LOS_ITEMS.find((i) => i.atajo === ev.key.toLowerCase())
-        if (item && puede(item.permiso) && (!item.modulo || moduloActivo(item.modulo))) {
+        if (item && itemVisible(item, puede, moduloActivo, extensionActiva)) {
           ev.preventDefault()
           router.push(item.href)
         }
@@ -64,9 +64,9 @@ export function AtajosGlobales() {
       window.removeEventListener("keydown", tecla)
       window.removeEventListener(EVENTO_AYUDA_ATAJOS, abrir)
     }
-  }, [router, puede, moduloActivo])
+  }, [router, puede, moduloActivo, extensionActiva])
 
-  const nav = TODOS_LOS_ITEMS.filter((i) => i.atajo && puede(i.permiso))
+  const nav = TODOS_LOS_ITEMS.filter((i) => i.atajo && itemVisible(i, puede, moduloActivo, extensionActiva))
   return (
     <Dialog open={ayuda} onOpenChange={setAyuda}>
       <DialogContent className="max-w-lg">

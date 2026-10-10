@@ -4,6 +4,7 @@ import { Azar } from "@/lib/azar"
 import type { AlmacenLocal } from "./almacen"
 import { aplicarOperacion } from "./reductores"
 import { ErrorRed, type Servidor } from "./servidor"
+import { PREFIJO_DISPOSITIVO_SIMULADO } from "./tipos"
 import type { DatosOp, OpConfirmada, Operacion, Resultado, TipoOp, UsuarioContexto } from "./tipos"
 
 /**
@@ -216,7 +217,8 @@ export class MotorSync {
       this.ultimaSincronizacion = this.ahora()
       await this.o.almacen.escribirMeta("ultimaSincronizacion", this.ultimaSincronizacion)
 
-      const recibidas = nuevas.filter((c) => c.op.dispositivo !== this.dispositivo).length
+      // Las operaciones simuladas (demo) se aplican igual, pero no cuentan como "cambios de otros puestos"
+      const recibidas = nuevas.filter((c) => c.op.dispositivo !== this.dispositivo && !c.op.dispositivo.startsWith(PREFIJO_DISPOSITIVO_SIMULADO)).length
       if (resueltas.size || nuevas.length) {
         this.montarVisible()
         this.version++

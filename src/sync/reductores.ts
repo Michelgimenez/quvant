@@ -4,7 +4,7 @@ import { claveStock, clavePrecio, precioDe, saldoCliente, siguienteNumero, type 
 import { puedeAsignarRol, tienePermiso } from "@/dominio/permisos"
 import { calcularAumento } from "@/dominio/precios"
 import { ESTADOS_CON_AVISO, mensajeAvisoServicio, NOMBRE_ESTADO_SERVICIO, puedeTransicionar } from "@/dominio/servicio"
-import { MEDIOS_PAGO, MODULOS, type Id, type ItemComercial, type Modulo, type Producto, type TipoMovimiento, type Venta } from "@/dominio/tipos"
+import { EXTENSIONES, MEDIOS_PAGO, MODULOS, type Id, type ItemComercial, type Modulo, type Producto, type TipoMovimiento, type Venta } from "@/dominio/tipos"
 import { totalItems, totalPagos } from "@/dominio/ventas"
 import { hashTexto } from "@/lib/azar"
 import { esHexValido } from "@/lib/color"
@@ -55,6 +55,7 @@ const MODULO_DE_OPERACION: Partial<Record<string, Modulo>> = {
   venta: "mostrador",
   presupuesto: "presupuestos",
   stock: "inventario",
+  transferencia: "inventario",
   conteo: "inventario",
   precios: "precios",
   precio: "precios",
@@ -379,7 +380,63 @@ const stockTransferir: Manejador<"stock.transferir"> = (e, d, ctx, op) => {
     if (queda < 0) avisos.push(`stock_negativo: ${e.productos[it.productoId].sku} queda en ${formatoCantidad(queda)} en ${desde.nombre}`)
   })
   auditar(e, ctx, op, "stock", d.transferenciaId, `Transferencia ${desde.codigo} → ${hacia.codigo} · ${d.items.length} producto(s)`)
+  e.transferencias[d.transferenciaId] = { id: d.transferenciaId, orgId: e.org.id, desdeId: desde.id, haciaId: hacia.id, items: d.items, estado: "recibida", motivo: d.motivo, despachadaEn: ctx.ahora, llegadaEstimada: ctx.ahora, recibidaEn: ctx.ahora, usuarioId: ctx.usuario.id }
   return { avisos }
+}
+
+function validarItemsTransferencia(e: EstadoEmpresa, items: { productoId: Id; cantidad: number }[]) {
+  exigir(items.length > 0 && items.length <= 200, "invalida", "La transferencia no tiene productos")
+  for (const it of items) {
+    exigir(e.productos[it.productoId], "no_existe", "Producto inexistente")
+    exigir(Number.isFinite(it.cantidad) && it.cantidad > 0, "invalida", "Cantidad inválida")
+  }
+}
+
+const transferenciaDespachar: Manejador<"transferencia.despachar"> = (e, d, ctx, op) => {
+  const desde = exigirSucursal(e, ctx, d.desdeId)
+  const hacia = sucursalDe(e, d.haciaId)
+  exigir(hacia, "no_existe", "La sucursal de destino no existe")
+  exigir(desde.id !== hacia.id, "invalida", "Origen y destino son la misma sucursal")
+  exigir(!e.transferencias[d.transferenciaId], "duplicada", "La transferencia ya existe")
+  validarItemsTransferencia(e, d.items)
+  const llegada = Date.parse(d.llegadaEstimada)
+  exigir(Number.isFinite(llegada) && llegada > Date.parse(ctx.ahora) - 60_000, "invalida", "La llegada estimada tiene que ser posterior al despacho")
+  const avisos: string[] = []
+  d.items.forEach((it, i) => {
+    const queda = moverStock(e, op, ctx, desde.id, it.productoId, -it.cantidad, "transferencia_salida", d.transferenciaId, `Transferencia a ${hacia.nombre} (en tránsito)`, `s${i}`)
+    if (queda < 0) avisos.push(`stock_negativo: ${e.productos[it.productoId].sku} queda en ${formatoCantidad(queda)} en ${desde.nombre}`)
+  })
+  e.transferencias[d.transferenciaId] = { id: d.transferenciaId, orgId: e.org.id, desdeId: desde.id, haciaId: hacia.id, items: d.items, estado: "en_transito", motivo: d.motivo.trim(), despachadaEn: ctx.ahora, llegadaEstimada: d.llegadaEstimada, recibidaEn: null, usuarioId: ctx.usuario.id }
+  auditar(e, ctx, op, "stock", d.transferenciaId, `Transferencia ${desde.codigo} → ${hacia.codigo} despachada · ${d.items.length} producto(s)`)
+  return { avisos }
+}
+
+const transferenciaRecibir: Manejador<"transferencia.recibir"> = (e, d, ctx, op) => {
+  const t = e.transferencias[d.transferenciaId]
+  exigir(t, "no_existe", "La transferencia no existe")
+  exigir(t.estado === "en_transito", "estado", "La transferencia ya se recibió")
+  const hacia = exigirSucursal(e, ctx, t.haciaId)
+  const desde = sucursalDe(e, t.desdeId)
+  t.items.forEach((it, i) => moverStock(e, op, ctx, hacia.id, it.productoId, it.cantidad, "transferencia_entrada", t.id, `Transferencia desde ${desde?.nombre ?? "otra sucursal"}`, `e${i}`))
+  t.estado = "recibida"
+  t.recibidaEn = ctx.ahora
+  auditar(e, ctx, op, "stock", t.id, `Transferencia ${desde?.codigo ?? "?"} → ${hacia.codigo} recibida`)
+}
+
+const extensionActivar: Manejador<"extension.activar"> = (e, d, ctx, op) => {
+  exigir((EXTENSIONES as readonly string[]).includes(d.extension), "invalida", "Extensión desconocida")
+  const previa = e.org.extensiones[d.extension]
+  e.org.extensiones[d.extension] = { activa: d.activa, activadaEn: d.activa ? (previa?.activa ? previa.activadaEn : ctx.ahora) : (previa?.activadaEn ?? null), activadaPor: ctx.usuario.id }
+  auditar(e, ctx, op, "organizacion", e.org.id, `Extensión ${d.extension} ${d.activa ? "activada" : "desactivada"}`)
+}
+
+const usuarioPreferencia: Manejador<"usuario.preferencia"> = (e, d, ctx) => {
+  exigir(/^[a-z0-9._-]{1,60}$/.test(d.clave), "invalida", "Clave de preferencia inválida")
+  const v = d.valor
+  exigir(v === null || typeof v === "boolean" || (typeof v === "number" && Number.isFinite(v)) || (typeof v === "string" && v.length <= 200), "invalida", "Valor de preferencia inválido")
+  const u = e.usuarios.find((x) => x.id === ctx.usuario.id)
+  exigir(u, "no_existe", "El usuario no existe")
+  u.preferencias = { ...u.preferencias, [d.clave]: v }
 }
 
 const stockMinimo: Manejador<"stock.minimo"> = (e, d, ctx, op) => {
@@ -983,6 +1040,10 @@ const MANEJADORES: { [K in TipoOp]: Manejador<K> } = {
   "usuario.guardar": usuarioGuardar,
   "importar.productos": importarProductos,
   "sucursal.guardar": sucursalGuardar,
+  "transferencia.despachar": transferenciaDespachar,
+  "transferencia.recibir": transferenciaRecibir,
+  "extension.activar": extensionActivar,
+  "usuario.preferencia": usuarioPreferencia,
   "lista.guardar": listaGuardar,
 }
 
@@ -994,7 +1055,7 @@ export function aplicarOperacion(e: EstadoEmpresa, op: Operacion, ctx: Contexto)
   try {
     exigir(op.orgId === e.org.id, "permiso", "La operación pertenece a otra organización")
     exigir(MANEJADORES[op.tipo], "invalida", `Operación desconocida: ${op.tipo}`)
-    exigir(tienePermiso(ctx.usuario.rol, PERMISO_OPERACION[op.tipo]), "permiso", "Tu rol no permite esta acción")
+    exigir(tienePermiso(ctx.usuario.rol, PERMISO_OPERACION[op.tipo], ctx.usuario.permisosExtra), "permiso", "Tu rol no permite esta acción")
     if (op.sucursalId) exigir(puedeSucursal(ctx, op.sucursalId), "sucursal", "No tenés permiso en esa sucursal")
     const modulo = MODULO_DE_OPERACION[op.tipo.split(".")[0]]
     if (modulo) exigir(e.org.modulos[modulo] !== false, "permiso", `El módulo ${modulo} no está activo`)

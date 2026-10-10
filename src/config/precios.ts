@@ -1,3 +1,5 @@
+import { ES_COMPLETAR } from "./sitio"
+
 /**
  * Precios públicos de Yunque. Editables: el sitio y la presentación leen de acá.
  * Valores en USD por mes, por negocio (un negocio puede tener varias sucursales).
@@ -46,6 +48,16 @@ export const PRECIOS = {
     ],
     aCambio: "Uso real del sistema, reuniones de seguimiento y permiso para aprender de su operación.",
   },
+  /** Extensiones que se contratan aparte. Mientras el precio sea [COMPLETAR] se muestra "Consultá". */
+  extensiones: {
+    forja: { precioMensual: "[COMPLETAR: precio mensual de Forja por organización, en USD]", unidad: "por mes por organización" },
+  },
 } as const
+
+/** Texto del precio de una extensión: "Consultá" mientras no tenga valor real. */
+export function textoPrecioExtension(id: keyof typeof PRECIOS.extensiones) {
+  const p = PRECIOS.extensiones[id]
+  return ES_COMPLETAR.test(String(p.precioMensual)) ? "Consultá" : `USD ${p.precioMensual} ${p.unidad}`
+}
 
 export type PlanId = (typeof PRECIOS.planes)[number]["id"]

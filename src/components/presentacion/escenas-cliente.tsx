@@ -99,7 +99,7 @@ function SuProblema() {
       </Aparecer>
       <ul className="mt-14 grid grid-cols-2 gap-8">
         {cliente.problemas.map((p, i) => (
-          <Aparecer key={p.area} demora={0.5 + i * 0.18} className="rounded-3xl border border-white/10 bg-forja/80 p-8" y={24}>
+          <Aparecer key={p.area} demora={0.5 + i * 0.18} className="rounded-3xl border border-white/10 bg-superficie/80 p-8" y={24}>
             <p className="font-mono text-[20px] uppercase tracking-widest text-acero">{p.area}</p>
             <p className="mt-3 text-[30px] leading-snug text-niebla">
               <TextoConfig texto={p.detalle} />
@@ -214,7 +214,7 @@ function SuMarca() {
             <p className="font-mono text-[18px] uppercase tracking-widest text-acero">Sus categorías</p>
             <ul className="mt-3 flex flex-wrap gap-2">
               {cliente.categorias.map((c) => (
-                <li key={c} className="rounded-full border border-white/10 bg-forja px-4 py-2 text-[18px] text-niebla">
+                <li key={c} className="rounded-full border border-white/10 bg-superficie px-4 py-2 text-[18px] text-niebla">
                   <TextoConfig texto={c} />
                 </li>
               ))}
@@ -348,7 +348,7 @@ function SocioFundador() {
             A cambio: {socios.aCambio.charAt(0).toLowerCase() + socios.aCambio.slice(1)}
           </Aparecer>
         </div>
-        <Aparecer demora={0.8} className="flex flex-col self-start rounded-3xl border border-white/10 bg-forja/80 p-10">
+        <Aparecer demora={0.8} className="flex flex-col self-start rounded-3xl border border-white/10 bg-superficie/80 p-10">
           <p className="font-mono text-[20px] uppercase tracking-widest text-acero">Plan {plan.nombre}</p>
           <p className="mt-4 text-[80px] font-extrabold leading-none tracking-tight text-niebla">USD {plan.precioMensual}</p>
           <p className="mt-2 text-[26px] text-acero">{plan.unidad}</p>

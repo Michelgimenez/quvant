@@ -1,7 +1,9 @@
 import {
   BarChart3,
   Boxes,
+  Blocks,
   ClipboardCheck,
+  Flame,
   FileText,
   LayoutDashboard,
   PackagePlus,
@@ -17,7 +19,7 @@ import {
   type LucideIcon,
 } from "lucide-react"
 import type { Permiso } from "@/dominio/permisos"
-import type { Modulo, Rol } from "@/dominio/tipos"
+import type { IdExtension, Modulo, Rol } from "@/dominio/tipos"
 
 export type ItemNav = {
   href: string
@@ -25,6 +27,8 @@ export type ItemNav = {
   icono: LucideIcon
   permiso: Permiso
   modulo?: Modulo
+  /** Solo se muestra si la organización activó esta extensión. */
+  extension?: IdExtension
   /** Atajo "g + letra". */
   atajo?: string
 }
@@ -57,6 +61,13 @@ export const NAVEGACION: { grupo: string; items: ItemNav[] }[] = [
     ],
   },
   {
+    grupo: "Extensiones",
+    items: [
+      { href: "/app/forja", nombre: "Forja", icono: Flame, permiso: "forja.ver", extension: "forja", atajo: "f" },
+      { href: "/app/extensiones", nombre: "Extensiones", icono: Blocks, permiso: "extensiones.gestionar" },
+    ],
+  },
+  {
     grupo: "Administración",
     items: [
       { href: "/app/usuarios", nombre: "Usuarios y permisos", icono: UserCog, permiso: "usuarios.gestionar", atajo: "u" },
@@ -68,6 +79,16 @@ export const NAVEGACION: { grupo: string; items: ItemNav[] }[] = [
 ]
 
 export const TODOS_LOS_ITEMS = NAVEGACION.flatMap((g) => g.items)
+
+/** Un acceso se muestra si el permiso alcanza, el módulo está activo y, si es de una extensión, está activada. */
+export function itemVisible(
+  i: ItemNav,
+  puede: (p: Permiso) => boolean,
+  moduloActivo: (m: Modulo) => boolean,
+  extensionActiva: (x: IdExtension) => boolean,
+) {
+  return puede(i.permiso) && (!i.modulo || moduloActivo(i.modulo)) && (!i.extension || extensionActiva(i.extension))
+}
 
 /** Accesos de la barra inferior en el celular, según el rol. */
 export const NAV_MOVIL: Record<Rol, string[]> = {

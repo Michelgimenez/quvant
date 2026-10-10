@@ -5,7 +5,7 @@
 /*
  * Yunque — sistema de diseño.
  * Modo oscuro primero: `.dark` va en <html> por defecto (next-themes).
- * Los tokens de marca (--hierro, --forja, ...) son fijos; los semánticos
+ * Los tokens de marca (--hierro, --superficie, ...) son fijos; los semánticos
  * (--background, --primary, ...) cambian por tema y son los que usa shadcn/ui.
  * Contraste AA verificado a mano para texto normal (ver docs/ARQUITECTURA.md).
  */
@@ -21,20 +21,25 @@
 
   /* Paleta de marca */
   --color-hierro: var(--hierro);
-  --color-forja: var(--forja);
   --color-acero: var(--acero);
   --color-niebla: var(--niebla);
   --color-temple: var(--temple);
   --color-chispa: var(--chispa);
   --color-ok: var(--ok);
   --color-error: var(--error);
+  --color-superficie: var(--superficie);
+
+  /* Forja: escala de calor (frío → ascua → brasa → chispa → blanco caliente) */
+  --color-frio: var(--frio);
+  --color-ascua: var(--ascua);
+  --color-brasa: var(--brasa);
+  --color-blanco-caliente: var(--blanco-caliente);
 
   /* Semánticos extra */
   --color-enlace: var(--enlace);
   --color-chispa-texto: var(--chispa-texto);
   --color-ok-texto: var(--ok-texto);
   --color-error-texto: var(--error-texto);
-  --color-superficie: var(--superficie);
   --color-superficie-2: var(--superficie-2);
   --color-linea: var(--linea);
   --color-serie-1: var(--serie-1);
@@ -90,13 +95,18 @@
 /* Tokens de marca: no cambian con el tema */
 :root {
   --hierro: #0e1116;
-  --forja: #1a1f27;
+  --superficie: #1a1f27;
   --acero: #9aa3ae;
   --niebla: #eef1f4;
   --temple: #3b6ef5;
   --chispa: #ffb224;
   --ok: #2fb36e;
   --error: #e5484d;
+  /* Forja (extensión): calor del trabajo. --temple sigue siendo solo selección y foco. */
+  --frio: #3a4450;
+  --ascua: #c2410c;
+  --brasa: #ff6a1f;
+  --blanco-caliente: #fff4e0;
   /* Temple accesible para superficies llenas con texto blanco (4,9:1) */
   --temple-accion: #3466f0;
 
@@ -131,7 +141,6 @@
   --chispa-texto: #8a5200;
   --ok-texto: #17794a;
   --error-texto: #b42329;
-  --superficie: #ffffff;
   --superficie-2: #f6f8fa;
   --linea: #d5dae0;
   --grilla: rgb(14 17 22 / 0.045);
@@ -163,9 +172,9 @@
 .dark {
   --background: var(--hierro);
   --foreground: var(--niebla);
-  --card: var(--forja);
+  --card: var(--superficie);
   --card-foreground: var(--niebla);
-  --popover: var(--forja);
+  --popover: var(--superficie);
   --popover-foreground: var(--niebla);
   --primary: var(--temple-accion);
   --primary-foreground: #ffffff;
@@ -184,7 +193,6 @@
   --chispa-texto: var(--chispa);
   --ok-texto: #3fc580;
   --error-texto: #f06368;
-  --superficie: var(--forja);
   --superficie-2: #151a21;
   --linea: rgb(154 163 174 / 0.16);
   --grilla: rgb(238 241 244 / 0.035);

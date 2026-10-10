@@ -24,6 +24,7 @@ export type Escena =
   | "seguridad"
   | "integraciones"
   | "plataforma"
+  | "forja"
 
 export type Feature = {
   id: string
@@ -80,6 +81,7 @@ export const FEATURES: Feature[] = [
   { id: "mercadolibre", nombre: "Mercado Libre", frase: "Stock y precios sincronizados con tus publicaciones.", estado: "próximamente", escena: "integraciones" },
   { id: "app-deposito", nombre: "App de depósito", frase: "Picking y recepción desde el celular, con lector.", estado: "próximamente", escena: "stock", nota: "Hoy el depósito usa la app web adaptada al celular." },
   { id: "migraciones", nombre: "Migración asistida", frase: "Traemos los datos de tu sistema anterior.", estado: "próximamente", escena: "plataforma", nota: "El importador de Excel/CSV existe; los conectores por sistema de origen no." },
+  { id: "forja", nombre: "Forja: el taller conectado", frase: "Todas las sucursales en vivo: ventas, stock, transferencias y reparaciones.", estado: "próximamente", escena: "forja", nota: "Extensión en construcción. Ya existen el modelo de datos, los permisos por sucursal, los canales en vivo y el simulador de la demo." },
 ]
 
 export function featuresPorEstado(estado: EstadoFeature) {

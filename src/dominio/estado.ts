@@ -24,6 +24,7 @@ import type {
   Sucursal,
   Usuario,
   Venta,
+  Transferencia,
 } from "./tipos"
 
 /**
@@ -53,6 +54,7 @@ export type EstadoEmpresa = {
   servicio: Record<Id, OrdenServicio>
   compras: Record<Id, OrdenCompra>
   entregas: Record<Id, Entrega>
+  transferencias: Record<Id, Transferencia>
   cajas: Record<Id, SesionCaja>
   movimientosCaja: MovimientoCaja[]
   conteos: Record<Id, Conteo>

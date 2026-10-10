@@ -15,7 +15,7 @@ export const metadata: Metadata = {
 
 const PALETA = [
   { token: "--hierro", hex: "#0E1116", uso: "Fondo principal" },
-  { token: "--forja", hex: "#1A1F27", uso: "Superficies" },
+  { token: "--superficie", hex: "#1A1F27", uso: "Superficies" },
   { token: "--acero", hex: "#9AA3AE", uso: "Texto secundario" },
   { token: "--niebla", hex: "#EEF1F4", uso: "Texto sobre oscuro" },
   { token: "--temple", hex: "#3B6EF5", uso: "Acción, enlaces, foco" },
@@ -34,7 +34,7 @@ export default function PaginaMarca() {
         </header>
 
         <section className="grid gap-4 md:grid-cols-[2fr_1fr]">
-          <div className="flex min-h-72 flex-col items-center justify-center gap-8 rounded-xl bg-forja p-10 text-niebla">
+          <div className="flex min-h-72 flex-col items-center justify-center gap-8 rounded-xl bg-superficie p-10 text-niebla">
             <Logo className="h-16 sm:h-20" tono="negativo" />
             <p className="font-display text-2xl font-semibold">Firme, aunque todo se mueva.</p>
           </div>
@@ -42,7 +42,7 @@ export default function PaginaMarca() {
             <div className="flex items-center justify-center rounded-xl bg-niebla p-8 text-hierro">
               <Logo className="h-10" tono="positivo" />
             </div>
-            <div className="flex items-center gap-6 rounded-xl bg-forja p-6 text-niebla">
+            <div className="flex items-center gap-6 rounded-xl bg-superficie p-6 text-niebla">
               <Isotipo className="h-12" tono="negativo" />
               <Wordmark className="h-8" />
             </div>

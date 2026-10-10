@@ -34,6 +34,20 @@ Picking, recepción y conteos con lector, pensada para el celular del depósito.
 ### 5 · Integraciones
 Mercado Pago, Mercado Libre y WhatsApp Business conectados de verdad (hoy emulados detrás de interfaces en `src/integraciones/`).
 
+## Forja (extensión visual): en construcción
+
+Forja convierte los datos de Yunque en un taller conectado: las sucursales en un mapa, cada una por dentro en 3D, y la jornada que se puede reproducir. Plan por fases (detalle en `docs/FORJA.md` cuando esté completa):
+
+1. **Base** ✔︎ — token `--superficie`, paleta de calor, modelo de datos (ubicación de sucursales, transferencias en tránsito, extensiones por empresa, preferencias, permisos extra por persona), lecturas SQL con RLS, canales en vivo por sucursal, simulador para la demo y tests de aislamiento.
+2. Red en el mapa (MapLibre + deck.gl) y constelación.
+3. Taller isométrico 3D por sucursal.
+4. Línea de tiempo del día y modo sala de control.
+5. Animación de activación y página de extensiones.
+6. Recorrido de una pieza (SKU o máquina).
+7. Versión 2D completa (movimiento reducido y equipos modestos).
+8. Demo pública para Ferremix, videos, sitio y presentación.
+9. Rendimiento, accesibilidad y documentación.
+
 ## Cómo empieza un negocio (implementación)
 
 1. **Relevamiento** — cómo trabajan hoy: sistema, precios, stock y sucursales.

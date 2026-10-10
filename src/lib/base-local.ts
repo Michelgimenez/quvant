@@ -36,8 +36,10 @@ async function abrir() {
   const { rows } = await db.query<{ archivo: string }>("select archivo from local.migraciones")
   const hechas = new Set(rows.map((r) => r.archivo))
   const raiz = path.join(process.cwd(), "supabase")
+  // Cada archivo se aplica una sola vez, por nombre: lo nuevo va en archivos nuevos
   const pendientes = [
     { archivo: "local/shim-supabase.sql", ruta: path.join(raiz, "local", "shim-supabase.sql") },
+    { archivo: "local/shim-realtime.sql", ruta: path.join(raiz, "local", "shim-realtime.sql") },
     ...readdirSync(path.join(raiz, "migrations"))
       .filter((f) => f.endsWith(".sql"))
       .sort()

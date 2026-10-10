@@ -24,7 +24,7 @@ export function PuertaClave({
   const [estado, enviar, pendiente] = useActionState<Estado, FormData>(accion, {})
   return (
     <main className="dark grilla-tecnica flex min-h-dvh items-center justify-center bg-hierro px-4 py-10 text-niebla">
-      <div className="w-full max-w-sm rounded-2xl border border-white/10 bg-forja/90 p-8 shadow-2xl">
+      <div className="w-full max-w-sm rounded-2xl border border-white/10 bg-superficie/90 p-8 shadow-2xl">
         <Isotipo className="h-12 text-niebla" tono="negativo" />
         <h1 className="mt-6 text-2xl font-bold tracking-tight">{titulo}</h1>
         <p className="mt-2 text-sm text-acero">{bajada}</p>

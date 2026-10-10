@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation"
 import { useTheme } from "next-themes"
 import { FilePlus2, Moon, Package, RefreshCw, ShoppingCart, Sun, Unplug, User } from "lucide-react"
 import { useApp, useDatos } from "@/cliente/app-contexto"
-import { TODOS_LOS_ITEMS } from "@/cliente/navegacion"
+import { TODOS_LOS_ITEMS, itemVisible } from "@/cliente/navegacion"
 import { corteSimulado, setCorteSimulado } from "@/cliente/red"
 import { CommandDialog, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList, CommandSeparator, CommandShortcut } from "@/components/ui/command"
 import { normalizar } from "@/lib/texto"
@@ -17,7 +17,7 @@ export function PaletaComandos() {
   const [abierta, setAbierta] = useState(false)
   const [texto, setTexto] = useState("")
   const router = useRouter()
-  const { puede, moduloActivo, motor } = useApp()
+  const { puede, moduloActivo, extensionActiva, motor } = useApp()
   const { e, v } = useDatos()
   const { resolvedTheme, setTheme } = useTheme()
 
@@ -59,7 +59,7 @@ export function PaletaComandos() {
     router.push(href)
   }
 
-  const items = TODOS_LOS_ITEMS.filter((i) => puede(i.permiso) && (!i.modulo || moduloActivo(i.modulo)))
+  const items = TODOS_LOS_ITEMS.filter((i) => itemVisible(i, puede, moduloActivo, extensionActiva))
 
   return (
     <CommandDialog open={abierta} onOpenChange={setAbierta} title="Buscar en Yunque" description="Módulos, productos, clientes y acciones">

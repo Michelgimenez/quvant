@@ -72,7 +72,7 @@ export function Hero() {
             <PlayCircle className="size-4" /> Probarlo acá mismo
           </a>
         </div>
-        <p className="aparecer mt-6 inline-flex items-center gap-2 rounded-full border border-white/10 bg-forja/70 px-3 py-1 text-xs text-acero" style={{ animationDelay: "1.6s" }}>
+        <p className="aparecer mt-6 inline-flex items-center gap-2 rounded-full border border-white/10 bg-superficie/70 px-3 py-1 text-xs text-acero" style={{ animationDelay: "1.6s" }}>
           <span className="size-1.5 rounded-full bg-chispa" aria-hidden />
           {SITIO.estado}
         </p>

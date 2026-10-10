@@ -51,7 +51,7 @@ export function Problema() {
       <Encabezado id="titulo-problema" ficha="01 · El problema" titulo="El sistema no puede ser el que frena el negocio." bajada="En una ferretería industrial se venden miles de artículos, con precios que cambian todo el tiempo. Con las herramientas de siempre, eso cuesta caro." />
       <ul className="grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
         {PROBLEMAS.map((p) => (
-          <li key={p.titulo} className="rounded-xl border border-white/10 bg-forja/70 p-5">
+          <li key={p.titulo} className="rounded-xl border border-white/10 bg-superficie/70 p-5">
             <p.icono className="size-6 text-acero" aria-hidden />
             <h3 className="mt-4 font-semibold text-niebla">{p.titulo}</h3>
             <p className="mt-2 text-sm text-acero">{p.texto}</p>
@@ -114,7 +114,7 @@ function Captura({ id, alt }: { id: string; alt: string }) {
 
 export function MarcoNavegador({ children, className }: { children: React.ReactNode; className?: string }) {
   return (
-    <div className={cn("overflow-hidden rounded-xl border border-white/10 bg-forja shadow-2xl shadow-black/40", className)}>
+    <div className={cn("overflow-hidden rounded-xl border border-white/10 bg-superficie shadow-2xl shadow-black/40", className)}>
       <div className="flex items-center gap-1.5 border-b border-white/10 px-3 py-2" aria-hidden>
         <span className="size-2.5 rounded-full bg-white/15" />
         <span className="size-2.5 rounded-full bg-white/15" />
@@ -140,7 +140,7 @@ export function ParaQuien() {
       <Encabezado id="titulo-para-quien" ficha="05 · Para quién es" titulo="Hecho para negocios con stock complicado." />
       <ul className="grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
         {AUDIENCIAS.map((a) => (
-          <li key={a.titulo} className="rounded-xl border border-white/10 bg-forja/70 p-5">
+          <li key={a.titulo} className="rounded-xl border border-white/10 bg-superficie/70 p-5">
             <a.icono className="size-6 text-temple" aria-hidden />
             <h3 className="mt-4 font-semibold text-niebla">{a.titulo}</h3>
             <p className="mt-2 text-sm text-acero">{a.texto}</p>
@@ -166,7 +166,7 @@ export function Seguridad() {
       <Encabezado id="titulo-seguridad" ficha="06 · Seguridad y tus datos" titulo="Tus datos, cuidados y siempre tuyos." bajada="Sin promesas de certificaciones que no tenemos: antes de pasar a producción, una auditoría externa revisa la arquitectura y la seguridad." />
       <ul className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
         {SEGURIDAD.map((s) => (
-          <li key={s.titulo} className="flex gap-4 rounded-xl border border-white/10 bg-forja/70 p-5">
+          <li key={s.titulo} className="flex gap-4 rounded-xl border border-white/10 bg-superficie/70 p-5">
             <s.icono className="size-6 shrink-0 text-ok" aria-hidden />
             <div>
               <h3 className="font-semibold text-niebla">{s.titulo}</h3>
@@ -190,7 +190,7 @@ export function Precios() {
       />
       <div className="grid gap-4 md:grid-cols-2">
         {PRECIOS.planes.map((p, i) => (
-          <article key={p.id} className={cn("flex flex-col rounded-2xl border p-6", i === 0 ? "border-temple/50 bg-forja" : "border-white/10 bg-forja/70")}>
+          <article key={p.id} className={cn("flex flex-col rounded-2xl border p-6", i === 0 ? "border-temple/50 bg-superficie" : "border-white/10 bg-superficie/70")}>
             <h3 className="text-xl font-bold text-niebla">{p.nombre}</h3>
             <p className="mt-1 text-sm text-acero">{p.para}</p>
             <p className="mt-6 text-niebla">
@@ -227,7 +227,7 @@ export function EstadoProducto() {
       <Encabezado id="titulo-estado" ficha="Estado real" titulo="Qué está listo hoy." bajada={`${SITIO.estado}. Esto es lo que funciona, lo que se puede ver con partes emuladas y lo que viene.`} />
       <div className="grid gap-4 lg:grid-cols-3">
         {grupos.map((g) => (
-          <div key={g} className="rounded-xl border border-white/10 bg-forja/70 p-5">
+          <div key={g} className="rounded-xl border border-white/10 bg-superficie/70 p-5">
             <EstadoFeatureBadge estado={g} className="border-white/10 bg-hierro" />
             <p className="mt-2 text-xs text-acero">
               {g === "disponible" && "Funciona de punta a punta en la app (hoy con datos de demostración)."}
@@ -264,7 +264,7 @@ export function Preguntas() {
   return (
     <section id="preguntas" className="diferida mx-auto max-w-3xl scroll-mt-24 px-4 py-20" aria-labelledby="titulo-preguntas">
       <Encabezado id="titulo-preguntas" ficha="09 · Preguntas" titulo="Lo que nos preguntan." centrado />
-      <div className="divide-y divide-white/10 rounded-2xl border border-white/10 bg-forja/70">
+      <div className="divide-y divide-white/10 rounded-2xl border border-white/10 bg-superficie/70">
         {PREGUNTAS.map(([p, r]) => (
           <details key={p} className="group px-5 py-4">
             <summary className="flex cursor-pointer list-none items-center justify-between gap-4 font-medium text-niebla">

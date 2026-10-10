@@ -40,7 +40,7 @@ export function EncabezadoSitio() {
             <summary className="flex size-9 cursor-pointer list-none items-center justify-center rounded-lg text-niebla [&::-webkit-details-marker]:hidden" aria-label="Menú">
               <Menu className="size-5" />
             </summary>
-            <nav className="absolute right-0 top-11 w-56 rounded-xl border border-white/10 bg-forja p-2 shadow-xl" aria-label="Secciones (menú)">
+            <nav className="absolute right-0 top-11 w-56 rounded-xl border border-white/10 bg-superficie p-2 shadow-xl" aria-label="Secciones (menú)">
               {ENLACES.map(([href, n]) => (
                 <a key={href} href={href} className="block rounded-md px-3 py-2.5 text-sm text-niebla hover:bg-white/5">
                   {n}
