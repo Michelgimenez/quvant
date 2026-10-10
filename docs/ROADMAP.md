@@ -39,7 +39,7 @@ Mercado Pago, Mercado Libre y WhatsApp Business conectados de verdad (hoy emulad
 Forja convierte los datos de Yunque en un taller conectado: las sucursales en un mapa, cada una por dentro en 3D, y la jornada que se puede reproducir. Plan por fases (detalle en `docs/FORJA.md` cuando esté completa):
 
 1. **Base** ✔︎ — token `--superficie`, paleta de calor, modelo de datos (ubicación de sucursales, transferencias en tránsito, extensiones por empresa, preferencias, permisos extra por persona), lecturas SQL con RLS, canales en vivo por sucursal, simulador para la demo y tests de aislamiento.
-2. Red en el mapa (MapLibre + deck.gl) y constelación.
+2. **Red en el mapa** ✔︎ — MapLibre + deck.gl, nodos con calor y stock crítico, transferencias animadas, tarjetas y constelación.
 3. Taller isométrico 3D por sucursal.
 4. Línea de tiempo del día y modo sala de control.
 5. Animación de activación y página de extensiones.

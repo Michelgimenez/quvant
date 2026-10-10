@@ -53,7 +53,8 @@ export async function activarForja(p: Page) {
   await p.getByTestId("activar-forja").click()
   await p.waitForURL(/\/app\/forja/)
   await p.getByTestId("forja").waitFor({ timeout: 30_000 })
-  await p.waitForTimeout(1500)
+  await p.locator("[data-testid=forja-red][data-listo=true]").waitFor({ timeout: 60_000 })
+  await p.waitForTimeout(3500)
 }
 
 /** Pantallas a capturar. Se completa a medida que se construye cada fase. */
@@ -177,7 +178,44 @@ export const PANTALLAS: Pantalla[] = [
   { id: "estado", ruta: "/estado", esperar: "h1" },
   { id: "inversores-clave", ruta: "/inversores", esperar: "#clave" },
   { id: "forja-extensiones", ruta: "/app/extensiones", usuario: "dueno@demo.yunque.app", esperar: "[data-testid=extension-forja]", carpeta: "forja" },
-  { id: "forja-red-base", ruta: "/app", usuario: "dueno@demo.yunque.app", esperar: "#contenido h1", carpeta: "forja", antes: activarForja },
+  { id: "forja-red-mapa", ruta: "/app", usuario: "dueno@demo.yunque.app", esperar: "#contenido h1", carpeta: "forja", antes: activarForja },
+  {
+    id: "forja-red-tarjeta",
+    ruta: "/app",
+    usuario: "dueno@demo.yunque.app",
+    esperar: "#contenido h1",
+    carpeta: "forja",
+    soloEscritorio: true,
+    antes: async (p) => {
+      await activarForja(p)
+      await p.locator("[data-nodo=CC] button").hover({ force: true })
+      await p.getByTestId("tarjeta-nodo").waitFor()
+    },
+  },
+  {
+    id: "forja-red-transferencia",
+    ruta: "/app",
+    usuario: "dueno@demo.yunque.app",
+    esperar: "#contenido h1",
+    carpeta: "forja",
+    antes: async (p) => {
+      await activarForja(p)
+      await p.getByTestId("transferencia-en-transito").first().click()
+      await p.getByTestId("detalle-transferencia").waitFor()
+    },
+  },
+  {
+    id: "forja-red-constelacion",
+    ruta: "/app",
+    usuario: "dueno@demo.yunque.app",
+    esperar: "#contenido h1",
+    carpeta: "forja",
+    antes: async (p) => {
+      await activarForja(p)
+      await p.getByTestId("vista-constelacion").click()
+      await p.waitForTimeout(1600)
+    },
+  },
   ...ESCENAS_INVERSORES.map((nombre, i) => ({
     id: `inversores-${String(i + 1).padStart(2, "0")}-${nombre}`,
     ruta: "/inversores",

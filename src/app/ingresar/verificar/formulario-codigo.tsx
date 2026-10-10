@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { ES_DEMO } from "@/lib/modo"
-import { verificarCodigo, type EstadoVerificacion } from "../acciones"
+import { verificarCodigo, type EstadoVerificacion } from "@/acciones/ingreso"
 
 type CodigoDemo = { codigo: string; segundosRestantes: number }
 

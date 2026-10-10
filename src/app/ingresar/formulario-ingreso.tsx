@@ -6,7 +6,7 @@ import { Loader2 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { ingresar, type EstadoIngreso } from "./acciones"
+import { ingresar, type EstadoIngreso } from "@/acciones/ingreso"
 import { EVENTO_USAR_DEMO } from "./usuarios-demo"
 
 export function FormularioIngreso() {

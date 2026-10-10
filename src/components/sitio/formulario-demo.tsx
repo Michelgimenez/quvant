@@ -2,7 +2,7 @@
 
 import { useActionState } from "react"
 import { CheckCircle2, Loader2 } from "lucide-react"
-import { pedirDemo, type EstadoSolicitud } from "@/app/acciones-sitio"
+import { pedirDemo, type EstadoSolicitud } from "@/acciones/sitio"
 import { RUBROS } from "@/config/sitio"
 import { unir } from "@/lib/unir"
 

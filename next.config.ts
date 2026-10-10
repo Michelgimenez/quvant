@@ -6,6 +6,8 @@ const esDev = process.env.NODE_ENV === "development"
 const conHttps = (process.env.NEXT_PUBLIC_SITIO_URL ?? "").startsWith("https://")
 const supabase = process.env.NEXT_PUBLIC_SUPABASE_URL ?? ""
 const supabaseWs = supabase.replace(/^http/, "ws")
+// Mapa base de Forja: estilo oscuro gratuito de CARTO (tiles, fuentes y sprites)
+const mapas = "https://basemaps.cartocdn.com https://*.basemaps.cartocdn.com"
 
 /**
  * CSP sin nonces: 'unsafe-inline' en scripts es necesario para el payload
@@ -16,9 +18,9 @@ const csp = [
   "default-src 'self'",
   `script-src 'self' 'unsafe-inline'${esDev ? " 'unsafe-eval'" : ""}`,
   "style-src 'self' 'unsafe-inline'",
-  "img-src 'self' blob: data:",
+  `img-src 'self' blob: data: ${mapas}`,
   "font-src 'self' data:",
-  `connect-src 'self'${supabase ? ` ${supabase} ${supabaseWs}` : ""}`,
+  `connect-src 'self' ${mapas}${supabase ? ` ${supabase} ${supabaseWs}` : ""}`,
   "media-src 'self' blob:",
   "worker-src 'self' blob:",
   "manifest-src 'self'",

@@ -101,6 +101,10 @@
 | D52 | **Simulador de la demo**: propone intenciones (ventas al ritmo de cada sucursal, despachos hacia stock crítico, recepciones, avances de servicio) que se convierten en **operaciones reales** con un autor verosímil y se inyectan en el servidor demo: mismas reglas que la app. Solo en organizaciones demo, con el sello SIMULACIÓN; sus cambios no disparan el aviso "cambios desde otros puestos". | Que la demo se vea viva sin inventar datos fuera del modelo de Yunque. |
 | D53 | deck.gl **9.3.11** (la 9.4.0 depende de `@loaders.gl/worker-utils@4.5.4`, que no está publicado) y `overrides` para fijar la familia `@loaders.gl` en 4.5.3. | Instalación reproducible. |
 | D54 | Coordenadas: "Ferremix Moreno" (Av. Bartolomé Mitre 2322, Moreno) geocodificada **una vez** con Nominatim (OpenStreetMap): −34,65088, −58,78347. Las sucursales de la empresa demo tienen coordenadas **ilustrativas** en el Gran Buenos Aires (son ficticias: sello DEMO). Error a reportar: en esa única consulta mandé el email del usuario en el encabezado User-Agent (Nominatim pide contacto) sin preguntar antes. | Pedido del documento; la consulta no se repite. |
+| D55 | **Red (nivel 1)**: MapLibre con el estilo dark-matter de CARTO teñido a la paleta (atribución visible), deck.gl encima para arcos 3D, estelas que recorren los arcos y el brillo de los nodos; los **nodos son elementos del DOM** (botones accesibles) que se ubican con la proyección del mapa o con el diseño de la constelación, y se reacomodan con GSAP. | DOM para lo que se lee y se toca (texto nítido, foco, teclado); WebGL para lo que brilla y se mueve. |
+| D56 | El **worker de MapLibre** se copia de `node_modules` a `public/vendor/maplibre/` antes de `dev` y `build` (`scripts/copiar-maplibre.mjs`) y se fija con `setWorkerUrl`. | Turbopack no resuelve la URL del worker que arma MapLibre; así queda la misma versión instalada y dentro de la CSP (`'self'`). |
+| D57 | Las server actions compartidas pasaron a `src/acciones/` (`sitio.ts`, `ingreso.ts`). | En desarrollo, `/` y `/ingresar` se recargaban en bucle por importar acciones desde la carpeta de otra ruta (existía desde las fases de Yunque; los e2e corren contra producción y no lo veían). |
+| D58 | CSP: `connect-src` e `img-src` suman `basemaps.cartocdn.com` y `*.basemaps.cartocdn.com` (estilo, tiles, fuentes y sprites del mapa). | Mínimo necesario para el mapa base gratuito. |
 
 ## Fases
 
@@ -248,3 +252,13 @@ Pedido: verificar y corregir, sin funciones nuevas (salvo el destino de "Pedir u
 - **Stack** instalado (Three.js, React Three Fiber, drei, MapLibre, deck.gl, GSAP, zustand) para las fases siguientes (D53).
 - El *shim* de Realtime va en su propio archivo (`supabase/local/shim-realtime.sql`): la base local aplica cada archivo una sola vez por nombre, y agregar Realtime al shim original había dejado sin aplicar la migración 0900 en una base ya creada (lo detectaron los e2e de "Pedir una demo").
 - Tests: 15 unitarios de Forja, 14 de aislamiento de Forja (lecturas, vista, canales, operaciones) y 2 e2e (activación con simulación viva; permiso extra ve solo su sucursal y sin permiso no hay acceso). Capturas en `docs/capturas/forja/`.
+
+### Forja · Fase 2 — Red en el mapa
+- **Mapa** (MapLibre, estilo oscuro de CARTO teñido: hormigón y grafito, nombres apagados, sin puntos de interés) con inclinación de 50°, encuadre de toda la red y atribución visible (D55, D58).
+- **Nodos-forja**: núcleo con el color de la escala de calor, anillo con la porción de stock crítico en ámbar, halo contenido (deck.gl, aditivo) y pulso por cada venta en vivo. Nombre, código y sello DEMO en cada sucursal ficticia.
+- **Transferencias en tránsito**: arcos 3D con estelas finas que recorren el arco (sentido y movimiento) y el bulto ubicado según la llegada estimada; clic en el arco o en la lista → detalle con productos, cantidades, salida y llegada estimada.
+- **Tarjeta del nodo** (cursor o foco): ventas de hoy, presupuestos abiertos, stock crítico y sin stock, ventas sin sincronizar y órdenes de servicio por estado.
+- **Constelación**: disposición radial con nodos dimensionados por facturación (28 días) y enlaces con grosor por volumen de transferencias; el interruptor Mapa/Constelación reacomoda los nodos con una animación de 0,9 s.
+- Carga diferida verificada en e2e: los scripts de `/app/inventario` no contienen MapLibre ni deck.gl.
+- Arreglos de paso: worker de MapLibre (D56) y bucle de recargas en desarrollo (D57).
+- Tests: 3 e2e de Forja (red completa con tarjeta, transferencia, constelación y simulación; permisos por sucursal; carga diferida). Capturas en `docs/capturas/forja/forja-red-*`.

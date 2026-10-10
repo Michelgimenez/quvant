@@ -29,9 +29,13 @@ export type NodoForja = {
   promedioHora: number
   /** 0 = frío · 1 = promedio de la sucursal · ≥ 2 = pico. */
   calor: number
+  /** Facturación de los últimos 28 días (centavos): tamaño en la constelación. */
+  facturacion28: number
   presupuestosAbiertos: number
   stockCritico: number
   sinStock: number
+  /** Productos con stock mínimo definido (base del anillo de stock crítico). */
+  productosConMinimo: number
   ordenes: Partial<Record<EstadoServicio, number>>
   /** Ventas hechas sin conexión que todavía no se sincronizaron (cola del mostrador). */
   colaSinConexion: number
@@ -51,10 +55,14 @@ export type TransferenciaForja = {
   motivo: string
 }
 
+/** Volumen de transferencias entre dos sucursales en 28 días (grosor del enlace). */
+export type FlujoForja = { desdeId: Id; haciaId: Id; transferencias: number; unidades: number }
+
 export type RedForja = {
   org: { id: Id; nombre: string; esDemo: boolean }
   nodos: NodoForja[]
   transferencias: TransferenciaForja[]
+  flujos: FlujoForja[]
   generadoEn: FechaISO
 }
 
@@ -125,14 +133,17 @@ export function redForja(e: EstadoEmpresa, ahora: Date, permitidas: Id[] | null 
   const visibles = e.sucursales.filter((s) => permitidas === null || permitidas.includes(s.id))
   const ids = new Set(visibles.map((s) => s.id))
 
-  const porSucursal = new Map<Id, { hoy: number; importe: number; hora: number; mes: number; cola: number }>()
-  for (const s of visibles) porSucursal.set(s.id, { hoy: 0, importe: 0, hora: 0, mes: 0, cola: 0 })
+  const porSucursal = new Map<Id, { hoy: number; importe: number; hora: number; mes: number; facturacion: number; cola: number }>()
+  for (const s of visibles) porSucursal.set(s.id, { hoy: 0, importe: 0, hora: 0, mes: 0, facturacion: 0, cola: 0 })
   for (const v of Object.values(e.ventas)) {
     const acc = porSucursal.get(v.sucursalId)
     if (!acc || v.estado !== "confirmada") continue
     const t = Date.parse(v.fecha)
     if (t > ahora.getTime()) continue
-    if (t >= hace28) acc.mes++
+    if (t >= hace28) {
+      acc.mes++
+      acc.facturacion += v.total
+    }
     if (t >= inicio) {
       acc.hoy++
       acc.importe += v.total
@@ -161,6 +172,8 @@ export function redForja(e: EstadoEmpresa, ahora: Date, permitidas: Id[] | null 
       ventasUltimaHora: a.hora,
       promedioHora,
       calor: calorRelativo(a.hora, promedioHora),
+      facturacion28: a.facturacion,
+      productosConMinimo: stock.length,
       presupuestosAbiertos: Object.values(e.presupuestos).filter((p) => p.sucursalId === s.id && ["borrador", "enviado", "aceptado"].includes(p.estado) && !p.ventaId).length,
       stockCritico: stock.filter((st) => st.cantidad > 0 && st.cantidad <= st.minimo).length,
       sinStock: stock.filter((st) => st.cantidad <= 0).length,
@@ -183,7 +196,17 @@ export function redForja(e: EstadoEmpresa, ahora: Date, permitidas: Id[] | null 
       items: t.items.map((i) => ({ productoId: i.productoId, nombre: e.productos[i.productoId]?.nombre ?? "Producto", cantidad: i.cantidad })),
     }))
 
-  return { org: { id: e.org.id, nombre: e.org.nombre, esDemo: e.org.esDemo }, nodos, transferencias, generadoEn: ahora.toISOString() }
+  const flujosMap = new Map<string, FlujoForja>()
+  for (const t of Object.values(e.transferencias)) {
+    if (!ids.has(t.desdeId) || !ids.has(t.haciaId) || Date.parse(t.despachadaEn) < hace28) continue
+    const k = `${t.desdeId}>${t.haciaId}`
+    const f = flujosMap.get(k) ?? { desdeId: t.desdeId, haciaId: t.haciaId, transferencias: 0, unidades: 0 }
+    f.transferencias++
+    f.unidades += t.items.reduce((a, i) => a + i.cantidad, 0)
+    flujosMap.set(k, f)
+  }
+
+  return { org: { id: e.org.id, nombre: e.org.nombre, esDemo: e.org.esDemo }, nodos, transferencias, flujos: [...flujosMap.values()], generadoEn: ahora.toISOString() }
 }
 
 /** Interior de una sucursal (nivel 2). */

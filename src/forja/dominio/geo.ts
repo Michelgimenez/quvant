@@ -49,3 +49,19 @@ export function proyeccion(puntos: { lat: number; lng: number }[], ancho: number
     return { x: ancho / 2 + (m.x - cx) * escala, y: alto / 2 + (m.y - cy) * escala }
   }
 }
+
+export type Punto3D = [lng: number, lat: number, alturaM: number]
+
+/**
+ * Arco de transferencia: recta en el plano con altura parabólica (en metros),
+ * proporcional a la distancia. Se usa igual para dibujar el arco y para ubicar
+ * las chispas que viajan sobre él.
+ */
+export function puntoEnArco(a: { lat: number; lng: number }, b: { lat: number; lng: number }, t: number): Punto3D {
+  const altura = distanciaKm(a, b) * 1000 * 0.22
+  return [a.lng + (b.lng - a.lng) * t, a.lat + (b.lat - a.lat) * t, Math.sin(Math.PI * t) * altura]
+}
+
+export function puntosArco(a: { lat: number; lng: number }, b: { lat: number; lng: number }, segmentos = 48): Punto3D[] {
+  return Array.from({ length: segmentos + 1 }, (_, i) => puntoEnArco(a, b, i / segmentos))
+}

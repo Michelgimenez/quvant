@@ -48,3 +48,6 @@ next-env.d.ts
 /test-results/
 /playwright-report/
 /blob-report/
+
+# Copiado de node_modules antes de dev/build (scripts/copiar-maplibre.mjs)
+/public/vendor/
