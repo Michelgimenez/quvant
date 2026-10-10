@@ -1,5 +1,16 @@
 import type { Page } from "@playwright/test"
 
+/** Recorre la página para que se monten las secciones que cargan al entrar en pantalla. */
+export async function recorrer(p: Page) {
+  const alto = await p.evaluate(() => document.body.scrollHeight)
+  for (let y = 0; y < alto; y += 600) {
+    await p.evaluate((n) => window.scrollTo(0, n), y)
+    await p.waitForTimeout(120)
+  }
+  await p.waitForTimeout(1500)
+  await p.evaluate(() => window.scrollTo(0, 0))
+}
+
 export type Pantalla = {
   id: string
   ruta: string
@@ -19,6 +30,23 @@ export type Pantalla = {
 /** Pantallas a capturar. Se completa a medida que se construye cada fase. */
 export const PANTALLAS: Pantalla[] = [
   { id: "marca", ruta: "/marca", paginaCompleta: true },
+  { id: "sitio", ruta: "/", paginaCompleta: true, antes: recorrer },
+  { id: "sitio-hero", ruta: "/" },
+  {
+    id: "sitio-nunca-se-cae",
+    ruta: "/",
+    antes: async (p) => {
+      await p.locator("#nunca-se-cae").scrollIntoViewIfNeeded()
+      const demo = p.getByTestId("demo-conexion")
+      await demo.waitFor()
+      await demo.getByRole("button").first().click()
+      await p.waitForTimeout(800)
+      await demo.getByTestId("demo-interruptor").click()
+      await demo.getByRole("button").nth(1).click()
+      await demo.getByRole("button").nth(3).click()
+      await p.locator("#titulo-nunca").scrollIntoViewIfNeeded()
+    },
+  },
   { id: "ingresar", ruta: "/ingresar" },
   { id: "app-tablero", ruta: "/app", usuario: "dueno@demo.yunque.app", esperar: "[data-testid=ventas-hoy]", publica: true },
   { id: "app-tablero-mostrador", ruta: "/app", usuario: "mostrador@demo.yunque.app", esperar: "#contenido h1" },

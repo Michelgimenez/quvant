@@ -45,6 +45,9 @@ const nextConfig: NextConfig = {
   experimental: {
     // Navegaciones y Server Actions quedan pendientes (no fallan) sin conexión.
     useOffline: true,
+    // CSS incrustado en el HTML: sin pedidos que bloqueen el primer pintado
+    // (Tailwind genera poco CSS). También deja el HTML de la app autosuficiente sin conexión.
+    inlineCss: true,
   },
   turbopack: {
     rules: {

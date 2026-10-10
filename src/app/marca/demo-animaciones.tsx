@@ -4,7 +4,7 @@ import { useState } from "react"
 import { RotateCcw, Sparkles } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { YunqueArmado } from "@/components/marca/yunque-armado"
-import { lanzarChispa } from "@/components/marca/momento-chispa"
+import { CapaChispas, lanzarChispa } from "@/components/marca/momento-chispa"
 
 export function DemoAnimaciones() {
   const [vuelta, setVuelta] = useState(0)
@@ -25,6 +25,7 @@ export function DemoAnimaciones() {
           <Button onClick={(e) => lanzarChispa({ desde: e.currentTarget, mensaje: "Cola sincronizada · 3 ventas" })}>
             <Sparkles /> Probar momento chispa
           </Button>
+          <CapaChispas />
         </div>
       </div>
     </section>

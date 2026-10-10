@@ -34,6 +34,8 @@
 | D26 | Integraciones (ARCA, Mercado Pago, Mercado Libre, WhatsApp) detrás de interfaces en `src/integraciones/`, con implementaciones **emuladas** que lo dicen en pantalla ("CAE emulado", "envío emulado"). | Conectar una real = implementar la interfaz; la app no cambia. |
 | D27 | Monitoreo sin proveedor: errores de cliente y servidor (`onRequestError`) como JSON estructurado en la consola del servidor + webhook opcional (`MONITOREO_WEBHOOK`). | No hay cuenta de Sentry; queda listo para conectar. |
 | D28 | La chispa se usa **solo** en los cuatro momentos del documento (cola sincronizada, presupuesto → venta, cierre de caja, conteo sin diferencias). | La regla de marca la reserva para logros; no se agregó en otros lugares. |
+| D29 | Héroe del sitio animado **solo con CSS** (sin JavaScript), demos interactivas que cargan al acercarse a la pantalla, imágenes con `getImageProps` (sin JS de cliente), CSS incrustado (`experimental.inlineCss`) y proveedores de interfaz (toasts, tooltips, chispas) solo donde se usan. | Rendimiento del sitio público. |
+| D30 | El formulario "Pedir una demo" guarda en Supabase si está configurado; en modo demo, en `.data/solicitudes-demo.jsonl` (ignorado por git). Tiene campo trampa contra bots y límite de 5 envíos cada 10 minutos por IP. | Sin claves reales no hay base remota; el archivo local permite probar el flujo completo. |
 | D25 | Service worker escrito a mano (`public/sw.js`): precarga las rutas clave y sus chunks; estáticos cache-first; páginas de `/app` network-first con respaldo. | Serwist y similares dependen de webpack; con Turbopack, un SW chico es más predecible. |
 
 ## Fases
@@ -83,3 +85,12 @@
 - **Importador** Excel/CSV: detección de columnas, números argentinos, validación por fila, vista previa, nuevos vs. actualizados.
 - **Auditoría** con filtros y exportación; **monitoreo de errores** (pantallas de error, `onRequestError`, `/api/errores` con límite); **página de estado** (`/estado`) honesta.
 - Tests: 99 unitarios + RLS, 11 e2e (incluye recorrido de todos los módulos sin errores, permisos del técnico, co-branding y aviso del taller).
+
+### Fase 5 — Sitio del producto (`/`)
+- Héroe: el yunque se arma en tres piezas, cruza el golpe de luz, salta la chispa y aparece "Firme, aunque todo se mueva." (CSS puro; con `prefers-reduced-motion` aparece armado).
+- Secciones: el problema, **"Nunca se cae" interactivo** (mostrador real con el mismo motor de la app, interruptor de internet, cola y sincronización con chispa), módulos con capturas reales en marcos de navegador y su estado del registro, **precios al día** (el aumento masivo de la app sobre el catálogo demo), para quién es, seguridad (sin certificaciones inventadas), precios desde `src/config/precios.ts`, socios fundadores con formulario, "Qué está listo hoy" generado desde `features.ts`, preguntas frecuentes y "Pedir una demo".
+- SEO: metadatos, Open Graph generado con la marca (`/opengraph-image`), JSON-LD `Organization` + `SoftwareApplication`, `robots.txt`, `sitemap.xml`, canónica.
+- **Lighthouse** (Lighthouse 13.5, Chrome del sistema, build de producción local):
+  - Escritorio: Performance **100**, Accesibilidad **100**, Buenas prácticas **100**, SEO **100**.
+  - Celular (simulación 4G lenta + CPU ×4): Accesibilidad **100**, Buenas prácticas **100**, SEO **100**, Performance **77–89** según la corrida (LCP simulado 3,4–3,6 s; TBT 120–530 ms). En Chrome real el LCP observado es de **0,27 s** (el titular, en el primer pintado). **Pendiente**: llevar Performance móvil simulada a ≥ 90; el costo restante es estilo y layout de una página larga más la hidratación de React (ideas en ROADMAP).
+- Tests e2e del sitio: héroe y JSON-LD, "Nunca se cae" (vender, cortar, vender, reconectar, chispa), formulario con validación.

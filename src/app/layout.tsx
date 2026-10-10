@@ -7,7 +7,7 @@ import "./globals.css"
 // Inter con eje óptico: opsz 32 = Inter Display (titulares), opsz 14 = texto.
 const inter = Inter({
   variable: "--font-inter",
-  subsets: ["latin", "latin-ext"],
+  subsets: ["latin"],
   axes: ["opsz"],
   display: "swap",
 })
@@ -16,6 +16,7 @@ const jetbrains = JetBrains_Mono({
   variable: "--font-jetbrains",
   subsets: ["latin"],
   display: "swap",
+  preload: false,
 })
 
 export const metadata: Metadata = {

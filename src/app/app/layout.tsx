@@ -1,5 +1,6 @@
 import type { Metadata } from "next"
 import { ShellApp } from "@/components/app/shell"
+import { ProveedoresInterfaz } from "@/components/base/proveedores-interfaz"
 
 export const metadata: Metadata = {
   title: { default: "App", template: "%s · Yunque" },
@@ -8,5 +9,9 @@ export const metadata: Metadata = {
 }
 
 export default function LayoutApp({ children }: LayoutProps<"/app">) {
-  return <ShellApp>{children}</ShellApp>
+  return (
+    <ProveedoresInterfaz>
+      <ShellApp>{children}</ShellApp>
+    </ProveedoresInterfaz>
+  )
 }

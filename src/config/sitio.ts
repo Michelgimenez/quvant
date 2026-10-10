@@ -19,6 +19,9 @@ export const SITIO = {
   },
 } as const
 
+/** Rubros del formulario "Pedir una demo". */
+export const RUBROS = ["Ferretería industrial", "Distribuidora de maquinaria", "Corralón", "Casa de repuestos", "Ferretería", "Otro"] as const
+
 export const ES_COMPLETAR = /\[COMPLETAR[^\]]*\]/
 
 export function estaCompleto(valor: string) {

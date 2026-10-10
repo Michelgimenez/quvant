@@ -296,6 +296,7 @@
   *::before,
   *::after {
     animation-duration: 1ms !important;
+    animation-delay: 0s !important;
     animation-iteration-count: 1 !important;
     transition-duration: 1ms !important;
     scroll-behavior: auto !important;
@@ -354,4 +355,126 @@
   @page {
     margin: 8mm;
   }
+}
+
+/* Paquetes de datos viajando por el cable (demo "Nunca se cae") */
+.flujo-red {
+  top: -2px;
+  animation: flujo-x 1.2s linear infinite;
+}
+@keyframes flujo-x {
+  from {
+    transform: translateX(-8px);
+  }
+  to {
+    transform: translateX(96px);
+  }
+}
+@media (min-width: 1024px) {
+  .flujo-red {
+    top: 0;
+    animation-name: flujo-y;
+  }
+  @keyframes flujo-y {
+    from {
+      transform: translateY(-8px);
+    }
+    to {
+      transform: translateY(96px);
+    }
+  }
+}
+
+/* ───────── Héroe del sitio: el yunque se arma (solo CSS) ───────── */
+.pieza-yunque {
+  animation: pieza-entra 420ms cubic-bezier(0.2, 0.9, 0.25, 1) both;
+}
+.pieza-base {
+  --desde: 26px;
+}
+.pieza-cintura {
+  --desde: 18px;
+  animation-delay: 250ms;
+}
+.pieza-cara {
+  --desde: -30px;
+  animation-delay: 500ms;
+  animation-duration: 350ms;
+}
+@keyframes pieza-entra {
+  from {
+    opacity: 0;
+    transform: translateY(var(--desde));
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+.golpe-luz {
+  opacity: 0;
+  animation: golpe-luz 500ms ease-out 850ms both;
+}
+@keyframes golpe-luz {
+  0% {
+    opacity: 0;
+    transform: translateX(0);
+  }
+  40% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    transform: translateX(135px);
+  }
+}
+.chispa-hero {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: chispa-hero 550ms cubic-bezier(0.2, 0.9, 0.25, 1) 1050ms both;
+}
+@keyframes chispa-hero {
+  0% {
+    opacity: 0;
+    transform: scale(0.2) rotate(-60deg);
+  }
+  60% {
+    opacity: 1;
+    transform: scale(1.35) rotate(10deg);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1) rotate(0deg);
+  }
+}
+.rayo-hero {
+  stroke-dasharray: 1;
+  stroke-dashoffset: 1;
+  opacity: 0;
+  animation: rayo 600ms ease-out 1080ms both;
+}
+.aparecer {
+  animation: aparecer 600ms cubic-bezier(0.2, 0.9, 0.25, 1) both;
+}
+@keyframes aparecer {
+  from {
+    opacity: 0.01;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .golpe-luz,
+  .rayo-hero {
+    display: none;
+  }
+}
+
+/* Secciones del sitio fuera de pantalla: el navegador no las calcula hasta acercarse */
+.diferida {
+  content-visibility: auto;
+  contain-intrinsic-size: auto 900px;
 }
