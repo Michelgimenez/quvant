@@ -12,6 +12,7 @@ import { aCentavos, formatoPesos } from "@/dominio/dinero"
 import { saldoCliente } from "@/dominio/estado"
 import type { Centavos, Id, MedioPago, Pago } from "@/dominio/tipos"
 import { NOMBRE_MEDIO, totalPagos, vuelto } from "@/dominio/ventas"
+import { integraciones } from "@/integraciones"
 import { cn } from "@/lib/utils"
 
 const ICONO: Record<MedioPago, React.ComponentType<{ className?: string }>> = {
@@ -48,6 +49,7 @@ export function DialogoCobro({
   const [recibido, setRecibido] = useState("")
   const [mpAprobado, setMpAprobado] = useState(false)
   const [qr, setQr] = useState<string | null>(null)
+  const [cobroId, setCobroId] = useState<string | null>(null)
 
   const medios: MedioPago[] = ["efectivo", "debito", "credito", "transferencia", "mercadopago", ...(conCuenta ? (["cuenta_corriente"] as const) : [])]
   const pagado = totalPagos(pagos)
@@ -61,9 +63,20 @@ export function DialogoCobro({
   const montoMp = pagos.filter((p) => p.medio === "mercadopago").reduce((t, p) => t + p.importe, 0)
   useEffect(() => {
     if (!usaMp) return
-    QRCode.toDataURL(`YUNQUE-DEMO|cobro-emulado|${montoMp}`, { margin: 1, width: 180, color: { dark: "#0e1116", light: "#ffffff" } })
-      .then(setQr)
-      .catch(() => setQr(null))
+    let vivo = true
+    integraciones()
+      .cobrador.crearCobroQR(montoMp, `mostrador-${Date.now()}`)
+      .then(async (c) => {
+        const url = await QRCode.toDataURL(c.qrTexto, { margin: 1, width: 180, color: { dark: "#0e1116", light: "#ffffff" } })
+        if (vivo) {
+          setCobroId(c.id)
+          setQr(url)
+        }
+      })
+      .catch(() => vivo && setQr(null))
+    return () => {
+      vivo = false
+    }
   }, [usaMp, montoMp])
 
   const elegir = (medio: MedioPago) => {
@@ -155,7 +168,17 @@ export function DialogoCobro({
                   <CheckCircle2 className="size-4" /> Pago acreditado (simulado)
                 </p>
               ) : (
-                <Button size="sm" variant="outline" onClick={() => setMpAprobado(true)}>
+                <Button
+                  size="sm"
+                  variant="outline"
+                  disabled={!cobroId}
+                  onClick={async () => {
+                    const cobrador = integraciones().cobrador
+                    if (!cobroId) return
+                    cobrador.simularAprobacion(cobroId)
+                    setMpAprobado((await cobrador.consultar(cobroId)) === "aprobado")
+                  }}
+                >
                   <CircleDollarSign /> Simular pago acreditado
                 </Button>
               )}

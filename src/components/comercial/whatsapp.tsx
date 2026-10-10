@@ -4,6 +4,7 @@ import { Copy, MessageCircle } from "lucide-react"
 import { toast } from "sonner"
 import { Button } from "@/components/ui/button"
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog"
+import { integraciones } from "@/integraciones"
 
 /**
  * Aviso por WhatsApp. En la demo el envío está EMULADO: se muestra el mensaje
@@ -43,9 +44,10 @@ export function DialogoWhatsApp({ destinatario, telefono, mensaje, onEnviado, on
             <Copy /> Copiar
           </Button>
           <Button
-            onClick={() => {
+            onClick={async () => {
+              const r = await integraciones().mensajeria.enviar(telefono, mensaje)
               onEnviado?.()
-              toast.success("Aviso registrado (envío emulado)")
+              toast.success(r.emulado ? "Aviso registrado (envío emulado)" : "Mensaje enviado")
               onCerrar()
             }}
           >

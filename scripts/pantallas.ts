@@ -86,4 +86,36 @@ export const PANTALLAS: Pantalla[] = [
       await p.getByTestId("codigo-demo").waitFor()
     },
   },
+  { id: "app-servicio", ruta: "/app/servicio", usuario: "tecnico@demo.yunque.app", esperar: "#contenido h1", publica: true, antes: async (p) => p.getByLabel("Solo mis órdenes").uncheck() },
+  {
+    id: "app-servicio-orden",
+    ruta: "/app/servicio",
+    usuario: "admin@demo.yunque.app",
+    esperar: "#contenido h1",
+    antes: async (p) => {
+      await p.getByRole("region", { name: "Listo para retirar" }).getByRole("button").first().click()
+      await p.getByTestId("detalle-orden").waitFor()
+    },
+  },
+  { id: "app-clientes", ruta: "/app/clientes", usuario: "admin@demo.yunque.app", esperar: "[role=table]", publica: true },
+  {
+    id: "app-cliente-cuenta",
+    ruta: "/app/clientes?filtro=deudores",
+    usuario: "admin@demo.yunque.app",
+    esperar: "[role=table]",
+    antes: async (p) => {
+      await p.getByRole("row").nth(1).click()
+      await p.getByTestId("ficha-cliente").waitFor()
+    },
+  },
+  { id: "app-compras", ruta: "/app/compras", usuario: "compras@demo.yunque.app", esperar: "[role=table]" },
+  { id: "app-compras-sugerencias", ruta: "/app/compras", usuario: "compras@demo.yunque.app", esperar: "[role=table]", antes: async (p) => p.getByRole("tab", { name: /Sugerencias/ }).click() },
+  { id: "app-entregas", ruta: "/app/entregas", usuario: "deposito@demo.yunque.app", esperar: "#contenido h1" },
+  { id: "app-reportes", ruta: "/app/reportes", usuario: "dueno@demo.yunque.app", esperar: "#contenido h1", publica: true, paginaCompleta: true },
+  { id: "app-usuarios", ruta: "/app/usuarios", usuario: "dueno@demo.yunque.app", esperar: "#contenido h1" },
+  { id: "app-permisos", ruta: "/app/usuarios", usuario: "dueno@demo.yunque.app", esperar: "#contenido h1", soloEscritorio: true, antes: async (p) => p.getByRole("tab", { name: "Matriz de permisos" }).click() },
+  { id: "app-configuracion", ruta: "/app/configuracion", usuario: "dueno@demo.yunque.app", esperar: "#contenido h1", publica: true },
+  { id: "app-importar", ruta: "/app/importar", usuario: "compras@demo.yunque.app", esperar: "#contenido h1" },
+  { id: "app-auditoria", ruta: "/app/auditoria", usuario: "dueno@demo.yunque.app", esperar: "[role=table]" },
+  { id: "estado", ruta: "/estado", esperar: "h1" },
 ]

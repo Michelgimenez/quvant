@@ -10,7 +10,7 @@
  * Contraste AA verificado a mano para texto normal (ver docs/ARQUITECTURA.md).
  */
 
-@custom-variant dark (&:is(.dark *));
+@custom-variant dark (&:is(.dark *):not(:is(.light *)));
 
 @theme inline {
   --color-background: var(--background);
@@ -105,8 +105,9 @@
   --radius: 0.625rem;
 }
 
-/* Modo claro */
-:root {
+/* Modo claro (también como clase, para vistas previas dentro del modo oscuro) */
+:root,
+.light {
   --background: var(--niebla);
   --foreground: var(--hierro);
   --card: #ffffff;

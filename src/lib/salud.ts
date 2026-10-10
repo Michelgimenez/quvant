@@ -1,4 +1,5 @@
 import "server-only"
+import { erroresUltimaHora } from "./monitoreo"
 
 export type Componente = {
   id: string
@@ -12,6 +13,8 @@ export type EstadoServidor = {
   version: string
   modo: "demo" | "supabase"
   momento: string
+  /** Errores registrados por el monitoreo en la última hora (en esta instancia). */
+  erroresUltimaHora: number
   componentes: Componente[]
 }
 
@@ -49,6 +52,7 @@ export async function estadoServidor(): Promise<EstadoServidor> {
     version: VERSION,
     modo: conSupabase ? "supabase" : "demo",
     momento: new Date().toISOString(),
+    erroresUltimaHora: erroresUltimaHora(),
     componentes,
   }
 }

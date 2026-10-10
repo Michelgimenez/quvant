@@ -917,6 +917,37 @@ const importarProductos: Manejador<"importar.productos"> = (e, d, ctx, op) => {
   return { asignado: { creados, actualizados } }
 }
 
+// ───────────────────────────── Estructura ─────────────────────────────
+
+const sucursalGuardar: Manejador<"sucursal.guardar"> = (e, d, ctx, op) => {
+  const s = e.sucursales.find((x) => x.id === d.sucursalId)
+  exigir(s, "no_existe", "La sucursal no existe")
+  const c = d.cambios
+  if (c.nombre !== undefined) exigir(c.nombre.trim().length >= 2, "invalida", "Nombre inválido")
+  if (c.puestos !== undefined) exigir(Number.isInteger(c.puestos) && c.puestos >= 1 && c.puestos <= 50, "invalida", "Cantidad de puestos inválida")
+  if (c.puestos !== undefined && c.puestos < s.puestos) {
+    for (let p = c.puestos + 1; p <= s.puestos; p++) exigir(!cajaAbierta(e, s.id, p), "estado", `Cerrá la caja del puesto ${p} antes de quitarlo`)
+  }
+  Object.assign(s, { ...c, nombre: c.nombre?.trim() ?? s.nombre, direccion: c.direccion?.trim() ?? s.direccion })
+  auditar(e, ctx, op, "sucursal", s.id, `Sucursal ${s.codigo}: ${Object.keys(c).join(", ")}`)
+}
+
+const listaGuardar: Manejador<"lista.guardar"> = (e, d, ctx, op) => {
+  const datos = d.nuevo ?? d.cambios ?? {}
+  if (datos.nombre !== undefined) exigir(datos.nombre.trim().length >= 2 && datos.nombre.length <= 60, "invalida", "Nombre inválido")
+  if (datos.margenSugerido !== undefined) exigir(Number.isFinite(datos.margenSugerido) && datos.margenSugerido >= 0 && datos.margenSugerido <= 1000, "invalida", "Margen inválido")
+  if (d.nuevo) {
+    exigir(!e.listas.some((l) => l.id === d.listaId), "duplicada", "La lista ya existe")
+    e.listas.push({ id: d.listaId, orgId: e.org.id, nombre: d.nuevo.nombre.trim(), margenSugerido: d.nuevo.margenSugerido, esDefault: false })
+    auditar(e, ctx, op, "lista", d.listaId, `Nueva lista de precios: ${d.nuevo.nombre}`)
+    return
+  }
+  const l = e.listas.find((x) => x.id === d.listaId)
+  exigir(l, "no_existe", "La lista no existe")
+  Object.assign(l, { ...d.cambios, nombre: d.cambios?.nombre?.trim() ?? l.nombre })
+  auditar(e, ctx, op, "lista", l.id, `Lista ${l.nombre}: ${Object.keys(d.cambios ?? {}).join(", ")}`)
+}
+
 // ───────────────────────────── Despacho ─────────────────────────────
 
 const MANEJADORES: { [K in TipoOp]: Manejador<K> } = {
@@ -951,6 +982,8 @@ const MANEJADORES: { [K in TipoOp]: Manejador<K> } = {
   "org.config": orgConfig,
   "usuario.guardar": usuarioGuardar,
   "importar.productos": importarProductos,
+  "sucursal.guardar": sucursalGuardar,
+  "lista.guardar": listaGuardar,
 }
 
 /**

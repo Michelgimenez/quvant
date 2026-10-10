@@ -85,6 +85,8 @@ as $$
     when 'org.config' then 'config.editar'
     when 'usuario.guardar' then 'usuarios.gestionar'
     when 'importar.productos' then 'importar.datos'
+    when 'sucursal.guardar' then 'config.editar'
+    when 'lista.guardar' then 'precios.editar'
     else '__desconocida__'
   end
 $$;

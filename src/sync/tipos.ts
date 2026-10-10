@@ -148,6 +148,8 @@ export type DatosOp = {
     cambios?: Partial<Pick<Usuario, "nombre" | "rol" | "sucursalIds" | "activo">>
   }
   "importar.productos": { importacionId: Id; filas: FilaImportada[]; listaId: Id; sucursalId: Id | null }
+  "sucursal.guardar": { sucursalId: Id; cambios: { nombre?: string; direccion?: string; puestos?: number } }
+  "lista.guardar": { listaId: Id; nuevo?: { nombre: string; margenSugerido: number }; cambios?: { nombre?: string; margenSugerido?: number } }
 }
 
 export type TipoOp = keyof DatosOp
@@ -245,4 +247,6 @@ export const PERMISO_OPERACION: Record<TipoOp, Permiso> = {
   "org.config": "config.editar",
   "usuario.guardar": "usuarios.gestionar",
   "importar.productos": "importar.datos",
+  "sucursal.guardar": "config.editar",
+  "lista.guardar": "precios.editar",
 }

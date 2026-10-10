@@ -31,6 +31,9 @@
 | D22 | Números **provisorios** locales (`CC1-L0007`) y **definitivos** asignados por el servidor al sincronizar; al reaplicar operaciones confirmadas se usa el número que asignó el servidor. | La numeración fiscal no puede depender de un dispositivo desconectado. |
 | D23 | La función SQL implementa hoy 7 tipos de operación (venta, presupuesto guardar/convertir, ajuste, transferencia, cierre de caja, cobro). El resto devuelve **error temporal**: la operación queda en la cola del dispositivo, no se pierde. | Honestidad sobre el alcance; deuda documentada. |
 | D24 | Gráficos en SVG propio con la paleta de series **validada** con el validador de dataviz (modo claro y oscuro); vista de tabla en cada gráfico. | Control total de accesibilidad y peso. |
+| D26 | Integraciones (ARCA, Mercado Pago, Mercado Libre, WhatsApp) detrás de interfaces en `src/integraciones/`, con implementaciones **emuladas** que lo dicen en pantalla ("CAE emulado", "envío emulado"). | Conectar una real = implementar la interfaz; la app no cambia. |
+| D27 | Monitoreo sin proveedor: errores de cliente y servidor (`onRequestError`) como JSON estructurado en la consola del servidor + webhook opcional (`MONITOREO_WEBHOOK`). | No hay cuenta de Sentry; queda listo para conectar. |
+| D28 | La chispa se usa **solo** en los cuatro momentos del documento (cola sincronizada, presupuesto → venta, cierre de caja, conteo sin diferencias). | La regla de marca la reserva para logros; no se agregó en otros lugares. |
 | D25 | Service worker escrito a mano (`public/sw.js`): precarga las rutas clave y sus chunks; estáticos cache-first; páginas de `/app` network-first con respaldo. | Serwist y similares dependen de webpack; con Turbopack, un SW chico es más predecible. |
 
 ## Fases
@@ -68,3 +71,15 @@
 - **PWA**: manifiesto y service worker; la app abre sin conexión.
 - Tests: 85 unitarios + RLS (incluye 9 de sincronización y conflictos, 13 de la función SQL de operaciones) y 7 e2e (incluye venta sin conexión con recarga sin internet).
 - Bug encontrado por los tests y corregido: `app.puede_sucursal()` no comparaba la sucursal pedida (respondía "sí" si el usuario tenía el permiso en cualquier sucursal).
+
+### Fase 4 — App: servicio técnico, clientes, compras, entregas, reportes, roles, co-branding
+- **Servicio técnico**: tablero por estado (kanban) y lista, ingreso de equipos con tipo ilustrado, técnico asignado, transiciones validadas, presupuesto de reparación, avisos por WhatsApp (**emulados**) en la línea de tiempo, órdenes atrasadas marcadas.
+- **Clientes y cuentas corrientes**: filtros (con cuenta, con saldo, sobre su límite), ficha con saldo/límite/disponible, movimientos con saldo acumulado, registro de pagos, compras, presupuestos y taller; edición con detección de conflictos; solo administración otorga crédito.
+- **Compras**: órdenes, **sugerencias por stock mínimo** agrupadas por proveedor, envío, recepción parcial o total que ingresa stock, proveedores.
+- **Entregas**: hoja de ruta del día pensada para el celular del chofer, reordenamiento, en camino / entregada / no se pudo con motivo.
+- **Reportes**: ventas (por día/semana y sucursal, categoría, medio de pago, vendedor, productos), stock valorizado y stock quieto, cuentas corrientes, taller, ventas para revisar; todo exportable a CSV (formato Excel en español).
+- **Usuarios y permisos**: alta (invitación emulada), rol, sucursales, activo, estado del 2FA y matriz de permisos.
+- **Configuración**: co-branding (nombre, logo claro y oscuro, color de acento con control de contraste AA y vista previa en vivo claro/oscuro), módulos activos, sucursales y listas, integraciones con "probar conexión", exportación (CSV y JSON completo).
+- **Importador** Excel/CSV: detección de columnas, números argentinos, validación por fila, vista previa, nuevos vs. actualizados.
+- **Auditoría** con filtros y exportación; **monitoreo de errores** (pantallas de error, `onRequestError`, `/api/errores` con límite); **página de estado** (`/estado`) honesta.
+- Tests: 99 unitarios + RLS, 11 e2e (incluye recorrido de todos los módulos sin errores, permisos del técnico, co-branding y aviso del taller).
