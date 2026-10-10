@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 64" role="img" aria-label="Ferretería Industrial Demo"><title>Ferretería Industrial Demo (empresa ficticia)</title>
+<g transform="translate(4 4)"><path d="M28 0 L52.25 14 L52.25 42 L28 56 L3.75 42 L3.75 14Z" fill="#12A594"/><circle cx="28" cy="28" r="11" fill="none" stroke="#FFFFFF" stroke-width="5"/></g>
+<text x="70" y="30" font-family="Inter, Arial, Helvetica, sans-serif" font-size="21" font-weight="800" letter-spacing="-0.5" fill="#EEF1F4">Ferretería Industrial</text>
+<text x="70" y="52" font-family="Inter, Arial, Helvetica, sans-serif" font-size="13" font-weight="600" letter-spacing="2.5" fill="#9AA3AE">EMPRESA DEMO</text>
+</svg>

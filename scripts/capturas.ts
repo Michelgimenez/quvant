@@ -39,7 +39,11 @@ async function levantarServidor(): Promise<ChildProcess | null> {
   const proc = spawn("npx", ["next", "start", "-p", String(PUERTO)], {
     shell: true,
     stdio: "ignore",
-    env: { ...process.env, INVERSORES_KEY: process.env.INVERSORES_KEY ?? "yunque-demo" },
+    env: {
+      ...process.env,
+      INVERSORES_KEY: process.env.INVERSORES_KEY ?? "yunque-demo",
+      SESION_SECRETO: process.env.SESION_SECRETO ?? "secreto-de-capturas-no-usar-en-produccion-000000",
+    },
   })
   for (let i = 0; i < 120; i++) {
     if (await servidorArriba()) return proc
