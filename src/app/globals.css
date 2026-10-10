@@ -270,6 +270,12 @@
   .sin-scrollbar::-webkit-scrollbar {
     display: none;
   }
+  /* Presentaciones: fondo hierro hasta en el rebote del scroll */
+  html.presentando,
+  html.presentando body {
+    background: var(--hierro);
+    overscroll-behavior: none;
+  }
 }
 
 @keyframes chispa {

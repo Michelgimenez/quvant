@@ -19,7 +19,10 @@ const BUSCAR = ["Disco de corte metal 115", "Guantes de nitrilo", "Cinta aislado
  * servidor emulado. El visitante corta internet, sigue vendiendo, lo vuelve a
  * conectar y ve cómo la cola se sincroniza sola.
  */
-export function DemoConexion({ compacta = false }: { compacta?: boolean }) {
+/** Guion automático (presentaciones): vende, corta, sigue vendiendo y reconecta solo. */
+export type GuionConexion = { activo: boolean; velocidad: number; reinicio: number }
+
+export function DemoConexion({ compacta = false, guion }: { compacta?: boolean; guion?: GuionConexion }) {
   const [demo, setDemo] = useState<DemoEmbebida | null>(null)
   useEffect(() => {
     let vivo = true
@@ -37,13 +40,13 @@ export function DemoConexion({ compacta = false }: { compacta?: boolean }) {
   }
   return (
     <>
-      <Mostrador demo={demo} compacta={compacta} />
+      <Mostrador demo={demo} compacta={compacta} guion={guion} />
       <CapaChispas />
     </>
   )
 }
 
-function Mostrador({ demo, compacta }: { demo: DemoEmbebida; compacta: boolean }) {
+function Mostrador({ demo, compacta, guion }: { demo: DemoEmbebida; compacta: boolean; guion?: GuionConexion }) {
   const { motor } = demo
   const version = useSyncExternalStore(
     (cb) => motor.suscribir(cb),
@@ -106,105 +109,138 @@ function Mostrador({ demo, compacta }: { demo: DemoEmbebida; compacta: boolean }
     if (r.ok) setMias((xs) => [id, ...xs].slice(0, 30))
   }
 
+  // Guion para presentaciones
+  useEffect(() => {
+    if (!guion?.activo) return
+    let cancelado = false
+    const t = (s: number) => new Promise<void>((ok, mal) => setTimeout(() => (cancelado ? mal(new Error("cancelado")) : ok()), (s * 1000) / guion.velocidad))
+    const red = (v: boolean) => {
+      setConectado(v)
+      demo.setRed(v)
+    }
+    ;(async () => {
+      red(true)
+      await t(1.0)
+      await vender(productos[0])
+      await t(1.6)
+      red(false)
+      await t(1.1)
+      await vender(productos[1])
+      await t(0.9)
+      await vender(productos[2])
+      await t(0.9)
+      await vender(productos[4])
+      await t(2.0)
+      red(true)
+    })().catch(() => {})
+    return () => {
+      cancelado = true
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [guion?.activo, guion?.reinicio])
+
   const pendientes = motor.pendientes.filter((o) => o.tipo === "venta.crear").length
   const sinConexion = !conectado
   void version // fuerza el re-render cuando cambia el motor
 
   return (
-    <div className={cn("grid gap-4 rounded-2xl border border-linea bg-forja/60 p-4 sm:p-6", compacta ? "" : "lg:grid-cols-[minmax(0,1.25fr)_auto_minmax(0,1fr)]")} data-testid="demo-conexion">
-      {/* Mostrador */}
-      <section className="space-y-3 rounded-xl border border-linea bg-hierro/70 p-4" aria-label="Mostrador de demostración">
-        <div className="flex items-center justify-between gap-2">
-          <p className="ficha">Mostrador · CC · puesto 1</p>
-          <span className={cn("inline-flex h-7 items-center gap-2 rounded-full border px-3 text-xs", sinConexion ? "border-chispa/50 bg-chispa/10" : "border-linea bg-forja")} data-testid="demo-estado">
-            <Punto tono={sinConexion ? "chispa" : pendientes ? "acero" : "ok"} pulso={sinConexion} />
-            {sinConexion ? `Sin conexión${pendientes ? ` · ${pendientes} ${pendientes === 1 ? "venta" : "ventas"} en cola` : ""}` : pendientes ? "Sincronizando" : "Sincronizado"}
-          </span>
+    // Consultas de contenedor (no de ventana): se ve igual en el sitio y dentro del escenario de las presentaciones
+    <div className="@container">
+      <div className={cn("grid gap-4 rounded-2xl border border-linea bg-forja/60 p-4 @xl:p-6", compacta ? "" : "@3xl:grid-cols-[minmax(0,1.25fr)_auto_minmax(0,1fr)]")} data-testid="demo-conexion">
+        {/* Mostrador */}
+        <section className="space-y-3 rounded-xl border border-linea bg-hierro/70 p-4" aria-label="Mostrador de demostración">
+          <div className="flex items-center justify-between gap-2">
+            <p className="ficha">Mostrador · CC · puesto 1</p>
+            <span className={cn("inline-flex h-7 items-center gap-2 rounded-full border px-3 text-xs", sinConexion ? "border-chispa/50 bg-chispa/10" : "border-linea bg-forja")} data-testid="demo-estado">
+              <Punto tono={sinConexion ? "chispa" : pendientes ? "acero" : "ok"} pulso={sinConexion} />
+              {sinConexion ? `Sin conexión${pendientes ? ` · ${pendientes} ${pendientes === 1 ? "venta" : "ventas"} en cola` : ""}` : pendientes ? "Sincronizando" : "Sincronizado"}
+            </span>
+          </div>
+          <p className="text-sm text-acero">Tocá un producto para venderlo.</p>
+          <div className="grid grid-cols-2 gap-2 @xl:grid-cols-3">
+            {productos.map((p) => (
+              <button
+                key={p.id}
+                type="button"
+                onClick={() => vender(p)}
+                className="flex items-center gap-2 rounded-lg border border-linea bg-forja px-2.5 py-2 text-left transition-colors hover:border-temple/60 active:translate-y-px"
+              >
+                <MiniaturaProducto tipo={p.ilustracion} className="size-8" />
+                <span className="min-w-0">
+                  <span className="block truncate text-xs text-niebla">{p.nombre.replace(/ (Abrasur|Corta|Escudo|Protek|Lumen|Conductel|Lubrimax|Arkon|Vulkor|Torkan|Brava)$/, "")}</span>
+                  <span className="num block text-[11px] text-acero">{formatoPesos(precioDe(e, lista.id, p.id), { sinDecimales: true })}</span>
+                </span>
+              </button>
+            ))}
+          </div>
+          <ul className="space-y-1.5" aria-label="Ventas de este mostrador" aria-live="polite">
+            {mias.slice(0, 5).map((id) => {
+              const v = e.ventas[id]
+              if (!v) return null
+              const enCola = v.numero === null
+              return (
+                <li key={id} className="flex items-center gap-2 rounded-md bg-forja px-2.5 py-1.5 text-xs">
+                  <span className={cn("num", enCola ? "text-chispa" : "text-ok")}>{enCola ? v.numeroLocal : `#${v.numero}`}</span>
+                  <span className="min-w-0 flex-1 truncate text-acero">{v.items[0]?.descripcion}</span>
+                  <span className="num text-niebla">{formatoPesos(v.total, { sinDecimales: true })}</span>
+                  <span className={cn("rounded px-1.5 py-0.5 text-[10px]", enCola ? "bg-chispa/15 text-chispa" : "bg-ok/15 text-ok")}>{enCola ? "en cola" : "sincronizada"}</span>
+                </li>
+              )
+            })}
+            {mias.length === 0 && <li className="rounded-md border border-dashed border-linea px-3 py-3 text-center text-xs text-acero">Todavía no vendiste nada.</li>}
+          </ul>
+        </section>
+
+        {/* Conexión */}
+        <div className="flex items-center justify-center gap-3 @3xl:flex-col">
+          <div className="relative h-1 w-24 overflow-hidden @3xl:h-24 @3xl:w-1" aria-hidden>
+            {conectado ? (
+              <>
+                <span className="absolute inset-0 bg-temple/30" />
+                <span className="flujo-red absolute size-1.5 rounded-full bg-temple @3xl:left-[-1px]" />
+              </>
+            ) : (
+              <span className="absolute inset-0 border-t-2 border-dashed border-error/70 @3xl:border-l-2 @3xl:border-t-0" />
+            )}
+          </div>
+          <label className={cn("flex cursor-pointer flex-col items-center gap-2 rounded-xl border px-4 py-3 text-center", conectado ? "border-linea bg-hierro/70" : "border-error/50 bg-error/10")}>
+            {conectado ? <Wifi className="size-5 text-ok" /> : <WifiOff className="size-5 text-error" />}
+            <span className="text-xs font-semibold text-niebla">{conectado ? "Internet: conectado" : "Internet: cortado"}</span>
+            <Switch
+              checked={conectado}
+              onCheckedChange={(v) => {
+                setConectado(v)
+                demo.setRed(v)
+              }}
+              aria-label="Internet"
+              data-testid="demo-interruptor"
+            />
+            <span className="text-[11px] text-acero">{conectado ? "Cortá la conexión" : "Volvé a conectar"}</span>
+          </label>
+          <div className="relative h-1 w-24 overflow-hidden @3xl:h-24 @3xl:w-1" aria-hidden>
+            {conectado ? <span className="absolute inset-0 bg-temple/30" /> : <span className="absolute inset-0 border-t-2 border-dashed border-error/70 @3xl:border-l-2 @3xl:border-t-0" />}
+          </div>
         </div>
-        <p className="text-sm text-acero">Tocá un producto para venderlo.</p>
-        <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
-          {productos.map((p) => (
-            <button
-              key={p.id}
-              type="button"
-              onClick={() => vender(p)}
-              className="flex items-center gap-2 rounded-lg border border-linea bg-forja px-2.5 py-2 text-left transition-colors hover:border-temple/60 active:translate-y-px"
-            >
-              <MiniaturaProducto tipo={p.ilustracion} className="size-8" />
-              <span className="min-w-0">
-                <span className="block truncate text-xs text-niebla">{p.nombre.replace(/ (Abrasur|Corta|Escudo|Protek|Lumen|Conductel|Lubrimax|Arkon|Vulkor|Torkan|Brava)$/, "")}</span>
-                <span className="num block text-[11px] text-acero">{formatoPesos(precioDe(e, lista.id, p.id), { sinDecimales: true })}</span>
-              </span>
-            </button>
-          ))}
-        </div>
-        <ul className="space-y-1.5" aria-label="Ventas de este mostrador" aria-live="polite">
-          {mias.slice(0, 5).map((id) => {
-            const v = e.ventas[id]
-            if (!v) return null
-            const enCola = v.numero === null
-            return (
-              <li key={id} className="flex items-center gap-2 rounded-md bg-forja px-2.5 py-1.5 text-xs">
-                <span className={cn("num", enCola ? "text-chispa" : "text-ok")}>{enCola ? v.numeroLocal : `#${v.numero}`}</span>
-                <span className="min-w-0 flex-1 truncate text-acero">{v.items[0]?.descripcion}</span>
-                <span className="num text-niebla">{formatoPesos(v.total, { sinDecimales: true })}</span>
-                <span className={cn("rounded px-1.5 py-0.5 text-[10px]", enCola ? "bg-chispa/15 text-chispa" : "bg-ok/15 text-ok")}>{enCola ? "en cola" : "sincronizada"}</span>
+
+        {/* Servidor */}
+        <section ref={panelServidor} className="space-y-3 rounded-xl border border-linea bg-hierro/70 p-4" aria-label="Servidor">
+          <div className="flex items-center justify-between">
+            <p className="ficha">Servidor · la nube</p>
+            {conectado ? <Cloud className="size-4 text-ok" /> : <CloudOff className="size-4 text-error" />}
+          </div>
+          <p className="text-sm text-acero">{conectado ? "Recibe cada venta y le pone su número definitivo." : "No le llega nada. El mostrador no se entera: sigue vendiendo."}</p>
+          <ul className="space-y-1.5">
+            {recibidas.map((r) => (
+              <li key={r.id} className="flex items-center gap-2 rounded-md bg-forja px-2.5 py-1.5 text-xs">
+                <span className="num text-ok">#{r.numero}</span>
+                <span className="flex-1 text-acero">venta recibida</span>
+                <span className="num text-niebla">{formatoPesos(r.total, { sinDecimales: true })}</span>
               </li>
-            )
-          })}
-          {mias.length === 0 && <li className="rounded-md border border-dashed border-linea px-3 py-3 text-center text-xs text-acero">Todavía no vendiste nada.</li>}
-        </ul>
-      </section>
-
-      {/* Conexión */}
-      <div className="flex items-center justify-center gap-3 lg:flex-col">
-        <div className="relative h-1 w-24 overflow-hidden lg:h-24 lg:w-1" aria-hidden>
-          {conectado ? (
-            <>
-              <span className="absolute inset-0 bg-temple/30" />
-              <span className="flujo-red absolute size-1.5 rounded-full bg-temple lg:left-[-1px]" />
-            </>
-          ) : (
-            <span className="absolute inset-0 border-t-2 border-dashed border-error/70 lg:border-l-2 lg:border-t-0" />
-          )}
-        </div>
-        <label className={cn("flex cursor-pointer flex-col items-center gap-2 rounded-xl border px-4 py-3 text-center", conectado ? "border-linea bg-hierro/70" : "border-error/50 bg-error/10")}>
-          {conectado ? <Wifi className="size-5 text-ok" /> : <WifiOff className="size-5 text-error" />}
-          <span className="text-xs font-semibold text-niebla">{conectado ? "Internet: conectado" : "Internet: cortado"}</span>
-          <Switch
-            checked={conectado}
-            onCheckedChange={(v) => {
-              setConectado(v)
-              demo.setRed(v)
-            }}
-            aria-label="Internet"
-            data-testid="demo-interruptor"
-          />
-          <span className="text-[11px] text-acero">{conectado ? "Cortá la conexión" : "Volvé a conectar"}</span>
-        </label>
-        <div className="relative h-1 w-24 overflow-hidden lg:h-24 lg:w-1" aria-hidden>
-          {conectado ? <span className="absolute inset-0 bg-temple/30" /> : <span className="absolute inset-0 border-t-2 border-dashed border-error/70 lg:border-l-2 lg:border-t-0" />}
-        </div>
+            ))}
+            {recibidas.length === 0 && <li className="rounded-md border border-dashed border-linea px-3 py-3 text-center text-xs text-acero">Esperando ventas…</li>}
+          </ul>
+        </section>
       </div>
-
-      {/* Servidor */}
-      <section ref={panelServidor} className="space-y-3 rounded-xl border border-linea bg-hierro/70 p-4" aria-label="Servidor">
-        <div className="flex items-center justify-between">
-          <p className="ficha">Servidor · la nube</p>
-          {conectado ? <Cloud className="size-4 text-ok" /> : <CloudOff className="size-4 text-error" />}
-        </div>
-        <p className="text-sm text-acero">{conectado ? "Recibe cada venta y le pone su número definitivo." : "No le llega nada. El mostrador no se entera: sigue vendiendo."}</p>
-        <ul className="space-y-1.5">
-          {recibidas.map((r) => (
-            <li key={r.id} className="flex items-center gap-2 rounded-md bg-forja px-2.5 py-1.5 text-xs">
-              <span className="num text-ok">#{r.numero}</span>
-              <span className="flex-1 text-acero">venta recibida</span>
-              <span className="num text-niebla">{formatoPesos(r.total, { sinDecimales: true })}</span>
-            </li>
-          ))}
-          {recibidas.length === 0 && <li className="rounded-md border border-dashed border-linea px-3 py-3 text-center text-xs text-acero">Esperando ventas…</li>}
-        </ul>
-      </section>
     </div>
   )
 }

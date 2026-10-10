@@ -85,6 +85,27 @@ describe("motor de sincronización", () => {
     expect(srv.ventas[v.id].numero).toBe(m.estado.ventas[v.id].numero)
   })
 
+  it("una venta hecha mientras se sincroniza la anterior no queda esperando en la cola", async () => {
+    const { crearMotor, usuario, cc, servidor } = escenario()
+    const m = await crearMotor(usuario("mostrador@demo.yunque.app"))
+    const p = conStock(m.estado, cc.id, 2)
+    // Servidor lento: la segunda venta entra con el primer ciclo en curso
+    const enviar = servidor.enviar.bind(servidor)
+    let primera = true
+    servidor.enviar = async (ops, autor) => {
+      if (primera) {
+        primera = false
+        await m.ejecutar("venta.crear", { venta: venta(m, cc.id, p) }, { sucursalId: cc.id })
+        void m.sincronizar()
+      }
+      return enviar(ops, autor)
+    }
+    await m.ejecutar("venta.crear", { venta: venta(m, cc.id, p) }, { sucursalId: cc.id })
+    await m.sincronizar()
+    expect(m.pendientes).toHaveLength(0)
+    expect(Object.values(m.estado.ventas).filter((v) => v.numeroLocal.startsWith("CC1-L") && v.numero !== null).length).toBeGreaterThanOrEqual(2)
+  })
+
   it("sin conexión: se sigue vendiendo, la cola persiste y se sincroniza al volver", async () => {
     const { crearMotor, usuario, cc, cortar, reconectar } = escenario()
     const almacen = new AlmacenMemoria()

@@ -27,6 +27,22 @@ export type Pantalla = {
   tema?: "claro" | "oscuro"
 }
 
+/** Entra a una presentación con clave (si hace falta) y va a la escena n. */
+export function escena(n: number, clave = process.env.INVERSORES_KEY ?? "yunque-demo") {
+  return async (p: Page) => {
+    if (await p.locator("#clave").count()) {
+      await p.locator("#clave").fill(clave)
+      await p.getByRole("button", { name: "Entrar" }).click()
+    }
+    await p.getByTestId("presentacion-play").waitFor({ timeout: 60_000 })
+    await p.evaluate((k) => (window.location.hash = String(k)), n)
+    await p.locator(`[data-escena]:not([aria-hidden=true])`).first().waitFor()
+    await p.waitForTimeout(n === 5 ? 4000 : 2500)
+  }
+}
+
+const ESCENAS_INVERSORES = ["apertura", "problema", "terreno", "solucion", "demo", "diferencial", "modelo", "estado", "hoja-de-ruta", "inversion", "equipo", "cierre"]
+
 /** Pantallas a capturar. Se completa a medida que se construye cada fase. */
 export const PANTALLAS: Pantalla[] = [
   { id: "marca", ruta: "/marca", paginaCompleta: true },
@@ -146,4 +162,10 @@ export const PANTALLAS: Pantalla[] = [
   { id: "app-importar", ruta: "/app/importar", usuario: "compras@demo.yunque.app", esperar: "#contenido h1" },
   { id: "app-auditoria", ruta: "/app/auditoria", usuario: "dueno@demo.yunque.app", esperar: "[role=table]" },
   { id: "estado", ruta: "/estado", esperar: "h1" },
+  { id: "inversores-clave", ruta: "/inversores", esperar: "#clave" },
+  ...ESCENAS_INVERSORES.map((nombre, i) => ({
+    id: `inversores-${String(i + 1).padStart(2, "0")}-${nombre}`,
+    ruta: "/inversores",
+    antes: escena(i + 1),
+  })),
 ]

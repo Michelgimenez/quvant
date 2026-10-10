@@ -34,10 +34,10 @@ export function Carrito({
 
   if (items.length === 0) {
     return (
-      <div className="flex min-h-56 flex-col items-center justify-center gap-3 rounded-xl border border-dashed border-linea p-8 text-center">
+      <div className="@container flex min-h-56 flex-col items-center justify-center gap-3 rounded-xl border border-dashed border-linea p-8 text-center">
         <ShoppingCart className="size-7 text-muted-foreground" />
         <p className="text-sm text-muted-foreground">{vacio}</p>
-        <p className="hidden items-center gap-3 text-xs text-muted-foreground sm:flex">
+        <p className="hidden items-center gap-3 text-xs text-muted-foreground @md:flex">
           <span><Kbd>F2</Kbd> buscar</span>
           <span><Kbd>F4</Kbd> cliente</span>
           <span><Kbd>F8</Kbd> cobrar</span>
@@ -47,7 +47,7 @@ export function Carrito({
   }
 
   return (
-    <ul className="divide-y divide-linea rounded-xl border border-linea bg-card" aria-label="Ítems" data-testid="carrito">
+    <ul className="@container divide-y divide-linea rounded-xl border border-linea bg-card" aria-label="Ítems" data-testid="carrito">
       {items.map((it, i) => {
         const p = e.productos[it.productoId]
         const disponible = e.stock[claveStock(sucursalId, it.productoId)]?.cantidad ?? 0
@@ -55,7 +55,7 @@ export function Carrito({
         const lista = precioDe(e, listaId, it.productoId)
         const paso = p?.unidad === "m" || p?.unidad === "kg" || p?.unidad === "l" ? 0.5 : 1
         return (
-          <li key={`${it.productoId}-${i}`} className="grid grid-cols-[auto_minmax(0,1fr)] items-center gap-x-3 gap-y-2 px-3 py-2.5 sm:grid-cols-[auto_minmax(0,1fr)_auto_auto_auto_auto]">
+          <li key={`${it.productoId}-${i}`} className="grid grid-cols-[auto_minmax(0,1fr)] items-center gap-x-3 gap-y-2 px-3 py-2.5 @lg:grid-cols-[auto_minmax(0,1fr)_auto_auto_auto_auto]">
             <MiniaturaProducto tipo={p?.ilustracion ?? "tornillo"} className="size-10" />
             <div className="min-w-0">
               <p className="truncate text-sm font-medium">{it.descripcion}</p>
@@ -65,7 +65,7 @@ export function Carrito({
               </p>
               {sinStock && <p className="text-[11px] font-medium text-chispa-texto">Hay {formatoCantidad(disponible)} en esta sucursal</p>}
             </div>
-            <div className="col-span-2 flex items-center gap-1 sm:col-span-1">
+            <div className="col-span-2 flex items-center gap-1 @lg:col-span-1">
               <Button size="icon-sm" variant="outline" onClick={() => (it.cantidad - paso <= 0 ? quitar(i) : cambiar(i, { cantidad: Math.round((it.cantidad - paso) * 1000) / 1000 }))} aria-label={`Restar ${it.descripcion}`}>
                 <Minus />
               </Button>
@@ -81,14 +81,14 @@ export function Carrito({
               <Button size="icon-sm" variant="outline" onClick={() => cambiar(i, { cantidad: Math.round((it.cantidad + paso) * 1000) / 1000 })} aria-label={`Sumar ${it.descripcion}`}>
                 <Plus />
               </Button>
-              <div className="ml-auto flex items-center gap-1 sm:hidden">
+              <div className="ml-auto flex items-center gap-1 @lg:hidden">
                 <span className="num text-sm font-semibold">{formatoPesos(subtotalItem(it))}</span>
                 <Button size="icon-sm" variant="ghost" onClick={() => quitar(i)} aria-label={`Quitar ${it.descripcion}`}>
                   <Trash2 />
                 </Button>
               </div>
             </div>
-            <label className="hidden items-center gap-1 text-xs text-muted-foreground sm:flex">
+            <label className="hidden items-center gap-1 text-xs text-muted-foreground @lg:flex">
               Desc.
               <Input
                 type="number"
@@ -101,8 +101,8 @@ export function Carrito({
               />
               %
             </label>
-            <span className="num hidden w-28 text-right text-sm font-semibold sm:block">{formatoPesos(subtotalItem(it))}</span>
-            <Button size="icon-sm" variant="ghost" className="hidden sm:inline-flex" onClick={() => quitar(i)} aria-label={`Quitar ${it.descripcion}`}>
+            <span className="num hidden w-28 text-right text-sm font-semibold @lg:block">{formatoPesos(subtotalItem(it))}</span>
+            <Button size="icon-sm" variant="ghost" className="hidden @lg:inline-flex" onClick={() => quitar(i)} aria-label={`Quitar ${it.descripcion}`}>
               <Trash2 />
             </Button>
           </li>

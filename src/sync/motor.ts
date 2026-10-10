@@ -63,6 +63,7 @@ export class MotorSync {
   private base!: EstadoEmpresa
   private oyentes = new Set<(e: EventoMotor) => void>()
   private sincronizando: Promise<void> | null = null
+  private otraVuelta = false
   private temporizador: ReturnType<typeof setTimeout> | null = null
   private azar = new Azar(Date.now() ^ Math.floor(Math.random() * 1e9))
 
@@ -153,10 +154,26 @@ export class MotorSync {
 
   // ───────── sincronización ─────────
 
+  /**
+   * Un solo ciclo a la vez. Si piden sincronizar durante un ciclo (p. ej. una
+   * venta nueva mientras se envía la anterior), se hace otra vuelta al
+   * terminar: ninguna operación queda esperando al próximo disparador.
+   */
   sincronizar(): Promise<void> {
-    this.sincronizando ??= this.ciclo().finally(() => {
-      this.sincronizando = null
-    })
+    if (this.sincronizando) {
+      this.otraVuelta = true
+      return this.sincronizando
+    }
+    this.sincronizando = (async () => {
+      try {
+        do {
+          this.otraVuelta = false
+          await this.ciclo()
+        } while (this.otraVuelta && this.hayRed())
+      } finally {
+        this.sincronizando = null
+      }
+    })()
     return this.sincronizando
   }
 

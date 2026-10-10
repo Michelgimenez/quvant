@@ -10,7 +10,7 @@
  * Con --sitio copia además las capturas de la app a public/capturas/ (las usa el sitio).
  */
 import { chromium, type Browser, type Page } from "@playwright/test"
-import { spawn, type ChildProcess } from "node:child_process"
+import { spawn, spawnSync, type ChildProcess } from "node:child_process"
 import { copyFileSync, mkdirSync } from "node:fs"
 import path from "node:path"
 import { PANTALLAS, type Pantalla } from "./pantallas"
@@ -125,7 +125,8 @@ async function main() {
   } finally {
     await browser.close()
     if (proc) {
-      if (process.platform === "win32" && proc.pid) spawn("taskkill", ["/pid", String(proc.pid), "/T", "/F"], { shell: true })
+      // En Windows hay que matar el árbol (npx → next start) y esperar a que termine
+      if (process.platform === "win32" && proc.pid) spawnSync("taskkill", ["/pid", String(proc.pid), "/T", "/F"], { shell: true, stdio: "ignore" })
       else proc.kill()
     }
   }
