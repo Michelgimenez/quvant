@@ -4,7 +4,7 @@ import { useEffect, useMemo, useRef, useState } from "react"
 import { motion } from "motion/react"
 import { CheckCircle2, ScanBarcode, Search, ShoppingCart } from "lucide-react"
 import { ProveedorApp, useConexion, useDatos } from "@/cliente/app-contexto"
-import type { DemoEmbebida } from "@/cliente/demo-embebida"
+import { sesionDemo, type DemoEmbebida } from "@/cliente/demo-embebida"
 import { LogoOrg } from "@/components/base/logo-org"
 import { MiniaturaProducto } from "@/components/base/ilustracion"
 import { Punto } from "@/components/base/sellos"
@@ -15,25 +15,31 @@ import { formatoCantidad, formatoPesos } from "@/dominio/dinero"
 import { claveStock, listaDefault } from "@/dominio/estado"
 import type { ItemComercial, Producto } from "@/dominio/tipos"
 import { itemDesdeProducto, totalItems } from "@/dominio/ventas"
-import type { Sesion } from "@/lib/auth/tipos"
 import { cn } from "@/lib/utils"
 import { useEscena } from "./motor"
 
 type Paso = "mostrador" | "escaneo" | "presupuesto"
+const PASOS: Paso[] = ["mostrador", "escaneo", "presupuesto"]
+
+/** Título y bajada de cada paso de la película. */
+export type TextosPelicula = [titulo: string, bajada: string][]
+
+const TEXTOS: TextosPelicula = [
+  ["Venta de mostrador", "Teclado o lector. Sigue funcionando sin internet."],
+  ["Escaneo con el celular", "El depósito consulta stock apuntando la cámara."],
+  ["Presupuesto → venta", "Un clic y el presupuesto aceptado es una venta."],
+]
 
 /**
  * Escena "Demo del producto": componentes reales de la app sobre la empresa
  * demo, con un cursor animado. Vende en el mostrador, escanea con el celular
  * y convierte un presupuesto en venta (operaciones reales del motor).
  */
-export function PeliculaProducto({ demo }: { demo: DemoEmbebida }) {
-  const sesion: Sesion = useMemo(() => {
-    const u = demo.semilla.usuarios.find((x) => x.id === demo.usuario.id)!
-    return { sub: u.id, org: u.orgId, rol: u.rol, nombre: u.nombre, email: u.email, sucursales: u.sucursalIds, aal: "aal1", modo: "demo", exp: 2_000_000_000 }
-  }, [demo])
+export function PeliculaProducto({ demo, textos = TEXTOS, bucle = false }: { demo: DemoEmbebida; textos?: TextosPelicula; bucle?: boolean }) {
+  const sesion = useMemo(() => sesionDemo(demo), [demo])
   return (
     <ProveedorApp motor={demo.motor} servidor={demo.servidor} sesion={sesion}>
-      <Pelicula demo={demo} />
+      <Pelicula demo={demo} textos={textos} bucle={bucle} />
     </ProveedorApp>
   )
 }
@@ -42,7 +48,7 @@ function esperar(ms: number, cancelado: { v: boolean }) {
   return new Promise<void>((ok, mal) => setTimeout(() => (cancelado.v ? mal(new Error("cancelado")) : ok()), ms))
 }
 
-function Pelicula({ demo }: { demo: DemoEmbebida }) {
+function Pelicula({ demo, textos, bucle }: { demo: DemoEmbebida; textos: TextosPelicula; bucle: boolean }) {
   const { activa, velocidad, escala, reducir, reinicio } = useEscena()
   const { motor } = demo
   // Suscripción al motor: la pantalla se actualiza cuando la cola se sincroniza
@@ -66,6 +72,10 @@ function Pelicula({ demo }: { demo: DemoEmbebida }) {
   const [escaneado, setEscaneado] = useState<Producto | null>(null)
   const [convertido, setConvertido] = useState<string | null>(null)
   const [cursor, setCursor] = useState({ x: 1500, y: 900, clic: 0 })
+  // En bucle, cada vuelta vuelve a correr el guion (con un presupuesto distinto)
+  const [vuelta, setVuelta] = useState(0)
+  const ventasLocales = useRef(0)
+  const numeroLocal = () => `CC1-L${String(++ventasLocales.current).padStart(4, "0")}`
 
   const elegirPresupuesto = () =>
     Object.values(motor.estado.presupuestos).find((p) => p.sucursalId === cc.id && (p.estado === "enviado" || p.estado === "aceptado") && p.items.length >= 2 && p.items.length <= 4) ??
@@ -86,7 +96,8 @@ function Pelicula({ demo }: { demo: DemoEmbebida }) {
   useEffect(() => {
     if (!activa) return
     const cancelado = { v: false }
-    const t = (s: number) => esperar((reducir ? 0.05 : s) * 1000 / velocidad, cancelado)
+    // Con movimiento reducido se mantienen los tiempos del guion: solo el cursor deja de deslizarse
+    const t = (s: number) => esperar((s * 1000) / velocidad, cancelado)
     const tipear = async (frase: string) => {
       for (let i = 1; i <= frase.length; i++) {
         setTexto(frase.slice(0, i))
@@ -139,7 +150,7 @@ function Pelicula({ demo }: { demo: DemoEmbebida }) {
       const actuales = [itemDesdeProducto(motor.estado, p1, lista.id), itemDesdeProducto(motor.estado, p2, lista.id, 10)]
       await motor.ejecutar(
         "venta.crear",
-        { venta: { id, sucursalId: cc.id, puesto: 1, numeroLocal: "CC1-L0001", fecha: new Date().toISOString(), clienteId: null, listaId: lista.id, items: actuales, pagos: [{ medio: "efectivo", importe: totalItems(actuales) }], entrega: null } },
+        { venta: { id, sucursalId: cc.id, puesto: 1, numeroLocal: numeroLocal(), fecha: new Date().toISOString(), clienteId: null, listaId: lista.id, items: actuales, pagos: [{ medio: "efectivo", importe: totalItems(actuales) }], entrega: null } },
         { sucursalId: cc.id },
       )
       setVentaId(id)
@@ -161,7 +172,7 @@ function Pelicula({ demo }: { demo: DemoEmbebida }) {
         "presupuesto.convertir",
         {
           presupuestoId: pres.id,
-          venta: { id: motor.uuid(), sucursalId: pres.sucursalId, puesto: 1, numeroLocal: "CC1-L0002", fecha: new Date().toISOString(), clienteId: pres.clienteId, listaId: pres.listaId, items: pres.items, pagos: [{ medio: "transferencia", importe: pres.total }], entrega: null },
+          venta: { id: motor.uuid(), sucursalId: pres.sucursalId, puesto: 1, numeroLocal: numeroLocal(), fecha: new Date().toISOString(), clienteId: pres.clienteId, listaId: pres.listaId, items: pres.items, pagos: [{ medio: "transferencia", importe: pres.total }], entrega: null },
         },
         { sucursalId: pres.sucursalId },
       )
@@ -169,21 +180,21 @@ function Pelicula({ demo }: { demo: DemoEmbebida }) {
         lanzarChispa({ desde: refConvertir.current, mensaje: "Presupuesto → venta" })
         setConvertido(motor.estado.presupuestos[pres.id]?.ventaId ?? "")
       }
+      if (bucle) {
+        await t(6)
+        setVuelta((v) => v + 1)
+      }
     })().catch(() => {})
     return () => {
       cancelado.v = true
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [activa, reinicio])
+  }, [activa, reinicio, vuelta])
 
   const venta = ventaId ? e.ventas[ventaId] : null
   const ventaConvertida = convertido ? e.ventas[convertido] : null
   const total = totalItems(items)
-  const pasos: [Paso, string, string][] = [
-    ["mostrador", "Venta de mostrador", "Teclado o lector. Sigue funcionando sin internet."],
-    ["escaneo", "Escaneo con el celular", "El depósito consulta stock apuntando la cámara."],
-    ["presupuesto", "Presupuesto → venta", "Un clic y el presupuesto aceptado es una venta."],
-  ]
+  const pasos = PASOS.map((id, i) => [id, ...textos[i]] as const)
 
   return (
     <div ref={raiz} className="relative size-full">

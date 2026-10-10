@@ -37,9 +37,11 @@ export function escena(n: number, clave = process.env.INVERSORES_KEY ?? "yunque-
     await p.getByTestId("presentacion-play").waitFor({ timeout: 60_000 })
     await p.evaluate((k) => (window.location.hash = String(k)), n)
     await p.locator(`[data-escena]:not([aria-hidden=true])`).first().waitFor()
-    await p.waitForTimeout(n === 5 ? 4000 : 2500)
+    await p.waitForTimeout(4000)
   }
 }
+
+const ESCENAS_CLIENTE = ["portada", "su-problema", "su-marca", "un-dia", "corte", "como-empezamos", "socio-fundador"]
 
 const ESCENAS_INVERSORES = ["apertura", "problema", "terreno", "solucion", "demo", "diferencial", "modelo", "estado", "hoja-de-ruta", "inversion", "equipo", "cierre"]
 
@@ -166,6 +168,11 @@ export const PANTALLAS: Pantalla[] = [
   ...ESCENAS_INVERSORES.map((nombre, i) => ({
     id: `inversores-${String(i + 1).padStart(2, "0")}-${nombre}`,
     ruta: "/inversores",
+    antes: escena(i + 1),
+  })),
+  ...ESCENAS_CLIENTE.map((nombre, i) => ({
+    id: `demo-ferremix-${String(i + 1).padStart(2, "0")}-${nombre}`,
+    ruta: "/demo/ferremix",
     antes: escena(i + 1),
   })),
 ]

@@ -97,9 +97,10 @@ async function capturar(browser: Browser, p: Pantalla) {
     await page.waitForTimeout(600)
     const archivo = path.join(SALIDA, `${p.id}--${vista.nombre}.png`)
     await page.screenshot({ path: archivo, fullPage: Boolean(p.paginaCompleta) })
-    if (p.publica) {
+    // El sitio usa solo las de escritorio
+    if (p.publica && vista.nombre === "escritorio") {
       mkdirSync(PUBLICAS, { recursive: true })
-      copyFileSync(archivo, path.join(PUBLICAS, `${p.id}${vista.nombre === "celular" ? "-celular" : ""}.png`))
+      copyFileSync(archivo, path.join(PUBLICAS, `${p.id}.png`))
     }
     console.log(`✓ ${p.id} (${vista.nombre})`)
     await ctx.close()

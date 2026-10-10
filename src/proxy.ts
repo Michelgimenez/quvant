@@ -1,4 +1,5 @@
 import { NextResponse, type NextRequest } from "next/server"
+import { clienteDemo } from "@/config/clientes"
 import { exige2FA } from "@/dominio/permisos"
 import { verificar } from "@/lib/auth/firma"
 import { COOKIE_PRE_SESION, COOKIE_SESION, type Sesion } from "@/lib/auth/tipos"
@@ -10,6 +11,13 @@ import { COOKIE_PRE_SESION, COOKIE_SESION, type Sesion } from "@/lib/auth/tipos"
  */
 export async function proxy(req: NextRequest) {
   const { pathname, search } = req.nextUrl
+
+  // Demo comercial: solo los prospectos configurados en src/config/clientes/ (el resto, 404 real)
+  const demo = /^\/demo\/([^/]+)\/?$/.exec(pathname)
+  if (demo) {
+    return clienteDemo(demo[1]) ? NextResponse.next() : NextResponse.rewrite(new URL("/_not-found", req.url), { status: 404 })
+  }
+
   const sesion = await verificar<Sesion>(req.cookies.get(COOKIE_SESION)?.value, "yunque-app")
 
   if (pathname.startsWith("/app")) {
@@ -39,5 +47,5 @@ export async function proxy(req: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/app/:path*", "/ingresar", "/ingresar/verificar"],
+  matcher: ["/app/:path*", "/ingresar", "/ingresar/verificar", "/demo/:cliente"],
 }

@@ -8,7 +8,22 @@ import { useEscena } from "./motor"
 const CURVA = [0.2, 0.8, 0.2, 1] as const
 
 /** Fondo y marco de una escena de 1920×1080. */
-export function Lienzo({ numero, etiqueta, children, className, sinMarca = false }: { numero?: string; etiqueta?: string; children: React.ReactNode; className?: string; sinMarca?: boolean }) {
+export function Lienzo({
+  numero,
+  etiqueta,
+  children,
+  className,
+  sinMarca = false,
+  marca,
+}: {
+  numero?: string
+  etiqueta?: string
+  children: React.ReactNode
+  className?: string
+  sinMarca?: boolean
+  /** Reemplaza el logo de Yunque arriba a la derecha (p. ej. marca del cliente + sello). */
+  marca?: React.ReactNode
+}) {
   return (
     <div className={cn("absolute inset-0 overflow-hidden bg-hierro", className)}>
       <div
@@ -28,7 +43,7 @@ export function Lienzo({ numero, etiqueta, children, className, sinMarca = false
       )}
       {!sinMarca && (
         <div className="absolute right-[140px] top-[78px] text-niebla/70">
-          <Logo className="h-[34px]" tono="negativo" />
+          {marca ?? <Logo className="h-[34px]" tono="negativo" />}
         </div>
       )}
       <div className="absolute inset-0 px-[140px] pb-[110px] pt-[170px]">{children}</div>

@@ -1,5 +1,5 @@
 import type { Metadata } from "next"
-import { Tablero } from "./tablero"
+import { Tablero } from "@/components/app/tablero"
 
 export const metadata: Metadata = { title: "Tablero" }
 
