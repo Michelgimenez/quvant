@@ -1,0 +1,322 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+@import "shadcn/tailwind.css";
+
+/*
+ * Yunque — sistema de diseño.
+ * Modo oscuro primero: `.dark` va en <html> por defecto (next-themes).
+ * Los tokens de marca (--hierro, --forja, ...) son fijos; los semánticos
+ * (--background, --primary, ...) cambian por tema y son los que usa shadcn/ui.
+ * Contraste AA verificado a mano para texto normal (ver docs/ARQUITECTURA.md).
+ */
+
+@custom-variant dark (&:is(.dark *));
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+  --font-mono: var(--font-jetbrains), ui-monospace, monospace;
+  --font-heading: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+
+  /* Paleta de marca */
+  --color-hierro: var(--hierro);
+  --color-forja: var(--forja);
+  --color-acero: var(--acero);
+  --color-niebla: var(--niebla);
+  --color-temple: var(--temple);
+  --color-chispa: var(--chispa);
+  --color-ok: var(--ok);
+  --color-error: var(--error);
+
+  /* Semánticos extra */
+  --color-enlace: var(--enlace);
+  --color-chispa-texto: var(--chispa-texto);
+  --color-ok-texto: var(--ok-texto);
+  --color-error-texto: var(--error-texto);
+  --color-superficie: var(--superficie);
+  --color-superficie-2: var(--superficie-2);
+  --color-linea: var(--linea);
+
+  /* Color de la organización (co-branding), lo define el AppShell */
+  --color-marca: var(--marca);
+  --color-marca-contraste: var(--marca-contraste);
+
+  --color-sidebar-ring: var(--sidebar-ring);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar: var(--sidebar);
+  --color-chart-5: var(--chart-5);
+  --color-chart-4: var(--chart-4);
+  --color-chart-3: var(--chart-3);
+  --color-chart-2: var(--chart-2);
+  --color-chart-1: var(--chart-1);
+  --color-ring: var(--ring);
+  --color-input: var(--input);
+  --color-border: var(--border);
+  --color-destructive: var(--destructive);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-accent: var(--accent);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-muted: var(--muted);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-secondary: var(--secondary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-primary: var(--primary);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-popover: var(--popover);
+  --color-card-foreground: var(--card-foreground);
+  --color-card: var(--card);
+  --radius-sm: calc(var(--radius) * 0.6);
+  --radius-md: calc(var(--radius) * 0.8);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) * 1.4);
+  --radius-2xl: calc(var(--radius) * 1.8);
+  --radius-3xl: calc(var(--radius) * 2.2);
+  --radius-4xl: calc(var(--radius) * 2.6);
+
+  --animate-chispa: chispa 900ms cubic-bezier(0.2, 0.8, 0.2, 1) both;
+}
+
+/* Tokens de marca: no cambian con el tema */
+:root {
+  --hierro: #0e1116;
+  --forja: #1a1f27;
+  --acero: #9aa3ae;
+  --niebla: #eef1f4;
+  --temple: #3b6ef5;
+  --chispa: #ffb224;
+  --ok: #2fb36e;
+  --error: #e5484d;
+  /* Temple accesible para superficies llenas con texto blanco (4,9:1) */
+  --temple-accion: #3466f0;
+
+  --marca: var(--temple-accion);
+  --marca-contraste: #ffffff;
+  --radius: 0.625rem;
+}
+
+/* Modo claro */
+:root {
+  --background: var(--niebla);
+  --foreground: var(--hierro);
+  --card: #ffffff;
+  --card-foreground: var(--hierro);
+  --popover: #ffffff;
+  --popover-foreground: var(--hierro);
+  --primary: var(--temple-accion);
+  --primary-foreground: #ffffff;
+  --secondary: #e2e6eb;
+  --secondary-foreground: var(--hierro);
+  --muted: #e2e6eb;
+  --muted-foreground: #5b6470;
+  --accent: #e2e6eb;
+  --accent-foreground: var(--hierro);
+  --destructive: #c62f35;
+  --border: #d5dae0;
+  --input: #c9cfd6;
+  --ring: var(--temple);
+
+  --enlace: #2a55d0;
+  --chispa-texto: #8a5200;
+  --ok-texto: #17794a;
+  --error-texto: #b42329;
+  --superficie: #ffffff;
+  --superficie-2: #f6f8fa;
+  --linea: #d5dae0;
+  --grilla: rgb(14 17 22 / 0.045);
+
+  --chart-1: #3466f0;
+  --chart-2: #d08700;
+  --chart-3: #17794a;
+  --chart-4: #8a5cf6;
+  --chart-5: #5b6470;
+
+  --sidebar: #ffffff;
+  --sidebar-foreground: var(--hierro);
+  --sidebar-primary: var(--temple-accion);
+  --sidebar-primary-foreground: #ffffff;
+  --sidebar-accent: #e2e6eb;
+  --sidebar-accent-foreground: var(--hierro);
+  --sidebar-border: #d5dae0;
+  --sidebar-ring: var(--temple);
+}
+
+/* Modo oscuro (por defecto) */
+.dark {
+  --background: var(--hierro);
+  --foreground: var(--niebla);
+  --card: var(--forja);
+  --card-foreground: var(--niebla);
+  --popover: var(--forja);
+  --popover-foreground: var(--niebla);
+  --primary: var(--temple-accion);
+  --primary-foreground: #ffffff;
+  --secondary: #242a34;
+  --secondary-foreground: var(--niebla);
+  --muted: #242a34;
+  --muted-foreground: var(--acero);
+  --accent: #242a34;
+  --accent-foreground: var(--niebla);
+  --destructive: #f06368;
+  --border: rgb(154 163 174 / 0.16);
+  --input: rgb(154 163 174 / 0.22);
+  --ring: var(--temple);
+
+  --enlace: #6e93f8;
+  --chispa-texto: var(--chispa);
+  --ok-texto: #3fc580;
+  --error-texto: #f06368;
+  --superficie: var(--forja);
+  --superficie-2: #151a21;
+  --linea: rgb(154 163 174 / 0.16);
+  --grilla: rgb(238 241 244 / 0.035);
+
+  --chart-1: #6e93f8;
+  --chart-2: #ffb224;
+  --chart-3: #3fc580;
+  --chart-4: #b197fc;
+  --chart-5: #9aa3ae;
+
+  --sidebar: #12161c;
+  --sidebar-foreground: var(--niebla);
+  --sidebar-primary: var(--temple-accion);
+  --sidebar-primary-foreground: #ffffff;
+  --sidebar-accent: #1f252e;
+  --sidebar-accent-foreground: var(--niebla);
+  --sidebar-border: rgb(154 163 174 / 0.14);
+  --sidebar-ring: var(--temple);
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  html {
+    @apply font-sans;
+    -webkit-tap-highlight-color: transparent;
+  }
+  body {
+    @apply bg-background text-foreground;
+    font-feature-settings: "cv11", "ss01";
+  }
+  button:not(:disabled),
+  [role="button"]:not(:disabled) {
+    cursor: pointer;
+  }
+  h1,
+  h2,
+  h3,
+  .font-display {
+    font-family: var(--font-heading);
+    font-variation-settings: "opsz" 32;
+    letter-spacing: -0.025em;
+  }
+  :focus-visible {
+    outline: 2px solid var(--temple);
+    outline-offset: 2px;
+  }
+  ::selection {
+    background: rgb(59 110 245 / 0.35);
+  }
+}
+
+@layer components {
+  /* Etiqueta tipo ficha técnica: VENTA #10482 · MOSTRADOR 2 */
+  .ficha {
+    font-family: var(--font-mono);
+    font-size: 0.6875rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--muted-foreground);
+    font-variant-numeric: tabular-nums;
+  }
+  .grilla-tecnica {
+    background-image:
+      linear-gradient(to right, var(--grilla) 1px, transparent 1px),
+      linear-gradient(to bottom, var(--grilla) 1px, transparent 1px);
+    background-size: 32px 32px;
+  }
+  .num {
+    font-family: var(--font-mono);
+    font-variant-numeric: tabular-nums;
+  }
+  .sin-scrollbar {
+    scrollbar-width: none;
+  }
+  .sin-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+@keyframes chispa {
+  0% {
+    opacity: 0;
+    transform: scale(0.2) rotate(-45deg);
+  }
+  40% {
+    opacity: 1;
+    transform: scale(1.25) rotate(8deg);
+  }
+  70% {
+    opacity: 1;
+    transform: scale(0.95) rotate(0deg);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(1) rotate(0deg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 1ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 1ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+.chispa-rayo {
+  stroke-dasharray: 1;
+  stroke-dashoffset: 1;
+  animation: rayo 700ms cubic-bezier(0.2, 0.8, 0.2, 1) 120ms both;
+}
+.chispa-mensaje {
+  animation: mensaje-chispa 1300ms ease both;
+}
+@keyframes rayo {
+  0% {
+    stroke-dashoffset: 1;
+    opacity: 1;
+  }
+  60% {
+    stroke-dashoffset: 0;
+    opacity: 1;
+  }
+  100% {
+    stroke-dashoffset: -1;
+    opacity: 0;
+  }
+}
+@keyframes mensaje-chispa {
+  0% {
+    opacity: 0;
+    transform: translate(-50%, 4px);
+  }
+  15%,
+  75% {
+    opacity: 1;
+    transform: translate(-50%, 0);
+  }
+  100% {
+    opacity: 0;
+    transform: translate(-50%, -4px);
+  }
+}
