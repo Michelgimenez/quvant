@@ -25,4 +25,12 @@ test.describe("demo comercial por cliente", () => {
     const r = await request.get("/demo/otro-negocio")
     expect(r.status()).toBe(404)
   })
+
+  test("los archivos de public/demo (logos de la empresa demo) no pasan por el filtro de prospectos", async ({ request }) => {
+    for (const logo of ["ferreteria-industrial-demo-claro.svg", "ferreteria-industrial-demo-oscuro.svg"]) {
+      const r = await request.get(`/demo/${logo}`)
+      expect(r.status(), logo).toBe(200)
+      expect(r.headers()["content-type"]).toContain("image/svg+xml")
+    }
+  })
 })

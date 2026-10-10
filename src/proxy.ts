@@ -12,8 +12,9 @@ import { COOKIE_PRE_SESION, COOKIE_SESION, type Sesion } from "@/lib/auth/tipos"
 export async function proxy(req: NextRequest) {
   const { pathname, search } = req.nextUrl
 
-  // Demo comercial: solo los prospectos configurados en src/config/clientes/ (el resto, 404 real)
-  const demo = /^\/demo\/([^/]+)\/?$/.exec(pathname)
+  // Demo comercial: solo los prospectos configurados en src/config/clientes/ (el resto, 404 real).
+  // Los slugs no llevan punto: así no se tocan los archivos de public/demo/ (logos de la empresa demo).
+  const demo = /^\/demo\/([^/.]+)\/?$/.exec(pathname)
   if (demo) {
     return clienteDemo(demo[1]) ? NextResponse.next() : NextResponse.rewrite(new URL("/_not-found", req.url), { status: 404 })
   }

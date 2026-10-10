@@ -1,0 +1,113 @@
+# Yunque — seguridad
+
+> Estado honesto: **demo funcional, sin auditoría externa y sin despliegue a producción.** Este documento dice
+> qué existe hoy, qué falta y qué tiene que revisar una auditoría profesional antes del primer cliente real.
+> Arquitectura general en [`ARQUITECTURA.md`](ARQUITECTURA.md).
+
+## Lo que existe hoy
+
+### Aislamiento entre empresas (multiempresa)
+- Todas las tablas de negocio llevan `org_id`, con **claves foráneas compuestas** (`org_id`, `id`): una fila no puede referenciar datos de otra empresa.
+- **RLS activado y forzado** (`force row level security`) en todas las tablas, también para el dueño de las tablas.
+- El rol `authenticated` solo tiene **`SELECT`**, filtrado por organización y, donde aplica, por sucursal permitida.
+- **Escrituras solo por `public.aplicar_operacion()`** (security definer, `search_path` fijo): valida el permiso del rol y la sucursal, aplica en una subtransacción y deja registro. Las funciones internas (`app.*`) tienen `execute` revocado para `public`.
+- **Columnas protegidas**: costos de productos y de ítems de venta no se otorgan; se leen con `app.costos_productos()` solo con el permiso `costos.ver`.
+- **Doble factor exigido en la base**: dueño y administración sin `aal2` en el JWT no tienen permisos.
+- **Tests**: 27+ pruebas de aislamiento sobre PostgreSQL real (PGlite) con un control negativo (una fuga plantada a propósito que el detector tiene que encontrar). Los tests encontraron y se corrigió un bug real: `app.puede_sucursal()` no comparaba la sucursal pedida.
+
+### Auditoría
+- Trigger de auditoría en las tablas de negocio (quién, qué, cuándo, antes y después).
+- `auditoria`, `movimientos_stock`, `movimientos_cuenta` y `operaciones` son **de solo agregar**: un trigger impide `UPDATE`, `DELETE` y `TRUNCATE`.
+- Operaciones rechazadas registradas aparte (`operaciones_rechazadas`).
+
+### Ingreso y sesiones
+- Mismo mensaje para email inexistente y contraseña incorrecta (sin enumeración de usuarios).
+- **Límite de intentos**: 5 fallos por email y 20 por IP cada 15 minutos (`app.ingreso_permitido()` en la base; en memoria en modo demo). El email se guarda solo como hash.
+- Sesión en cookie **`httpOnly`**, `SameSite=Lax`, `Secure` en producción, firmada con HS256 (`SESION_SECRETO`, mínimo 32 caracteres; en producción sin secreto la app no arranca la sesión), 12 h. Pre-sesión de 5 min para el doble factor.
+- Redirección posterior al ingreso solo a rutas internas de `/app` (sin redirecciones abiertas).
+- Doble factor TOTP para dueño y administración.
+- Las server actions de Next validan el origen (protección CSRF incorporada).
+
+### Presentaciones
+- `/inversores`: clave (`INVERSORES_KEY`) comparada en **tiempo constante**, límite de intentos **por IP**, cookie firmada `httpOnly` + `SameSite=Strict` limitada a `/inversores` por 8 h. En producción sin clave configurada, la presentación queda cerrada.
+- Monto, destino de la inversión, equipo y contacto están en un módulo `server-only` y viajan **solo después** de validar la clave (test e2e lo verifica).
+- `/demo/[cliente]`: pública por enlace, sin datos sensibles, `noindex`; prospectos no configurados → 404.
+
+### Navegador y cabeceras
+- `Content-Security-Policy` (`default-src 'self'`, `frame-ancestors 'none'`, `connect-src` limitado a la propia app y a Supabase), `X-Frame-Options: DENY`, `X-Content-Type-Options: nosniff`, `Referrer-Policy: strict-origin-when-cross-origin`, `Permissions-Policy` (cámara solo propia; micrófono, geolocalización y pagos desactivados), `Cross-Origin-Opener-Policy: same-origin` y **HSTS** en producción.
+- `robots.txt` excluye `/app`, `/api`, `/ingresar`, `/inversores`, `/demo` y `/marca`.
+
+### Formularios y endpoints públicos
+- "Pedir una demo": validación con zod, **campo trampa** contra bots y límite de 5 envíos cada 10 minutos por IP. En Supabase, `solicitudes_demo` solo permite `INSERT` anónimo (sin lectura).
+- `/api/errores` (reporte de errores del cliente) con límite por IP y tamaño acotado.
+
+### Secretos
+- Sin claves reales en el repositorio. `.env.local` está en `.gitignore`; `.env.example` documenta las variables.
+- La clave de servicio de Supabase (`SUPABASE_SERVICE_ROLE_KEY`) solo se usa en módulos `server-only`.
+- Integraciones de pago, facturación y mensajería **emuladas**: no hay credenciales de terceros.
+
+### Monitoreo
+- Errores de servidor (`onRequestError`) y de cliente como JSON estructurado en la consola del servidor + webhook opcional (`MONITOREO_WEBHOOK`). Página `/estado` honesta.
+
+## Lo que falta (antes de producción)
+
+| Tema | Situación | Qué hacer |
+|---|---|---|
+| Auditoría externa | No hubo | Revisión de arquitectura, RLS y pentest (es la etapa 1 de la hoja de ruta) |
+| CSP | Usa `'unsafe-inline'` para scripts (con nonces todas las páginas pasan a render dinámico) | Nonces o hashes; medir el costo en el sitio público |
+| Modo Supabase | Preparado pero **no probado** contra una instancia real; la función de operaciones cubre 7 de 33 tipos | Staging con Supabase, mismos tests de RLS, completar operaciones |
+| Datos en el dispositivo | La réplica local y la cola (IndexedDB) **quedan en el equipo** al salir; no están cifradas | Borrar la base local al salir en equipos compartidos; política de dispositivos; evaluar cifrado |
+| Revocación de sesión | JWT sin estado: una sesión robada vale hasta que vence (12 h) | Lista de revocación o sesiones de Supabase con refresh corto |
+| Bloqueo por email | 5 fallos bloquean ese email 15 min: un tercero puede bloquear a un usuario a propósito | CAPTCHA tras fallos, avisos al usuario, bloqueo progresivo |
+| Recuperación del 2FA | No hay códigos de respaldo | Códigos de recuperación y proceso de soporte verificado |
+| Backups | No configurados (no hay base real) | Backups diarios + PITR de Supabase y **restauración probada** periódicamente |
+| Dependencias | `npm audit --omit=dev`: **0 vulnerabilidades**. El reporte completo marca `braces` (alta, DoS por patrones anidados) dentro de la CLI de `shadcn`, que es herramienta de desarrollo (`devDependencies`) y no llega al navegador ni al servidor | `npm audit` y Dependabot/Renovate en CI; actualizar la CLI cuando publique la corrección |
+| CI | No hay pipeline | GitHub Actions con `npm run verificar`, tests de RLS y e2e en cada PR |
+| Rotación de secretos | Manual | Procedimiento documentado para `SESION_SECRETO`, `INVERSORES_KEY` y claves de Supabase |
+| Límite de intentos en demo | En memoria, por instancia | En producción ya usa la base |
+| Logs | Solo consola + webhook | Retención, alertas y acceso restringido; no registrar datos personales |
+| Protección de borde | Sin WAF ni límite global | Límites en el proveedor (Vercel/Cloudflare) |
+
+## Lista para una auditoría profesional
+
+**Aplicación (OWASP Top 10 / ASVS nivel 2)**
+- [ ] Control de acceso: cada operación de `aplicar_operacion` valida permiso y sucursal; probar escalamiento horizontal (otra empresa) y vertical (otro rol).
+- [ ] Autenticación: fuerza bruta, enumeración, fijación de sesión, cierre de sesión, expiración, flujo de 2FA y su recuperación.
+- [ ] Inyección: entradas de las operaciones (`jsonb`) y del importador de Excel/CSV (incluida inyección de fórmulas al exportar CSV).
+- [ ] XSS: datos de clientes, productos y presupuestos en la UI, tickets impresos y mensajes de WhatsApp; efectividad de la CSP.
+- [ ] CSRF y origen de las server actions; cabeceras de seguridad en todas las respuestas.
+- [ ] SSRF y redirecciones abiertas (parámetro `siguiente`).
+- [ ] Manejo de errores: sin trazas ni datos internos en las respuestas.
+- [ ] Service worker: qué queda en caché, alcance, actualización y que no cachee respuestas con datos de otra sesión.
+
+**Base de datos y RLS**
+- [ ] Todas las tablas con RLS forzado; ninguna política `using (true)` para `authenticated`.
+- [ ] `security definer` con `search_path` fijo y `execute` revocado donde corresponde.
+- [ ] Columnas protegidas (costos) inaccesibles por la API REST de Supabase.
+- [ ] Exigencia de `aal2` para dueño y administración.
+- [ ] Tablas de solo agregar: ni `UPDATE`, ni `DELETE`, ni `TRUNCATE`, tampoco con la clave de servicio salvo procedimiento.
+- [ ] Correr `tests/rls` contra la instancia real (no solo PGlite).
+
+**Secretos y configuración**
+- [ ] Ningún secreto en el repo ni en el historial de git.
+- [ ] Variables de entorno por ambiente; la clave de servicio nunca en el cliente.
+- [ ] Rotación probada de `SESION_SECRETO` (invalida sesiones) y de `INVERSORES_KEY`.
+
+**Backups y continuidad**
+- [ ] Backups automáticos + PITR activados.
+- [ ] **Restauración probada** en un entorno aparte, con tiempo medido.
+- [ ] Exportación completa por empresa (ya existe en Configuración) verificada contra una restauración.
+
+**Dependencias y cadena de suministro**
+- [ ] `npm audit` sin altas/críticas en producción; versiones fijadas con lockfile.
+- [ ] Dependabot/Renovate y revisión de paquetes nuevos.
+
+**Logs y monitoreo**
+- [ ] Errores con contexto sin datos personales ni secretos.
+- [ ] Alertas por picos de rechazos de operaciones, intentos de ingreso fallidos y errores 5xx.
+- [ ] Retención y acceso a logs definidos.
+
+**Dispositivos y modo sin conexión**
+- [ ] Datos locales al cerrar sesión en equipos compartidos.
+- [ ] Qué puede hacer un dispositivo robado con una sesión vigente y una cola pendiente.
+- [ ] Integridad de la cola: el servidor revalida todo (el cliente nunca decide precios ni números definitivos).

@@ -118,5 +118,57 @@
 - **Un archivo por prospecto** en `src/config/clientes/` (nombre, rubro, color, logos, categorías, problemas detectados, sucursales, contacto) + registro en `index.ts` + `_plantilla.ts` para sumar uno nuevo. La ruta se genera en el build para cada prospecto configurado.
 - **`/demo/ferremix`**: logo y naranja de Ferremix, "Así se vería Yunque en Ferremix" y sello `PROPUESTA` siempre visible. Mismo motor y controles que la presentación para inversores.
 - **7 escenas** (≈ 5 min 47 s a 1×; 4 min 38 s a 1,25×; 7 min 43 s a 0,75×): portada, **su problema** (del relevamiento, en `[COMPLETAR]`), **Yunque con su marca** (el tablero real de la app con su logo y color, la pantalla de ingreso en el celular con "con yunque" discreto y sus categorías), **un día en su negocio** (mostrador 08:15, depósito 11:40, presupuesto aceptado 17:20, con operaciones reales y en bucle), **el corte de conexión** en vivo, **cómo empezamos** (relevamiento, migración, piloto en una sucursal, puesta en marcha) y **socio fundador** (condiciones y plan desde `src/config/precios.ts`).
-- Tests: 103 unitarios + RLS (3 nuevos de honestidad: Ferremix solo en su configuración, ningún prospecto como "cliente activo" o "caso de éxito", estados válidos del registro); 19 e2e (2 nuevos: marca, sellos y escenas de Ferremix; prospecto inexistente → 404).
+- Tests: 103 unitarios + RLS (3 nuevos de honestidad: Ferremix solo en su configuración, ningún prospecto como "cliente activo" o "caso de éxito", estados válidos del registro); 19 e2e (2 nuevos: marca, sellos y escenas de Ferremix; prospecto inexistente → 404; en la fase 8 se sumó un tercero).
 - Capturas de las 7 escenas en escritorio y celular (`docs/capturas/demo-ferremix-*`).
+
+### Fase 8 — Documentación, pulido y verificación final
+- **Documentación**: [`ARQUITECTURA.md`](ARQUITECTURA.md) (componentes, modo demo vs. Supabase, modelo multiempresa, sincronización y reglas de conflicto, deudas técnicas), [`SEGURIDAD.md`](SEGURIDAD.md) (medidas actuales, lo que falta, lista para auditoría profesional), [`PITCH.md`](PITCH.md) (guion de las 12 escenas con sus `[COMPLETAR]` y preguntas probables), [`ROADMAP.md`](ROADMAP.md) (etapas desde `src/config/hoja-de-ruta.ts`) y `README.md` (cómo correrlo, usuarios, rutas, teclas).
+- **Pulido**: `shadcn` pasó a `devDependencies` (solo se usa su CSS al compilar): `npm audit --omit=dev` da 0 vulnerabilidades. El script de capturas cierra el servidor que levanta (en Windows quedaba huérfano) y copia al sitio solo las capturas que usa.
+- **Bug encontrado al revisar las capturas** (introducido en la fase 7): el filtro de prospectos del proxy (`/demo/:cliente`) también atrapaba los archivos de `public/demo/` y el logo de la empresa demo respondía 404 en toda la app. Ahora los slugs no admiten punto; test e2e nuevo con control negativo (falla con el código anterior). Se rehicieron todas las capturas, incluidas las que usa el sitio.
+- **Capturas**: 98 archivos en `docs/capturas/` — todas las pantallas del sitio, la app (por rol), el ingreso, las 12 escenas de inversores y las 7 de la demo de Ferremix, en escritorio (1440×900) y celular (390×844); algunas pantallas de detalle solo en escritorio.
+- **Verificación final**: typecheck, lint, 103 tests unitarios + RLS, build y 20 tests e2e, todo en verde.
+
+## Qué quedó hecho
+
+- **App** (`/app`): inventario multisucursal con escaneo y conteos, precios con aumento masivo, mostrador que vende sin conexión (incluso tras recargar sin internet), caja, presupuestos → venta, servicio técnico, clientes y cuentas corrientes, compras, entregas, reportes, usuarios y permisos por rol con doble factor, configuración con co-branding, importador, auditoría. Local-first con sincronización y reglas de conflicto probadas.
+- **Base**: esquema multiempresa en Supabase/PostgreSQL con RLS forzado, escrituras solo por una función con permisos, auditoría de solo agregar; probado con PGlite.
+- **Sitio** (`/`): héroe animado, demo interactiva "Nunca se cae", precios al día, estado real del producto desde el registro; Lighthouse escritorio 100/100/100/100.
+- **Presentación para inversores** (`/inversores`): 12 escenas con clave, demo del producto en vivo, controles completos.
+- **Demo comercial** (`/demo/[cliente]`, `/demo/ferremix`): un archivo por prospecto, su marca y sello PROPUESTA.
+
+## Pendientes
+
+**De contenido (no de código)** — todo visible como `[COMPLETAR]`:
+- Presentación: datos de mercado con fuente, hallazgos del terreno y conclusión (`src/config/inversores.ts`); monto, porcentajes definitivos, equipo con fotos y contacto (`src/config/inversion.ts`); validar supuestos de proyección (`src/config/proyecciones.ts`).
+- Ferremix: categorías reales, problemas detectados, sucursales y contacto (`src/config/clientes/ferremix.ts`).
+- Sitio: datos de contacto (`src/config/sitio.ts`).
+
+**Técnicos** (detalle en ARQUITECTURA y SEGURIDAD):
+- Modo Supabase: adaptador del cliente, carga inicial, 26 tipos de operación por portar a SQL, probar contra una instancia real.
+- Seguridad antes de producción: auditoría externa, CSP con nonces, revocación de sesiones, recuperación del 2FA, datos locales al salir, backups con restauración probada, CI.
+- Performance móvil del sitio en Lighthouse simulado (77–89; objetivo ≥ 90).
+- Comparar con el proyecto de Ferremix cuando haya acceso e integrar lo mejor (D8).
+
+## Cómo levantar el proyecto
+
+```bash
+npm install
+npm run dev                      # http://localhost:3000 (modo demo, sin claves)
+npm run verificar                # typecheck + lint + tests + build
+npm run build && npm run test:e2e
+npm run build && npm run capturas
+```
+
+Variables en `.env.example` (todas opcionales en desarrollo). Sin Supabase, todo corre en modo demo.
+
+## Usuarios de prueba
+
+Contraseña **`demo1234`** para todos. Dueño y administración pasan por el doble factor: el código se muestra en la pantalla de verificación (autenticador emulado).
+
+`dueno@demo.yunque.app` (dueño) · `admin@demo.yunque.app` (administración) · `mostrador@demo.yunque.app` (mostrador, Casa Central) · `mostrador.norte@demo.yunque.app` (mostrador, Norte) · `maquinaria@demo.yunque.app` (mostrador, maquinaria) · `deposito@demo.yunque.app` (depósito) · `tecnico@demo.yunque.app` y `tecnico2@demo.yunque.app` (técnicos) · `compras@demo.yunque.app` (compras).
+
+## Teclas de las presentaciones
+
+Clave de `/inversores`: `INVERSORES_KEY` (en desarrollo, si falta, `yunque-demo`). `/demo/ferremix` no lleva clave.
+
+**P** reproducir/pausar · **H** ocultar controles y cursor · **R** reiniciar · **1/2/3** velocidad 0,75×/1×/1,25× · **→ ↓ AvPág Espacio** siguiente · **← ↑ RePág** anterior · **Inicio/Fin** primera/última · **F** pantalla completa · **`#N`** en la URL va a la escena N.
