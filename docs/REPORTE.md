@@ -2,7 +2,7 @@
 
 ## Resumen · revisión final (10/10/2026)
 
-**Estado real:** demo funcional / piloto. Primer piloto en negociación, sin clientes pagando. Pagos, facturación y WhatsApp **emulados**. Sin despliegue a producción.
+**Estado real:** demo funcional / piloto. Primer piloto en negociación, sin clientes pagando. Pagos, facturación y WhatsApp **emulados**. **Publicado para revisión en https://yunque-rust.vercel.app** (modo demo, datos ficticios, sin Supabase).
 
 ### Listo y probado
 - **App (`/app`)**: inventario multisucursal con escaneo y conteos, precios con aumento masivo, mostrador y caja, presupuestos → venta, servicio técnico, clientes y cuentas corrientes, compras, entregas, reportes, usuarios y permisos, co-branding, importador y auditoría. Recorrida con **los 9 usuarios de prueba**, cada módulo de su rol, en escritorio y celular, sin errores.
@@ -91,6 +91,7 @@
 | D42 | El aviso de solicitudes va en un **panel interno** nuevo (`/panel`) con clave propia (`PANEL_KEY`), no en `/app`. | `/app` es el panel de cada empresa cliente y sus usuarios de prueba son públicos: mostrar ahí nombres y WhatsApp de interesados expondría datos personales. |
 | D43 | El shim de Supabase de los tests replica los **privilegios por defecto** de Supabase, y la migración `0800_privilegios_api` los revoca y deja solo lo necesario. | La revisión encontró que, en Supabase real, las tablas creadas después de la 0300 quedaban con privilegios de más para `anon`/`authenticated` (RLS evitaba la fuga, pero era una sola capa). |
 | D44 | Test e2e de "sin conexión sin duplicados" que lee la cola, lo confirmado y el log del servidor demo en IndexedDB y compara el stock antes y después. Se validó con controles negativos (rompiendo las dos defensas contra duplicados el test falla). | El test anterior solo verificaba que sincronizara. |
+| D45 | Publicado en **Vercel** (proyecto `yunque`, https://yunque-rust.vercel.app) por pedido explícito, en modo demo. Claves nuevas como variables secretas; la base local de solicitudes usa `/tmp` (temporal); `outputFileTracingIncludes` lleva el SQL de las migraciones al servidor. | Para revisar el sitio, la app y las presentaciones desde el navegador. Producción real (con Supabase y dominio propio) sigue pendiente. |
 
 ## Fases
 
@@ -225,3 +226,4 @@ Pedido: verificar y corregir, sin funciones nuevas (salvo el destino de "Pedir u
 - **"Pedir una demo"**: antes iba a `.data/solicitudes-demo.jsonl` (nadie lo leía; en serverless no se puede escribir). Ahora va a la base y al panel `/panel` (D41, D42). El archivo viejo solo tenía envíos de los tests e2e.
 - **Seguridad**: `.env.local` nunca estuvo en git; ningún archivo del navegador menciona `service_role`, secretos ni claves; 2FA verificado para dueño y administración. Corregidos los privilegios de fábrica de Supabase (D43) y las cabeceras HSTS/`upgrade-insecure-requests` por http. `SEGURIDAD.md` actualizado.
 - **Recorrido**: `scripts/revision.ts` → 216 pantallas (sitio con la demo de corte, los 9 usuarios de prueba en cada módulo de su rol, 12 escenas de inversores y 7 de Ferremix) en 1440×900 y 390×844. La primera pasada encontró 32 errores en la demo de Ferremix (pedidos subidos a `https://localhost`); corregido, la segunda dio **0 errores**. Capturas en `docs/capturas/revision/`.
+- **Publicado en Vercel** (https://yunque-rust.vercel.app, D45): el mismo recorrido contra el sitio publicado dio **216 pantallas, 0 fallas, 0 errores**. "Pedir una demo" → `/panel` probado en producción: se guarda y aparece como nueva.

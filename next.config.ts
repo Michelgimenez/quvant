@@ -47,6 +47,11 @@ const nextConfig: NextConfig = {
   reactStrictMode: true,
   // PGlite (base local del modo demo) carga WASM y archivos de datos: no se empaqueta
   serverExternalPackages: ["@electric-sql/pglite"],
+  // La base local aplica las migraciones al abrirse: el SQL tiene que viajar con el servidor
+  outputFileTracingIncludes: {
+    "/": ["./supabase/**/*.sql"],
+    "/panel": ["./supabase/**/*.sql"],
+  },
   experimental: {
     // Navegaciones y Server Actions quedan pendientes (no fallan) sin conexión.
     useOffline: true,

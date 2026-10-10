@@ -4,6 +4,7 @@
  * de consola, error de página, pedido fallido y respuesta ≥ 400.
  *
  *   npm run build && npx tsx scripts/revision.ts
+ *   REVISION_URL=https://… REVISION_SALIDA=carpeta npx tsx scripts/revision.ts   # contra un sitio publicado
  *
  * Recorre: el sitio (con la demo "Nunca se cae": vender, cortar, vender en cola,
  * reconectar), /app con cada usuario de prueba y cada módulo que su rol puede
@@ -18,8 +19,10 @@ import { USUARIOS_DEMO } from "@/datos/demo/catalogo"
 import { PERMISOS_POR_ROL } from "@/dominio/permisos"
 
 const PUERTO = Number(process.env.PUERTO_REVISION ?? 3410)
-const BASE = `http://localhost:${PUERTO}`
-const SALIDA = path.join(process.cwd(), "docs", "capturas", "revision")
+const EXTERNA = process.env.REVISION_URL?.replace(/\/$/, "")
+const BASE = EXTERNA ?? `http://localhost:${PUERTO}`
+const SALIDA = process.env.REVISION_SALIDA ? path.resolve(process.env.REVISION_SALIDA) : path.join(process.cwd(), "docs", "capturas", "revision")
+const CLAVE_INVERSORES = process.env.INVERSORES_KEY ?? "yunque-demo"
 const VISTAS = [
   { nombre: "escritorio", width: 1440, height: 900, movil: false },
   { nombre: "celular", width: 390, height: 844, movil: true },
@@ -240,7 +243,7 @@ function informe(inicio: Date) {
   const lineas = [
     "# Revisión final · recorrido con Playwright",
     "",
-    `Fecha: ${inicio.toLocaleString("es-AR", { timeZone: "America/Argentina/Buenos_Aires", hourCycle: "h23" })} · build de producción (\`next start\`) · escritorio 1440×900 y celular 390×844.`,
+    `Fecha: ${inicio.toLocaleString("es-AR", { timeZone: "America/Argentina/Buenos_Aires", hourCycle: "h23" })} · ${EXTERNA ? `sitio publicado (${EXTERNA})` : "build de producción (\`next start\`)"} · escritorio 1440×900 y celular 390×844.`,
     "Generado por `scripts/revision.ts`. Se registran errores de consola, errores de página, pedidos fallidos (sin contar cancelaciones normales de navegación) y respuestas HTTP ≥ 400.",
     "",
     "| Sección | Pantallas recorridas (ambos tamaños) | Fallas del recorrido | Errores registrados |",
@@ -267,19 +270,19 @@ async function main() {
   const inicio = new Date()
   rmSync(SALIDA, { recursive: true, force: true })
   mkdirSync(SALIDA, { recursive: true })
-  const proc = await levantarServidor()
+  const proc = EXTERNA ? null : await levantarServidor()
   const browser = await chromium.launch()
   try {
     for (const vista of VISTAS) {
       await sitio(browser, vista)
       await app(browser, vista)
-      await presentacion(browser, vista, "Inversores", "/inversores", ["apertura", "problema", "terreno", "solucion", "demo", "diferencial", "modelo", "estado", "hoja-de-ruta", "inversion", "equipo", "cierre"], "inversores", "yunque-demo")
+      await presentacion(browser, vista, "Inversores", "/inversores", ["apertura", "problema", "terreno", "solucion", "demo", "diferencial", "modelo", "estado", "hoja-de-ruta", "inversion", "equipo", "cierre"], "inversores", CLAVE_INVERSORES)
       await presentacion(browser, vista, "Demo Ferremix", "/demo/ferremix", ["portada", "su-problema", "su-marca", "un-dia", "corte", "como-empezamos", "socio-fundador"], "demo-ferremix")
     }
   } finally {
     await browser.close()
-    if (process.platform === "win32" && proc.pid) spawnSync("taskkill", ["/pid", String(proc.pid), "/T", "/F"], { shell: true, stdio: "ignore" })
-    else proc.kill()
+    if (proc && process.platform === "win32" && proc.pid) spawnSync("taskkill", ["/pid", String(proc.pid), "/T", "/F"], { shell: true, stdio: "ignore" })
+    else proc?.kill()
     informe(inicio)
   }
   console.log(`${recorridas.length} pantallas · ${recorridas.filter((r) => !r.ok).length} fallas · ${incidentes.length} incidentes`)

@@ -1,0 +1,13 @@
+# Nunca subir secretos locales ni datos de desarrollo
+.env*
+!.env.example
+.data
+.vercel
+
+# Pesado y no hace falta para compilar
+node_modules
+.next
+docs/capturas
+test-results
+playwright-report
+coverage

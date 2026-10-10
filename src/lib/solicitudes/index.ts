@@ -1,6 +1,6 @@
 import "server-only"
 import { createClient } from "@supabase/supabase-js"
-import { baseLocal } from "@/lib/base-local"
+import { BASE_LOCAL_TEMPORAL, baseLocal } from "@/lib/base-local"
 import { modoActual } from "@/lib/modo"
 import { supabaseServicio } from "@/lib/supabase/servidor"
 import { insertarSolicitud, listarSolicitudes, marcarSolicitud, type NuevaSolicitud, type Solicitud } from "./postgres"
@@ -14,7 +14,9 @@ export type { NuevaSolicitud, Solicitud } from "./postgres"
  * - sin Supabase: la base local de desarrollo (mismo esquema y mismas reglas).
  */
 export function destinoSolicitudes() {
-  return modoActual() === "supabase" ? "Supabase · tabla solicitudes_demo" : "Base local de desarrollo · .data/base-local (tabla solicitudes_demo)"
+  if (modoActual() === "supabase") return "Supabase · tabla solicitudes_demo"
+  if (BASE_LOCAL_TEMPORAL) return "base temporal del servidor de Vercel (se borra al reciclarse y cada instancia tiene la suya; para guardarlas de verdad hay que configurar Supabase)"
+  return "Base local de desarrollo · .data/base-local (tabla solicitudes_demo)"
 }
 
 export async function guardarSolicitud(s: NuevaSolicitud) {

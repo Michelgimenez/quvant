@@ -4,7 +4,10 @@ Sistema de gestión en la nube para ferreterías industriales, distribuidores de
 complejo en Argentina. El mostrador sigue vendiendo aunque se corte internet. *Firme, aunque todo se mueva.*
 
 **Estado:** demo funcional / piloto. Primer piloto en negociación. Todavía no hay clientes pagando.
-Pagos, facturación y mensajería están **emulados**. Sin despliegue a producción.
+Pagos, facturación y mensajería están **emulados**.
+
+**Publicado para revisión** (modo demo, datos ficticios): https://yunque-rust.vercel.app — proyecto `yunque`
+en Vercel. Sin Supabase: las solicitudes de "Pedir una demo" van a una base temporal del servidor.
 
 ## Cómo correrlo
 
@@ -87,6 +90,17 @@ local (`.data/base-local`, mismo esquema que producción).
 
 Para sumar un prospecto a la demo comercial: copiar `src/config/clientes/_plantilla.ts`, poner sus logos en
 `public/clientes/<slug>/` y registrarlo en `src/config/clientes/index.ts`. La demo queda en `/demo/<slug>`.
+
+## Publicar en Vercel
+
+El proyecto está vinculado (`.vercel/`, fuera de git). Variables en Vercel → Production: `SESION_SECRETO`,
+`INVERSORES_KEY`, `PANEL_KEY` (secretas) y `NEXT_PUBLIC_SITIO_URL`. Para volver a publicar:
+
+```powershell
+npx.cmd vercel deploy --prod
+```
+
+`.vercelignore` evita subir `.env*`, `.data` y las capturas.
 
 ## Documentación
 

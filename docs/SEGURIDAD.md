@@ -1,6 +1,6 @@
 # Yunque — seguridad
 
-> Estado honesto: **demo funcional, sin auditoría externa y sin despliegue a producción.** Este documento dice
+> Estado honesto: **demo funcional, sin auditoría externa.** Publicado en Vercel solo para revisión (https://yunque-rust.vercel.app), en modo demo: datos ficticios, sin Supabase ni datos de clientes. Este documento dice
 > qué existe hoy, qué falta y qué tiene que revisar una auditoría profesional antes del primer cliente real.
 > Arquitectura general en [`ARQUITECTURA.md`](ARQUITECTURA.md). Última revisión: 10/10/2026 (revisión final).
 
@@ -52,6 +52,12 @@
 - La clave de servicio de Supabase (`SUPABASE_SERVICE_ROLE_KEY`) solo se usa en módulos `server-only` (límite de intentos y panel). Verificado en la revisión final: ningún archivo de `.next/static` (lo que baja al navegador) menciona `service_role`, `SESION_SECRETO`, `INVERSORES_KEY`, `PANEL_KEY` ni las claves de desarrollo. Las únicas variables públicas son la URL del sitio y la URL + clave anónima de Supabase.
 - `.env.local` nunca estuvo en el historial de git (verificado).
 - Integraciones de pago, facturación y mensajería **emuladas**: no hay credenciales de terceros.
+
+### Publicación en Vercel (revisión)
+- Variables en Vercel → Production, cargadas como **secretas**: `SESION_SECRETO` (48 caracteres al azar), `INVERSORES_KEY` y `PANEL_KEY` (nuevas, distintas de las de desarrollo) y `NEXT_PUBLIC_SITIO_URL` (https → se activan HSTS y `upgrade-insecure-requests`).
+- `.vercelignore` impide subir `.env*` (incluido `.env.local`), `.data` y las capturas.
+- Rutas públicas por enlace: el sitio, la app demo (usuarios de prueba públicos, datos ficticios) y `/demo/ferremix` (marca de Ferremix con sello PROPUESTA, `noindex`). Con clave: `/inversores` y `/panel`.
+- Sin Supabase, las solicitudes de "Pedir una demo" quedan en `/tmp` de la función: temporales y por instancia (el panel lo aclara).
 
 ### Monitoreo
 - Errores de servidor (`onRequestError`) y de cliente como JSON estructurado en la consola del servidor + webhook opcional (`MONITOREO_WEBHOOK`). Página `/estado` honesta.

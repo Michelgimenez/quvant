@@ -11,9 +11,11 @@ import { PGlite } from "@electric-sql/pglite"
  *
  * Una sola instancia por proceso (en globalThis): dos instancias sobre la misma
  * carpeta la corromperían. No sirve en plataformas sin disco persistente: en
- * producción se usa Supabase.
+ * producción se usa Supabase. En Vercel (sin Supabase) va a /tmp, la única carpeta
+ * escribible: es temporal y cada instancia tiene la suya.
  */
-const CARPETA = path.join(process.cwd(), ".data", "base-local")
+export const BASE_LOCAL_TEMPORAL = Boolean(process.env.VERCEL)
+const CARPETA = BASE_LOCAL_TEMPORAL ? "/tmp/yunque-base-local" : path.join(process.cwd(), ".data", "base-local")
 
 type ConBase = typeof globalThis & { __yunqueBaseLocal?: Promise<PGlite> }
 
