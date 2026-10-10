@@ -21,6 +21,8 @@ const MODULOS: [string, RegExp][] = [
 
 test.describe("módulos", () => {
   test("la dueña recorre todos los módulos sin errores", async ({ page }) => {
+    // Recorre todos los módulos: con la máquina cargada pasa del minuto
+    test.setTimeout(150_000)
     const errores: string[] = []
     page.on("pageerror", (e) => errores.push(e.message))
     await ingresar(page, "dueno@demo.yunque.app")

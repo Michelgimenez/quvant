@@ -78,6 +78,8 @@ test.describe("Forja · red", () => {
   })
 
   test("MapLibre y deck.gl se cargan solo en Forja", async ({ page }) => {
+    // Vuelve a bajar todos los scripts para leerlos: con la máquina cargada pasa del minuto
+    test.setTimeout(150_000)
     await ingresar(page, "dueno@demo.yunque.app")
     const otros = registrarScripts(page)
     await page.goto("/app/inventario")
@@ -165,5 +167,56 @@ test.describe("Forja · taller", () => {
     expect(barra!.y + barra!.height).toBeLessThanOrEqual(nav!.y)
     await page.getByTestId("zona-deposito").click()
     await expect(page.getByTestId("panel-zona")).toBeVisible()
+  })
+})
+
+test.describe("Forja · repetición del día y sala de control", () => {
+  test("repetir el día a 1200×: arranca de cero, suma ventas y al llegar al presente vuelve a en vivo", async ({ page }) => {
+    test.setTimeout(180_000)
+    await ingresar(page, "dueno@demo.yunque.app")
+    await activarForja(page)
+    await expect(page.getByTestId("forja-red")).toHaveAttribute("data-listo", "true", { timeout: 60_000 })
+    const linea = page.getByTestId("linea-tiempo")
+    await expect(linea).toHaveAttribute("data-modo", "vivo")
+
+    await page.getByTestId("velocidad-1200").click()
+    await page.getByTestId("repetir").click()
+    await expect(linea).toHaveAttribute("data-modo", "repeticion")
+    await expect(page.getByText("REPETICIÓN")).toBeVisible()
+    await expect.poll(() => ventasHoy(page)).toBeLessThan(5)
+    await expect.poll(() => ventasHoy(page), { timeout: 30_000 }).toBeGreaterThan(5)
+    // De 8:00 a 15:30 son unos 22 s a 1200×
+    await expect(linea).toHaveAttribute("data-modo", "vivo", { timeout: 45_000 })
+
+    // Con el teclado: Inicio lleva al principio del día, en pausa
+    await page.getByTestId("cursor-dia").focus()
+    await page.keyboard.press("Home")
+    await expect(linea).toHaveAttribute("data-modo", "repeticion")
+    await expect(page.getByTestId("repetir")).toHaveAttribute("aria-label", "Seguir la repetición")
+    expect(await ventasHoy(page)).toBeLessThanOrEqual(1)
+    await page.getByTestId("volver-en-vivo").click()
+    await expect(linea).toHaveAttribute("data-modo", "vivo")
+  })
+
+  test("sala de control: recorre la red y cada sucursal cada 20 s, con titulares y sellos visibles", async ({ page }) => {
+    test.setTimeout(150_000)
+    await ingresar(page, "dueno@demo.yunque.app")
+    await activarForja(page)
+    await expect(page.getByTestId("forja-red")).toHaveAttribute("data-listo", "true", { timeout: 60_000 })
+    await page.getByTestId("abrir-sala").click()
+    const sala = page.getByTestId("sala-control")
+    await expect(sala).toHaveAttribute("data-parada", "red")
+    await expect(page.getByTestId("sala-parada")).toHaveText("Toda la red")
+    await expect(page.getByTestId("titular").first()).toBeVisible()
+    await expect(page.getByText("SIMULACIÓN")).toBeVisible()
+    await expect(page.getByTestId("linea-tiempo")).toHaveCount(0)
+
+    await page.clock.fastForward(20_500)
+    await expect(sala).not.toHaveAttribute("data-parada", "red")
+    await expect(page.getByTestId("sala-parada")).not.toHaveText("Toda la red")
+
+    await page.getByTestId("salir-sala").click()
+    await expect(sala).toHaveCount(0)
+    await expect(page.getByTestId("linea-tiempo")).toBeVisible()
   })
 })

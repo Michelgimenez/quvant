@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useMemo, useRef, useState } from "react"
+import { useContext, useEffect, useMemo, useRef, useState } from "react"
 import * as maplibregl from "maplibre-gl"
 import "maplibre-gl/dist/maplibre-gl.css"
 import { MapboxOverlay } from "@deck.gl/mapbox"
@@ -12,7 +12,7 @@ import { grosorEnlace, layoutConstelacion } from "@/forja/dominio/constelacion"
 import { avanceTransito, puntoEnArco, puntosArco, type Punto3D } from "@/forja/dominio/geo"
 import type { EventoForja, NodoForja, RedForja, TransferenciaForja } from "@/forja/dominio/modelo"
 import { hora } from "../formato"
-import { useEscenaForja } from "../store"
+import { ContextoEscena, useEscenaForja } from "../store"
 import { ESTILO_CARTO, teñirMapa } from "./estilo-mapa"
 import { NodoRed } from "./nodo-red"
 import { TarjetaNodo } from "./tarjeta-nodo"
@@ -24,10 +24,10 @@ import { TarjetaNodo } from "./tarjeta-nodo"
  * ubican con la proyección del mapa, o con el diseño de la constelación.
  */
 export type ControlRed = {
-  /** Cámara hacia un nodo (acerca e inclina). Resuelve al terminar. */
-  volarA: (id: Id, duracionMs: number) => Promise<void>
-  /** Vuelve a encuadrar toda la red. */
-  encuadrar: (duracionMs: number) => Promise<void>
+  /** Cámara hacia un nodo (acerca e inclina; por defecto, a nivel de calle). Resuelve al terminar. */
+  volarA: (id: Id, duracionMs: number, opciones?: { zoom?: number; pitch?: number }) => Promise<void>
+  /** Vuelve a encuadrar toda la red; `margen` reserva lugar para paneles encima del mapa. */
+  encuadrar: (duracionMs: number, margen?: { top: number; bottom: number; left: number; right: number }) => Promise<void>
   /** Posición en pantalla de un nodo (para el iris de la transición). */
   posicion: (id: Id) => { x: number; y: number } | null
 }
@@ -35,6 +35,8 @@ export type ControlRed = {
 type Pulso = { nodoId: Id; t0: number }
 
 const DURACION_PULSO = 1400
+/** Más ventas nuevas que esto de una vez es un salto en la línea de tiempo: no se anima cada una. */
+const MAX_PULSOS_POR_PASO = 12
 
 /**
  * Resuelve cuando termina el movimiento de cámara recién iniciado. Se escucha
@@ -69,7 +71,9 @@ export function UniversoRed({
   /** Falso mientras se ve el taller: el bucle de animación del mapa descansa. */
   activa?: boolean
 }) {
+  const store = useContext(ContextoEscena)!
   const vista = useEscenaForja((s) => s.vista)
+  const sala = useEscenaForja((s) => s.sala)
   const resaltado = useEscenaForja((s) => s.resaltado)
   const resaltar = useEscenaForja((s) => s.resaltar)
   const elegirTransferencia = useEscenaForja((s) => s.elegirTransferencia)
@@ -98,18 +102,16 @@ export function UniversoRed({
     for (const ev of eventos) if (ev.tipo === "venta") u[ev.sucursalId] = ev.id
     return u
   }, [eventos])
-  // Golpe de brillo en el mapa por cada venta nueva (las del día al montar no cuentan)
+  // Golpe de brillo en el mapa por cada venta nueva (las del día al montar no cuentan). En la
+  // repetición la lista crece y se achica con el cursor: se compara siempre con la anterior.
   const vistos = useRef<Set<string> | null>(null)
   useEffect(() => {
-    if (!vistos.current) {
-      vistos.current = new Set(eventos.map((e) => e.id))
-      return
+    const actuales = new Set(eventos.map((e) => e.id))
+    if (vistos.current) {
+      const nuevas = eventos.filter((ev) => ev.tipo === "venta" && !vistos.current!.has(ev.id))
+      if (nuevas.length <= MAX_PULSOS_POR_PASO) for (const ev of nuevas) pulsos.current.push({ nodoId: ev.sucursalId, t0: performance.now() })
     }
-    for (const ev of eventos) {
-      if (vistos.current.has(ev.id)) continue
-      vistos.current.add(ev.id)
-      if (ev.tipo === "venta") pulsos.current.push({ nodoId: ev.sucursalId, t0: performance.now() })
-    }
+    vistos.current = actuales
   }, [eventos])
 
   // ───── Mapa y overlay ─────
@@ -162,7 +164,7 @@ export function UniversoRed({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
-  function encuadrar(duracionMs: number) {
+  function encuadrar(duracionMs: number, margen?: { top: number; bottom: number; left: number; right: number }) {
     const mapa = mapaRef.current
     const ns = datos.current.conCoordenadas
     if (!mapa || !ns.length) return Promise.resolve()
@@ -172,7 +174,7 @@ export function UniversoRed({
     const { clientWidth: ancho, clientHeight: alto } = mapa.getContainer()
     const mx = Math.round(Math.min(160, ancho * 0.22))
     const my = Math.round(Math.min(140, alto * 0.16))
-    mapa.fitBounds(bounds, { padding: { top: my, bottom: my + 40, left: mx, right: mx }, pitch: 50, bearing: -14, duration: duracionMs, maxZoom: 13 })
+    mapa.fitBounds(bounds, { padding: margen ?? { top: my, bottom: my + 40, left: mx, right: mx }, pitch: 50, bearing: -14, duration: duracionMs, maxZoom: 13 })
     return finDelMovimiento(mapa, duracionMs)
   }
 
@@ -180,11 +182,11 @@ export function UniversoRed({
   useEffect(() => {
     if (!controlRef) return
     controlRef.current = {
-      volarA: (id, duracionMs) => {
+      volarA: (id, duracionMs, opciones) => {
         const mapa = mapaRef.current
         const n = datos.current.conCoordenadas.find((x) => x.id === id)
         if (!mapa || !n) return Promise.resolve()
-        mapa.flyTo({ center: [n.lng!, n.lat!], zoom: 15.5, pitch: 62, bearing: mapa.getBearing() - 18, duration: duracionMs, essential: true })
+        mapa.flyTo({ center: [n.lng!, n.lat!], zoom: opciones?.zoom ?? 15.5, pitch: opciones?.pitch ?? 62, bearing: mapa.getBearing() - 18, duration: duracionMs, essential: true })
         return finDelMovimiento(mapa, duracionMs)
       },
       encuadrar,
@@ -218,12 +220,14 @@ export function UniversoRed({
           el.style.transform = `translate3d(${p.x}px, ${p.y}px, 0)`
         }
       }
-      if (overlay) overlay.setProps({ layers: vistaRef.current === "mapa" ? capasMapa(r, ns, t, Date.now(), pulsos.current, sel, reducir) : [] })
+      // En la repetición, los bultos en camino se ubican según la hora del cursor
+      const ahoraMs = store.getState().reloj.t ?? Date.now()
+      if (overlay) overlay.setProps({ layers: vistaRef.current === "mapa" ? capasMapa(r, ns, t, ahoraMs, pulsos.current, sel, reducir) : [] })
       if (vistaRef.current === "constelacion" && svgEnlaces.current) animarEnlaces(svgEnlaces.current, t, reducir)
     }
     marco = requestAnimationFrame(paso)
     return () => cancelAnimationFrame(marco)
-  }, [])
+  }, [store])
 
   // ───── Cambio Mapa ⇄ Constelación con reacomodo ─────
   const constelacion = useMemo(() => {
@@ -324,9 +328,9 @@ export function UniversoRed({
         ))}
       </ul>
 
-      {nodoResaltado && <TarjetaNodo nodo={nodoResaltado} elemento={elementos.current.get(nodoResaltado.id) ?? null} contenedor={contenedor.current} />}
-      <DetalleTransferencia red={red} id={transferenciaId} onCerrar={() => elegirTransferencia(null)} />
-      <SelectorArcos red={red} onElegir={elegirTransferencia} />
+      {nodoResaltado && !sala && <TarjetaNodo nodo={nodoResaltado} elemento={elementos.current.get(nodoResaltado.id) ?? null} contenedor={contenedor.current} />}
+      {!sala && <DetalleTransferencia red={red} id={transferenciaId} onCerrar={() => elegirTransferencia(null)} />}
+      {!sala && <SelectorArcos red={red} onElegir={elegirTransferencia} />}
     </div>
   )
 }
@@ -441,7 +445,7 @@ function SelectorArcos({ red, onElegir }: { red: RedForja; onElegir: (id: Id) =>
   const enTransito = red.transferencias.filter((t) => t.estado === "en_transito")
   if (!enTransito.length) return null
   return (
-    <div className="pointer-events-auto absolute bottom-14 left-4 flex max-w-[60%] flex-wrap gap-2" aria-label="Transferencias en tránsito">
+    <div className="pointer-events-auto absolute bottom-[4.5rem] left-4 flex max-w-[60%] flex-wrap gap-2" aria-label="Transferencias en tránsito">
       {enTransito.map((t) => (
         <button key={t.id} type="button" onClick={() => onElegir(t.id)} className="rounded-md border border-white/10 bg-hierro/85 px-2.5 py-1.5 font-mono text-[11px] text-niebla backdrop-blur hover:border-white/25 focus-visible:outline focus-visible:outline-1 focus-visible:outline-temple" data-testid="transferencia-en-transito">
           <span className="mr-1.5 inline-block size-1.5 rounded-full bg-brasa align-middle" aria-hidden />

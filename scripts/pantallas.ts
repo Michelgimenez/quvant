@@ -279,6 +279,36 @@ export const PANTALLAS: Pantalla[] = [
       await p.waitForTimeout(400)
     }),
   },
+  {
+    id: "forja-repeticion",
+    ruta: "/app",
+    usuario: "dueno@demo.yunque.app",
+    esperar: "#contenido h1",
+    carpeta: "forja",
+    antes: async (p) => {
+      await activarForja(p)
+      // Repetición a 1200× y pausa al pasar el mediodía
+      await p.getByTestId("velocidad-1200").click()
+      await p.getByTestId("repetir").click()
+      await p.waitForFunction(() => (document.querySelector("[data-testid=hora-repeticion]")?.textContent ?? "") >= "12:00", undefined, { polling: 50, timeout: 60_000 })
+      await p.getByTestId("repetir").click()
+      await p.waitForTimeout(800)
+    },
+  },
+  {
+    id: "forja-sala",
+    ruta: "/app",
+    usuario: "dueno@demo.yunque.app",
+    esperar: "#contenido h1",
+    carpeta: "forja",
+    soloEscritorio: true,
+    antes: async (p) => {
+      await activarForja(p)
+      await p.getByTestId("abrir-sala").click()
+      await p.getByTestId("titular").first().waitFor()
+      await p.waitForTimeout(2500)
+    },
+  },
   ...ESCENAS_INVERSORES.map((nombre, i) => ({
     id: `inversores-${String(i + 1).padStart(2, "0")}-${nombre}`,
     ruta: "/inversores",

@@ -9,6 +9,8 @@ import type { EventoForja, RedForja, TallerForja } from "@/forja/dominio/modelo"
  */
 export type FuenteForja = {
   red: RedForja
+  /** La red tal como estaba a otra hora del día (repetición). */
+  redEn: (t: Date) => RedForja
   /** Eventos del día hasta ahora (línea de tiempo y animación de lo nuevo). */
   eventos: EventoForja[]
   taller: (sucursalId: Id) => TallerForja | null

@@ -292,3 +292,88 @@ describe("Forja · plano de planta", () => {
     expect(plano.zonas.some((z) => z.tipo === "mostrador")).toBe(false)
   })
 })
+
+describe("Forja · la red a otra hora del día (repetición)", () => {
+  it("cuenta solo las ventas hasta esa hora y el calor sale de esa hora", () => {
+    const cc = e.sucursales.find((s) => s.codigo === "CC")!
+    const mediodia = new Date("2026-10-07T15:00:00.000Z")
+    const red = redForja(e, mediodia)
+    const nodo = red.nodos.find((n) => n.id === cc.id)!
+    const esperadas = Object.values(e.ventas).filter((v) => v.sucursalId === cc.id && v.estado === "confirmada" && v.fecha >= "2026-10-07T03:00:00.000Z" && v.fecha <= mediodia.toISOString()).length
+    expect(nodo.ventasHoy).toBe(esperadas)
+    expect(nodo.ventasHoy).toBeLessThanOrEqual(redForja(e, AHORA).nodos.find((n) => n.id === cc.id)!.ventasHoy)
+  })
+
+  it("una transferencia no existe antes de salir, está en camino hasta que llega y después figura recibida", () => {
+    const copia = structuredClone(e)
+    const [a, b] = copia.sucursales
+    copia.transferencias["t-hoy"] = {
+      id: "t-hoy",
+      orgId: copia.org.id,
+      desdeId: a.id,
+      haciaId: b.id,
+      estado: "recibida",
+      despachadaEn: "2026-10-07T13:00:00.000Z",
+      llegadaEstimada: "2026-10-07T14:00:00.000Z",
+      recibidaEn: "2026-10-07T14:10:00.000Z",
+      items: [],
+      motivo: "Prueba",
+      usuarioId: copia.usuarios[0].id,
+    } as unknown as (typeof copia.transferencias)[string]
+    const en = (iso: string) => redForja(copia, new Date(iso)).transferencias.find((t) => t.id === "t-hoy")
+    expect(en("2026-10-07T12:59:00.000Z")).toBeUndefined()
+    expect(en("2026-10-07T13:30:00.000Z")).toMatchObject({ estado: "en_transito", recibidaEn: null })
+    expect(en("2026-10-07T14:30:00.000Z")).toMatchObject({ estado: "recibida", recibidaEn: "2026-10-07T14:10:00.000Z" })
+  })
+
+  it("el stock crítico se reconstruye con los movimientos posteriores", () => {
+    const copia = structuredClone(e)
+    const cc = copia.sucursales.find((s) => s.codigo === "CC")!
+    const st = Object.values(copia.stock).find((x) => x.sucursalId === cc.id && x.minimo > 0)!
+    st.minimo = 3
+    st.cantidad = 0
+    // Sin otros movimientos de Casa Central en esa franja: solo cambia el producto de la prueba
+    copia.movimientos = copia.movimientos.filter((m) => !(m.sucursalId === cc.id && (m.productoId === st.productoId || (m.fecha > "2026-10-07T13:00:00.000Z" && m.fecha < "2026-10-07T15:00:00.000Z"))))
+    copia.movimientos.push({ id: "m-rep", orgId: copia.org.id, sucursalId: cc.id, productoId: st.productoId, tipo: "venta", cantidad: -5, refId: null, motivo: "", usuarioId: copia.usuarios[0].id, fecha: "2026-10-07T14:00:00.000Z" })
+    const sin = (iso: string) => redForja(copia, new Date(iso)).nodos.find((n) => n.id === cc.id)!.sinStock
+    expect(sin("2026-10-07T14:30:00.000Z") - sin("2026-10-07T13:30:00.000Z")).toBe(1)
+  })
+})
+
+describe("Forja · repetición y titulares", () => {
+  it("el tramo va de la apertura a ahora y a 1200× diez horas pasan en 30 s", async () => {
+    const { tramoDelDia, avanzar, duracionReal } = await import("@/forja/dominio/repeticion")
+    const tramo = tramoDelDia([], new Date("2026-10-07T21:00:00.000Z"))
+    expect(new Date(tramo.inicio).toISOString()).toBe("2026-10-07T11:00:00.000Z")
+    expect(tramo.fin - tramo.inicio).toBe(10 * 3_600_000)
+    expect(duracionReal(tramo, 1200)).toBe(30_000)
+    expect(avanzar(tramo.inicio, 30_000, 1200, tramo.fin)).toBe(tramo.fin)
+    expect(avanzar(tramo.inicio, 1000, 60, tramo.fin)).toBe(tramo.inicio + 60_000)
+  })
+
+  it("los eventos hasta el cursor coinciden con filtrar por hora", async () => {
+    const { hastaCursor } = await import("@/forja/dominio/repeticion")
+    const evs = eventosDelDia(e, AHORA)
+    for (const iso of ["2026-10-07T10:00:00.000Z", "2026-10-07T14:22:00.000Z", "2026-10-07T18:30:00.000Z"]) {
+      const t = Date.parse(iso)
+      expect(hastaCursor(evs, t)).toEqual(evs.filter((x) => Date.parse(x.en) <= t))
+    }
+  })
+
+  it("titulares: del más nuevo al más viejo, con quiebres de stock como alerta", async () => {
+    const { titulares } = await import("@/forja/dominio/repeticion")
+    const red = redForja(e, AHORA)
+    const evs = eventosDelDia(e, AHORA)
+    const lista = titulares(evs, red)
+    expect(lista.length).toBeGreaterThan(0)
+    for (let i = 1; i < lista.length; i++) expect(lista[i - 1].en >= lista[i].en).toBe(true)
+    const quiebre = evs.find((x) => x.tipo === "stock_critico")
+    if (quiebre) expect(lista.find((t) => t.id === quiebre.id)?.tono).toBe("alerta")
+  })
+
+  it("la sala de control recorre la red completa y después cada sucursal", async () => {
+    const { recorridoSala } = await import("@/forja/dominio/repeticion")
+    const red = redForja(e, AHORA)
+    expect(recorridoSala(red)).toEqual([null, ...red.nodos.map((n) => n.id)])
+  })
+})

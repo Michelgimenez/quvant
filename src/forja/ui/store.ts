@@ -4,6 +4,7 @@ import { createStore, useStore } from "zustand"
 import { createContext, useContext } from "react"
 import type { Id } from "@/dominio/tipos"
 import type { TipoZona } from "@/forja/dominio/plano"
+import type { Velocidad } from "@/forja/dominio/repeticion"
 
 /**
  * Estado de la escena de Forja (no los datos: esos vienen de la fuente).
@@ -11,6 +12,9 @@ import type { TipoZona } from "@/forja/dominio/plano"
  */
 export type VistaRed = "mapa" | "constelacion"
 export type Nivel = "red" | "taller" | "pieza"
+
+/** Repetición del día: el cursor de la interfaz se actualiza unas 8 veces por segundo. */
+export type Repeticion = { activa: boolean; reproduciendo: boolean; velocidad: Velocidad; cursor: number }
 
 export type EstadoEscena = {
   nivel: Nivel
@@ -29,6 +33,14 @@ export type EstadoEscena = {
   pieza: { tipo: "producto" | "maquina"; id: Id } | null
   /** Transición en curso entre niveles (bloquea la entrada). */
   transicion: null | "entrando" | "saliendo"
+  repeticion: Repeticion
+  /**
+   * Hora que muestra la escena, cuadro a cuadro (null = en vivo). Es mutable a
+   * propósito: el mapa la lee en cada cuadro sin provocar renders de React.
+   */
+  reloj: { t: number | null }
+  /** Modo sala de control (pantalla completa, recorrido y titulares). */
+  sala: boolean
   setVista: (v: VistaRed) => void
   resaltar: (id: Id | null) => void
   elegirTransferencia: (id: Id | null) => void
@@ -38,6 +50,10 @@ export type EstadoEscena = {
   elegirZona: (z: EstadoEscena["zona"]) => void
   resaltarZona: (z: TipoZona | null) => void
   resaltarRack: (id: string | null) => void
+  repetir: (desde: number) => void
+  setRepeticion: (r: Partial<Repeticion>) => void
+  salirDeRepeticion: () => void
+  setSala: (sala: boolean) => void
   verPieza: (p: EstadoEscena["pieza"]) => void
 }
 
@@ -53,6 +69,9 @@ export function crearStoreEscena() {
     rackResaltado: null,
     pieza: null,
     transicion: null,
+    repeticion: { activa: false, reproduciendo: false, velocidad: 1200, cursor: 0 },
+    reloj: { t: null },
+    sala: false,
     setVista: (vista) => set({ vista, transferenciaId: null }),
     resaltar: (resaltado) => set({ resaltado }),
     elegirTransferencia: (transferenciaId) => set({ transferenciaId }),
@@ -62,6 +81,22 @@ export function crearStoreEscena() {
     elegirZona: (zona) => set({ zona, rackResaltado: null }),
     resaltarZona: (zonaResaltada) => set({ zonaResaltada }),
     resaltarRack: (rackResaltado) => set({ rackResaltado }),
+    repetir: (desde) =>
+      set((s) => {
+        s.reloj.t = desde
+        return { repeticion: { ...s.repeticion, activa: true, reproduciendo: true, cursor: desde }, transferenciaId: null }
+      }),
+    setRepeticion: (r) => set((s) => ({ repeticion: { ...s.repeticion, ...r } })),
+    salirDeRepeticion: () =>
+      set((s) => {
+        s.reloj.t = null
+        return { repeticion: { ...s.repeticion, activa: false, reproduciendo: false } }
+      }),
+    setSala: (sala) =>
+      set((s) => {
+        if (sala) s.reloj.t = null
+        return { sala, resaltado: null, transferenciaId: null, repeticion: sala ? { ...s.repeticion, activa: false, reproduciendo: false } : s.repeticion }
+      }),
     verPieza: (pieza) => set({ pieza, nivel: pieza ? "pieza" : "red" }),
   }))
 }

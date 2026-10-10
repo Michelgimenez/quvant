@@ -492,3 +492,28 @@
   content-visibility: auto;
   contain-intrinsic-size: auto 900px;
 }
+
+/* Forja · sala de control: avance de cada parada y entrada de titulares (solo transform y opacity) */
+@keyframes forja-parada {
+  from {
+    transform: scaleX(0);
+  }
+  to {
+    transform: scaleX(1);
+  }
+}
+@keyframes forja-titular {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* Forja · la atribución del mapa (CARTO, OpenStreetMap) siempre visible, arriba de la línea de tiempo */
+[data-linea] .forja-mapa .maplibregl-ctrl-bottom-right {
+  margin-bottom: 3.25rem;
+}

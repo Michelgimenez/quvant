@@ -126,13 +126,41 @@ function ordenesActivas(e: EstadoEmpresa, sucursalId: Id) {
   return Object.values(e.servicio).filter((o) => o.sucursalId === sucursalId && o.estado !== "entregado")
 }
 
-/** Red completa (nivel 1). `permitidas` limita las sucursales (rol y permisos). */
+/** Estado de una orden a una hora dada (el último evento hasta ese momento); null si todavía no había ingresado. */
+function estadoOrdenEn(o: EstadoEmpresa["servicio"][Id], t: number) {
+  let estado: EstadoServicio | null = null
+  for (const ev of o.eventos) if (Date.parse(ev.fecha) <= t) estado = ev.estado
+  return estado
+}
+
+/**
+ * Stock a una hora dada: el actual menos lo que se movió después. Para "ahora"
+ * no cambia nada; para la repetición del día reconstruye cada quiebre.
+ */
+function stockEn(e: EstadoEmpresa, t: number) {
+  const despues = new Map<string, number>()
+  for (const m of e.movimientos) {
+    if (Date.parse(m.fecha) <= t) continue
+    const k = `${m.sucursalId}:${m.productoId}`
+    despues.set(k, (despues.get(k) ?? 0) + m.cantidad)
+  }
+  return (st: { sucursalId: Id; productoId: Id; cantidad: number }) => st.cantidad - (despues.get(`${st.sucursalId}:${st.productoId}`) ?? 0)
+}
+
+/**
+ * Red completa (nivel 1) tal como estaba en `ahora`: ventas, calor, stock,
+ * transferencias y órdenes se reconstruyen a esa hora (la repetición del día
+ * usa la misma función). Presupuestos y ventas sin sincronizar, tal como están
+ * hoy. `permitidas` limita las sucursales (rol y permisos).
+ */
 export function redForja(e: EstadoEmpresa, ahora: Date, permitidas: Id[] | null = null): RedForja {
   const inicio = inicioDiaART(ahora).getTime()
-  const haceUnaHora = ahora.getTime() - 3_600_000
-  const hace28 = ahora.getTime() - 28 * 86_400_000
+  const tAhora = ahora.getTime()
+  const haceUnaHora = tAhora - 3_600_000
+  const hace28 = tAhora - 28 * 86_400_000
   const visibles = e.sucursales.filter((s) => permitidas === null || permitidas.includes(s.id))
   const ids = new Set(visibles.map((s) => s.id))
+  const cantidadEn = stockEn(e, tAhora)
 
   const porSucursal = new Map<Id, { hoy: number; importe: number; hora: number; mes: number; facturacion: number; cola: number }>()
   for (const s of visibles) porSucursal.set(s.id, { hoy: 0, importe: 0, hora: 0, mes: 0, facturacion: 0, cola: 0 })
@@ -156,9 +184,15 @@ export function redForja(e: EstadoEmpresa, ahora: Date, permitidas: Id[] | null 
   const nodos: NodoForja[] = visibles.map((s) => {
     const a = porSucursal.get(s.id)!
     const promedioHora = Math.round((a.mes / (28 * HORAS_HABILES)) * 1000) / 1000
-    const stock = Object.values(e.stock).filter((st) => st.sucursalId === s.id && st.minimo > 0)
+    const stock = Object.values(e.stock)
+      .filter((st) => st.sucursalId === s.id && st.minimo > 0)
+      .map((st) => ({ minimo: st.minimo, cantidad: cantidadEn(st) }))
     const ordenes: Partial<Record<EstadoServicio, number>> = {}
-    for (const o of ordenesActivas(e, s.id)) ordenes[o.estado] = (ordenes[o.estado] ?? 0) + 1
+    for (const o of Object.values(e.servicio)) {
+      if (o.sucursalId !== s.id) continue
+      const estado = estadoOrdenEn(o, tAhora)
+      if (estado && estado !== "entregado") ordenes[estado] = (ordenes[estado] ?? 0) + 1
+    }
     return {
       id: s.id,
       nombre: s.nombre,
@@ -183,23 +217,28 @@ export function redForja(e: EstadoEmpresa, ahora: Date, permitidas: Id[] | null 
     }
   })
 
+  // Transferencias tal como estaban en `ahora`: las que todavía no salieron no existen y las recibidas después siguen en camino
   const transferencias = Object.values(e.transferencias)
-    .filter((t) => (ids.has(t.desdeId) || ids.has(t.haciaId)) && (t.estado === "en_transito" || Date.parse(t.recibidaEn ?? t.despachadaEn) >= inicio))
-    .map((t) => ({
-      id: t.id,
-      desdeId: t.desdeId,
-      haciaId: t.haciaId,
-      estado: t.estado,
-      despachadaEn: t.despachadaEn,
-      llegadaEstimada: t.llegadaEstimada,
-      recibidaEn: t.recibidaEn,
-      motivo: t.motivo,
-      items: t.items.map((i) => ({ productoId: i.productoId, nombre: e.productos[i.productoId]?.nombre ?? "Producto", cantidad: i.cantidad })),
-    }))
+    .filter((t) => (ids.has(t.desdeId) || ids.has(t.haciaId)) && Date.parse(t.despachadaEn) <= tAhora)
+    .map((t) => {
+      const recibida = t.recibidaEn !== null && Date.parse(t.recibidaEn) <= tAhora
+      return {
+        id: t.id,
+        desdeId: t.desdeId,
+        haciaId: t.haciaId,
+        estado: recibida ? ("recibida" as const) : ("en_transito" as const),
+        despachadaEn: t.despachadaEn,
+        llegadaEstimada: t.llegadaEstimada,
+        recibidaEn: recibida ? t.recibidaEn : null,
+        motivo: t.motivo,
+        items: t.items.map((i) => ({ productoId: i.productoId, nombre: e.productos[i.productoId]?.nombre ?? "Producto", cantidad: i.cantidad })),
+      }
+    })
+    .filter((t) => t.estado === "en_transito" || Date.parse(t.recibidaEn!) >= inicio)
 
   const flujosMap = new Map<string, FlujoForja>()
   for (const t of Object.values(e.transferencias)) {
-    if (!ids.has(t.desdeId) || !ids.has(t.haciaId) || Date.parse(t.despachadaEn) < hace28) continue
+    if (!ids.has(t.desdeId) || !ids.has(t.haciaId) || Date.parse(t.despachadaEn) < hace28 || Date.parse(t.despachadaEn) > tAhora) continue
     const k = `${t.desdeId}>${t.haciaId}`
     const f = flujosMap.get(k) ?? { desdeId: t.desdeId, haciaId: t.haciaId, transferencias: 0, unidades: 0 }
     f.transferencias++

@@ -4,17 +4,18 @@ import { useMemo } from "react"
 import { useApp } from "@/cliente/app-contexto"
 import type { FuenteForja } from "@/forja/datos/fuente"
 import { useRedForjaApp, useSimulacionForja } from "@/forja/datos/usar-forja-app"
-import { tallerForja } from "@/forja/dominio/modelo"
+import { redForja, tallerForja } from "@/forja/dominio/modelo"
 import { Universo } from "./universo"
 
 /** Forja dentro de la app: datos de Yunque, simulador si la empresa es demo y enlaces a los módulos. */
 export function UniversoForjaApp({ simulacion }: { activacion: boolean; simulacion: boolean }) {
   const { motor } = useApp()
-  const { red, eventos } = useRedForjaApp()
+  const { red, eventos, permitidas } = useRedForjaApp()
   const sim = useSimulacionForja(simulacion)
   const fuente = useMemo<FuenteForja>(
     () => ({
       red,
+      redEn: (t) => redForja(motor.estado, t, permitidas),
       eventos,
       taller: (id) => (red.nodos.some((n) => n.id === id) ? tallerForja(motor.estado, id, new Date()) : null),
       simulacion: sim.activa,
@@ -33,7 +34,7 @@ export function UniversoForjaApp({ simulacion }: { activacion: boolean; simulaci
         mostrador: () => "/app/mostrador",
       },
     }),
-    [red, eventos, sim.activa, motor],
+    [red, eventos, sim.activa, motor, permitidas],
   )
   return <Universo fuente={fuente} />
 }

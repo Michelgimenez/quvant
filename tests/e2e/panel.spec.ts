@@ -11,7 +11,8 @@ test.describe("pedir una demo → panel interno", () => {
     await form.getByLabel("Cantidad de sucursales").fill("3")
     await form.getByLabel("WhatsApp").fill("+54 9 11 0000-0000")
     await form.getByTestId("enviar-sitio").click()
-    await expect(form.getByTestId("solicitud-ok")).toBeVisible()
+    // La primera escritura en la base local puede tardar si el servidor recién arranca
+    await expect(form.getByTestId("solicitud-ok")).toBeVisible({ timeout: 30_000 })
 
     // Sin clave, el panel no entrega ningún dato personal
     expect(await (await request.get("/panel")).text()).not.toContain(nombre)

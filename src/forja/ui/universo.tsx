@@ -1,15 +1,19 @@
 "use client"
 
-import { useContext, useEffect, useRef, useState } from "react"
+import { useContext, useEffect, useMemo, useRef, useState } from "react"
 import gsap from "gsap"
-import { ArrowLeft } from "lucide-react"
+import { ArrowLeft, MonitorPlay, X } from "lucide-react"
 import { Sello } from "@/components/base/sellos"
 import type { Id } from "@/dominio/tipos"
 import { PARADAS_CALOR, colorCalor } from "@/forja/dominio/calor"
+import { hastaCursor, tramoDelDia } from "@/forja/dominio/repeticion"
 import type { FuenteForja } from "@/forja/datos/fuente"
 import { cn } from "@/lib/utils"
+import { hora } from "./formato"
+import { LineaTiempo, useMotorRepeticion } from "./linea-tiempo"
 import { MarcaForja } from "./marca-forja"
 import { UniversoRed, type ControlRed } from "./red/universo-red"
+import { SalaControl } from "./sala-control"
 import { ContextoEscena, crearStoreEscena, useEscenaForja, type VistaRed } from "./store"
 import type { ModoCamara } from "./taller/camara"
 import { NivelTaller, precargarTaller3D } from "./taller/nivel-taller"
@@ -34,6 +38,7 @@ const cuadros = (n: number) => new Promise<void>((ok) => (n <= 0 ? ok() : reques
 function Escena({ fuente, alEntrar }: { fuente: FuenteForja; alEntrar?: (id: Id) => void }) {
   const store = useContext(ContextoEscena)!
   const control = useRef<ControlRed | null>(null)
+  const raiz = useRef<HTMLDivElement>(null)
   const escenario = useRef<HTMLDivElement>(null)
   const iris = useRef<HTMLDivElement>(null)
   const avisarListo = useRef<(() => void) | null>(null)
@@ -41,10 +46,53 @@ function Escena({ fuente, alEntrar }: { fuente: FuenteForja; alEntrar?: (id: Id)
   const nivel = useEscenaForja((s) => s.nivel)
   const sucursalId = useEscenaForja((s) => s.sucursalId)
   const transicion = useEscenaForja((s) => s.transicion)
-  const { red } = fuente
+  const sala = useEscenaForja((s) => s.sala)
+  const setSala = useEscenaForja((s) => s.setSala)
+
+  // ───── Repetición del día: la red y los eventos tal como estaban a la hora del cursor ─────
+  const tramo = useMemo(() => tramoDelDia(fuente.eventos, new Date()), [fuente.eventos])
+  useMotorRepeticion(tramo)
+  const repeticion = useEscenaForja((s) => s.repeticion)
+  const cursor = repeticion.activa ? repeticion.cursor : null
+  const red = useMemo(() => (cursor === null ? fuente.red : fuente.redEn(new Date(cursor))), [cursor, fuente])
+  const eventos = useMemo(() => (cursor === null ? fuente.eventos : hastaCursor(fuente.eventos, cursor)), [cursor, fuente.eventos])
+
   const nodoActual = nivel === "taller" ? (red.nodos.find((n) => n.id === sucursalId) ?? null) : null
   const enTransito = red.transferencias.filter((t) => t.estado === "en_transito").length
   const ventasHoy = red.nodos.reduce((a, n) => a + n.ventasHoy, 0)
+
+  // ───── Sala de control: pantalla completa y pantalla siempre encendida ─────
+  useEffect(() => {
+    if (!sala) return
+    const el = raiz.current
+    let completa = false
+    let candado: { release: () => Promise<void> } | null = null
+    el?.requestFullscreen?.()
+      .then(() => (completa = true))
+      .catch(() => {
+        /* sin permiso o sin soporte: la sala ocupa el área de Forja */
+      })
+    const nav = navigator as Navigator & { wakeLock?: { request: (t: "screen") => Promise<{ release: () => Promise<void> }> } }
+    nav.wakeLock
+      ?.request("screen")
+      .then((c) => (candado = c))
+      .catch(() => {})
+    // Esc sale de la pantalla completa (el navegador) y con eso, de la sala
+    const alSalirDePantallaCompleta = () => {
+      if (completa && !document.fullscreenElement) setSala(false)
+    }
+    const tecla = (e: KeyboardEvent) => {
+      if (e.key === "Escape" && !document.fullscreenElement) setSala(false)
+    }
+    document.addEventListener("fullscreenchange", alSalirDePantallaCompleta)
+    window.addEventListener("keydown", tecla)
+    return () => {
+      document.removeEventListener("fullscreenchange", alSalirDePantallaCompleta)
+      window.removeEventListener("keydown", tecla)
+      void candado?.release().catch(() => {})
+      if (document.fullscreenElement) void document.exitFullscreen().catch(() => {})
+    }
+  }, [sala, setSala])
 
   // ───── Iris: el brillo del nodo crece hasta cubrir la escena y se funde ─────
   function ubicarIris(pos: { x: number; y: number }, color: string) {
@@ -66,9 +114,11 @@ function Escena({ fuente, alEntrar }: { fuente: FuenteForja; alEntrar?: (id: Id)
   async function entrar(id: Id) {
     const st = store.getState()
     const nodo = red.nodos.find((n) => n.id === id)
-    if (st.transicion || st.nivel !== "red" || !nodo) return
+    if (st.transicion || st.nivel !== "red" || st.sala || !nodo) return
     alEntrar?.(id)
     const reducir = reducirMovimiento()
+    // El taller muestra el presente: la repetición termina al entrar
+    st.salirDeRepeticion()
     st.setTransicion("entrando")
     st.resaltar(null)
     st.elegirTransferencia(null)
@@ -130,15 +180,26 @@ function Escena({ fuente, alEntrar }: { fuente: FuenteForja; alEntrar?: (id: Id)
   })
 
   return (
-    <div className="relative flex h-full flex-col bg-hierro text-niebla" data-nivel={nivel}>
+    <div ref={raiz} className="relative flex h-full flex-col bg-hierro text-niebla" data-nivel={nivel} data-sala={sala || undefined}>
       <header className="relative z-30 flex flex-wrap items-center gap-3 border-b border-white/10 bg-hierro/80 px-4 py-2.5 backdrop-blur">
-        <MarcaForja tamano={22} />
+        <MarcaForja tamano={sala ? 30 : 22} />
         <div className="flex items-center gap-2">
           {fuente.propuesta && <Sello texto="PROPUESTA" titulo="Propuesta comercial: no es un cliente activo" />}
           {red.org.esDemo && !fuente.propuesta && <Sello />}
           {fuente.simulacion && <Sello texto="SIMULACIÓN" titulo="Eventos generados para la demostración" />}
+          {repeticion.activa && <Sello texto="REPETICIÓN" titulo="La red tal como estaba a esa hora del día" />}
         </div>
-        {nodoActual ? (
+        {sala ? (
+          <>
+            <span className="font-mono text-xs uppercase tracking-[0.2em] text-acero">Sala de control</span>
+            <div className="ml-auto flex items-center gap-4">
+              <Reloj />
+              <button type="button" onClick={() => setSala(false)} className="inline-flex items-center gap-1 rounded-md border border-white/10 px-2 py-1 text-xs text-acero hover:border-white/25 hover:text-niebla focus-visible:outline focus-visible:outline-1 focus-visible:outline-temple" data-testid="salir-sala">
+                <X className="size-3.5" aria-hidden /> Salir
+              </button>
+            </div>
+          </>
+        ) : nodoActual ? (
           <nav className="flex min-w-0 items-center gap-2 text-sm" aria-label="Ubicación en Forja">
             <button type="button" onClick={() => void volver()} disabled={transicion !== null} className="inline-flex items-center gap-1 rounded-md border border-white/10 px-2 py-1 text-xs text-acero hover:border-white/25 hover:text-niebla focus-visible:outline focus-visible:outline-1 focus-visible:outline-temple disabled:opacity-50" aria-label="Volver a la red">
               <ArrowLeft className="size-3.5" aria-hidden /> Red
@@ -156,27 +217,54 @@ function Escena({ fuente, alEntrar }: { fuente: FuenteForja; alEntrar?: (id: Id)
             {red.nodos.length} {red.nodos.length === 1 ? "sucursal" : "sucursales"} · {enTransito} en tránsito · <span data-testid="ventas-hoy-total">{ventasHoy}</span> ventas hoy
           </span>
         )}
-        <div className="ml-auto flex items-center gap-3">
-          {nodoActual ? (
-            <Leyenda className="mt-0 hidden lg:flex" />
-          ) : (
-            <>
-              <LeyendaCalor />
-              <SelectorVista />
-            </>
-          )}
-        </div>
+        {!sala && (
+          <div className="ml-auto flex items-center gap-3">
+            {nodoActual ? (
+              <Leyenda className="mt-0 hidden lg:flex" />
+            ) : (
+              <>
+                <SelectorVista />
+                <button
+                  type="button"
+                  onClick={() => setSala(true)}
+                  className="hidden items-center gap-1.5 rounded-lg border border-white/10 px-2.5 py-1 text-xs text-acero hover:border-white/25 hover:text-niebla focus-visible:outline focus-visible:outline-1 focus-visible:outline-temple md:inline-flex"
+                  data-testid="abrir-sala"
+                >
+                  <MonitorPlay className="size-3.5" aria-hidden /> Sala de control
+                </button>
+              </>
+            )}
+          </div>
+        )}
       </header>
-      <div ref={escenario} className="relative flex-1 overflow-clip">
+      {/* data-linea: la atribución del mapa sube por encima de la línea de tiempo */}
+      <div ref={escenario} className="relative flex-1 overflow-clip" data-linea={(nivel === "red" && !sala) || undefined}>
         {/* isolate: las capas de deck.gl no se cuelan sobre el taller */}
         <div className="absolute inset-0 isolate" inert={nivel !== "red"}>
-          <UniversoRed red={red} eventos={fuente.eventos} controlRef={control} onEntrar={(id) => void entrar(id)} activa={nivel === "red"} />
+          <UniversoRed red={red} eventos={eventos} controlRef={control} onEntrar={(id) => void entrar(id)} activa={nivel === "red"} />
         </div>
+        {nivel === "red" && !sala && transicion === null && (
+          <>
+            <LeyendaCalor />
+            <LineaTiempo eventos={fuente.eventos} tramo={tramo} />
+          </>
+        )}
+        {sala && <SalaControl red={red} eventos={eventos} control={control} />}
         {nodoActual && <NivelTaller fuente={fuente} nodo={nodoActual} modo={camara} onListo={() => avisarListo.current?.()} />}
         <div ref={iris} className="pointer-events-none absolute left-0 top-0 z-20 rounded-full opacity-0 will-change-transform" aria-hidden data-testid="forja-iris" />
       </div>
     </div>
   )
+}
+
+/** Hora actual para la sala de control (se actualiza cada 15 s). */
+function Reloj() {
+  const [ahora, setAhora] = useState(() => new Date().toISOString())
+  useEffect(() => {
+    const id = window.setInterval(() => setAhora(new Date().toISOString()), 15_000)
+    return () => window.clearInterval(id)
+  }, [])
+  return <span className="font-mono text-2xl text-niebla">{hora(ahora)}</span>
 }
 
 function SelectorVista() {
@@ -210,7 +298,7 @@ function LeyendaCalor() {
   const max = PARADAS_CALOR[PARADAS_CALOR.length - 1].calor
   const degradado = Array.from({ length: pasos + 1 }, (_, i) => colorCalor((i / pasos) * max)).join(", ")
   return (
-    <div className="hidden items-center gap-2 lg:flex" aria-label="Escala de calor: de frío a blanco caliente">
+    <div className="pointer-events-none absolute left-3 top-3 z-10 hidden items-center gap-2 rounded-md bg-hierro/70 px-2 py-1 backdrop-blur md:flex" aria-label="Escala de calor: de frío a blanco caliente">
       <span className="font-mono text-[10px] uppercase tracking-widest text-acero">frío</span>
       <span className="h-1.5 w-28 rounded-full" style={{ background: `linear-gradient(90deg, ${degradado})` }} aria-hidden />
       <span className="font-mono text-[10px] uppercase tracking-widest text-acero">pico</span>
