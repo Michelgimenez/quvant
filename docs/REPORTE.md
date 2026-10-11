@@ -2,7 +2,7 @@
 
 ## Resumen · revisión final y Forja (10/10/2026)
 
-**Estado real:** demo funcional / piloto. Primer piloto en negociación, sin clientes pagando. Pagos, facturación y WhatsApp **emulados**. **Publicado para revisión en https://yunque-rust.vercel.app** (modo demo, datos ficticios, sin Supabase). *Esa publicación es anterior a Forja: hay que volver a publicar para verla.*
+**Estado real:** demo funcional / piloto. Primer piloto en negociación, sin clientes pagando. Pagos, facturación y WhatsApp **emulados**. **Publicado para revisión en https://yunque-rust.vercel.app** (modo demo, datos ficticios, sin Supabase). Republicado con Forja el 11/10/2026: `/forja` y `/demo/ferremix/forja` andan ahí, y los e2e de Forja (18) pasan también contra el sitio publicado.
 
 ### Listo y probado
 - **App (`/app`)**: inventario multisucursal con escaneo y conteos, precios con aumento masivo, mostrador y caja, presupuestos → venta, servicio técnico, clientes y cuentas corrientes, compras, entregas, reportes, usuarios y permisos, co-branding, importador y auditoría. Recorrida con **los 9 usuarios de prueba**, cada módulo de su rol, en escritorio y celular, sin errores.
