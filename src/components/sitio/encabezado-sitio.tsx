@@ -5,6 +5,7 @@ import { Logo } from "@/components/marca/marca"
 const ENLACES = [
   ["#problema", "El problema"],
   ["#nunca-se-cae", "Nunca se cae"],
+  ["#forja", "Forja"],
   ["#modulos", "Módulos"],
   ["#precios", "Precios"],
   ["#socios", "Socios fundadores"],

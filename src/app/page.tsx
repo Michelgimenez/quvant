@@ -4,6 +4,7 @@ import { TextoConfig } from "@/components/base/sellos"
 import { EncabezadoSitio } from "@/components/sitio/encabezado-sitio"
 import { FormularioDemo } from "@/components/sitio/formulario-demo"
 import { Hero } from "@/components/sitio/hero"
+import { SeccionForja } from "@/components/sitio/seccion-forja"
 import { DemoConexionPerezosa, PreciosAlDiaPerezoso } from "@/components/sitio/interactivos"
 import { Encabezado, EstadoProducto, Modulos, ParaQuien, PieSitio, Precios, Preguntas, Problema, Seguridad } from "@/components/sitio/secciones"
 import { PRECIOS } from "@/config/precios"
@@ -84,6 +85,8 @@ export default function Inicio() {
           />
           <PreciosAlDiaPerezoso />
         </section>
+
+        <SeccionForja />
 
         <ParaQuien />
         <Seguridad />

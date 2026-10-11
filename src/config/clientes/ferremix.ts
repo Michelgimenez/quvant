@@ -31,4 +31,17 @@ export const FERREMIX: ClienteDemo = {
     email: "[COMPLETAR: email]",
     telefono: "[COMPLETAR: teléfono]",
   },
+  // Forja (PROPUESTA): Moreno es real; las otras tres son ubicaciones ilustrativas del oeste del conurbano, marcadas DEMO.
+  forja: {
+    sucursales: [
+      // Geocodificada una vez (OpenStreetMap / Nominatim)
+      { codigo: "CC", nombre: "Ferremix Moreno", direccion: "Av. Bartolomé Mitre 2322, Moreno, Buenos Aires", lat: -34.6508814, lng: -58.7834695, tipo: "sucursal", demo: false },
+      { codigo: "NO", nombre: "Sucursal Merlo", direccion: "[COMPLETAR: dirección real]", lat: -34.6649, lng: -58.7286, tipo: "sucursal", demo: true },
+      { codigo: "D2", nombre: "Sucursal General Rodríguez", direccion: "[COMPLETAR: dirección real]", lat: -34.6086, lng: -58.9512, tipo: "sucursal", demo: true, puestos: 2, ventasDia: 7 },
+      { codigo: "DM", nombre: "Depósito Paso del Rey", direccion: "[COMPLETAR: dirección real]", lat: -34.6391, lng: -58.7563, tipo: "deposito", demo: true },
+    ],
+    pendiente: "[COMPLETAR con los negocios y sucursales reales del dueño]",
+    embebibleEn: ["https://ferremix-propuesta.vercel.app", "http://localhost:*"],
+    snapshot: () => import("@/demo/ferremix-snapshot.json").then((m) => m.default),
+  },
 }

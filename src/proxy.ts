@@ -18,6 +18,11 @@ export async function proxy(req: NextRequest) {
   if (demo) {
     return clienteDemo(demo[1]) ? NextResponse.next() : NextResponse.rewrite(new URL("/_not-found", req.url), { status: 404 })
   }
+  // Demo de Forja de un prospecto: solo si su configuración la tiene
+  const forja = /^\/demo\/([^/.]+)\/forja\/?$/.exec(pathname)
+  if (forja) {
+    return clienteDemo(forja[1])?.forja ? NextResponse.next() : NextResponse.rewrite(new URL("/_not-found", req.url), { status: 404 })
+  }
 
   const sesion = await verificar<Sesion>(req.cookies.get(COOKIE_SESION)?.value, "yunque-app")
 
@@ -48,5 +53,5 @@ export async function proxy(req: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/app/:path*", "/ingresar", "/ingresar/verificar", "/demo/:cliente"],
+  matcher: ["/app/:path*", "/ingresar", "/ingresar/verificar", "/demo/:cliente", "/demo/:cliente/forja"],
 }

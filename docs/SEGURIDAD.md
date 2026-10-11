@@ -41,6 +41,8 @@
 
 ### Navegador y cabeceras
 - `Content-Security-Policy` (`default-src 'self'`, `frame-ancestors 'none'`, `connect-src` limitado a la propia app y a Supabase), `X-Frame-Options: DENY`, `X-Content-Type-Options: nosniff`, `Referrer-Policy: strict-origin-when-cross-origin`, `Permissions-Policy` (cámara solo propia; micrófono, geolocalización y pagos desactivados), `Cross-Origin-Opener-Policy: same-origin`, y **HSTS** + `upgrade-insecure-requests` cuando el sitio se publica por https (`NEXT_PUBLIC_SITIO_URL` con `https://`). *Hallazgo de la revisión final*: antes se enviaban en cualquier build de producción, y con `npm start` por http el navegador subía pedidos a `https://localhost` y fallaban.
+- **Única excepción al no-embebido**: `/demo/<prospecto>/forja` (demo de Forja para un prospecto) se puede mostrar en un iframe solo desde los orígenes de su configuración (`frame-ancestors 'self' …`, sin `X-Frame-Options`); la regla general la excluye para no pisarla. Lo verifican los e2e (cabeceras y carga en un iframe).
+- **Demos públicas de Forja** (`/forja`, `/demo/<prospecto>/forja`): no leen la base ni tienen sesión; trabajan sobre un snapshot del seed (empresa ficticia) con el simulador en el navegador. No hay lectura anónima ni se relaja RLS.
 - `robots.txt` excluye `/app`, `/api`, `/ingresar`, `/inversores`, `/demo`, `/marca` y `/panel`.
 
 ### Formularios y endpoints públicos

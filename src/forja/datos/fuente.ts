@@ -25,6 +25,8 @@ export type FuenteForja = {
   propuesta: boolean
   /** Enlaces a los módulos de Yunque (solo dentro de la app). */
   enlaces: EnlacesForja | null
+  /** Demos públicas: milisegundos que se suman al reloj real (la demo vive en la hora de su snapshot). */
+  desfase?: number
 }
 
 export type EnlacesForja = {

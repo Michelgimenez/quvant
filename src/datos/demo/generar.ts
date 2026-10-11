@@ -29,6 +29,24 @@ export type OpcionesDemo = {
   dias?: number
   org?: Partial<Pick<Organizacion, "nombre" | "slug" | "colorAcento" | "logo" | "logoNegativo">>
   categorias?: CategoriaDemo[]
+  /**
+   * Sucursales a medida (demos de Forja): cambia datos de las de siempre por su
+   * código (CC, NO, DM) y suma las nuevas a la primera empresa. CC y NO tienen
+   * que seguir existiendo (servicio técnico y transferencias de la demo).
+   */
+  sucursales?: SucursalDemoAMedida[]
+}
+
+export type SucursalDemoAMedida = {
+  codigo: string
+  nombre?: string
+  direccion?: string
+  lat?: number
+  lng?: number
+  tipo?: "sucursal" | "deposito"
+  demo?: boolean
+  puestos?: number
+  ventasDia?: number
 }
 
 export { SEMILLA_DEMO, COLOR_DEMO } from "./catalogo"
@@ -103,21 +121,30 @@ export function generarEmpresaDemo(opciones: OpcionesDemo = {}): EstadoEmpresa {
     cuit: i === 0 ? "30-71234567-1" : "30-71765432-8",
   }))
 
-  const sucursales: (Sucursal & { ventasDia: number })[] = NEGOCIOS_DEMO.flatMap((n, i) =>
-    n.sucursales.map((s) => ({
-      id: uuidDe(`${semilla}:sucursal:${s.codigo}`),
-      orgId,
-      negocioId: negocios[i].id,
-      nombre: s.nombre,
-      codigo: s.codigo,
-      direccion: s.direccion,
-      puestos: s.puestos,
-      tipo: "sucursal" as const,
-      lat: s.lat,
-      lng: s.lng,
-      demo: true,
-      ventasDia: s.ventasDia,
-    })),
+  const aMedida = new Map((opciones.sucursales ?? []).map((s) => [s.codigo, s]))
+  const base = NEGOCIOS_DEMO.map((n) => n.sucursales.map((s) => ({ ...s, tipo: "sucursal" as "sucursal" | "deposito", demo: true })))
+  // Las sucursales nuevas van a la primera empresa
+  const conocidas = new Set(base.flat().map((s) => s.codigo))
+  for (const s of opciones.sucursales ?? [])
+    if (!conocidas.has(s.codigo)) base[0].push({ nombre: s.codigo, codigo: s.codigo, direccion: "", puestos: 2, ventasDia: 6, lat: -34.6, lng: -58.6, tipo: "sucursal", demo: true })
+  const sucursales: (Sucursal & { ventasDia: number })[] = base.flatMap((lista, i) =>
+    lista.map((original) => {
+      const s = { ...original, ...aMedida.get(original.codigo) }
+      return {
+        id: uuidDe(`${semilla}:sucursal:${s.codigo}`),
+        orgId,
+        negocioId: negocios[i].id,
+        nombre: s.nombre ?? original.nombre,
+        codigo: s.codigo,
+        direccion: s.direccion ?? original.direccion,
+        puestos: s.puestos ?? original.puestos,
+        tipo: s.tipo ?? "sucursal",
+        lat: s.lat ?? original.lat,
+        lng: s.lng ?? original.lng,
+        demo: s.demo ?? true,
+        ventasDia: s.ventasDia ?? original.ventasDia,
+      }
+    }),
   )
   const sucPorCodigo = (c: string) => sucursales.find((s) => s.codigo === c)!
 
@@ -140,6 +167,8 @@ export function generarEmpresaDemo(opciones: OpcionesDemo = {}): EstadoEmpresa {
     NO: [U("mostrador.norte@demo.yunque.app")],
     DM: [U("maquinaria@demo.yunque.app"), U("dueno@demo.yunque.app")],
   }
+  // Sucursales a medida: venden administración y el dueño (pueden en todas)
+  for (const s of sucursales) vendedoresPor[s.codigo] ??= [U("admin@demo.yunque.app"), U("dueno@demo.yunque.app")]
   const tecnicos = [U("tecnico@demo.yunque.app"), U("tecnico2@demo.yunque.app")]
   const deposito = U("deposito@demo.yunque.app")
   const compras = U("compras@demo.yunque.app")

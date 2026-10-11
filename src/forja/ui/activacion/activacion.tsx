@@ -56,9 +56,19 @@ function pintarQuieta(t: number, c: Capas) {
  * saltar). La escena 3D se descarga aparte; textos, brillo e iris son del DOM
  * y se animan solo con transform y opacity, cuadro a cuadro desde un único reloj.
  */
-export function Activacion({ onFin, quietaDeEntrada = false }: { onFin: (motivo: FinActivacion) => void; quietaDeEntrada?: boolean }) {
+/** Con arranque manual (grabación de videos), el reloj espera este evento para empezar. */
+export const EVENTO_ARRANCAR_ACTIVACION = "forja:arrancar-activacion"
+
+export function Activacion({ onFin, quietaDeEntrada = false, arranqueManual = false }: { onFin: (motivo: FinActivacion) => void; quietaDeEntrada?: boolean; arranqueManual?: boolean }) {
   const [quieta, setQuieta] = useState(() => quietaDeEntrada || (typeof window !== "undefined" && window.matchMedia("(prefers-reduced-motion: reduce)").matches))
   const [listo3d, setListo3d] = useState(false)
+  const [arrancada, setArrancada] = useState(!arranqueManual)
+  useEffect(() => {
+    if (arrancada) return
+    const arrancar = () => setArrancada(true)
+    window.addEventListener(EVENTO_ARRANCAR_ACTIVACION, arrancar)
+    return () => window.removeEventListener(EVENTO_ARRANCAR_ACTIVACION, arrancar)
+  }, [arrancada])
   const [sonido, setSonido] = useState(false)
   const reloj = useRef(0)
   const capa = useRef<HTMLDivElement>(null)
@@ -115,7 +125,7 @@ export function Activacion({ onFin, quietaDeEntrada = false }: { onFin: (motivo:
 
   // Reloj único: avanza cuadro a cuadro (como mucho 50 ms por cuadro: con la pestaña oculta, se pausa)
   useEffect(() => {
-    if (!quieta && !listo3d) return
+    if ((!quieta && !listo3d) || !arrancada) return
     const duracion = quieta ? DURACION_QUIETA : DURACION_ACTIVACION
     reloj.current = 0
     let marco = 0
@@ -131,7 +141,7 @@ export function Activacion({ onFin, quietaDeEntrada = false }: { onFin: (motivo:
     }
     marco = requestAnimationFrame(paso)
     return () => cancelAnimationFrame(marco)
-  }, [quieta, listo3d, terminar])
+  }, [quieta, listo3d, arrancada, terminar])
 
   const alternarSonido = () => {
     const prender = !sonido

@@ -1,4 +1,5 @@
 import type { NextConfig } from "next"
+import { CLIENTES } from "./src/config/clientes"
 
 const esDev = process.env.NODE_ENV === "development"
 // HSTS y upgrade-insecure-requests solo si el sitio se publica por https: servidos por
@@ -42,6 +43,18 @@ const encabezadosSeguridad = [
   ...(conHttps ? [{ key: "Strict-Transport-Security", value: "max-age=63072000; includeSubDomains; preload" }] : []),
 ]
 
+/**
+ * Demos de Forja embebibles (`/demo/<prospecto>/forja`): solo esa ruta se puede
+ * mostrar en un iframe, y solo desde los orígenes de su configuración. Sin
+ * X-Frame-Options, y la regla general no la pisa (la excluye).
+ */
+const embebibles = Object.values(CLIENTES).flatMap((c) => (c.forja ? [{ slug: c.slug, origenes: c.forja.embebibleEn }] : []))
+const rutaGeneral = embebibles.length ? `/((?!demo/(?:${embebibles.map((e) => e.slug).join("|")})/forja/?$).*)` : "/(.*)"
+const encabezadosEmbebible = (origenes: string[]) => [
+  { key: "Content-Security-Policy", value: csp.replace("frame-ancestors 'none'", `frame-ancestors 'self' ${origenes.join(" ")}`) },
+  ...encabezadosSeguridad.filter((h) => h.key !== "Content-Security-Policy" && h.key !== "X-Frame-Options"),
+]
+
 const nextConfig: NextConfig = {
   cacheComponents: true,
   partialPrefetching: true,
@@ -71,7 +84,8 @@ const nextConfig: NextConfig = {
   },
   async headers() {
     return [
-      { source: "/(.*)", headers: encabezadosSeguridad },
+      { source: rutaGeneral, headers: encabezadosSeguridad },
+      ...embebibles.map((e) => ({ source: `/demo/${e.slug}/forja`, headers: encabezadosEmbebible(e.origenes) })),
       {
         source: "/sw.js",
         headers: [

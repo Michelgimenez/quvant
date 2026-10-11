@@ -233,7 +233,8 @@ export function UniversoRed({
         }
       }
       // En la repetición, los bultos en camino se ubican según la hora del cursor
-      const ahoraMs = store.getState().reloj.t ?? Date.now()
+      const { reloj } = store.getState()
+      const ahoraMs = reloj.t ?? Date.now() + reloj.desfase
       const factor = (i: number) => factorEncendido(encendido.current, t, i, reducir)
       if (overlay) overlay.setProps({ layers: vistaRef.current === "mapa" ? capasMapa(r, ns, t, ahoraMs, pulsos.current, sel, reducir, factor, pz?.flujos ?? null) : [] })
       if (vistaRef.current === "constelacion" && svgEnlaces.current) animarEnlaces(svgEnlaces.current, t, reducir)

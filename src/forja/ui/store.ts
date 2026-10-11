@@ -39,7 +39,7 @@ export type EstadoEscena = {
    * Hora que muestra la escena, cuadro a cuadro (null = en vivo). Es mutable a
    * propósito: el mapa la lee en cada cuadro sin provocar renders de React.
    */
-  reloj: { t: number | null }
+  reloj: { t: number | null; desfase: number }
   /** Modo sala de control (pantalla completa, recorrido y titulares). */
   sala: boolean
   setVista: (v: VistaRed) => void
@@ -55,6 +55,8 @@ export type EstadoEscena = {
   setRepeticion: (r: Partial<Repeticion>) => void
   salirDeRepeticion: () => void
   setSala: (sala: boolean) => void
+  /** Reloj de las demos públicas (ver FuenteForja.desfase). */
+  setDesfase: (ms: number) => void
   verPieza: (p: EstadoEscena["pieza"]) => void
 }
 
@@ -71,7 +73,7 @@ export function crearStoreEscena() {
     pieza: null,
     transicion: null,
     repeticion: { activa: false, reproduciendo: false, velocidad: 1200, cursor: 0 },
-    reloj: { t: null },
+    reloj: { t: null, desfase: 0 },
     sala: false,
     setVista: (vista) => set({ vista, transferenciaId: null }),
     resaltar: (resaltado) => set({ resaltado }),
@@ -92,6 +94,11 @@ export function crearStoreEscena() {
       set((s) => {
         s.reloj.t = null
         return { repeticion: { ...s.repeticion, activa: false, reproduciendo: false } }
+      }),
+    setDesfase: (ms) =>
+      set((s) => {
+        s.reloj.desfase = ms
+        return {}
       }),
     setSala: (sala) =>
       set((s) => {

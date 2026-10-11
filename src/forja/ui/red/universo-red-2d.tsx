@@ -66,9 +66,12 @@ export function UniversoRed2D({
   const [foco, setFoco] = useState<{ id: Id; escala: number } | null>(null)
   const [reducir] = useState(reducirMovimiento)
   // Los bultos en camino se ubican según la hora (la de la repetición, si está activa): basta con un paso por segundo
-  const [ahora, setAhora] = useState(() => Date.now())
+  const [ahora, setAhora] = useState(() => Date.now() + store.getState().reloj.desfase)
   useEffect(() => {
-    const id = window.setInterval(() => setAhora(store.getState().reloj.t ?? Date.now()), 1000)
+    const id = window.setInterval(() => {
+      const { reloj } = store.getState()
+      setAhora(reloj.t ?? Date.now() + reloj.desfase)
+    }, 1000)
     return () => window.clearInterval(id)
   }, [store])
 

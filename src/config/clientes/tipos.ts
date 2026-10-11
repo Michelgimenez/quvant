@@ -30,4 +30,31 @@ export type ClienteDemo = {
   plazo: string
   /** Quién presenta la demo (vendedor de Yunque). */
   contacto: { nombre: string; email: string; telefono: string }
+  /** Demo pública de Forja (`/demo/<slug>/forja`), si la tiene. */
+  forja?: ForjaCliente
+}
+
+/** Una sucursal de la demo de Forja: los nombres viven acá (el snapshot solo guarda el código). */
+export type SucursalForjaCliente = {
+  /** Código de la sucursal en el seed (CC, NO, DM) o uno nuevo. */
+  codigo: string
+  nombre: string
+  direccion: string
+  lat: number
+  lng: number
+  tipo: "sucursal" | "deposito"
+  /** Ficticia: se marca DEMO. */
+  demo: boolean
+  puestos?: number
+  ventasDia?: number
+}
+
+export type ForjaCliente = {
+  sucursales: SucursalForjaCliente[]
+  /** Lo que falta saber, visible en la demo como [COMPLETAR]. */
+  pendiente: string
+  /** Orígenes que pueden embeber la demo en un iframe (CSP frame-ancestors, solo en esa ruta). */
+  embebibleEn: string[]
+  /** Snapshot generado desde el seed con `npm run snapshot-forja` (sin nombres: los pone esta configuración). */
+  snapshot: () => Promise<unknown>
 }

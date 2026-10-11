@@ -20,5 +20,6 @@ export async function generateMetadata({ params }: PageProps<"/demo/[cliente]">)
 export default async function PaginaDemoCliente({ params }: PageProps<"/demo/[cliente]">) {
   const cliente = clienteDemo((await params).cliente)
   if (!cliente) notFound()
-  return <DeckCliente cliente={cliente} />
+  // La parte de Forja (con su carga de datos) no viaja a la demo comercial
+  return <DeckCliente cliente={{ ...cliente, forja: undefined }} />
 }

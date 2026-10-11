@@ -15,7 +15,9 @@
     "test:e2e": "playwright test",
     "capturas": "tsx scripts/capturas.ts",
     "verificar": "npm run typecheck && npm run lint && npm run test && npm run build",
-    "sellos": "node scripts/generar-sellos.mjs"
+    "sellos": "node scripts/generar-sellos.mjs",
+    "snapshot-forja": "tsx scripts/generar-snapshot-forja.ts",
+    "grabar-forja": "tsx scripts/grabar-forja.mjs"
   },
   "dependencies": {
     "@deck.gl/core": "^9.3.11",
@@ -67,6 +69,7 @@
     "eslint": "^9",
     "eslint-config-next": "16.4.0",
     "fake-indexeddb": "^6.2.5",
+    "ffmpeg-static": "^5.2.0",
     "jsdom": "^30.1.2",
     "shadcn": "^4.21.4",
     "tailwindcss": "^4",

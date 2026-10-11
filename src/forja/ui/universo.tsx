@@ -33,32 +33,55 @@ import { Leyenda } from "./taller/panel-zona"
 const UniversoRed = lazy(() => import("./red/universo-red").then((m) => ({ default: m.UniversoRed })))
 
 /** Si llega `activacion`, primero se ve la animación y después las sucursales se encienden una por una. */
-export type ActivacionUniverso = { alTerminar: (motivo: FinActivacion) => void }
+export type ActivacionUniverso = { alTerminar: (motivo: FinActivacion) => void; arranqueManual?: boolean }
+
+/** Co-branding de una demo para un prospecto (logo para fondo oscuro) y un aviso visible. */
+export type MarcaUniverso = { logo: string; nombre: string }
 
 export function Universo({
   fuente,
   alEntrar,
   activacion = null,
   pieza = null,
+  marca = null,
+  aviso = null,
 }: {
   fuente: FuenteForja
   alEntrar?: (id: Id) => void
   activacion?: ActivacionUniverso | null
   /** Abre el nivel 3 con esta pieza (desde el buscador o un enlace). */
   pieza?: Pieza | null
+  marca?: MarcaUniverso | null
+  aviso?: React.ReactNode
 }) {
   const [store] = useState(crearStoreEscena)
   return (
     <ContextoEscena.Provider value={store}>
-      <Escena fuente={fuente} alEntrar={alEntrar} activacion={activacion} piezaPedida={pieza} />
+      <Escena fuente={fuente} alEntrar={alEntrar} activacion={activacion} piezaPedida={pieza} marca={marca} aviso={aviso} />
     </ContextoEscena.Provider>
   )
 }
 
 const reducirMovimiento = () => window.matchMedia("(prefers-reduced-motion: reduce)").matches
+/** La hora de la escena: la real, o la de la demo (snapshot) si hay desfase. */
+const ahoraCon = (desfase: number) => new Date(Date.now() + desfase)
 const cuadros = (n: number) => new Promise<void>((ok) => (n <= 0 ? ok() : requestAnimationFrame(() => void cuadros(n - 1).then(ok))))
 
-function Escena({ fuente, alEntrar, activacion, piezaPedida }: { fuente: FuenteForja; alEntrar?: (id: Id) => void; activacion: ActivacionUniverso | null; piezaPedida: Pieza | null }) {
+function Escena({
+  fuente,
+  alEntrar,
+  activacion,
+  piezaPedida,
+  marca,
+  aviso,
+}: {
+  fuente: FuenteForja
+  alEntrar?: (id: Id) => void
+  activacion: ActivacionUniverso | null
+  piezaPedida: Pieza | null
+  marca: MarcaUniverso | null
+  aviso: React.ReactNode
+}) {
   const store = useContext(ContextoEscena)!
   const [entrada, setEntrada] = useState<"normal" | "esperando" | "encender">(activacion ? "esperando" : "normal")
   // Versión 2D: movimiento reducido o equipo modesto (o elegida a mano)
@@ -79,7 +102,11 @@ function Escena({ fuente, alEntrar, activacion, piezaPedida }: { fuente: FuenteF
   const verPieza = useEscenaForja((s) => s.verPieza)
 
   // ───── Repetición del día: la red y los eventos tal como estaban a la hora del cursor ─────
-  const tramo = useMemo(() => tramoDelDia(fuente.eventos, new Date()), [fuente.eventos])
+  // Demos públicas: la escena vive en la hora de su snapshot
+  const desfase = fuente.desfase ?? 0
+  const setDesfase = useEscenaForja((s) => s.setDesfase)
+  useEffect(() => setDesfase(desfase), [desfase, setDesfase])
+  const tramo = useMemo(() => tramoDelDia(fuente.eventos, ahoraCon(desfase)), [fuente.eventos, desfase])
   useMotorRepeticion(tramo)
   const repeticion = useEscenaForja((s) => s.repeticion)
   const cursor = repeticion.activa ? repeticion.cursor : null
@@ -247,6 +274,13 @@ function Escena({ fuente, alEntrar, activacion, piezaPedida }: { fuente: FuenteF
   return (
     <div ref={raiz} className="relative flex h-full flex-col bg-hierro text-niebla" data-nivel={nivel} data-sala={sala || undefined}>
       <header className="relative z-30 flex flex-wrap items-center gap-3 border-b border-white/10 bg-hierro/80 px-4 py-2.5 backdrop-blur">
+        {marca && (
+          <>
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src={marca.logo} alt={marca.nombre} className={sala ? "h-8 w-auto" : "h-6 w-auto"} data-testid="marca-cliente" />
+            <span className="font-mono text-[10px] uppercase tracking-widest text-acero">con</span>
+          </>
+        )}
         <MarcaForja tamano={sala ? 30 : 22} />
         <div className="flex items-center gap-2">
           {fuente.propuesta && <Sello texto="PROPUESTA" titulo="Propuesta comercial: no es un cliente activo" />}
@@ -258,7 +292,7 @@ function Escena({ fuente, alEntrar, activacion, piezaPedida }: { fuente: FuenteF
           <>
             <span className="font-mono text-xs uppercase tracking-[0.2em] text-acero">Sala de control</span>
             <div className="ml-auto flex items-center gap-4">
-              <Reloj />
+              <Reloj desfase={desfase} />
               <button type="button" onClick={() => setSala(false)} className="inline-flex items-center gap-1 rounded-md border border-white/10 px-2 py-1 text-xs text-acero hover:border-white/25 hover:text-niebla focus-visible:outline focus-visible:outline-1 focus-visible:outline-temple" data-testid="salir-sala">
                 <X className="size-3.5" aria-hidden /> Salir
               </button>
@@ -337,6 +371,11 @@ function Escena({ fuente, alEntrar, activacion, piezaPedida }: { fuente: FuenteF
             </Suspense>
           )}
         </div>
+        {aviso && nivel === "red" && !sala && (
+          <div className="absolute right-3 top-3 z-10 max-w-sm rounded-md border border-white/10 bg-hierro/80 px-2.5 py-1.5 text-[11px] text-acero backdrop-blur" data-testid="aviso-demo">
+            {aviso}
+          </div>
+        )}
         {nivel === "red" && !sala && transicion === null && (
           <>
             <LeyendaCalor />
@@ -358,6 +397,7 @@ function Escena({ fuente, alEntrar, activacion, piezaPedida }: { fuente: FuenteF
         {entrada === "esperando" && activacion && (
           <Activacion
             quietaDeEntrada={es2D}
+            arranqueManual={activacion.arranqueManual}
             onFin={(motivo) => {
               setEntrada("encender")
               activacion.alTerminar(motivo)
@@ -369,13 +409,13 @@ function Escena({ fuente, alEntrar, activacion, piezaPedida }: { fuente: FuenteF
   )
 }
 
-/** Hora actual para la sala de control (se actualiza cada 15 s). */
-function Reloj() {
-  const [ahora, setAhora] = useState(() => new Date().toISOString())
+/** Hora actual para la sala de control (se actualiza cada 15 s; en las demos, la hora de la demo). */
+function Reloj({ desfase }: { desfase: number }) {
+  const [ahora, setAhora] = useState(() => new Date(Date.now() + desfase).toISOString())
   useEffect(() => {
-    const id = window.setInterval(() => setAhora(new Date().toISOString()), 15_000)
+    const id = window.setInterval(() => setAhora(new Date(Date.now() + desfase).toISOString()), 15_000)
     return () => window.clearInterval(id)
-  }, [])
+  }, [desfase])
   return <span className="font-mono text-2xl text-niebla">{hora(ahora)}</span>
 }
 

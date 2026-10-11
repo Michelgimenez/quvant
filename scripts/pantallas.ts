@@ -49,7 +49,7 @@ export function escena(n: number, clave = process.env.INVERSORES_KEY ?? "yunque-
 
 const ESCENAS_CLIENTE = ["portada", "su-problema", "su-marca", "un-dia", "corte", "como-empezamos", "socio-fundador"]
 
-const ESCENAS_INVERSORES = ["apertura", "problema", "terreno", "solucion", "demo", "diferencial", "modelo", "estado", "hoja-de-ruta", "inversion", "equipo", "cierre"]
+const ESCENAS_INVERSORES = ["apertura", "problema", "terreno", "solucion", "demo", "forja", "diferencial", "modelo", "estado", "hoja-de-ruta", "inversion", "equipo", "cierre"]
 
 /** Activa Forja desde Extensiones (los datos de la demo viven en el navegador de cada captura). */
 export async function activarForja(p: Page) {
@@ -81,6 +81,13 @@ function activacionEn(segundos: number) {
     for (let f = 0; f < Math.round(segundos * 60); f++) await p.clock.runFor(1000 / 60)
     await p.waitForTimeout(300)
   }
+}
+
+/** Demos públicas de Forja: se salta la activación (tiene sus propias capturas) y se espera la red. */
+async function saltarActivacionPublica(p: Page) {
+  await p.getByTestId("saltar-activacion").click()
+  await p.locator("[data-testid=forja-red][data-listo=true]").waitFor({ timeout: 60_000 })
+  await p.waitForTimeout(3000)
 }
 
 /** Entra a Casa Central (nivel 2) y espera a que la cámara termine de bajar. */
@@ -322,6 +329,18 @@ export const PANTALLAS: Pantalla[] = [
       await p.locator("[data-rack]").nth(16).hover()
       await p.getByTestId("tooltip-rack").waitFor()
     }),
+  },
+  { id: "forja-publica", ruta: "/forja", esperar: "[data-testid=activacion]", carpeta: "forja", antes: saltarActivacionPublica },
+  { id: "forja-propuesta-ferremix", ruta: "/demo/ferremix/forja", esperar: "[data-testid=activacion]", carpeta: "forja", antes: saltarActivacionPublica },
+  {
+    id: "forja-sitio",
+    ruta: "/",
+    esperar: "#forja",
+    carpeta: "forja",
+    antes: async (p) => {
+      await p.locator("#forja").scrollIntoViewIfNeeded()
+      await p.waitForTimeout(1500)
+    },
   },
   {
     id: "forja-pieza-producto",

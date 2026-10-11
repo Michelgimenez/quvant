@@ -8,9 +8,10 @@ import { EstadoFeatureBadge, TextoConfig } from "@/components/base/sellos"
 import { Wordmark } from "@/components/marca/marca"
 import { YunqueArmado } from "@/components/marca/yunque-armado"
 import { DemoConexion } from "@/components/sitio/demo-conexion"
+import { VideoForja } from "@/components/sitio/video-forja"
 import { ETAPAS } from "@/config/hoja-de-ruta"
 import { MERCADO, PILARES, TERRENO } from "@/config/inversores"
-import { PRECIOS } from "@/config/precios"
+import { PRECIOS, textoPrecioExtension } from "@/config/precios"
 import { proyectar, SUPUESTOS } from "@/config/proyecciones"
 import { SITIO } from "@/config/sitio"
 import { FEATURES, type EstadoFeature } from "@/showcase/features"
@@ -150,10 +151,40 @@ function DemoProducto() {
   )
 }
 
+/** Forja: la extensión visual, con la toma genérica (empresa de demostración, sin ningún prospecto). */
+function ForjaEnVivo() {
+  const { activa, reinicio } = useEscena()
+  const forja = FEATURES.find((f) => f.id === "forja")
+  return (
+    <Lienzo numero="06" etiqueta="Forja · empresa demo">
+      <div className="grid h-full grid-cols-[520px_1fr] items-center gap-14">
+        <div>
+          <Aparecer>
+            <Titulo className="text-[76px]">Forja: el negocio, en vivo.</Titulo>
+          </Aparecer>
+          <Aparecer demora={0.4}>
+            <Bajada className="mt-8 text-[28px]">Toda la red de sucursales en un mapa, cada sucursal por dentro y el día entero en 30 segundos. Lo que un sistema viejo no puede mostrar.</Bajada>
+          </Aparecer>
+          <Aparecer demora={0.7}>
+            <div className="mt-10 flex flex-wrap items-center gap-4">
+              {forja && <EstadoFeatureBadge estado={forja.estado} />}
+              <p className="font-mono text-[20px] uppercase tracking-widest text-acero">Extensión · {textoPrecioExtension("forja")}</p>
+            </div>
+          </Aparecer>
+        </div>
+        <Aparecer demora={0.2} escala={0.97}>
+          <VideoForja activo={activa} reinicio={reinicio} etiqueta="Recorrido de Forja con la empresa de demostración" className="rounded-3xl" />
+          <p className="mt-3 font-mono text-[16px] text-acero">Empresa de demostración · datos simulados</p>
+        </Aparecer>
+      </div>
+    </Lienzo>
+  )
+}
+
 function Diferencial() {
   const { activa, velocidad, reinicio } = useEscena()
   return (
-    <Lienzo numero="06" etiqueta="El diferencial">
+    <Lienzo numero="07" etiqueta="El diferencial">
       <div className="grid h-full grid-cols-[500px_1fr] items-center gap-16">
         <div>
           <Aparecer>
@@ -186,7 +217,7 @@ function Modelo() {
   const paso = [1, 2, 2.5, 5, 10].map((m) => m * base).find((v) => v * 4 >= mayor) ?? base * 10
   const max = paso * 4
   return (
-    <Lienzo numero="07" etiqueta="Modelo de negocio">
+    <Lienzo numero="08" etiqueta="Modelo de negocio">
       <div className="grid h-full grid-cols-[620px_1fr] gap-20">
         <div className="space-y-6">
           <Aparecer>
@@ -264,7 +295,7 @@ function Modelo() {
 function EstadoActual() {
   const columnas: EstadoFeature[] = ["disponible", "demo", "próximamente"]
   return (
-    <Lienzo numero="08" etiqueta="Estado actual · con honestidad">
+    <Lienzo numero="09" etiqueta="Estado actual · con honestidad">
       <div className="flex items-end justify-between">
         <Aparecer>
           <Titulo className="text-[72px]">Demo funcional. Primer piloto en negociación.</Titulo>
@@ -301,7 +332,7 @@ function EstadoActual() {
 function HojaDeRuta() {
   const { activa, velocidad, reducir } = useEscena()
   return (
-    <Lienzo numero="09" etiqueta="Hoja de ruta · de demo a producción">
+    <Lienzo numero="10" etiqueta="Hoja de ruta · de demo a producción">
       <Aparecer>
         <Titulo className="text-[80px]">Cinco etapas para llegar a producción.</Titulo>
       </Aparecer>
@@ -346,7 +377,7 @@ function Inversion() {
   const fracciones = datos.inversion.destino.map((d) => d.porcentaje / 100)
   const inicios = fracciones.map((_, i) => fracciones.slice(0, i).reduce((a, b) => a + b, 0))
   return (
-    <Lienzo numero="10" etiqueta="Para qué es la inversión">
+    <Lienzo numero="11" etiqueta="Para qué es la inversión">
       <div className="grid h-full grid-cols-[1fr_640px] items-center gap-16">
         <div>
           <Aparecer>
@@ -400,7 +431,7 @@ function Inversion() {
 function Equipo() {
   const { datos } = useDatosInversores()
   return (
-    <Lienzo numero="11" etiqueta="Equipo">
+    <Lienzo numero="12" etiqueta="Equipo">
       <Aparecer>
         <Titulo className="text-[80px]">Quiénes lo construyen.</Titulo>
       </Aparecer>
@@ -464,6 +495,7 @@ export const ESCENAS_INVERSORES: DefinicionEscena[] = [
   { id: "terreno", titulo: "Lo que vimos en el terreno", largo: 120, duracion: 11, Componente: Terreno },
   { id: "solucion", titulo: "La solución", largo: 120, duracion: 11, Componente: Solucion },
   { id: "demo", titulo: "Demo del producto", largo: 150, duracion: 24, Componente: DemoProducto },
+  { id: "forja", titulo: "Forja: el negocio, en vivo", largo: 130, duracion: 46, Componente: ForjaEnVivo },
   { id: "diferencial", titulo: "El diferencial", largo: 140, duracion: 15, Componente: Diferencial },
   { id: "modelo", titulo: "Modelo de negocio", largo: 120, duracion: 13, Componente: Modelo },
   { id: "estado", titulo: "Estado actual", largo: 120, duracion: 12, Componente: EstadoActual },
