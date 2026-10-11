@@ -9,6 +9,7 @@ import { PARADAS_CALOR, colorCalor } from "@/forja/dominio/calor"
 import { hastaCursor, tramoDelDia } from "@/forja/dominio/repeticion"
 import type { FuenteForja } from "@/forja/datos/fuente"
 import { cn } from "@/lib/utils"
+import { Activacion, type FinActivacion } from "./activacion/activacion"
 import { hora } from "./formato"
 import { LineaTiempo, useMotorRepeticion } from "./linea-tiempo"
 import { MarcaForja } from "./marca-forja"
@@ -23,11 +24,14 @@ import { Leyenda } from "./taller/panel-zona"
  * El universo del taller: la misma escena para la app y para las demos
  * públicas. Recibe los datos ya armados (FuenteForja) y maneja la escena.
  */
-export function Universo({ fuente, alEntrar }: { fuente: FuenteForja; alEntrar?: (id: Id) => void }) {
+/** Si llega `activacion`, primero se ve la animación y después las sucursales se encienden una por una. */
+export type ActivacionUniverso = { alTerminar: (motivo: FinActivacion) => void }
+
+export function Universo({ fuente, alEntrar, activacion = null }: { fuente: FuenteForja; alEntrar?: (id: Id) => void; activacion?: ActivacionUniverso | null }) {
   const [store] = useState(crearStoreEscena)
   return (
     <ContextoEscena.Provider value={store}>
-      <Escena fuente={fuente} alEntrar={alEntrar} />
+      <Escena fuente={fuente} alEntrar={alEntrar} activacion={activacion} />
     </ContextoEscena.Provider>
   )
 }
@@ -35,8 +39,9 @@ export function Universo({ fuente, alEntrar }: { fuente: FuenteForja; alEntrar?:
 const reducirMovimiento = () => window.matchMedia("(prefers-reduced-motion: reduce)").matches
 const cuadros = (n: number) => new Promise<void>((ok) => (n <= 0 ? ok() : requestAnimationFrame(() => void cuadros(n - 1).then(ok))))
 
-function Escena({ fuente, alEntrar }: { fuente: FuenteForja; alEntrar?: (id: Id) => void }) {
+function Escena({ fuente, alEntrar, activacion }: { fuente: FuenteForja; alEntrar?: (id: Id) => void; activacion: ActivacionUniverso | null }) {
   const store = useContext(ContextoEscena)!
+  const [entrada, setEntrada] = useState<"normal" | "esperando" | "encender">(activacion ? "esperando" : "normal")
   const control = useRef<ControlRed | null>(null)
   const raiz = useRef<HTMLDivElement>(null)
   const escenario = useRef<HTMLDivElement>(null)
@@ -241,7 +246,7 @@ function Escena({ fuente, alEntrar }: { fuente: FuenteForja; alEntrar?: (id: Id)
       <div ref={escenario} className="relative flex-1 overflow-clip" data-linea={(nivel === "red" && !sala) || undefined}>
         {/* isolate: las capas de deck.gl no se cuelan sobre el taller */}
         <div className="absolute inset-0 isolate" inert={nivel !== "red"}>
-          <UniversoRed red={red} eventos={eventos} controlRef={control} onEntrar={(id) => void entrar(id)} activa={nivel === "red"} />
+          <UniversoRed red={red} eventos={eventos} controlRef={control} onEntrar={(id) => void entrar(id)} activa={nivel === "red"} entrada={entrada} />
         </div>
         {nivel === "red" && !sala && transicion === null && (
           <>
@@ -252,6 +257,14 @@ function Escena({ fuente, alEntrar }: { fuente: FuenteForja; alEntrar?: (id: Id)
         {sala && <SalaControl red={red} eventos={eventos} control={control} />}
         {nodoActual && <NivelTaller fuente={fuente} nodo={nodoActual} modo={camara} onListo={() => avisarListo.current?.()} />}
         <div ref={iris} className="pointer-events-none absolute left-0 top-0 z-20 rounded-full opacity-0 will-change-transform" aria-hidden data-testid="forja-iris" />
+        {entrada === "esperando" && activacion && (
+          <Activacion
+            onFin={(motivo) => {
+              setEntrada("encender")
+              activacion.alTerminar(motivo)
+            }}
+          />
+        )}
       </div>
     </div>
   )

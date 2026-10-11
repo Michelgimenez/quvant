@@ -55,8 +55,30 @@ export async function activarForja(p: Page) {
   await p.getByTestId("activar-forja").click()
   await p.waitForURL(/\/app\/forja/)
   await p.getByTestId("forja").waitFor({ timeout: 30_000 })
+  // La animación de activación tiene sus propias capturas
+  const saltar = p.getByTestId("saltar-activacion")
+  await saltar.waitFor({ timeout: 15_000 }).catch(() => {})
+  if (await saltar.isVisible().catch(() => false)) await saltar.click()
   await p.locator("[data-testid=forja-red][data-listo=true]").waitFor({ timeout: 60_000 })
   await p.waitForTimeout(3500)
+}
+
+/** Activa Forja con el reloj de la página en pausa y avanza hasta el segundo pedido de la animación. */
+function activacionEn(segundos: number) {
+  return async (p: Page) => {
+    await p.goto(p.url().replace(/\/app.*$/, "/app/extensiones"))
+    await p.getByTestId("activar-forja").waitFor()
+    await p.clock.pauseAt((await p.evaluate(() => Date.now())) + 3000)
+    await p.getByTestId("activar-forja").click()
+    // La red corre en tiempo real; la animación, solo cuando avanza el reloj
+    for (let i = 0; i < 600; i++) {
+      if (await p.locator("[data-testid=activacion][data-listo=true]").count()) break
+      await p.clock.runFor(50)
+      await p.waitForTimeout(60)
+    }
+    for (let f = 0; f < Math.round(segundos * 60); f++) await p.clock.runFor(1000 / 60)
+    await p.waitForTimeout(300)
+  }
 }
 
 /** Entra a Casa Central (nivel 2) y espera a que la cámara termine de bajar. */
@@ -229,6 +251,10 @@ export const PANTALLAS: Pantalla[] = [
       await p.waitForTimeout(1600)
     },
   },
+  { id: "forja-activacion-golpe", ruta: "/app", usuario: "dueno@demo.yunque.app", esperar: "#contenido h1", carpeta: "forja", soloEscritorio: true, conMovimiento: true, antes: activacionEn(0.9) },
+  { id: "forja-activacion", ruta: "/app", usuario: "dueno@demo.yunque.app", esperar: "#contenido h1", carpeta: "forja", conMovimiento: true, antes: activacionEn(3.0) },
+  // Con movimiento reducido: la composición quieta, sin 3D
+  { id: "forja-activacion-quieta", ruta: "/app", usuario: "dueno@demo.yunque.app", esperar: "#contenido h1", carpeta: "forja", soloEscritorio: true, antes: activacionEn(1) },
   {
     id: "forja-transicion",
     ruta: "/app",

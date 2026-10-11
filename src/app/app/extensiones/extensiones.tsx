@@ -13,6 +13,9 @@ import { textoPrecioExtension } from "@/config/precios"
 import { REGISTRO_EXTENSIONES, type DefinicionExtension } from "@/extensiones/registro"
 import { MarcaForja } from "@/forja/ui/marca-forja"
 
+/** Al acercarse al botón, la escena de la activación empieza a bajar: arranca sin espera. */
+const precargarActivacion = () => void import("@/forja/ui/activacion/escena-activacion").catch(() => {})
+
 export function Extensiones() {
   return (
     <Requiere permiso="extensiones.gestionar">
@@ -69,7 +72,9 @@ function TarjetaExtension({ x }: { x: DefinicionExtension }) {
               <Power /> Desactivar
             </Button>
             <Button variant="outline" size="sm" asChild>
-              <Link href={`${x.ruta}?activacion=1`}>Ver la activación</Link>
+              <Link href={`${x.ruta}?activacion=1`} onPointerEnter={precargarActivacion} onFocus={precargarActivacion}>
+                Ver la activación
+              </Link>
             </Button>
             <Button size="sm" asChild>
               <Link href={x.ruta}>
@@ -78,7 +83,7 @@ function TarjetaExtension({ x }: { x: DefinicionExtension }) {
             </Button>
           </div>
         ) : (
-          <Button onClick={() => cambiar(true)} disabled={enviando} data-testid={`activar-${x.id}`}>
+          <Button onClick={() => cambiar(true)} onPointerEnter={precargarActivacion} onFocus={precargarActivacion} disabled={enviando} data-testid={`activar-${x.id}`}>
             {enviando ? <Loader2 className="animate-spin" /> : <Power />} Activar {x.nombre}
           </Button>
         )}

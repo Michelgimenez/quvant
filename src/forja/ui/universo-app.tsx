@@ -1,15 +1,32 @@
 "use client"
 
-import { useMemo } from "react"
+import { useMemo, useState } from "react"
 import { useApp } from "@/cliente/app-contexto"
 import type { FuenteForja } from "@/forja/datos/fuente"
+import { PREFERENCIA_ACTIVACION, debeMostrarActivacion } from "@/forja/dominio/activacion"
 import { useRedForjaApp, useSimulacionForja } from "@/forja/datos/usar-forja-app"
 import { redForja, tallerForja } from "@/forja/dominio/modelo"
-import { Universo } from "./universo"
+import { Universo, type ActivacionUniverso } from "./universo"
 
 /** Forja dentro de la app: datos de Yunque, simulador si la empresa es demo y enlaces a los módulos. */
-export function UniversoForjaApp({ simulacion }: { activacion: boolean; simulacion: boolean }) {
-  const { motor } = useApp()
+export function UniversoForjaApp({ activacion, simulacion }: { activacion: boolean; simulacion: boolean }) {
+  const { motor, usuario, ejecutar } = useApp()
+  // La primera vez que la persona entra (o cuando la pide desde Extensiones)
+  const [conActivacion] = useState<ActivacionUniverso | null>(() =>
+    debeMostrarActivacion(activacion, usuario.preferencias)
+      ? {
+          alTerminar: () => {
+            if (!usuario.preferencias[PREFERENCIA_ACTIVACION]) void ejecutar("usuario.preferencia", { clave: PREFERENCIA_ACTIVACION, valor: new Date().toISOString() }, null)
+            // Sin ?activacion=1 en la dirección: recargar no la repite
+            const url = new URL(window.location.href)
+            if (url.searchParams.has("activacion")) {
+              url.searchParams.delete("activacion")
+              window.history.replaceState(window.history.state, "", url)
+            }
+          },
+        }
+      : null,
+  )
   const { red, eventos, permitidas } = useRedForjaApp()
   const sim = useSimulacionForja(simulacion)
   const fuente = useMemo<FuenteForja>(
@@ -36,5 +53,5 @@ export function UniversoForjaApp({ simulacion }: { activacion: boolean; simulaci
     }),
     [red, eventos, sim.activa, motor, permitidas],
   )
-  return <Universo fuente={fuente} />
+  return <Universo fuente={fuente} activacion={conActivacion} />
 }

@@ -377,3 +377,42 @@ describe("Forja · repetición y titulares", () => {
     expect(recorridoSala(red)).toEqual([null, ...red.nodos.map((n) => n.id)])
   })
 })
+
+describe("Forja · activación", () => {
+  it("dura 4,5 s como máximo y cada tramo cae dentro", async () => {
+    const { CRONOGRAMA, DURACION_ACTIVACION, tramo } = await import("@/forja/dominio/activacion")
+    expect(DURACION_ACTIVACION).toBeLessThanOrEqual(4.5)
+    for (const r of Object.values(CRONOGRAMA)) {
+      const lista = "desde" in r ? [r] : r.map((x) => ({ desde: x, hasta: x }))
+      for (const x of lista) {
+        expect(x.desde).toBeGreaterThanOrEqual(0)
+        expect(x.hasta).toBeLessThanOrEqual(DURACION_ACTIVACION)
+        expect(x.desde).toBeLessThanOrEqual(x.hasta)
+      }
+    }
+    expect(tramo(0, CRONOGRAMA.caida)).toBe(0)
+    expect(tramo(0.36, CRONOGRAMA.caida)).toBeCloseTo(0.5)
+    expect(tramo(9, CRONOGRAMA.iris)).toBe(1)
+  })
+
+  it("se muestra la primera vez o cuando se pide, y no otra vez sola", async () => {
+    const { debeMostrarActivacion, PREFERENCIA_ACTIVACION } = await import("@/forja/dominio/activacion")
+    expect(debeMostrarActivacion(false, {})).toBe(true)
+    expect(debeMostrarActivacion(false, { [PREFERENCIA_ACTIVACION]: "2026-10-07T18:30:00.000Z" })).toBe(false)
+    expect(debeMostrarActivacion(true, { [PREFERENCIA_ACTIVACION]: "2026-10-07T18:30:00.000Z" })).toBe(true)
+  })
+
+  it("el isotipo se extruye desde su trazo poligonal", async () => {
+    const { poligonoDeTrazo } = await import("@/forja/dominio/activacion")
+    const { TRAZO_YUNQUE } = await import("@/components/marca/trazos")
+    const p = poligonoDeTrazo(TRAZO_YUNQUE)
+    expect(p.length).toBe(19)
+    expect(p[0]).toEqual([2, 34])
+    for (const [x, y] of p) {
+      expect(x).toBeGreaterThanOrEqual(0)
+      expect(x).toBeLessThanOrEqual(100)
+      expect(y).toBeGreaterThanOrEqual(0)
+      expect(y).toBeLessThanOrEqual(88)
+    }
+  })
+})

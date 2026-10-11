@@ -517,3 +517,23 @@
 [data-linea] .forja-mapa .maplibregl-ctrl-bottom-right {
   margin-bottom: 3.25rem;
 }
+
+/* Forja · después de la activación, las sucursales se encienden una por una (opacity y scale) */
+[data-entrada="esperando"] > [data-testid="nodo-forja"] {
+  opacity: 0;
+}
+[data-entrada="encender"] > [data-testid="nodo-forja"] > * {
+  animation: forja-encender 0.7s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+  animation-delay: calc(var(--i) * 180ms + 150ms);
+}
+@keyframes forja-encender {
+  from {
+    opacity: 0;
+    scale: 0.6;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  [data-entrada="encender"] > [data-testid="nodo-forja"] > * {
+    animation: none;
+  }
+}

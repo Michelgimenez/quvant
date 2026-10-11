@@ -63,6 +63,7 @@ export function UniversoRed({
   controlRef,
   onEntrar,
   activa = true,
+  entrada = "normal",
 }: {
   red: RedForja
   eventos: EventoForja[]
@@ -70,6 +71,8 @@ export function UniversoRed({
   onEntrar?: (id: Id) => void
   /** Falso mientras se ve el taller: el bucle de animación del mapa descansa. */
   activa?: boolean
+  /** Después de la activación, las sucursales se encienden una por una. */
+  entrada?: "normal" | "esperando" | "encender"
 }) {
   const store = useContext(ContextoEscena)!
   const vista = useEscenaForja((s) => s.vista)
@@ -95,6 +98,11 @@ export function UniversoRed({
   useEffect(() => {
     datos.current = { red, conCoordenadas, transferenciaId, activa }
   }, [red, conCoordenadas, transferenciaId, activa])
+  // Encendido: el brillo de cada nodo (deck.gl) acompaña la aparición escalonada del DOM
+  const encendido = useRef<{ modo: typeof entrada; t0: number }>({ modo: entrada, t0: 0 })
+  useEffect(() => {
+    encendido.current = { modo: entrada, t0: performance.now() }
+  }, [entrada])
 
   // Última venta de cada sucursal: el nodo late cuando cambia
   const ultimaVenta = useMemo(() => {
@@ -222,7 +230,8 @@ export function UniversoRed({
       }
       // En la repetición, los bultos en camino se ubican según la hora del cursor
       const ahoraMs = store.getState().reloj.t ?? Date.now()
-      if (overlay) overlay.setProps({ layers: vistaRef.current === "mapa" ? capasMapa(r, ns, t, ahoraMs, pulsos.current, sel, reducir) : [] })
+      const factor = (i: number) => factorEncendido(encendido.current, t, i, reducir)
+      if (overlay) overlay.setProps({ layers: vistaRef.current === "mapa" ? capasMapa(r, ns, t, ahoraMs, pulsos.current, sel, reducir, factor) : [] })
       if (vistaRef.current === "constelacion" && svgEnlaces.current) animarEnlaces(svgEnlaces.current, t, reducir)
     }
     marco = requestAnimationFrame(paso)
@@ -310,10 +319,11 @@ export function UniversoRed({
       </svg>
 
       {/* Nodos */}
-      <ul className="pointer-events-none absolute inset-0" aria-label="Sucursales en la red">
-        {red.nodos.map((n) => (
+      <ul className="pointer-events-none absolute inset-0" aria-label="Sucursales en la red" data-entrada={entrada}>
+        {red.nodos.map((n, i) => (
           <NodoRed
             key={n.id}
+            indice={i}
             nodo={n}
             radio={vista === "constelacion" ? (posConstelacion.get(n.id)?.radio ?? 18) : 18}
             ultimaVenta={ultimaVenta[n.id]}
@@ -352,13 +362,25 @@ function arcoDe(t: TransferenciaForja, a: NodoForja, b: NodoForja) {
   return p
 }
 
-function capasMapa(red: RedForja, nodos: NodoForja[], t: number, ahoraMs: number, pulsos: Pulso[], seleccion: Id | null, reducir: boolean) {
+/** Encendido escalonado (mismo ritmo que la animación CSS de los nodos): 0 apagado, 1 encendido. */
+const ENCENDIDO_RETARDO = 150
+const ENCENDIDO_PASO = 180
+const ENCENDIDO_DURACION = 700
+function factorEncendido(e: { modo: "normal" | "esperando" | "encender"; t0: number }, t: number, i: number, reducir: boolean) {
+  if (e.modo === "normal" || reducir) return e.modo === "esperando" ? 0 : 1
+  if (e.modo === "esperando") return 0
+  return Math.min(1, Math.max(0, (t - e.t0 - ENCENDIDO_RETARDO - i * ENCENDIDO_PASO) / ENCENDIDO_DURACION))
+}
+
+function capasMapa(red: RedForja, nodos: NodoForja[], t: number, ahoraMs: number, pulsos: Pulso[], seleccion: Id | null, reducir: boolean, encendido: (i: number) => number = () => 1) {
   const porId = new Map(nodos.map((n) => [n.id, n]))
+  // Los arcos aparecen cuando ya se encendió la última sucursal
+  const arcosVisibles = encendido(nodos.length - 1)
   const arcos: DatoArco[] = []
   const chispas: DatoPunto[] = []
   const trazos: DatoTrazo[] = []
 
-  for (const tr of red.transferencias) {
+  for (const tr of arcosVisibles > 0 ? red.transferencias : []) {
     const a = porId.get(tr.desdeId)
     const b = porId.get(tr.haciaId)
     if (!a || !b) continue
@@ -386,7 +408,9 @@ function capasMapa(red: RedForja, nodos: NodoForja[], t: number, ahoraMs: number
 
   // Brillo de cada nodo según su calor, más el golpe de cada venta
   const brillos: DatoPunto[] = []
-  for (const n of nodos) {
+  for (const [i, n] of nodos.entries()) {
+    const luz = encendido(i)
+    if (luz <= 0) continue
     const [r, g, b] = rgb255Calor(n.calor)
     const golpe = pulsos.filter((p) => p.nodoId === n.id).reduce((m, p) => Math.max(m, 1 - (t - p.t0) / DURACION_PULSO), 0)
     // Halo contenido: el color manda, no el tamaño (render de producto, no caricatura)
@@ -397,7 +421,7 @@ function capasMapa(red: RedForja, nodos: NodoForja[], t: number, ahoraMs: number
       [1.8, 18],
       [2.8, 7],
     ] as const) {
-      brillos.push({ posicion: [n.lng!, n.lat!, 0], color: [r, g, b, Math.round(alfa * intensidad + golpe * 50)], radio: base * escala * (1 + golpe * 0.4) })
+      brillos.push({ posicion: [n.lng!, n.lat!, 0], color: [r, g, b, Math.round((alfa * intensidad + golpe * 50) * luz)], radio: base * escala * (1 + golpe * 0.4) })
     }
   }
 

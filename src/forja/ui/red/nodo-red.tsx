@@ -11,6 +11,7 @@ import { cn } from "@/lib/utils"
  * se recorre con Tab, se resalta con el foco (contorno --temple) y Enter entra.
  */
 export function NodoRed({
+  indice,
   nodo,
   radio,
   ultimaVenta,
@@ -19,6 +20,8 @@ export function NodoRed({
   onResaltar,
   onEntrar,
 }: {
+  /** Orden en la red: marca el turno en el encendido escalonado. */
+  indice: number
   nodo: NodoForja
   radio: number
   ultimaVenta: string | undefined
@@ -51,7 +54,7 @@ export function NodoRed({
   const descripcion = `${nodo.nombre}${nodo.demo ? " (sucursal de demostración)" : ""}: calor ${nombreCalor(nodo.calor)}, ${nodo.ventasHoy} ventas hoy, ${criticos} productos en stock crítico o sin stock.`
 
   return (
-    <li ref={refElemento} className="absolute left-0 top-0 will-change-transform" style={{ transform: "translate3d(-200px, -200px, 0)" }} data-testid="nodo-forja" data-nodo={nodo.codigo}>
+    <li ref={refElemento} className="absolute left-0 top-0 will-change-transform" style={{ transform: "translate3d(-200px, -200px, 0)", ["--i" as string]: indice }} data-testid="nodo-forja" data-nodo={nodo.codigo}>
       <button
         type="button"
         className={cn("pointer-events-auto absolute -translate-x-1/2 -translate-y-1/2 rounded-full outline-none", resaltado && "ring-1 ring-temple ring-offset-2 ring-offset-transparent")}

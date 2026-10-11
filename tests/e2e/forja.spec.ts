@@ -11,8 +11,17 @@ async function activarForja(page: Page) {
   await page.getByTestId("activar-forja").click()
   await page.waitForURL(/\/app\/forja/)
   await expect(page.getByTestId("forja")).toBeVisible({ timeout: 30_000 })
+  // La animación de activación se ve la primera vez: acá se salta (tiene su propio test)
+  await saltarActivacion(page)
   // La activación tiene que llegar al servidor antes de cambiar de persona
   await expect(page.getByTestId("estado-conexion")).toHaveText("Sincronizado", { timeout: 15_000 })
+}
+
+async function saltarActivacion(page: Page) {
+  const saltar = page.getByTestId("saltar-activacion")
+  await saltar.waitFor({ timeout: 15_000 }).catch(() => {})
+  if (await saltar.isVisible().catch(() => false)) await saltar.click()
+  await expect(page.getByTestId("activacion")).toHaveCount(0, { timeout: 10_000 })
 }
 
 const ventasHoy = async (page: Page) => Number(await page.getByTestId("ventas-hoy-total").innerText())
@@ -101,10 +110,12 @@ test.describe("Forja · taller", () => {
   test("entrar a una sucursal: taller 3D, zonas, panel con enlaces y vuelta a la red", async ({ page }) => {
     test.setTimeout(180_000)
     await ingresar(page, "dueno@demo.yunque.app")
-    const scripts = registrarScripts(page)
     await activarForja(page)
+    // Segunda visita (sin la animación de activación, que también usa 3D): three.js baja recién al entrar a una sucursal
+    const scripts = registrarScripts(page)
+    await page.goto("/app/forja")
     await expect(page.getByTestId("forja-red")).toHaveAttribute("data-listo", "true", { timeout: 60_000 })
-    // three.js baja recién al entrar a una sucursal
+    await expect(page.getByTestId("activacion")).toHaveCount(0)
     expect(await scripts()).not.toContain("THREE.WebGLRenderer")
 
     await page.locator("[data-nodo=CC] button").click({ force: true })
@@ -218,5 +229,38 @@ test.describe("Forja · repetición del día y sala de control", () => {
     await page.getByTestId("salir-sala").click()
     await expect(sala).toHaveCount(0)
     await expect(page.getByTestId("linea-tiempo")).toBeVisible()
+  })
+})
+
+test.describe("Forja · activación", () => {
+  test("el yunque se convierte en forja: termina sola, enciende las sucursales y no vuelve a aparecer", async ({ page }) => {
+    test.setTimeout(150_000)
+    await ingresar(page, "dueno@demo.yunque.app")
+    await page.goto("/app/extensiones")
+    await page.getByTestId("activar-forja").click()
+    await page.waitForURL(/\/app\/forja/)
+    const activacion = page.getByTestId("activacion")
+    await expect(activacion).toBeVisible({ timeout: 30_000 })
+    await expect(activacion).toHaveAttribute("data-modo", "3d")
+    await expect(activacion).toContainText("Lo firme y lo vivo, trabajando juntos.")
+    // Sonido apagado por defecto, con su botón
+    await expect(page.getByTestId("sonido-activacion")).toHaveAttribute("aria-pressed", "false")
+    // Dura 4,5 s como máximo (más la descarga de la escena)
+    await expect(activacion).toHaveCount(0, { timeout: 20_000 })
+    await expect(page.locator("[data-entrada=encender]")).toHaveCount(1)
+    await expect(page).not.toHaveURL(/activacion=1/)
+
+    // Quedó guardada en las preferencias: al volver a Forja no se repite sola
+    await expect(page.getByTestId("estado-conexion")).toHaveText("Sincronizado", { timeout: 15_000 })
+    await page.goto("/app/forja")
+    await expect(page.getByTestId("forja-red")).toHaveAttribute("data-listo", "true", { timeout: 60_000 })
+    await expect(activacion).toHaveCount(0)
+
+    // Desde Extensiones se puede ver de nuevo, y se salta con Esc
+    await page.goto("/app/extensiones")
+    await page.getByRole("link", { name: "Ver la activación" }).click()
+    await expect(activacion).toBeVisible({ timeout: 30_000 })
+    await page.keyboard.press("Escape")
+    await expect(activacion).toHaveCount(0, { timeout: 5_000 })
   })
 })

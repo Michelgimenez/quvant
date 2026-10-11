@@ -42,7 +42,7 @@ Forja convierte los datos de Yunque en un taller conectado: las sucursales en un
 2. **Red en el mapa** ✔︎ — MapLibre + deck.gl, nodos con calor y stock crítico, transferencias animadas, tarjetas y constelación.
 3. **Taller isométrico 3D por sucursal** ✔︎ — mostrador, depósito, servicio técnico y muelle desde los datos de Yunque, panel lateral con enlaces a cada módulo y transición de cámara desde el mapa.
 4. **Línea de tiempo del día y modo sala de control** ✔︎ — repetición a 1×, 60×, 600× o 1200× con la red reconstruida a cada hora, y recorrido de 20 s por sucursal con titulares para una TV.
-5. Animación de activación y página de extensiones.
+5. **Animación de activación y página de extensiones** ✔︎ — el yunque se convierte en forja (4,5 s, se puede saltar, queda guardada por persona) y versión quieta para movimiento reducido.
 6. Recorrido de una pieza (SKU o máquina).
 7. Versión 2D completa (movimiento reducido y equipos modestos).
 8. Demo pública para Ferremix, videos, sitio y presentación.
