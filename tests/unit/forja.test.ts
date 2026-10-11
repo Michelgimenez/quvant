@@ -416,3 +416,68 @@ describe("Forja · activación", () => {
     }
   })
 })
+
+describe("Forja · pieza (nivel 3)", () => {
+  it("recorrido de un SKU: el saldo de cada movimiento cierra con el stock actual", async () => {
+    const { recorridoProducto } = await import("@/forja/dominio/pieza")
+    const t = Object.values(e.transferencias).find((x) => x.items.length > 0)!
+    const r = recorridoProducto(e, t.items[0].productoId, AHORA)!
+    expect(r.movimientos.length).toBeGreaterThan(0)
+    for (const s of r.stock) {
+      const propios = r.movimientos.filter((m) => m.sucursalId === s.sucursalId)
+      if (!propios.length) continue
+      expect(propios[0].saldo).toBe(s.cantidad)
+      for (let i = 1; i < propios.length; i++) expect(propios[i].saldo).toBe(propios[i - 1].saldo - propios[i - 1].cantidad)
+    }
+    // Movimientos del más nuevo al más viejo, dentro de la ventana
+    for (let i = 1; i < r.movimientos.length; i++) expect(r.movimientos[i - 1].fecha >= r.movimientos[i].fecha).toBe(true)
+    expect(r.movimientos.every((m) => m.fecha >= r.desde)).toBe(true)
+  })
+
+  it("los flujos suman las transferencias del producto y las transferencias tienen su otra sucursal", async () => {
+    const { recorridoProducto } = await import("@/forja/dominio/pieza")
+    const t = Object.values(e.transferencias).find((x) => x.estado === "en_transito" && x.items.length > 0)!
+    const productoId = t.items[0].productoId
+    const r = recorridoProducto(e, productoId, AHORA)!
+    const f = r.flujos.find((x) => x.desdeId === t.desdeId && x.haciaId === t.haciaId)!
+    expect(f.enTransito).toBeGreaterThanOrEqual(t.items[0].cantidad)
+    const salida = r.movimientos.find((m) => m.tipo === "transferencia_salida" && m.refId === t.id)
+    expect(salida?.otraId).toBe(t.haciaId)
+  })
+
+  it("respeta las sucursales permitidas", async () => {
+    const { recorridoProducto, historiaMaquina } = await import("@/forja/dominio/pieza")
+    const no = e.sucursales.find((s) => s.codigo === "NO")!
+    const t = Object.values(e.transferencias).find((x) => x.items.length > 0)!
+    const r = recorridoProducto(e, t.items[0].productoId, AHORA, [no.id])!
+    expect(r.stock.map((s) => s.sucursalId)).toEqual([no.id])
+    expect(r.movimientos.every((m) => m.sucursalId === no.id)).toBe(true)
+    expect(r.flujos).toEqual([])
+    // Las órdenes de servicio de la demo son de Casa Central: desde Norte no se ve ninguna máquina
+    const serie = Object.values(e.servicio)[0].equipo.serie
+    expect(historiaMaquina(e, serie, [no.id])).toBeNull()
+  })
+
+  it("historia de una máquina: todas sus reparaciones en orden, y el buscador la encuentra por serie", async () => {
+    const { historiaMaquina, buscarMaquinas } = await import("@/forja/dominio/pieza")
+    const conteo = new Map<string, number>()
+    for (const o of Object.values(e.servicio)) conteo.set(o.equipo.serie, (conteo.get(o.equipo.serie) ?? 0) + 1)
+    const serie = [...conteo.entries()].find(([, n]) => n > 1)![0]
+    const h = historiaMaquina(e, serie)!
+    expect(h.ordenes.length).toBeGreaterThan(1)
+    for (let i = 1; i < h.ordenes.length; i++) expect(h.ordenes[i - 1].fechaIngreso <= h.ordenes[i].fechaIngreso).toBe(true)
+    // El reingreso es del mismo cliente
+    const clientes = new Set(Object.values(e.servicio).filter((o) => o.equipo.serie === serie).map((o) => o.clienteId))
+    expect(clientes.size).toBe(1)
+    expect(h.ventasCoincidentes.every((v) => v.fecha < h.ordenes[0].fechaIngreso)).toBe(true)
+    expect(buscarMaquinas(e, serie)[0]).toMatchObject({ serie, ordenes: h.ordenes.length })
+  })
+
+  it("la pieza viaja en la dirección como producto:<id> o maquina:<serie>", async () => {
+    const { piezaDesdeTexto } = await import("@/forja/dominio/pieza")
+    expect(piezaDesdeTexto("producto:abc-123")).toEqual({ tipo: "producto", id: "abc-123" })
+    expect(piezaDesdeTexto("maquina:SN1234567")).toEqual({ tipo: "maquina", id: "SN1234567" })
+    expect(piezaDesdeTexto("otra:cosa")).toBeNull()
+    expect(piezaDesdeTexto(null)).toBeNull()
+  })
+})

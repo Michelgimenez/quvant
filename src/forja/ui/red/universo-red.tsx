@@ -10,8 +10,9 @@ import type { Id } from "@/dominio/tipos"
 import { rgb255Calor } from "@/forja/dominio/calor"
 import { grosorEnlace, layoutConstelacion } from "@/forja/dominio/constelacion"
 import { avanceTransito, puntoEnArco, puntosArco, type Punto3D } from "@/forja/dominio/geo"
-import type { EventoForja, NodoForja, RedForja, TransferenciaForja } from "@/forja/dominio/modelo"
+import type { EventoForja, NodoForja, RedForja } from "@/forja/dominio/modelo"
 import { hora } from "../formato"
+import type { FlujoVista, VistaPieza } from "../pieza/vista"
 import { ContextoEscena, useEscenaForja } from "../store"
 import { ESTILO_CARTO, teñirMapa } from "./estilo-mapa"
 import { NodoRed } from "./nodo-red"
@@ -64,6 +65,7 @@ export function UniversoRed({
   onEntrar,
   activa = true,
   entrada = "normal",
+  pieza = null,
 }: {
   red: RedForja
   eventos: EventoForja[]
@@ -73,6 +75,8 @@ export function UniversoRed({
   activa?: boolean
   /** Después de la activación, las sucursales se encienden una por una. */
   entrada?: "normal" | "esperando" | "encender"
+  /** Nivel 3: en vez de las transferencias, los flujos de la pieza y una marca por sucursal. */
+  pieza?: VistaPieza | null
 }) {
   const store = useContext(ContextoEscena)!
   const vista = useEscenaForja((s) => s.vista)
@@ -94,10 +98,10 @@ export function UniversoRed({
   const [listo, setListo] = useState(false)
 
   const conCoordenadas = useMemo(() => red.nodos.filter((n) => n.lat !== null && n.lng !== null), [red.nodos])
-  const datos = useRef({ red, conCoordenadas, transferenciaId, activa })
+  const datos = useRef({ red, conCoordenadas, transferenciaId, activa, pieza })
   useEffect(() => {
-    datos.current = { red, conCoordenadas, transferenciaId, activa }
-  }, [red, conCoordenadas, transferenciaId, activa])
+    datos.current = { red, conCoordenadas, transferenciaId, activa, pieza }
+  }, [red, conCoordenadas, transferenciaId, activa, pieza])
   // Encendido: el brillo de cada nodo (deck.gl) acompaña la aparición escalonada del DOM
   const encendido = useRef<{ modo: typeof entrada; t0: number }>({ modo: entrada, t0: 0 })
   useEffect(() => {
@@ -149,7 +153,7 @@ export function UniversoRed({
       interleaved: false,
       layers: [],
       onClick: (info) => {
-        if (info.layer?.id === "arcos" && info.object) elegirTransferencia((info.object as DatoArco).id)
+        if (info.layer?.id === "arcos" && info.object && !datos.current.pieza) elegirTransferencia((info.object as DatoArco).id)
       },
       getCursor: ({ isHovering }) => (isHovering ? "pointer" : "grab"),
     })
@@ -217,7 +221,7 @@ export function UniversoRed({
       if (document.hidden || !datos.current.activa) return
       const mapa = mapaRef.current
       const overlay = overlayRef.current
-      const { red: r, conCoordenadas: ns, transferenciaId: sel } = datos.current
+      const { red: r, conCoordenadas: ns, transferenciaId: sel, pieza: pz } = datos.current
       pulsos.current = pulsos.current.filter((p) => t - p.t0 < DURACION_PULSO)
 
       if (mapa && vistaRef.current === "mapa") {
@@ -231,7 +235,7 @@ export function UniversoRed({
       // En la repetición, los bultos en camino se ubican según la hora del cursor
       const ahoraMs = store.getState().reloj.t ?? Date.now()
       const factor = (i: number) => factorEncendido(encendido.current, t, i, reducir)
-      if (overlay) overlay.setProps({ layers: vistaRef.current === "mapa" ? capasMapa(r, ns, t, ahoraMs, pulsos.current, sel, reducir, factor) : [] })
+      if (overlay) overlay.setProps({ layers: vistaRef.current === "mapa" ? capasMapa(r, ns, t, ahoraMs, pulsos.current, sel, reducir, factor, pz?.flujos ?? null) : [] })
       if (vistaRef.current === "constelacion" && svgEnlaces.current) animarEnlaces(svgEnlaces.current, t, reducir)
     }
     marco = requestAnimationFrame(paso)
@@ -328,6 +332,7 @@ export function UniversoRed({
             radio={vista === "constelacion" ? (posConstelacion.get(n.id)?.radio ?? 18) : 18}
             ultimaVenta={ultimaVenta[n.id]}
             resaltado={resaltado === n.id}
+            marca={pieza ? (pieza.marcas[n.id] ?? null) : undefined}
             refElemento={(el) => {
               if (el) elementos.current.set(n.id, el)
               else elementos.current.delete(n.id)
@@ -338,9 +343,9 @@ export function UniversoRed({
         ))}
       </ul>
 
-      {nodoResaltado && !sala && <TarjetaNodo nodo={nodoResaltado} elemento={elementos.current.get(nodoResaltado.id) ?? null} contenedor={contenedor.current} />}
-      {!sala && <DetalleTransferencia red={red} id={transferenciaId} onCerrar={() => elegirTransferencia(null)} />}
-      {!sala && <SelectorArcos red={red} onElegir={elegirTransferencia} />}
+      {nodoResaltado && !sala && !pieza && <TarjetaNodo nodo={nodoResaltado} elemento={elementos.current.get(nodoResaltado.id) ?? null} contenedor={contenedor.current} />}
+      {!sala && !pieza && <DetalleTransferencia red={red} id={transferenciaId} onCerrar={() => elegirTransferencia(null)} />}
+      {!sala && !pieza && <SelectorArcos red={red} onElegir={elegirTransferencia} />}
     </div>
   )
 }
@@ -352,7 +357,7 @@ type DatoPunto = { posicion: Punto3D; color: [number, number, number, number]; r
 type DatoTrazo = { desde: Punto3D; hasta: Punto3D; color: [number, number, number, number] }
 
 const cacheArcos = new Map<string, Punto3D[]>()
-function arcoDe(t: TransferenciaForja, a: NodoForja, b: NodoForja) {
+function arcoDe(t: { desdeId: Id; haciaId: Id }, a: NodoForja, b: NodoForja) {
   const k = `${t.desdeId}>${t.haciaId}`
   let p = cacheArcos.get(k)
   if (!p) {
@@ -372,7 +377,30 @@ function factorEncendido(e: { modo: "normal" | "esperando" | "encender"; t0: num
   return Math.min(1, Math.max(0, (t - e.t0 - ENCENDIDO_RETARDO - i * ENCENDIDO_PASO) / ENCENDIDO_DURACION))
 }
 
-function capasMapa(red: RedForja, nodos: NodoForja[], t: number, ahoraMs: number, pulsos: Pulso[], seleccion: Id | null, reducir: boolean, encendido: (i: number) => number = () => 1) {
+/** Estelas que recorren un arco: marcan sentido y movimiento. */
+function estelas(A: { lat: number; lng: number }, B: { lat: number; lng: number }, t: number, trazos: DatoTrazo[]) {
+  for (let k = 0; k < 3; k++) {
+    const fase = ((t / 2600 + k / 3) % 1 + 1) % 1
+    for (let s = 0; s < 6; s++) {
+      const u0 = Math.max(0, fase - s * 0.012)
+      const u1 = Math.max(0, fase - (s + 1) * 0.012)
+      const alfa = Math.round(210 * (1 - s / 6) * Math.sin(Math.PI * fase))
+      trazos.push({ desde: puntoEnArco(A, B, u0), hasta: puntoEnArco(A, B, u1), color: [255, 178, 36, alfa] })
+    }
+  }
+}
+
+function capasMapa(
+  red: RedForja,
+  nodos: NodoForja[],
+  t: number,
+  ahoraMs: number,
+  pulsos: Pulso[],
+  seleccion: Id | null,
+  reducir: boolean,
+  encendido: (i: number) => number = () => 1,
+  flujosPieza: FlujoVista[] | null = null,
+) {
   const porId = new Map(nodos.map((n) => [n.id, n]))
   // Los arcos aparecen cuando ya se encendió la última sucursal
   const arcosVisibles = encendido(nodos.length - 1)
@@ -380,7 +408,16 @@ function capasMapa(red: RedForja, nodos: NodoForja[], t: number, ahoraMs: number
   const chispas: DatoPunto[] = []
   const trazos: DatoTrazo[] = []
 
-  for (const tr of arcosVisibles > 0 ? red.transferencias : []) {
+  // Nivel 3: los flujos de la pieza (grosor por cantidad) en lugar de las transferencias del día
+  const maxFlujo = Math.max(1, ...(flujosPieza ?? []).map((f) => f.cantidad))
+  for (const f of flujosPieza ?? []) {
+    const a = porId.get(f.desdeId)
+    const b = porId.get(f.haciaId)
+    if (!a || !b) continue
+    arcos.push({ id: `pieza:${f.desdeId}>${f.haciaId}`, path: arcoDe(f, a, b), color: [255, 106, 31, 200], ancho: 1.5 + 3 * (f.cantidad / maxFlujo) })
+    if (!reducir) estelas({ lat: a.lat!, lng: a.lng! }, { lat: b.lat!, lng: b.lng! }, t, trazos)
+  }
+  for (const tr of arcosVisibles > 0 && !flujosPieza ? red.transferencias : []) {
     const a = porId.get(tr.desdeId)
     const b = porId.get(tr.haciaId)
     if (!a || !b) continue
@@ -393,17 +430,7 @@ function capasMapa(red: RedForja, nodos: NodoForja[], t: number, ahoraMs: number
     // El bulto: donde va según la llegada estimada
     const avance = avanceTransito(tr.despachadaEn, tr.llegadaEstimada, ahoraMs)
     chispas.push({ posicion: puntoEnArco(A, B, avance), color: [255, 244, 224, 255], radio: 4 })
-    if (reducir) continue
-    // Estelas que recorren el arco: marcan sentido y movimiento
-    for (let k = 0; k < 3; k++) {
-      const fase = ((t / 2600 + k / 3) % 1 + 1) % 1
-      for (let s = 0; s < 6; s++) {
-        const u0 = Math.max(0, fase - s * 0.012)
-        const u1 = Math.max(0, fase - (s + 1) * 0.012)
-        const alfa = Math.round(210 * (1 - s / 6) * Math.sin(Math.PI * fase))
-        trazos.push({ desde: puntoEnArco(A, B, u0), hasta: puntoEnArco(A, B, u1), color: [255, 178, 36, alfa] })
-      }
-    }
+    if (!reducir) estelas(A, B, t, trazos)
   }
 
   // Brillo de cada nodo según su calor, más el golpe de cada venta

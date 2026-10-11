@@ -90,6 +90,8 @@ export type BancoForja = {
   estado: EstadoServicio
   equipo: Ilustracion
   descripcion: string
+  /** Número de serie de la máquina (historia en el nivel 3). */
+  serie: string
   desde: FechaISO
   horasEnBanco: number
   prioridad: "normal" | "urgente"
@@ -304,6 +306,7 @@ export function tallerForja(e: EstadoEmpresa, sucursalId: Id, ahora: Date): Tall
       estado: o.estado,
       equipo: o.equipo.tipo,
       descripcion: `${o.equipo.marca} ${o.equipo.modelo}`.trim(),
+      serie: o.equipo.serie,
       desde: o.fechaIngreso,
       horasEnBanco: Math.max(0, Math.round((ahora.getTime() - Date.parse(o.fechaIngreso)) / 3_600_000)),
       prioridad: o.prioridad,

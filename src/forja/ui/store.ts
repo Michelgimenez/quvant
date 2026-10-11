@@ -3,6 +3,7 @@
 import { createStore, useStore } from "zustand"
 import { createContext, useContext } from "react"
 import type { Id } from "@/dominio/tipos"
+import type { Pieza } from "@/forja/dominio/pieza"
 import type { TipoZona } from "@/forja/dominio/plano"
 import type { Velocidad } from "@/forja/dominio/repeticion"
 
@@ -30,7 +31,7 @@ export type EstadoEscena = {
   /** Rack bajo el cursor (tooltip con productos y cantidades). */
   rackResaltado: string | null
   /** Producto o máquina del nivel 3. */
-  pieza: { tipo: "producto" | "maquina"; id: Id } | null
+  pieza: Pieza | null
   /** Transición en curso entre niveles (bloquea la entrada). */
   transicion: null | "entrando" | "saliendo"
   repeticion: Repeticion
@@ -97,7 +98,12 @@ export function crearStoreEscena() {
         if (sala) s.reloj.t = null
         return { sala, resaltado: null, transferenciaId: null, repeticion: sala ? { ...s.repeticion, activa: false, reproduciendo: false } : s.repeticion }
       }),
-    verPieza: (pieza) => set({ pieza, nivel: pieza ? "pieza" : "red" }),
+    verPieza: (pieza) =>
+      set((s) => {
+        // La pieza se ve sobre el mapa y en el presente: sin repetición ni transferencia elegida
+        if (pieza) s.reloj.t = null
+        return { pieza, nivel: pieza ? "pieza" : "red", resaltado: null, transferenciaId: null, repeticion: pieza ? { ...s.repeticion, activa: false, reproduciendo: false } : s.repeticion }
+      }),
   }))
 }
 

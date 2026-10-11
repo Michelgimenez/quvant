@@ -43,7 +43,7 @@ Forja convierte los datos de Yunque en un taller conectado: las sucursales en un
 3. **Taller isométrico 3D por sucursal** ✔︎ — mostrador, depósito, servicio técnico y muelle desde los datos de Yunque, panel lateral con enlaces a cada módulo y transición de cámara desde el mapa.
 4. **Línea de tiempo del día y modo sala de control** ✔︎ — repetición a 1×, 60×, 600× o 1200× con la red reconstruida a cada hora, y recorrido de 20 s por sucursal con titulares para una TV.
 5. **Animación de activación y página de extensiones** ✔︎ — el yunque se convierte en forja (4,5 s, se puede saltar, queda guardada por persona) y versión quieta para movimiento reducido.
-6. Recorrido de una pieza (SKU o máquina).
+6. **Recorrido de una pieza** ✔︎ — el camino de un SKU por las sucursales (arcos, stock y movimientos con saldo) y la historia de una máquina por número de serie, desde el buscador ⌘K o el taller.
 7. Versión 2D completa (movimiento reducido y equipos modestos).
 8. Demo pública para Ferremix, videos, sitio y presentación.
 9. Rendimiento, accesibilidad y documentación.
@@ -61,4 +61,5 @@ Forja convierte los datos de Yunque en un taller conectado: las sucursales en un
 - Completar los `[COMPLETAR]` de la presentación (mercado con fuente, hallazgos del terreno, monto, equipo, contacto) y de la demo de Ferremix (categorías, problemas, sucursales).
 - Comparar con el proyecto de Ferremix cuando haya acceso e integrar lo mejor de ese código.
 - Aprobación intermedia en el cierre de conteos si un cliente la pide.
+- Registrar el número de serie en compras y ventas de máquinas: hoy la historia de una máquina (Forja, nivel 3) solo tiene reparaciones y ventas que coinciden por cliente, marca y tipo.
 - Panel interno (`/panel`): usuarios individuales del equipo en lugar de una clave compartida, registro de quién contactó cada solicitud y aviso de privacidad en el formulario "Pedir una demo".

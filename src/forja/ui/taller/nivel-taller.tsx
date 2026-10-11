@@ -3,6 +3,7 @@
 import { Component, Suspense, lazy, useEffect, useMemo, useRef, useState } from "react"
 import type { FuenteForja } from "@/forja/datos/fuente"
 import type { NodoForja, TallerForja } from "@/forja/dominio/modelo"
+import type { Pieza } from "@/forja/dominio/pieza"
 import { NOMBRE_ZONA, TIPOS_ZONA, estadoBloque, planoTaller, type PlanoTaller, type TipoZona } from "@/forja/dominio/plano"
 import { cn } from "@/lib/utils"
 import { useEscenaForja } from "../store"
@@ -20,7 +21,7 @@ const reducirMovimiento = () => typeof window !== "undefined" && window.matchMed
  * Nivel 2 — una sucursal por dentro: la escena 3D (carga diferida), la barra
  * de zonas (también es el camino con teclado) y el panel lateral.
  */
-export function NivelTaller({ fuente, nodo, modo, onListo }: { fuente: FuenteForja; nodo: NodoForja; modo: ModoCamara; onListo: () => void }) {
+export function NivelTaller({ fuente, nodo, modo, onListo, onPieza }: { fuente: FuenteForja; nodo: NodoForja; modo: ModoCamara; onListo: () => void; onPieza?: (p: Pieza) => void }) {
   const taller = useMemo(() => fuente.taller(nodo.id), [fuente, nodo.id])
   const plano = useMemo(() => (taller ? planoTaller(taller, nodo.tipo) : null), [taller, nodo.tipo])
   const anclas = useMemo(() => (plano && taller ? anclasTaller(plano, taller) : []), [plano, taller])
@@ -71,7 +72,7 @@ export function NivelTaller({ fuente, nodo, modo, onListo }: { fuente: FuenteFor
       </ErrorWebGL>
       {listo && <CapaEtiquetas anclas={anclas} plano={plano} elementos={elementos} />}
       <BarraZonas plano={plano} taller={taller} />
-      {zona && <PanelZona zona={zona} nodo={nodo} taller={taller} plano={plano} red={fuente.red} enlaces={fuente.enlaces} />}
+      {zona && <PanelZona zona={zona} nodo={nodo} taller={taller} plano={plano} red={fuente.red} enlaces={fuente.enlaces} onPieza={onPieza} />}
     </div>
   )
 }

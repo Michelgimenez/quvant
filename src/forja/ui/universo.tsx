@@ -6,6 +6,7 @@ import { ArrowLeft, MonitorPlay, X } from "lucide-react"
 import { Sello } from "@/components/base/sellos"
 import type { Id } from "@/dominio/tipos"
 import { PARADAS_CALOR, colorCalor } from "@/forja/dominio/calor"
+import type { Pieza } from "@/forja/dominio/pieza"
 import { hastaCursor, tramoDelDia } from "@/forja/dominio/repeticion"
 import type { FuenteForja } from "@/forja/datos/fuente"
 import { cn } from "@/lib/utils"
@@ -13,6 +14,8 @@ import { Activacion, type FinActivacion } from "./activacion/activacion"
 import { hora } from "./formato"
 import { LineaTiempo, useMotorRepeticion } from "./linea-tiempo"
 import { MarcaForja } from "./marca-forja"
+import { PanelPieza } from "./pieza/panel-pieza"
+import { vistaDePieza } from "./pieza/vista"
 import { UniversoRed, type ControlRed } from "./red/universo-red"
 import { SalaControl } from "./sala-control"
 import { ContextoEscena, crearStoreEscena, useEscenaForja, type VistaRed } from "./store"
@@ -27,11 +30,22 @@ import { Leyenda } from "./taller/panel-zona"
 /** Si llega `activacion`, primero se ve la animación y después las sucursales se encienden una por una. */
 export type ActivacionUniverso = { alTerminar: (motivo: FinActivacion) => void }
 
-export function Universo({ fuente, alEntrar, activacion = null }: { fuente: FuenteForja; alEntrar?: (id: Id) => void; activacion?: ActivacionUniverso | null }) {
+export function Universo({
+  fuente,
+  alEntrar,
+  activacion = null,
+  pieza = null,
+}: {
+  fuente: FuenteForja
+  alEntrar?: (id: Id) => void
+  activacion?: ActivacionUniverso | null
+  /** Abre el nivel 3 con esta pieza (desde el buscador o un enlace). */
+  pieza?: Pieza | null
+}) {
   const [store] = useState(crearStoreEscena)
   return (
     <ContextoEscena.Provider value={store}>
-      <Escena fuente={fuente} alEntrar={alEntrar} activacion={activacion} />
+      <Escena fuente={fuente} alEntrar={alEntrar} activacion={activacion} piezaPedida={pieza} />
     </ContextoEscena.Provider>
   )
 }
@@ -39,7 +53,7 @@ export function Universo({ fuente, alEntrar, activacion = null }: { fuente: Fuen
 const reducirMovimiento = () => window.matchMedia("(prefers-reduced-motion: reduce)").matches
 const cuadros = (n: number) => new Promise<void>((ok) => (n <= 0 ? ok() : requestAnimationFrame(() => void cuadros(n - 1).then(ok))))
 
-function Escena({ fuente, alEntrar, activacion }: { fuente: FuenteForja; alEntrar?: (id: Id) => void; activacion: ActivacionUniverso | null }) {
+function Escena({ fuente, alEntrar, activacion, piezaPedida }: { fuente: FuenteForja; alEntrar?: (id: Id) => void; activacion: ActivacionUniverso | null; piezaPedida: Pieza | null }) {
   const store = useContext(ContextoEscena)!
   const [entrada, setEntrada] = useState<"normal" | "esperando" | "encender">(activacion ? "esperando" : "normal")
   const control = useRef<ControlRed | null>(null)
@@ -53,6 +67,8 @@ function Escena({ fuente, alEntrar, activacion }: { fuente: FuenteForja; alEntra
   const transicion = useEscenaForja((s) => s.transicion)
   const sala = useEscenaForja((s) => s.sala)
   const setSala = useEscenaForja((s) => s.setSala)
+  const pieza = useEscenaForja((s) => s.pieza)
+  const verPieza = useEscenaForja((s) => s.verPieza)
 
   // ───── Repetición del día: la red y los eventos tal como estaban a la hora del cursor ─────
   const tramo = useMemo(() => tramoDelDia(fuente.eventos, new Date()), [fuente.eventos])
@@ -63,6 +79,9 @@ function Escena({ fuente, alEntrar, activacion }: { fuente: FuenteForja; alEntra
   const eventos = useMemo(() => (cursor === null ? fuente.eventos : hastaCursor(fuente.eventos, cursor)), [cursor, fuente.eventos])
 
   const nodoActual = nivel === "taller" ? (red.nodos.find((n) => n.id === sucursalId) ?? null) : null
+  // Nivel 3: los datos de la pieza y cómo se marca el mapa
+  const datosPieza = useMemo(() => (nivel === "pieza" && pieza ? fuente.pieza(pieza) : null), [nivel, pieza, fuente])
+  const vistaPieza = useMemo(() => (datosPieza ? vistaDePieza(datosPieza) : null), [datosPieza])
   const enTransito = red.transferencias.filter((t) => t.estado === "en_transito").length
   const ventasHoy = red.nodos.reduce((a, n) => a + n.ventasHoy, 0)
 
@@ -119,7 +138,8 @@ function Escena({ fuente, alEntrar, activacion }: { fuente: FuenteForja; alEntra
   async function entrar(id: Id) {
     const st = store.getState()
     const nodo = red.nodos.find((n) => n.id === id)
-    if (st.transicion || st.nivel !== "red" || st.sala || !nodo) return
+    if (st.transicion || st.nivel === "taller" || st.sala || !nodo) return
+    if (st.nivel === "pieza") st.verPieza(null)
     alEntrar?.(id)
     const reducir = reducirMovimiento()
     // El taller muestra el presente: la repetición termina al entrar
@@ -171,13 +191,44 @@ function Escena({ fuente, alEntrar, activacion }: { fuente: FuenteForja; alEntra
     st.setTransicion(null)
   }
 
+  /** Nivel 3 desde cualquier lado: si se está en un taller, primero se vuelve a la red. */
+  async function irAPieza(p: Pieza) {
+    if (store.getState().nivel === "taller") await volver()
+    store.getState().verPieza(p)
+  }
+
+  // Desde el buscador o un enlace (?pieza=producto:… o maquina:…)
+  const clavePedida = piezaPedida ? `${piezaPedida.tipo}:${piezaPedida.id}` : null
+  useEffect(() => {
+    if (!piezaPedida) return
+    const id = requestAnimationFrame(() => void irAPieza(piezaPedida))
+    return () => cancelAnimationFrame(id)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [clavePedida])
+
+  // Nivel 3: la red se encuadra en el espacio que deja libre el panel; al salir, vuelve el encuadre normal
+  useEffect(() => {
+    if (nivel !== "pieza") return
+    const mapa = control.current
+    const caja = escenario.current?.getBoundingClientRect()
+    const duracion = reducirMovimiento() ? 0 : 900
+    if (caja && store.getState().vista === "mapa") {
+      const margen = caja.width >= 768 ? { top: 90, bottom: 110, left: 90, right: 440 } : { top: 50, bottom: Math.round(caja.height * 0.52) + 30, left: 60, right: 60 }
+      void mapa?.encuadrar(duracion, margen)
+    }
+    return () => {
+      if (store.getState().nivel === "red" && store.getState().vista === "mapa") void mapa?.encuadrar(duracion)
+    }
+  }, [nivel, store])
+
   // Esc: primero cierra el panel; después vuelve a la red
   useEffect(() => {
-    if (nivel !== "taller") return
+    if (nivel === "red") return
     const tecla = (e: KeyboardEvent) => {
       if (e.key !== "Escape" || e.defaultPrevented) return
       const st = store.getState()
-      if (st.zona) st.elegirZona(null)
+      if (st.nivel === "pieza") st.verPieza(null)
+      else if (st.zona) st.elegirZona(null)
       else void volver()
     }
     window.addEventListener("keydown", tecla)
@@ -204,6 +255,18 @@ function Escena({ fuente, alEntrar, activacion }: { fuente: FuenteForja; alEntra
               </button>
             </div>
           </>
+        ) : nivel === "pieza" && pieza ? (
+          <nav className="flex min-w-0 items-center gap-2 text-sm" aria-label="Ubicación en Forja">
+            <button type="button" onClick={() => verPieza(null)} className="inline-flex items-center gap-1 rounded-md border border-white/10 px-2 py-1 text-xs text-acero hover:border-white/25 hover:text-niebla focus-visible:outline focus-visible:outline-1 focus-visible:outline-temple" aria-label="Volver a la red">
+              <ArrowLeft className="size-3.5" aria-hidden /> Red
+            </button>
+            <span className="text-acero" aria-hidden>
+              /
+            </span>
+            <span className="truncate font-heading font-bold" aria-current="page">
+              {pieza.tipo === "producto" ? "Recorrido de una pieza" : "Historia de una máquina"}
+            </span>
+          </nav>
         ) : nodoActual ? (
           <nav className="flex min-w-0 items-center gap-2 text-sm" aria-label="Ubicación en Forja">
             <button type="button" onClick={() => void volver()} disabled={transicion !== null} className="inline-flex items-center gap-1 rounded-md border border-white/10 px-2 py-1 text-xs text-acero hover:border-white/25 hover:text-niebla focus-visible:outline focus-visible:outline-1 focus-visible:outline-temple disabled:opacity-50" aria-label="Volver a la red">
@@ -226,7 +289,7 @@ function Escena({ fuente, alEntrar, activacion }: { fuente: FuenteForja; alEntra
           <div className="ml-auto flex items-center gap-3">
             {nodoActual ? (
               <Leyenda className="mt-0 hidden lg:flex" />
-            ) : (
+            ) : nivel === "pieza" ? null : (
               <>
                 <SelectorVista />
                 <button
@@ -245,8 +308,8 @@ function Escena({ fuente, alEntrar, activacion }: { fuente: FuenteForja; alEntra
       {/* data-linea: la atribución del mapa sube por encima de la línea de tiempo */}
       <div ref={escenario} className="relative flex-1 overflow-clip" data-linea={(nivel === "red" && !sala) || undefined}>
         {/* isolate: las capas de deck.gl no se cuelan sobre el taller */}
-        <div className="absolute inset-0 isolate" inert={nivel !== "red"}>
-          <UniversoRed red={red} eventos={eventos} controlRef={control} onEntrar={(id) => void entrar(id)} activa={nivel === "red"} entrada={entrada} />
+        <div className="absolute inset-0 isolate" inert={nivel === "taller"}>
+          <UniversoRed red={red} eventos={eventos} controlRef={control} onEntrar={(id) => void entrar(id)} activa={nivel !== "taller"} entrada={entrada} pieza={vistaPieza} />
         </div>
         {nivel === "red" && !sala && transicion === null && (
           <>
@@ -255,7 +318,16 @@ function Escena({ fuente, alEntrar, activacion }: { fuente: FuenteForja; alEntra
           </>
         )}
         {sala && <SalaControl red={red} eventos={eventos} control={control} />}
-        {nodoActual && <NivelTaller fuente={fuente} nodo={nodoActual} modo={camara} onListo={() => avisarListo.current?.()} />}
+        {nodoActual && <NivelTaller fuente={fuente} nodo={nodoActual} modo={camara} onListo={() => avisarListo.current?.()} onPieza={(p) => void irAPieza(p)} />}
+        {nivel === "pieza" && datosPieza && <PanelPieza datos={datosPieza} red={red} enlaces={fuente.enlaces} onCerrar={() => verPieza(null)} />}
+        {nivel === "pieza" && !datosPieza && (
+          <div className="absolute right-4 top-4 z-20 max-w-sm rounded-xl border border-white/10 bg-hierro/95 p-4 text-sm text-acero" role="status" data-testid="panel-pieza-vacio">
+            No hay datos de esa pieza en las sucursales que podés ver.
+            <button type="button" onClick={() => verPieza(null)} className="ml-2 text-niebla underline-offset-4 hover:underline">
+              Volver a la red
+            </button>
+          </div>
+        )}
         <div ref={iris} className="pointer-events-none absolute left-0 top-0 z-20 rounded-full opacity-0 will-change-transform" aria-hidden data-testid="forja-iris" />
         {entrada === "esperando" && activacion && (
           <Activacion

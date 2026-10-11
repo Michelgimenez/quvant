@@ -1,11 +1,12 @@
 "use client"
 
 import Link from "next/link"
-import { ArrowLeft, ArrowUpRight, X } from "lucide-react"
+import { ArrowLeft, ArrowUpRight, History, Route, X } from "lucide-react"
 import { formatoCantidad, formatoPesosCorto } from "@/dominio/dinero"
 import { NOMBRE_ESTADO_SERVICIO } from "@/dominio/servicio"
 import type { EnlacesForja } from "@/forja/datos/fuente"
 import type { BancoForja, NodoForja, RedForja, TallerForja } from "@/forja/dominio/modelo"
+import type { Pieza } from "@/forja/dominio/pieza"
 import { NOMBRE_ZONA, estadoBloque, type PlanoTaller, type TipoZona } from "@/forja/dominio/plano"
 import { cn } from "@/lib/utils"
 import { duracionHoras, hora } from "../formato"
@@ -19,6 +20,8 @@ type Props = {
   plano: PlanoTaller
   red: RedForja
   enlaces: EnlacesForja | null
+  /** Ir al nivel 3 (recorrido de un producto o historia de una máquina). */
+  onPieza?: (p: Pieza) => void
 }
 
 /** Panel lateral del taller: los datos de Yunque de la zona y enlaces directos al módulo. */
@@ -171,7 +174,7 @@ function PanelDeposito({ taller, nodo, enlaces }: Props) {
   )
 }
 
-function PanelRack({ taller, nodo, enlaces, rackId }: Props & { rackId: string }) {
+function PanelRack({ taller, nodo, enlaces, rackId, onPieza }: Props & { rackId: string }) {
   const rack = taller.racks.find((r) => r.id === rackId)
   if (!rack) return <Volver zona="deposito" texto="Todo el depósito" />
   const productos = [...rack.productos].sort((a, b) => a.estante - b.estante || a.nombre.localeCompare(b.nombre))
@@ -199,13 +202,25 @@ function PanelRack({ taller, nodo, enlaces, rackId }: Props & { rackId: string }
             </>
           )
           return (
-            <li key={p.productoId}>
+            <li key={p.productoId} className="flex items-center gap-1">
               {enlaces ? (
-                <Link href={enlaces.inventario(nodo.id, { producto: p.productoId })} className="flex items-center gap-2 rounded-md px-1 py-1.5 hover:bg-white/5 focus-visible:outline focus-visible:outline-1 focus-visible:outline-temple">
+                <Link href={enlaces.inventario(nodo.id, { producto: p.productoId })} className="flex min-w-0 flex-1 items-center gap-2 rounded-md px-1 py-1.5 hover:bg-white/5 focus-visible:outline focus-visible:outline-1 focus-visible:outline-temple">
                   {fila}
                 </Link>
               ) : (
-                <div className="flex items-center gap-2 px-1 py-1.5">{fila}</div>
+                <div className="flex min-w-0 flex-1 items-center gap-2 px-1 py-1.5">{fila}</div>
+              )}
+              {onPieza && (
+                <button
+                  type="button"
+                  onClick={() => onPieza({ tipo: "producto", id: p.productoId })}
+                  className="shrink-0 rounded-md p-1.5 text-acero hover:bg-white/5 hover:text-niebla focus-visible:outline focus-visible:outline-1 focus-visible:outline-temple"
+                  aria-label={`Recorrido de ${p.nombre} por las sucursales`}
+                  title="Recorrido por las sucursales"
+                  data-testid="ver-recorrido"
+                >
+                  <Route className="size-3.5" aria-hidden />
+                </button>
               )}
             </li>
           )
@@ -274,7 +289,7 @@ function PanelServicio({ taller, enlaces }: Props) {
   )
 }
 
-function PanelOrden({ taller, enlaces, ordenId }: Props & { ordenId: string }) {
+function PanelOrden({ taller, enlaces, ordenId, onPieza }: Props & { ordenId: string }) {
   const o = taller.bancos.find((b) => b.id === ordenId)
   if (!o) return <Volver zona="servicio" texto="Todo el servicio técnico" />
   return (
@@ -299,11 +314,19 @@ function PanelOrden({ taller, enlaces, ordenId }: Props & { ordenId: string }) {
       </dl>
       {o.atrasada && <p className="mt-3 text-xs text-chispa">Pasó la fecha prometida al cliente.</p>}
       {o.estado === "esperando_aprobacion" && <p className="mt-3 text-xs text-acero">El presupuesto de reparación espera la aprobación del cliente.</p>}
-      {enlaces && (
-        <div className="mt-4">
-          <Enlace href={enlaces.servicio(o.id)}>Abrir la orden</Enlace>
-        </div>
-      )}
+      <div className="mt-4 flex flex-wrap gap-2">
+        {enlaces && <Enlace href={enlaces.servicio(o.id)}>Abrir la orden</Enlace>}
+        {onPieza && o.serie && (
+          <button
+            type="button"
+            onClick={() => onPieza({ tipo: "maquina", id: o.serie })}
+            className="inline-flex items-center gap-1 rounded-md border border-white/15 px-2.5 py-1.5 text-xs font-medium text-niebla hover:border-white/30 focus-visible:outline focus-visible:outline-1 focus-visible:outline-temple"
+            data-testid="ver-historia-maquina"
+          >
+            <History className="size-3.5 text-acero" aria-hidden /> Historia de la máquina
+          </button>
+        )}
+      </div>
     </>
   )
 }

@@ -4,6 +4,14 @@ import { useEffect, useRef } from "react"
 import { colorCalor, nombreCalor } from "@/forja/dominio/calor"
 import type { NodoForja } from "@/forja/dominio/modelo"
 import { cn } from "@/lib/utils"
+import type { MarcaNodo } from "../pieza/vista"
+
+const TONO_MARCA: Record<MarcaNodo["tono"], string> = {
+  normal: "border-white/25 text-niebla",
+  critico: "border-chispa/70 text-chispa",
+  sin_stock: "border-brasa/70 text-brasa",
+  activo: "border-blanco-caliente/60 text-blanco-caliente",
+}
 
 /**
  * Nodo-forja en el DOM: núcleo con el color del calor, anillo de stock crítico
@@ -19,6 +27,7 @@ export function NodoRed({
   refElemento,
   onResaltar,
   onEntrar,
+  marca,
 }: {
   /** Orden en la red: marca el turno en el encendido escalonado. */
   indice: number
@@ -29,6 +38,8 @@ export function NodoRed({
   refElemento: (el: HTMLElement | null) => void
   onResaltar: (si: boolean) => void
   onEntrar: () => void
+  /** Nivel 3: el dato de la pieza en esta sucursal (null: la pieza no pasó por acá). */
+  marca?: MarcaNodo | null
 }) {
   const pulso = useRef<HTMLSpanElement>(null)
   const color = colorCalor(nodo.calor)
@@ -54,7 +65,7 @@ export function NodoRed({
   const descripcion = `${nodo.nombre}${nodo.demo ? " (sucursal de demostración)" : ""}: calor ${nombreCalor(nodo.calor)}, ${nodo.ventasHoy} ventas hoy, ${criticos} productos en stock crítico o sin stock.`
 
   return (
-    <li ref={refElemento} className="absolute left-0 top-0 will-change-transform" style={{ transform: "translate3d(-200px, -200px, 0)", ["--i" as string]: indice }} data-testid="nodo-forja" data-nodo={nodo.codigo}>
+    <li ref={refElemento} className={cn("absolute left-0 top-0 will-change-transform transition-opacity", marca === null && "opacity-35")} style={{ transform: "translate3d(-200px, -200px, 0)", ["--i" as string]: indice }} data-testid="nodo-forja" data-nodo={nodo.codigo}>
       <button
         type="button"
         className={cn("pointer-events-auto absolute -translate-x-1/2 -translate-y-1/2 rounded-full outline-none", resaltado && "ring-1 ring-temple ring-offset-2 ring-offset-transparent")}
@@ -94,6 +105,11 @@ export function NodoRed({
           {nodo.tipo === "deposito" && <span>· depósito</span>}
           {nodo.demo && <span className="rounded-[3px] border border-dashed border-chispa/80 px-1 text-[9px] font-bold text-chispa">DEMO</span>}
         </span>
+        {marca && (
+          <span className={cn("mt-1 rounded-[4px] border bg-hierro/80 px-1.5 py-0.5 font-mono text-[11px] font-semibold", TONO_MARCA[marca.tono])} data-testid="marca-pieza">
+            {marca.texto}
+          </span>
+        )}
       </span>
     </li>
   )

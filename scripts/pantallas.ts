@@ -306,6 +306,36 @@ export const PANTALLAS: Pantalla[] = [
     }),
   },
   {
+    id: "forja-pieza-producto",
+    ruta: "/app",
+    usuario: "dueno@demo.yunque.app",
+    esperar: "#contenido h1",
+    carpeta: "forja",
+    antes: async (p) => {
+      await activarForja(p)
+      await p.keyboard.press("Control+k")
+      await p.getByPlaceholder("Buscar productos, clientes o ir a…").fill("Taladro percutor 650 W 13 mm Vulkor")
+      await p.getByRole("option", { name: /Recorrido de/ }).first().click()
+      await p.getByTestId("panel-pieza").waitFor()
+      await p.waitForTimeout(1800)
+    },
+  },
+  {
+    id: "forja-pieza-maquina",
+    ruta: "/app",
+    usuario: "dueno@demo.yunque.app",
+    esperar: "#contenido h1",
+    carpeta: "forja",
+    soloEscritorio: true,
+    antes: entrarAlTaller(async (p) => {
+      await p.getByTestId("zona-servicio").click()
+      await p.getByTestId("fila-orden").first().click()
+      await p.getByTestId("ver-historia-maquina").click()
+      await p.getByTestId("panel-pieza").waitFor()
+      await p.waitForTimeout(2500)
+    }),
+  },
+  {
     id: "forja-repeticion",
     ruta: "/app",
     usuario: "dueno@demo.yunque.app",

@@ -264,3 +264,48 @@ test.describe("Forja · activación", () => {
     await expect(activacion).toHaveCount(0, { timeout: 5_000 })
   })
 })
+
+test.describe("Forja · pieza (nivel 3)", () => {
+  test("⌘K abre el recorrido de un producto; desde el taller y por número de serie, la historia de una máquina", async ({ page }) => {
+    test.setTimeout(180_000)
+    await ingresar(page, "dueno@demo.yunque.app")
+    await activarForja(page)
+    await expect(page.getByTestId("forja-red")).toHaveAttribute("data-listo", "true", { timeout: 60_000 })
+    const buscador = page.getByPlaceholder("Buscar productos, clientes o ir a…")
+    const panel = page.getByTestId("panel-pieza")
+
+    // Recorrido de un SKU desde el buscador: stock y marca en cada sucursal, movimientos con saldo
+    await page.keyboard.press("Control+k")
+    await buscador.fill("Taladro percutor 650 W 13 mm Vulkor")
+    await page.getByRole("option", { name: /Recorrido de Taladro percutor 650 W 13 mm Vulkor/ }).click()
+    await expect(panel).toHaveAttribute("data-tipo", "producto", { timeout: 15_000 })
+    await expect(page.locator("[data-nivel=pieza]")).toBeVisible()
+    await expect(page.getByTestId("marca-pieza")).toHaveCount(3)
+    await expect(panel.getByTestId("stock-pieza").locator("> li")).toHaveCount(3)
+    await expect(panel.getByTestId("movimientos-pieza")).toContainText("queda")
+    await expect(page).not.toHaveURL(/pieza=/)
+    await page.keyboard.press("Escape")
+    await expect(panel).toHaveCount(0)
+    await expect(page.locator("[data-nivel=red]")).toBeVisible()
+
+    // Historia de una máquina desde una orden del taller
+    await page.locator("[data-nodo=CC] button").click({ force: true })
+    await expect(page.getByTestId("forja-taller")).toHaveAttribute("data-listo", "true", { timeout: 60_000 })
+    await page.getByTestId("zona-servicio").click()
+    await page.getByTestId("fila-orden").first().click()
+    await page.getByTestId("ver-historia-maquina").click()
+    await expect(panel).toHaveAttribute("data-tipo", "maquina", { timeout: 15_000 })
+    await expect(page.getByTestId("forja-taller")).toHaveCount(0)
+    await expect(panel.getByTestId("ordenes-maquina").locator("> li").first()).toBeVisible()
+    await expect(panel).toContainText("Yunque todavía no registra números de serie")
+    const serie = (await panel.locator("header").innerText()).match(/SN\d+/)![0]
+
+    // Y por número de serie desde el buscador
+    await page.keyboard.press("Escape")
+    await page.keyboard.press("Control+k")
+    await buscador.fill(serie)
+    await page.getByRole("option", { name: /Historia de/ }).first().click()
+    await expect(panel).toHaveAttribute("data-tipo", "maquina", { timeout: 15_000 })
+    await expect(panel).toContainText(serie)
+  })
+})

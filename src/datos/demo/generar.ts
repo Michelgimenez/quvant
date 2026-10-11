@@ -367,6 +367,9 @@ export function generarEmpresaDemo(opciones: OpcionesDemo = {}): EstadoEmpresa {
   const ventas: Record<Id, Venta> = {}
   const presupuestos: Record<Id, Presupuesto> = {}
   const servicio: Record<Id, OrdenServicio> = {}
+  /** Órdenes ya entregadas: de ahí salen los reingresos de la misma máquina. */
+  const entregadas: OrdenServicio[] = []
+  const ingresosPorSerie = new Map<string, number>()
   const comprasOC: Record<Id, OrdenCompra> = {}
   const entregas: Record<Id, Entrega> = {}
   const auditoria: RegistroAuditoria[] = []
@@ -677,14 +680,22 @@ export function generarEmpresaDemo(opciones: OpcionesDemo = {}): EstadoEmpresa {
         if (esHoy && fecha > ahora) continue
         const tipoCat = az.ponderado([["taladro", 22], ["amoladora", 20], ["soldadora", 14], ["compresor", 10], ["generador", 10], ["hidrolavadora", 10], ["sierra", 8], ["bomba", 6]] as const)
         const catDemo = categoriasDemo.find((c) => c.ilustracion === tipoCat) ?? categoriasDemo[0]
-        const clienteId = az.probabilidad(0.5) ? az.elegir(clientesEmpresa) : az.elegir(clientesParticulares)
-        const cliente = clientes[clienteId]
-        const falla = az.elegir(FALLAS[tipoCat] ?? FALLAS.default)
+        const clienteAzar = az.probabilidad(0.5) ? az.elegir(clientesEmpresa) : az.elegir(clientesParticulares)
+        const fallaAzar = az.elegir(FALLAS[tipoCat] ?? FALLAS.default)
         const id = az.uuid()
         const num = numero("servicio", "ST")
+        // Reingreso: una de cada seis órdenes es la misma máquina de una orden ya entregada (mismo
+        // cliente y número de serie). Se decide sin usar el azar: el resto de la demo no cambia.
+        const candidatas = num % 6 === 0 ? entregadas.filter((o) => (ingresosPorSerie.get(o.equipo.serie) ?? 0) < 2) : []
+        const previa = candidatas.length > 2 ? candidatas[(num * 7919) % candidatas.length] : null
+        const clienteId = previa?.clienteId ?? clienteAzar
+        const cliente = clientes[clienteId]
+        const fallasPrevia = previa ? (FALLAS[previa.equipo.tipo] ?? FALLAS.default) : null
+        const falla = fallasPrevia ? fallasPrevia[num % fallasPrevia.length] : fallaAzar
         const tecnicoId = az.elegir(tecnicos)
         const marca = az.elegir(catDemo.marcas)
-        const equipoNombre = `${catDemo.plantillas[0].nombre.split(" {")[0]} ${marca}`
+        const catEquipo = previa ? (categoriasDemo.find((c) => c.ilustracion === previa.equipo.tipo) ?? catDemo) : catDemo
+        const equipoNombre = `${catEquipo.plantillas[0].nombre.split(" {")[0]} ${previa?.equipo.marca ?? marca}`
         const presupuestoRep = Math.round(az.decimal(15000, 185000) / 500) * 500 * 100
         const eventos: EventoServicio[] = []
         const pasos: [EstadoServicio, number][] = [
@@ -729,7 +740,10 @@ export function generarEmpresaDemo(opciones: OpcionesDemo = {}): EstadoEmpresa {
           fechaIngreso: iso(fecha),
           fechaPrometida: iso(enART(sumarDias(dia, az.entero(5, 10)), 18)),
           clienteId,
-          equipo: { tipo: catDemo.ilustracion, marca, modelo: `${marca.slice(0, 2).toUpperCase()}-${az.entero(100, 990)}`, serie: `SN${az.entero(1_000_000, 9_999_999)}` },
+          equipo: (() => {
+            const nuevo = { tipo: catDemo.ilustracion, marca, modelo: `${marca.slice(0, 2).toUpperCase()}-${az.entero(100, 990)}`, serie: `SN${az.entero(1_000_000, 9_999_999)}` }
+            return previa ? { ...previa.equipo } : nuevo
+          })(),
           falla: falla.falla,
           accesorios: az.elegir(ACCESORIOS),
           diagnostico: estado === "ingresado" || estado === "diagnostico" ? "" : falla.diagnostico,
@@ -741,6 +755,8 @@ export function generarEmpresaDemo(opciones: OpcionesDemo = {}): EstadoEmpresa {
           eventos,
           actualizadoEn: eventos[eventos.length - 1].fecha,
         }
+        ingresosPorSerie.set(servicio[id].equipo.serie, (ingresosPorSerie.get(servicio[id].equipo.serie) ?? 0) + 1)
+        if (estado === "entregado") entregadas.push(servicio[id])
         for (const ev of eventos.slice(1)) auditar(new Date(ev.fecha), ev.usuarioId, "servicio.estado", "servicio", id, `Orden ST #${num} → ${ev.estado}`)
       }
     }

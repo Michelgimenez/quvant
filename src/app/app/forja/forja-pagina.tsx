@@ -57,7 +57,7 @@ function Contenido() {
     // Escena a pantalla completa dentro del marco de la app (siempre en oscuro). En celular
     // termina arriba de la barra de accesos; overflow-clip: nada la puede desplazar.
     <div className="dark -mx-3 -mb-24 -mt-4 h-[calc(100dvh-7.25rem-1px-env(safe-area-inset-bottom))] overflow-clip bg-hierro text-niebla sm:-mx-5 sm:-mt-6 lg:-mb-10 lg:h-[calc(100dvh-3.75rem)]" data-testid="forja">
-      <UniversoForjaApp activacion={params.get("activacion") === "1"} simulacion={params.get("simulacion") !== "0"} />
+      <UniversoForjaApp activacion={params.get("activacion") === "1"} simulacion={params.get("simulacion") !== "0"} pieza={params.get("pieza")} />
     </div>
   )
 }
