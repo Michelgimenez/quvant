@@ -16,6 +16,7 @@ import { LineaTiempo, useMotorRepeticion } from "./linea-tiempo"
 import { MarcaForja } from "./marca-forja"
 import { PanelPieza } from "./pieza/panel-pieza"
 import { vistaDePieza } from "./pieza/vista"
+import { AnunciosVivos } from "./anuncios"
 import { useModo2D } from "./modo-2d"
 import type { ControlRed } from "./red/universo-red"
 import { UniversoRed2D } from "./red/universo-red-2d"
@@ -86,7 +87,9 @@ function Escena({
   const [entrada, setEntrada] = useState<"normal" | "esperando" | "encender">(activacion ? "esperando" : "normal")
   // Versión 2D: movimiento reducido o equipo modesto (o elegida a mano)
   const modo2D = useModo2D()
-  const es2D = modo2D.activo
+  // Si el navegador pierde el contexto WebGL del mapa, se sigue en 2D sin trabar nada
+  const [sinWebGL, setSinWebGL] = useState(false)
+  const es2D = modo2D.activo || sinWebGL
   const control = useRef<ControlRed | null>(null)
   const raiz = useRef<HTMLDivElement>(null)
   const escenario = useRef<HTMLDivElement>(null)
@@ -367,10 +370,15 @@ function Escena({
             <UniversoRed2D red={red} eventos={eventos} controlRef={control} onEntrar={(id) => void entrar(id)} entrada={entrada} pieza={vistaPieza} />
           ) : (
             <Suspense fallback={null}>
-              <UniversoRed red={red} eventos={eventos} controlRef={control} onEntrar={(id) => void entrar(id)} activa={nivel !== "taller"} entrada={entrada} pieza={vistaPieza} />
+              <UniversoRed red={red} eventos={eventos} controlRef={control} onEntrar={(id) => void entrar(id)} activa={nivel !== "taller"} entrada={entrada} pieza={vistaPieza} onPerdida={() => setSinWebGL(true)} />
             </Suspense>
           )}
         </div>
+        {sinWebGL && nivel === "red" && (
+          <p className="absolute bottom-[4.5rem] right-3 z-10 rounded-md border border-white/10 bg-hierro/90 px-2.5 py-1.5 text-xs text-acero" role="status" data-testid="aviso-contexto">
+            Se perdió la aceleración gráfica: seguimos en la versión 2D.
+          </p>
+        )}
         {aviso && nivel === "red" && !sala && (
           <div className="absolute right-3 top-3 z-10 max-w-sm rounded-md border border-white/10 bg-hierro/80 px-2.5 py-1.5 text-[11px] text-acero backdrop-blur" data-testid="aviso-demo">
             {aviso}
@@ -394,6 +402,7 @@ function Escena({
           </div>
         )}
         <div ref={iris} className="pointer-events-none absolute left-0 top-0 z-20 rounded-full opacity-0 will-change-transform" aria-hidden data-testid="forja-iris" />
+        <AnunciosVivos eventos={fuente.eventos} red={fuente.red} activo={!repeticion.activa} />
         {entrada === "esperando" && activacion && (
           <Activacion
             quietaDeEntrada={es2D}

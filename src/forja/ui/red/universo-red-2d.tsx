@@ -8,6 +8,7 @@ import { avanceTransito, distanciaKm, proyeccion } from "@/forja/dominio/geo"
 import type { EventoForja, RedForja } from "@/forja/dominio/modelo"
 import type { VistaPieza } from "../pieza/vista"
 import { ContextoEscena, useEscenaForja } from "../store"
+import { moverConFlechas } from "../teclado"
 import { NodoRed } from "./nodo-red"
 import { TarjetaNodo } from "./tarjeta-nodo"
 import { DetalleTransferencia, SelectorArcos } from "./transferencias"
@@ -258,7 +259,7 @@ export function UniversoRed2D({
           })}
         </svg>
 
-        <ul className="pointer-events-none absolute inset-0" aria-label="Sucursales en la red" data-entrada={entrada}>
+        <ul className="pointer-events-none absolute inset-0" aria-label="Sucursales en la red (flechas para moverse)" onKeyDown={moverConFlechas} data-entrada={entrada}>
           {red.nodos.map((n, i) => (
             <NodoRed
               key={n.id}

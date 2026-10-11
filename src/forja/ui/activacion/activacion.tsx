@@ -161,6 +161,7 @@ export function Activacion({ onFin, quietaDeEntrada = false, arranqueManual = fa
                 reloj={reloj}
                 reducir={false}
                 onListo={() => setListo3d(true)}
+                onPerdida={() => setQuieta(true)}
                 onGolpe={() => conSonido.current && audio.current?.golpe()}
                 onChispas={() => conSonido.current && audio.current?.chisporroteo()}
               />

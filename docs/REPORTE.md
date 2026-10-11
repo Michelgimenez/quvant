@@ -1,16 +1,17 @@
 # Yunque — reporte de trabajo
 
-## Resumen · revisión final (10/10/2026)
+## Resumen · revisión final y Forja (10/10/2026)
 
-**Estado real:** demo funcional / piloto. Primer piloto en negociación, sin clientes pagando. Pagos, facturación y WhatsApp **emulados**. **Publicado para revisión en https://yunque-rust.vercel.app** (modo demo, datos ficticios, sin Supabase).
+**Estado real:** demo funcional / piloto. Primer piloto en negociación, sin clientes pagando. Pagos, facturación y WhatsApp **emulados**. **Publicado para revisión en https://yunque-rust.vercel.app** (modo demo, datos ficticios, sin Supabase). *Esa publicación es anterior a Forja: hay que volver a publicar para verla.*
 
 ### Listo y probado
 - **App (`/app`)**: inventario multisucursal con escaneo y conteos, precios con aumento masivo, mostrador y caja, presupuestos → venta, servicio técnico, clientes y cuentas corrientes, compras, entregas, reportes, usuarios y permisos, co-branding, importador y auditoría. Recorrida con **los 9 usuarios de prueba**, cada módulo de su rol, en escritorio y celular, sin errores.
 - **Sin conexión**: se corta la red, se vende, se recarga sin internet y al volver sincroniza solo. Un test e2e verifica que **cada venta llega una sola vez** al servidor, con número definitivo único, y que **el stock baja exactamente lo vendido** (validado con controles negativos).
 - **Datos y acceso**: aislamiento entre empresas con RLS forzado y privilegios explícitos (48 tests sobre PostgreSQL real, emulando a Supabase). Doble factor exigido para dueño y administración en la app y en la base. `.env` fuera de git. `service_role` solo en el servidor.
-- **Sitio (`/`)** con la demo "cortá la conexión"; **`/inversores`** (12 escenas, con clave); **`/demo/ferremix`** (7 escenas, sello `PROPUESTA` en todas; Ferremix no aparece en ningún otro lado: lo controla un test).
+- **Sitio (`/`)** con la demo "cortá la conexión" y la sección "Yunque + Forja"; **`/inversores`** (13 escenas, con clave); **`/demo/ferremix`** (7 escenas, sello `PROPUESTA` en todas; Ferremix no aparece en ningún otro lado del código: lo controla un test).
+- **Forja** (extensión visual, estado *demo*, detalle en [`FORJA.md`](FORJA.md)): activación, red de sucursales en el mapa y en constelación, cada sucursal por dentro en 3D, repetición del día a 1200×, sala de control, recorrido de una pieza, versión 2D completa, demo pública `/forja`, propuesta embebible `/demo/ferremix/forja` y dos videos. Lecturas y tiempo real con RLS por sucursal en Supabase (escritos y probados, todavía sin usar: la app corre en modo demo).
 - **"Pedir una demo"**: se guarda en la base y aparece en el panel interno **`/panel`** (clave `PANEL_KEY`) con aviso de solicitudes nuevas.
-- **Verificación**: typecheck, lint y build sin errores; **111 tests** unitarios y de RLS y **23 e2e** en verde. Recorrido de revisión: **216 pantallas, 0 fallas, 0 errores de consola** ([`capturas/revision/RESULTADO.md`](capturas/revision/RESULTADO.md)).
+- **Verificación**: typecheck, lint y build sin errores; **160 tests** unitarios y de RLS y **42 e2e** en verde (con Forja). La revisión de pantallas de abajo es anterior a Forja. Recorrido de revisión: **216 pantallas, 0 fallas, 0 errores de consola** ([`capturas/revision/RESULTADO.md`](capturas/revision/RESULTADO.md)).
 
 ### Corregido en esta revisión
 1. **Privilegios en Supabase real**: las tablas creadas después de la migración 0300 heredaban los privilegios de fábrica de Supabase. RLS evitaba la fuga, pero la defensa era de una sola capa. Ahora la migración 0800 deja solo lo necesario, y los tests emulan a Supabase.
@@ -20,7 +21,7 @@
 5. `/marca` y la demo de Ferremix tenían `[COMPLETAR]` escritos a mano; ahora salen de `src/config/`.
 
 ### No está listo
-- **Supabase real**: preparado, sin probar; la función SQL cubre 7 de 33 operaciones y falta el adaptador del cliente.
+- **Supabase real**: preparado, sin probar; la función SQL cubre 7 de 33 operaciones y falta el adaptador del cliente. Forja también: sus funciones y canales están listos, falta la fuente que los use.
 - **Integraciones reales**: ARCA, Mercado Pago, WhatsApp y Mercado Libre.
 - **Para producción**: auditoría externa, CSP con nonces, revocación de sesiones, recuperación del 2FA, backups con restauración probada, CI, panel con usuarios individuales y aviso de privacidad en el formulario.
 - **Rendimiento del sitio en celular**: Lighthouse simulado 77–89 (objetivo 90).
@@ -31,11 +32,14 @@
 |---|---|---|
 | `/inversores` · 2 El problema | 3 datos de mercado **con su fuente**: ferreterías, corralones y repuestos; distribuidores de maquinaria; negocios con sistemas de escritorio o planillas | `src/config/inversores.ts` → `MERCADO.datos` |
 | `/inversores` · 3 El terreno | 5 hallazgos (sistema, precios y listas, stock y sucursales, presupuestos y clientes, sitio web) y la conclusión | `src/config/inversores.ts` → `TERRENO` |
-| `/inversores` · 10 Inversión | monto y plan definitivo (hoy 25/40/20/15 %, preliminar) | `src/config/inversion.ts` → `INVERSION` |
-| `/inversores` · 11 Equipo | rol y bio de Michel; nombre, rol y bio del socio; dos fotos | `src/config/inversion.ts` → `EQUIPO` (fotos en `public/`) |
-| `/inversores` · 12 Cierre | nombre, email y teléfono de contacto | `src/config/inversion.ts` → `CONTACTO_INVERSORES` |
+| `/inversores` · 11 Inversión | monto y plan definitivo (hoy 25/40/20/15 %, preliminar) | `src/config/inversion.ts` → `INVERSION` |
+| `/inversores` · 12 Equipo | rol y bio de Michel; nombre, rol y bio del socio; dos fotos | `src/config/inversion.ts` → `EQUIPO` (fotos en `public/`) |
+| `/inversores` · 13 Cierre | nombre, email y teléfono de contacto | `src/config/inversion.ts` → `CONTACTO_INVERSORES` |
 | `/` · "Pedir una demo" y pie | email y WhatsApp comercial | `src/config/sitio.ts` → `contacto` |
 | `/demo/ferremix` | categorías reales y su fuente, 4 problemas del relevamiento, sucursales, plazo estimado y contacto | `src/config/clientes/ferremix.ts` |
+| `/demo/ferremix/forja` | los negocios y sucursales reales del dueño (hoy Moreno es real y hay tres ubicaciones DEMO) y sus direcciones; después, `npm run snapshot-forja` y `npm run grabar-forja -- ferremix` | `src/config/clientes/ferremix.ts` → `forja` |
+| `/` · Forja y `/app/extensiones` | precio mensual de Forja (se muestra "Consultá") | `src/config/precios.ts` → `extensiones.forja` |
+| Proyecto de Ferremix | copiar `public/demo/forja-ferremix.mp4` a `public/propuesta/forja.mp4` de ese proyecto | (a mano) |
 | No se muestran (solo configuración) | LinkedIn; validar la implementación promedio (USD 1.500) y los supuestos de la proyección | `src/config/sitio.ts`, `src/config/proyecciones.ts` |
 
 ---
@@ -134,6 +138,9 @@
 | D85 | El **generador del seed** acepta sucursales a medida (`sucursales`: código, nombre, ubicación, tipo, ficticia o no, ritmo de ventas): cambia las de siempre por su código y suma las nuevas. Sin esa opción, la demo de siempre sale idéntica. Las sucursales nuevas venden con administración y el dueño. | La demo del prospecto tiene cuatro sucursales (una real, tres DEMO) y un depósito. |
 | D86 | **Embebible solo esa ruta**: `/demo/<prospecto>/forja` lleva `frame-ancestors 'self'` más los orígenes de su configuración (`https://ferremix-propuesta.vercel.app http://localhost:*`) y no lleva `X-Frame-Options`; la regla general de cabeceras la excluye con una búsqueda negativa, así no la pisa. El resto del sitio sigue con `frame-ancestors 'none'` y `X-Frame-Options: DENY`. Un prospecto sin demo de Forja responde 404 real (en el proxy). | "Solo en esa ruta… sin X-Frame-Options y sin que una cabecera global la pise." |
 | D87 | La demo pública ocupa toda la ventana del iframe, sin barras de desplazamiento, y está probada a 1920×1080 (videos y capturas). No se escala con `transform`: MapLibre y deck.gl calculan el puntero con el tamaño real del lienzo. | Escalar el lienzo del mapa rompía la puntería de los arcos. |
+| D89 | **Taller a demanda**: `frameloop="demand"`; cada animación pide cuadros mientras dura (tweens de cámara, chispas, golpe del rack, bultos, destello de la pantalla, la baliza de un puesto sin conexión) y cada evento nuevo o cambio de datos pide uno. Quieto, el taller no gasta GPU. `dpr` adaptativo con `PerformanceMonitor` (arranca en 1,5, sube a 2 o baja a 1 según los cuadros por segundo) y el mapa con `pixelRatio` hasta 2. | "frameloop demand cuando no hay movimiento", "dpr adaptativo". |
+| D90 | **Pérdida del contexto WebGL**: el taller sigue en el plano 2D, el mapa en la versión 2D y la activación en su versión quieta, con un aviso. Lo prueba un e2e que fuerza la pérdida con `WEBGL_lose_context`. | "Manejar la pérdida de contexto WebGL": que nunca quede una pantalla negra. |
+| D91 | **Teclado y lectores de pantalla**: flechas, Inicio y Fin entre los nodos de la red y entre las zonas del taller (además de Tab), la tarjeta del nodo también con el foco, y una región en vivo que anuncia lo importante (quiebres de stock, llegadas, equipos listos) con una pausa de 8 s entre anuncios y nada durante la repetición. | "Navegación por teclado entre nodos y zonas, y textos alternativos de los estados". |
 | D88 | **Videos**: `scripts/grabar-forja.mjs` graba cuadro a cuadro con el reloj de la página en pausa (60 fps exactos aunque el render vaya más lento), en Chromium con aceleración de GPU (ANGLE/D3D11 en esta PC), y codifica H.264 con `ffmpeg-static`. En modo `?grabar` el simulador se detiene, la activación espera la señal del guion y los eventos (venta, quiebre de stock) los pide el script: las tomas salen siempre iguales. Secuencia de 46 s: activación, red con transferencias, entrada a Casa Central / Moreno, dos ventas en el mostrador, un rack que pasa a crítico y la repetición del día a 1200×. | El documento pide GPU y 60 fps; el reloj en pausa garantiza la fluidez. |
 
 ## Fases
@@ -340,3 +347,13 @@ Pedido: verificar y corregir, sin funciones nuevas (salvo el destino de "Pedir u
 - **Sitio**: sección "Yunque + Forja" con el video genérico en bucle y sin sonido (con movimiento reducido no arranca solo), los tres puntos, "Ver la demo" y el precio como extensión ("Consultá" mientras sea `[COMPLETAR]`), y su ancla en el encabezado.
 - **`/inversores`**: escena 06 "Forja: el negocio, en vivo" con la toma genérica, después de la demo del producto (las siguientes pasan a 07–13).
 - Tests: 4 e2e de las demos públicas (genérica sin sesión y no embebible; la del prospecto con sus cabeceras, marca, PROPUESTA, Moreno sin DEMO y las demás con DEMO, el `[COMPLETAR]` visible; carga dentro de un iframe; 404 de un prospecto sin Forja; la sección del sitio) y 1 de la escena de inversores. La regla de honestidad sigue pasando.
+
+### Forja · Fase 9 — Rendimiento, accesibilidad y documentación
+- **Rendimiento** (D89, D90): taller dibujado a demanda, `dpr` adaptativo, `pixelRatio` acotado en el mapa, nada animado ni simulado con la pestaña oculta, carga separada de cada motor (verificada en e2e) y pérdida del contexto WebGL resuelta sin pantallas negras.
+- **Accesibilidad** (D91): flechas entre nodos y zonas, foco visible `--temple`, descripciones de cada nodo y zona, línea de tiempo como control deslizante con la hora en texto, región en vivo para lo importante, Esc para volver y versión 2D con movimiento reducido.
+- **Documentación**: [`docs/FORJA.md`](FORJA.md) (recorrido, código, datos y permisos, demos, videos, rendimiento, 2D, accesibilidad y qué falta), este reporte y el ROADMAP.
+- Tests: 3 e2e (teclado de punta a punta, pérdida del contexto en el taller, anuncio de un quiebre de stock).
+- **Arreglo de paso**: el primer anuncio a lectores de pantalla se descartaba si llegaba en los primeros 8 s de la página.
+
+### Forja · Cierre
+Las nueve fases del documento están hechas y commiteadas, con typecheck, lint, build, 160 tests unitarios y de RLS y 42 e2e en verde. Forja queda en estado **demo** en el registro de funcionalidades: completa con la empresa de demostración y con la propuesta para Ferremix, sin conectar todavía a una base real.

@@ -58,6 +58,21 @@ test.describe("Forja · demos públicas", () => {
     expect((await page.request.get("/demo/otro/forja")).status()).toBe(404)
   })
 
+  test("lo importante se anuncia a los lectores de pantalla (un rack que pasa a crítico)", async ({ page }) => {
+    test.setTimeout(150_000)
+    // Con ?grabar el simulador se detiene y los eventos se piden a mano
+    await page.goto("/forja?grabar=1")
+    await expect(page.getByTestId("activacion")).toBeVisible({ timeout: 30_000 })
+    await page.waitForFunction(() => Boolean(window.__forjaGuion))
+    await page.evaluate(() => window.__forjaGuion!.arrancar())
+    await saltarActivacion(page)
+    await expect(page.getByTestId("forja-red")).toHaveAttribute("data-listo", "true", { timeout: 60_000 })
+    const anuncios = page.getByTestId("anuncios-vivos")
+    await expect(anuncios).toHaveAttribute("aria-live", "polite")
+    expect(await page.evaluate(() => window.__forjaGuion!.quiebre("CC"))).toBe(true)
+    await expect(anuncios).toContainText(/quedan|se quedó sin/, { timeout: 10_000 })
+  })
+
   test("el sitio presenta Yunque + Forja con la toma genérica y el botón a la demo", async ({ page }) => {
     await page.goto("/")
     const seccion = page.locator("#forja")

@@ -1,7 +1,7 @@
 "use client"
 
 import { useEffect, useRef } from "react"
-import { useFrame } from "@react-three/fiber"
+import { useFrame, useThree } from "@react-three/fiber"
 import gsap from "gsap"
 import * as THREE from "three"
 import { ALTO_PARED, ANCHO, FONDO } from "@/forja/dominio/plano"
@@ -50,26 +50,29 @@ function encuadre(ancho: number, alto: number, az: number, el: number) {
 export function CamaraTaller({ modo, reducir, margenDerecho, margenAbajo }: { modo: ModoCamara; reducir: boolean; margenDerecho: number; margenAbajo: number }) {
   // "arriba": esperando detrás del brillo; "quieta": baja (o ya está) en el corte; "saliendo": sube
   const p = useRef({ ...(modo === "arriba" && !reducir ? ARRIBA : FINAL), margen: margenDerecho, abajo: margenAbajo })
+  // El taller dibuja a demanda: mientras la cámara se mueve, pide un cuadro por paso
+  const invalidate = useThree((s) => s.invalidate)
 
   useEffect(() => {
     if (modo === "arriba") return
     const destino = modo === "saliendo" ? ARRIBA : FINAL
     if (reducir) {
       Object.assign(p.current, destino)
+      invalidate()
       return
     }
-    const t = gsap.to(p.current, { ...destino, duration: modo === "saliendo" ? 0.65 : 1.6, ease: modo === "saliendo" ? "power2.in" : "power3.out", overwrite: "auto" })
+    const t = gsap.to(p.current, { ...destino, duration: modo === "saliendo" ? 0.65 : 1.6, ease: modo === "saliendo" ? "power2.in" : "power3.out", overwrite: "auto", onUpdate: invalidate })
     return () => {
       t.kill()
     }
-  }, [modo, reducir])
+  }, [modo, reducir, invalidate])
 
   useEffect(() => {
-    const t = gsap.to(p.current, { margen: margenDerecho, abajo: margenAbajo, duration: reducir ? 0 : 0.5, ease: "power2.out", overwrite: "auto" })
+    const t = gsap.to(p.current, { margen: margenDerecho, abajo: margenAbajo, duration: reducir ? 0 : 0.5, ease: "power2.out", overwrite: "auto", onUpdate: invalidate, onComplete: invalidate })
     return () => {
       t.kill()
     }
-  }, [margenDerecho, margenAbajo, reducir])
+  }, [margenDerecho, margenAbajo, reducir, invalidate])
 
   useFrame(({ camera, size }) => {
     const { el, az, zoomK, margen, abajo } = p.current

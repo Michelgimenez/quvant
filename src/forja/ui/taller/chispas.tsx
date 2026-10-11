@@ -1,7 +1,7 @@
 "use client"
 
 import { forwardRef, useImperativeHandle, useMemo } from "react"
-import { useFrame } from "@react-three/fiber"
+import { useFrame, useThree } from "@react-three/fiber"
 import * as THREE from "three"
 
 /**
@@ -35,10 +35,12 @@ export const Chispas = forwardRef<ControlChispas, { reducir: boolean }>(function
     return g
   }, [])
 
+  const invalidate = useThree((s) => s.invalidate)
   useImperativeHandle(
     ref,
     () => ({
       lanzar: (x, y, z, cantidad = 24) => {
+        invalidate()
         // Con movimiento reducido, apenas un destello corto y quieto
         const n = reducir ? 4 : cantidad
         for (let k = 0; k < n; k++) {
@@ -53,10 +55,10 @@ export const Chispas = forwardRef<ControlChispas, { reducir: boolean }>(function
         }
       },
     }),
-    [sim, reducir],
+    [sim, reducir, invalidate],
   )
 
-  useFrame((_, dtReal) => {
+  useFrame((estado, dtReal) => {
     const dt = Math.min(dtReal, 1 / 30)
     const posiciones = geometria.attributes.position.array as Float32Array
     const colores = geometria.attributes.color.array as Float32Array
@@ -83,6 +85,8 @@ export const Chispas = forwardRef<ControlChispas, { reducir: boolean }>(function
       colores.set([CALIENTE.r * a, CALIENTE.g * a, CALIENTE.b * a, BRASA.r * a * 0.5, BRASA.g * a * 0.5, BRASA.b * a * 0.5], v)
       n++
     }
+    // Dibujo a demanda: mientras quede alguna chispa en el aire, otro cuadro
+    if (n > 0) estado.invalidate()
     geometria.setDrawRange(0, n * 2)
     geometria.attributes.position.needsUpdate = true
     geometria.attributes.color.needsUpdate = true

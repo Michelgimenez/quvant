@@ -58,7 +58,7 @@ export function Muelle3D({ plano, enTransito, salidas, reducir }: { plano: Plano
 function BultoSaliente({ lugar, salidas, desde, hasta, reducir }: { lugar: number; salidas: React.RefObject<{ id: string; t0: number }[]>; desde: [number, number]; hasta: [number, number]; reducir: boolean }) {
   const grupo = useRef<THREE.Group>(null)
   const material = useRef<THREE.MeshStandardMaterial>(null)
-  useFrame(() => {
+  useFrame((estado) => {
     const g = grupo.current
     if (!g) return
     const s = salidas.current[lugar]
@@ -67,6 +67,7 @@ function BultoSaliente({ lugar, salidas, desde, hasta, reducir }: { lugar: numbe
       return
     }
     const t = Math.min(1, (performance.now() - s.t0) / (reducir ? 600 : DURACION_SALIDA))
+    if (t < 1) estado.invalidate()
     // Aparece en el muelle, espera un instante y se desliza hacia afuera, acelerando
     const avance = reducir ? 1 : t < 0.2 ? 0 : Math.pow((t - 0.2) / 0.8, 2)
     g.position.set(desde[0] + (hasta[0] - desde[0]) * avance, 0, desde[1] + (hasta[1] - desde[1]) * avance)

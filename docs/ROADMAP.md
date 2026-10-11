@@ -34,9 +34,9 @@ Picking, recepción y conteos con lector, pensada para el celular del depósito.
 ### 5 · Integraciones
 Mercado Pago, Mercado Libre y WhatsApp Business conectados de verdad (hoy emulados detrás de interfaces en `src/integraciones/`).
 
-## Forja (extensión visual): en construcción
+## Forja (extensión visual): lista en demo
 
-Forja convierte los datos de Yunque en un taller conectado: las sucursales en un mapa, cada una por dentro en 3D, y la jornada que se puede reproducir. Plan por fases (detalle en `docs/FORJA.md` cuando esté completa):
+Forja convierte los datos de Yunque en un taller conectado: las sucursales en un mapa, cada una por dentro en 3D, y la jornada que se puede reproducir. Hecha por fases (detalle en [`docs/FORJA.md`](FORJA.md)):
 
 1. **Base** ✔︎ — token `--superficie`, paleta de calor, modelo de datos (ubicación de sucursales, transferencias en tránsito, extensiones por empresa, preferencias, permisos extra por persona), lecturas SQL con RLS, canales en vivo por sucursal, simulador para la demo y tests de aislamiento.
 2. **Red en el mapa** ✔︎ — MapLibre + deck.gl, nodos con calor y stock crítico, transferencias animadas, tarjetas y constelación.
@@ -46,7 +46,9 @@ Forja convierte los datos de Yunque en un taller conectado: las sucursales en un
 6. **Recorrido de una pieza** ✔︎ — el camino de un SKU por las sucursales (arcos, stock y movimientos con saldo) y la historia de una máquina por número de serie, desde el buscador ⌘K o el taller.
 7. **Versión 2D completa** ✔︎ — mapa SVG y plano de planta con los mismos datos e interacciones, automática con movimiento reducido o equipos modestos y elegible a mano; no descarga nada de 3D.
 8. **Demo pública, videos, sitio y presentación** ✔︎ — `/forja` y la propuesta embebible para Ferremix (sin base: snapshot del seed y simulador en el navegador), dos videos de 46 s, la sección del sitio y la escena de `/inversores`.
-9. Rendimiento, accesibilidad y documentación.
+9. **Rendimiento, accesibilidad y documentación** ✔︎ — taller a demanda, `dpr` adaptativo, pérdida de contexto WebGL resuelta, teclado entre nodos y zonas, anuncios para lectores de pantalla y `docs/FORJA.md`.
+
+Lo que sigue con Forja: conectarla a Supabase (las funciones `forja_*` y los canales por sucursal ya están), los datos reales del prospecto y el precio de la extensión.
 
 ## Cómo empieza un negocio (implementación)
 

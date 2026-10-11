@@ -69,9 +69,10 @@ export function Deposito3D({ plano, pulsos: refPulsos }: { plano: PlanoTaller; p
   }, [plano.racks, porEstado])
 
   // Golpe ámbar sobre el rack que acaba de pasar a crítico: aristas que se abren y se apagan
-  useFrame(() => {
+  useFrame((estado) => {
     const ahora = performance.now()
     const vivos = refPulsos.current.filter((p) => ahora - p.t0 < DURACION_GOLPE).slice(-GOLPES)
+    if (vivos.length) estado.invalidate()
     golpes.current.forEach((linea, i) => {
       if (!linea) return
       const p = vivos[i]

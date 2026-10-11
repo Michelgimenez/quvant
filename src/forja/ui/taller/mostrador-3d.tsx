@@ -49,9 +49,11 @@ function Puesto({ p, ultimasVentas }: { p: PuestoPlano; ultimasVentas: React.Ref
   const cola = Math.min(8, p.puesto.sinConexion)
   const brillo = useMemo(() => texturaBrillo(), [])
 
-  useFrame(({ clock }) => {
+  useFrame(({ clock, invalidate }) => {
     const t = ultimasVentas.current?.[p.puesto.puesto]
     const destello = t ? Math.max(0, 1 - (performance.now() - t) / 900) : 0
+    // La baliza respira mientras haya cola; el destello dura menos de un segundo
+    if (destello > 0 || cola > 0) invalidate()
     if (pantalla.current) pantalla.current.emissiveIntensity = base + destello * 2.2
     if (baliza.current) {
       // La luz ámbar respira mientras haya ventas sin sincronizar

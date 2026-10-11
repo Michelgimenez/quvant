@@ -7,6 +7,7 @@ import type { Pieza } from "@/forja/dominio/pieza"
 import { NOMBRE_ZONA, TIPOS_ZONA, estadoBloque, planoTaller, type PlanoTaller, type TipoZona } from "@/forja/dominio/plano"
 import { cn } from "@/lib/utils"
 import { useEscenaForja } from "../store"
+import { moverConFlechas } from "../teclado"
 import type { ModoCamara } from "./camara"
 import { CapaEtiquetas, anclasTaller } from "./etiquetas"
 import { PanelZona } from "./panel-zona"
@@ -46,6 +47,9 @@ export function NivelTaller({
   const caja = useRef<HTMLDivElement>(null)
   const [tamano, setTamano] = useState({ ancho: 1200, alto: 800 })
   const [listo, setListo] = useState(false)
+  // Si el navegador pierde el contexto WebGL, el taller sigue en el plano 2D
+  const [perdido, setPerdido] = useState(false)
+  const en2D = modo2D || perdido
   const [reducir] = useState(reducirMovimiento)
 
   useEffect(() => {
@@ -68,8 +72,8 @@ export function NivelTaller({
   const enTransito = taller.muelle.filter((b) => b.tipo === "transferencia" && b.estado === "en_transito").length
 
   return (
-    <div ref={caja} className="absolute inset-0 z-10 overflow-clip bg-hierro" data-testid="forja-taller" data-sucursal={nodo.codigo} data-listo={listo} data-modo={modo2D ? "2d" : "3d"}>
-      {modo2D ? (
+    <div ref={caja} className="absolute inset-0 z-10 overflow-clip bg-hierro" data-testid="forja-taller" data-sucursal={nodo.codigo} data-listo={listo} data-modo={en2D ? "2d" : "3d"}>
+      {en2D ? (
         <Plano2D plano={plano} sucursalId={nodo.id} eventos={fuente.eventos} enTransito={enTransito} margenDerecho={margenDerecho} margenAbajo={margenAbajo} onListo={avisar} />
       ) : (
       <ErrorWebGL onFallo={avisar}>
@@ -86,11 +90,17 @@ export function NivelTaller({
             anclas={anclas}
             elementos={elementos}
             onListo={avisar}
+            onPerdida={() => setPerdido(true)}
           />
         </Suspense>
       </ErrorWebGL>
       )}
-      {listo && !modo2D && <CapaEtiquetas anclas={anclas} plano={plano} elementos={elementos} />}
+      {listo && !en2D && <CapaEtiquetas anclas={anclas} plano={plano} elementos={elementos} />}
+      {perdido && (
+        <p className="absolute left-3 top-3 z-10 rounded-md border border-white/10 bg-hierro/90 px-2.5 py-1.5 text-xs text-acero" role="status" data-testid="aviso-contexto">
+          Se perdió la aceleración gráfica: seguimos en el plano 2D.
+        </p>
+      )}
       <BarraZonas plano={plano} taller={taller} />
       {zona && <PanelZona zona={zona} nodo={nodo} taller={taller} plano={plano} red={fuente.red} enlaces={fuente.enlaces} onPieza={onPieza} />}
     </div>
@@ -128,7 +138,7 @@ function BarraZonas({ plano, taller }: { plano: PlanoTaller; taller: TallerForja
   const resaltarZona = useEscenaForja((s) => s.resaltarZona)
   const tipos = TIPOS_ZONA.filter((t) => plano.zonas.some((z) => z.tipo === t))
   return (
-    <nav className={cn("pointer-events-auto absolute bottom-3 left-3 right-3 z-10 flex gap-2 overflow-x-auto md:right-auto", zona && "max-md:hidden")} aria-label="Zonas de la sucursal">
+    <nav className={cn("pointer-events-auto absolute bottom-3 left-3 right-3 z-10 flex gap-2 overflow-x-auto md:right-auto", zona && "max-md:hidden")} aria-label="Zonas de la sucursal (flechas para moverse)" onKeyDown={moverConFlechas}>
       {tipos.map((t) => {
         const activa = zona?.tipo === t
         return (

@@ -14,6 +14,7 @@ import type { EventoForja, NodoForja, RedForja } from "@/forja/dominio/modelo"
 import type { FlujoVista, VistaPieza } from "../pieza/vista"
 import { ContextoEscena, useEscenaForja } from "../store"
 import { ESTILO_CARTO, teñirMapa } from "./estilo-mapa"
+import { moverConFlechas } from "../teclado"
 import { NodoRed } from "./nodo-red"
 import { DetalleTransferencia, SelectorArcos } from "./transferencias"
 import { TarjetaNodo } from "./tarjeta-nodo"
@@ -66,6 +67,7 @@ export function UniversoRed({
   activa = true,
   entrada = "normal",
   pieza = null,
+  onPerdida,
 }: {
   red: RedForja
   eventos: EventoForja[]
@@ -77,6 +79,8 @@ export function UniversoRed({
   entrada?: "normal" | "esperando" | "encender"
   /** Nivel 3: en vez de las transferencias, los flujos de la pieza y una marca por sucursal. */
   pieza?: VistaPieza | null
+  /** El navegador perdió el contexto WebGL del mapa. */
+  onPerdida?: () => void
 }) {
   const store = useContext(ContextoEscena)!
   const vista = useEscenaForja((s) => s.vista)
@@ -98,6 +102,10 @@ export function UniversoRed({
   const [listo, setListo] = useState(false)
 
   const conCoordenadas = useMemo(() => red.nodos.filter((n) => n.lat !== null && n.lng !== null), [red.nodos])
+  const onPerdidaRef = useRef(onPerdida)
+  useEffect(() => {
+    onPerdidaRef.current = onPerdida
+  }, [onPerdida])
   const datos = useRef({ red, conCoordenadas, transferenciaId, activa, pieza })
   useEffect(() => {
     datos.current = { red, conCoordenadas, transferenciaId, activa, pieza }
@@ -140,6 +148,8 @@ export function UniversoRed({
         bearing: -14,
         attributionControl: false,
         maxPitch: 70,
+        // Más de 2× no se nota en un mapa oscuro y cuesta el doble de píxeles
+        pixelRatio: Math.min(window.devicePixelRatio || 1, 2),
         canvasContextAttributes: { antialias: true },
       })
     } catch (e) {
@@ -160,6 +170,7 @@ export function UniversoRed({
     mapa.addControl(overlay)
     overlayRef.current = overlay
     mapa.on("style.load", () => teñirMapa(mapa))
+    mapa.on("webglcontextlost", () => onPerdidaRef.current?.())
     mapa.on("load", () => {
       encuadrar(0)
       setListo(true)
@@ -327,7 +338,7 @@ export function UniversoRed({
       </svg>
 
       {/* Nodos */}
-      <ul className="pointer-events-none absolute inset-0" aria-label="Sucursales en la red" data-entrada={entrada}>
+      <ul className="pointer-events-none absolute inset-0" aria-label="Sucursales en la red (flechas para moverse)" onKeyDown={moverConFlechas} data-entrada={entrada}>
         {red.nodos.map((n, i) => (
           <NodoRed
             key={n.id}

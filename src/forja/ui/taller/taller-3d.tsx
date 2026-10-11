@@ -1,8 +1,8 @@
 "use client"
 
-import { useEffect, useRef } from "react"
-import { Canvas, useFrame } from "@react-three/fiber"
-import { ContactShadows } from "@react-three/drei"
+import { useEffect, useRef, useState } from "react"
+import { Canvas, useFrame, useThree } from "@react-three/fiber"
+import { ContactShadows, PerformanceMonitor } from "@react-three/drei"
 import type { EventoForja } from "@/forja/dominio/modelo"
 import { rackDeUbicacion, type PlanoTaller } from "@/forja/dominio/plano"
 import { useEscenaForja } from "../store"
@@ -29,6 +29,8 @@ export type PropsTaller3D = {
   anclas: Ancla[]
   elementos: React.RefObject<Map<string, HTMLElement>>
   onListo: () => void
+  /** El navegador perdió el contexto WebGL: el taller pasa al plano 2D. */
+  onPerdida: () => void
 }
 
 /**
@@ -39,17 +41,29 @@ export default function Taller3D(props: PropsTaller3D) {
   const zonaResaltada = useEscenaForja((s) => s.zonaResaltada)
   const rackResaltado = useEscenaForja((s) => s.rackResaltado)
   const elegirZona = useEscenaForja((s) => s.elegirZona)
+  // dpr adaptativo: arranca en 1,5 y sube o baja según los cuadros por segundo medidos
+  const [dpr, setDpr] = useState(() => Math.min(1.5, window.devicePixelRatio || 1))
+  const { onPerdida } = props
   return (
     <Canvas
       orthographic
       flat
-      dpr={[1, 2]}
+      // A demanda: solo se dibuja cuando algo se mueve (cámara, chispas, golpes, bultos) o cambia
+      frameloop="demand"
+      dpr={dpr}
+      onCreated={({ gl }) =>
+        gl.domElement.addEventListener("webglcontextlost", (e) => {
+          e.preventDefault()
+          onPerdida()
+        })
+      }
       camera={{ position: [40, 40, 40], zoom: 20, near: 1, far: 400 }}
       gl={{ antialias: true, powerPreference: "high-performance" }}
       style={{ cursor: zonaResaltada || rackResaltado ? "pointer" : "default" }}
       onPointerMissed={() => elegirZona(null)}
       aria-label="Corte isométrico de la sucursal"
     >
+      <PerformanceMonitor onIncline={() => setDpr(Math.min(2, window.devicePixelRatio || 1))} onDecline={() => setDpr(1)} flipflops={3} onFallback={() => setDpr(1)} />
       <Escena {...props} />
     </Canvas>
   )
@@ -57,6 +71,7 @@ export default function Taller3D(props: PropsTaller3D) {
 
 function Escena({ plano, sucursalId, eventos, enTransito, modo, reducir, margenDerecho, margenAbajo, anclas, elementos, onListo }: PropsTaller3D) {
   const chispas = useRef<ControlChispas>(null)
+  const invalidate = useThree((s) => s.invalidate)
   const ultimasVentas = useRef<Record<number, number>>({})
   // Animaciones de lo nuevo: las leen los bucles de cada zona (sin renders de React)
   const pulsos = useRef<{ rackId: string; t0: number }[]>([])
@@ -89,7 +104,9 @@ function Escena({ plano, sucursalId, eventos, enTransito, modo, reducir, margenD
     }
     if (nuevosPulsos.length) pulsos.current = [...pulsos.current.filter((x) => ahora - x.t0 < 2400), ...nuevosPulsos]
     if (nuevasSalidas.length) salidas.current = [...salidas.current.filter((x) => ahora - x.t0 < 3000), ...nuevasSalidas].slice(-4)
-  }, [eventos, sucursalId, plano])
+    // Lo nuevo pide cuadros; cada animación sigue pidiendo mientras dura
+    invalidate()
+  }, [eventos, sucursalId, plano, invalidate])
 
   return (
     <>

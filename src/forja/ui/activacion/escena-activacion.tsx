@@ -33,17 +33,31 @@ export default function EscenaActivacion({
   reloj,
   reducir,
   onListo,
+  onPerdida,
   onGolpe,
   onChispas,
 }: {
   reloj: React.RefObject<number>
   reducir: boolean
   onListo: () => void
+  /** El navegador perdió el contexto WebGL: la activación sigue en su versión quieta. */
+  onPerdida: () => void
   onGolpe: () => void
   onChispas: () => void
 }) {
   return (
-    <Canvas dpr={[1, 2]} camera={{ position: CAMARA.toArray(), fov: 35, near: 0.1, far: 80 }} gl={{ antialias: true, powerPreference: "high-performance" }} aria-hidden>
+    <Canvas
+      dpr={[1, 2]}
+      camera={{ position: CAMARA.toArray(), fov: 35, near: 0.1, far: 80 }}
+      gl={{ antialias: true, powerPreference: "high-performance" }}
+      onCreated={({ gl }) =>
+        gl.domElement.addEventListener("webglcontextlost", (e) => {
+          e.preventDefault()
+          onPerdida()
+        })
+      }
+      aria-hidden
+    >
       <color attach="background" args={["#0e1116"]} />
       <Entorno />
       {/* Luz principal arriba a la izquierda y un recorte frío desde atrás: el acero se lee por sus bordes */}
