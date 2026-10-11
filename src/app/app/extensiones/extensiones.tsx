@@ -12,9 +12,12 @@ import { Button } from "@/components/ui/button"
 import { textoPrecioExtension } from "@/config/precios"
 import { REGISTRO_EXTENSIONES, type DefinicionExtension } from "@/extensiones/registro"
 import { MarcaForja } from "@/forja/ui/marca-forja"
+import { usaVersion2D } from "@/forja/ui/modo-2d"
 
-/** Al acercarse al botón, la escena de la activación empieza a bajar: arranca sin espera. */
-const precargarActivacion = () => void import("@/forja/ui/activacion/escena-activacion").catch(() => {})
+/** Al acercarse al botón, la escena de la activación empieza a bajar (salvo en la versión 2D, que no la usa). */
+const precargarActivacion = () => {
+  if (!usaVersion2D()) void import("@/forja/ui/activacion/escena-activacion").catch(() => {})
+}
 
 export function Extensiones() {
   return (

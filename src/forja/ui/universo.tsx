@@ -1,8 +1,8 @@
 "use client"
 
-import { useContext, useEffect, useMemo, useRef, useState } from "react"
+import { Suspense, lazy, useContext, useEffect, useMemo, useRef, useState } from "react"
 import gsap from "gsap"
-import { ArrowLeft, MonitorPlay, X } from "lucide-react"
+import { ArrowLeft, Box, MonitorPlay, Square, X } from "lucide-react"
 import { Sello } from "@/components/base/sellos"
 import type { Id } from "@/dominio/tipos"
 import { PARADAS_CALOR, colorCalor } from "@/forja/dominio/calor"
@@ -16,7 +16,9 @@ import { LineaTiempo, useMotorRepeticion } from "./linea-tiempo"
 import { MarcaForja } from "./marca-forja"
 import { PanelPieza } from "./pieza/panel-pieza"
 import { vistaDePieza } from "./pieza/vista"
-import { UniversoRed, type ControlRed } from "./red/universo-red"
+import { useModo2D } from "./modo-2d"
+import type { ControlRed } from "./red/universo-red"
+import { UniversoRed2D } from "./red/universo-red-2d"
 import { SalaControl } from "./sala-control"
 import { ContextoEscena, crearStoreEscena, useEscenaForja, type VistaRed } from "./store"
 import type { ModoCamara } from "./taller/camara"
@@ -27,6 +29,9 @@ import { Leyenda } from "./taller/panel-zona"
  * El universo del taller: la misma escena para la app y para las demos
  * públicas. Recibe los datos ya armados (FuenteForja) y maneja la escena.
  */
+/** El mapa 3D (MapLibre y deck.gl) se descarga solo si se usa: en la versión 2D no viaja. */
+const UniversoRed = lazy(() => import("./red/universo-red").then((m) => ({ default: m.UniversoRed })))
+
 /** Si llega `activacion`, primero se ve la animación y después las sucursales se encienden una por una. */
 export type ActivacionUniverso = { alTerminar: (motivo: FinActivacion) => void }
 
@@ -56,6 +61,9 @@ const cuadros = (n: number) => new Promise<void>((ok) => (n <= 0 ? ok() : reques
 function Escena({ fuente, alEntrar, activacion, piezaPedida }: { fuente: FuenteForja; alEntrar?: (id: Id) => void; activacion: ActivacionUniverso | null; piezaPedida: Pieza | null }) {
   const store = useContext(ContextoEscena)!
   const [entrada, setEntrada] = useState<"normal" | "esperando" | "encender">(activacion ? "esperando" : "normal")
+  // Versión 2D: movimiento reducido o equipo modesto (o elegida a mano)
+  const modo2D = useModo2D()
+  const es2D = modo2D.activo
   const control = useRef<ControlRed | null>(null)
   const raiz = useRef<HTMLDivElement>(null)
   const escenario = useRef<HTMLDivElement>(null)
@@ -141,13 +149,14 @@ function Escena({ fuente, alEntrar, activacion, piezaPedida }: { fuente: FuenteF
     if (st.transicion || st.nivel === "taller" || st.sala || !nodo) return
     if (st.nivel === "pieza") st.verPieza(null)
     alEntrar?.(id)
-    const reducir = reducirMovimiento()
+    // En 2D no hay vuelo ni descenso de cámara: el mismo camino corto que con movimiento reducido
+    const reducir = reducirMovimiento() || es2D
     // El taller muestra el presente: la repetición termina al entrar
     st.salirDeRepeticion()
     st.setTransicion("entrando")
     st.resaltar(null)
     st.elegirTransferencia(null)
-    void precargarTaller3D()
+    if (!es2D) void precargarTaller3D()
     // 1. El mapa vuela hacia el nodo, acercando e inclinando
     if (!reducir && st.vista === "mapa" && nodo.lat !== null) await control.current?.volarA(id, 1500)
     // 2. El brillo del nodo crece hasta cubrir la escena
@@ -172,7 +181,7 @@ function Escena({ fuente, alEntrar, activacion, piezaPedida }: { fuente: FuenteF
     if (st.transicion || st.nivel !== "taller" || !st.sucursalId) return
     const id = st.sucursalId
     const nodo = red.nodos.find((n) => n.id === id)
-    const reducir = reducirMovimiento()
+    const reducir = reducirMovimiento() || es2D
     st.setTransicion("saliendo")
     st.elegirZona(null)
     // La cámara del taller sube mientras el brillo cubre; después, el camino inverso en el mapa
@@ -294,6 +303,17 @@ function Escena({ fuente, alEntrar, activacion, piezaPedida }: { fuente: FuenteF
                 <SelectorVista />
                 <button
                   type="button"
+                  onClick={modo2D.alternar}
+                  aria-pressed={es2D}
+                  title={modo2D.motivo && !modo2D.elegido ? `Versión 2D automática: ${modo2D.motivo}` : es2D ? "Pasar a la versión 3D" : "Pasar a la versión 2D (más liviana)"}
+                  className="inline-flex items-center gap-1.5 rounded-lg border border-white/10 px-2.5 py-1 text-xs text-acero hover:border-white/25 hover:text-niebla focus-visible:outline focus-visible:outline-1 focus-visible:outline-temple"
+                  data-testid="alternar-2d"
+                >
+                  {es2D ? <Square className="size-3.5" aria-hidden /> : <Box className="size-3.5" aria-hidden />}
+                  {es2D ? "2D" : "3D"}
+                </button>
+                <button
+                  type="button"
                   onClick={() => setSala(true)}
                   className="hidden items-center gap-1.5 rounded-lg border border-white/10 px-2.5 py-1 text-xs text-acero hover:border-white/25 hover:text-niebla focus-visible:outline focus-visible:outline-1 focus-visible:outline-temple md:inline-flex"
                   data-testid="abrir-sala"
@@ -309,7 +329,13 @@ function Escena({ fuente, alEntrar, activacion, piezaPedida }: { fuente: FuenteF
       <div ref={escenario} className="relative flex-1 overflow-clip" data-linea={(nivel === "red" && !sala) || undefined}>
         {/* isolate: las capas de deck.gl no se cuelan sobre el taller */}
         <div className="absolute inset-0 isolate" inert={nivel === "taller"}>
-          <UniversoRed red={red} eventos={eventos} controlRef={control} onEntrar={(id) => void entrar(id)} activa={nivel !== "taller"} entrada={entrada} pieza={vistaPieza} />
+          {es2D ? (
+            <UniversoRed2D red={red} eventos={eventos} controlRef={control} onEntrar={(id) => void entrar(id)} entrada={entrada} pieza={vistaPieza} />
+          ) : (
+            <Suspense fallback={null}>
+              <UniversoRed red={red} eventos={eventos} controlRef={control} onEntrar={(id) => void entrar(id)} activa={nivel !== "taller"} entrada={entrada} pieza={vistaPieza} />
+            </Suspense>
+          )}
         </div>
         {nivel === "red" && !sala && transicion === null && (
           <>
@@ -318,7 +344,7 @@ function Escena({ fuente, alEntrar, activacion, piezaPedida }: { fuente: FuenteF
           </>
         )}
         {sala && <SalaControl red={red} eventos={eventos} control={control} />}
-        {nodoActual && <NivelTaller fuente={fuente} nodo={nodoActual} modo={camara} onListo={() => avisarListo.current?.()} onPieza={(p) => void irAPieza(p)} />}
+        {nodoActual && <NivelTaller fuente={fuente} nodo={nodoActual} modo={camara} modo2D={es2D} onListo={() => avisarListo.current?.()} onPieza={(p) => void irAPieza(p)} />}
         {nivel === "pieza" && datosPieza && <PanelPieza datos={datosPieza} red={red} enlaces={fuente.enlaces} onCerrar={() => verPieza(null)} />}
         {nivel === "pieza" && !datosPieza && (
           <div className="absolute right-4 top-4 z-20 max-w-sm rounded-xl border border-white/10 bg-hierro/95 p-4 text-sm text-acero" role="status" data-testid="panel-pieza-vacio">
@@ -331,6 +357,7 @@ function Escena({ fuente, alEntrar, activacion, piezaPedida }: { fuente: FuenteF
         <div ref={iris} className="pointer-events-none absolute left-0 top-0 z-20 rounded-full opacity-0 will-change-transform" aria-hidden data-testid="forja-iris" />
         {entrada === "esperando" && activacion && (
           <Activacion
+            quietaDeEntrada={es2D}
             onFin={(motivo) => {
               setEntrada("encender")
               activacion.alTerminar(motivo)

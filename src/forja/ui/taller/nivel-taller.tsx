@@ -10,6 +10,7 @@ import { useEscenaForja } from "../store"
 import type { ModoCamara } from "./camara"
 import { CapaEtiquetas, anclasTaller } from "./etiquetas"
 import { PanelZona } from "./panel-zona"
+import { Plano2D } from "./plano-2d"
 
 const Taller3D = lazy(() => import("./taller-3d"))
 /** Se llama al empezar la transición: el módulo 3D baja mientras vuela el mapa. */
@@ -21,7 +22,22 @@ const reducirMovimiento = () => typeof window !== "undefined" && window.matchMed
  * Nivel 2 — una sucursal por dentro: la escena 3D (carga diferida), la barra
  * de zonas (también es el camino con teclado) y el panel lateral.
  */
-export function NivelTaller({ fuente, nodo, modo, onListo, onPieza }: { fuente: FuenteForja; nodo: NodoForja; modo: ModoCamara; onListo: () => void; onPieza?: (p: Pieza) => void }) {
+export function NivelTaller({
+  fuente,
+  nodo,
+  modo,
+  modo2D = false,
+  onListo,
+  onPieza,
+}: {
+  fuente: FuenteForja
+  nodo: NodoForja
+  modo: ModoCamara
+  /** Versión 2D: plano de planta en SVG en lugar del corte 3D (sin three.js). */
+  modo2D?: boolean
+  onListo: () => void
+  onPieza?: (p: Pieza) => void
+}) {
   const taller = useMemo(() => fuente.taller(nodo.id), [fuente, nodo.id])
   const plano = useMemo(() => (taller ? planoTaller(taller, nodo.tipo) : null), [taller, nodo.tipo])
   const anclas = useMemo(() => (plano && taller ? anclasTaller(plano, taller) : []), [plano, taller])
@@ -52,7 +68,10 @@ export function NivelTaller({ fuente, nodo, modo, onListo, onPieza }: { fuente: 
   const enTransito = taller.muelle.filter((b) => b.tipo === "transferencia" && b.estado === "en_transito").length
 
   return (
-    <div ref={caja} className="absolute inset-0 z-10 overflow-clip bg-hierro" data-testid="forja-taller" data-sucursal={nodo.codigo} data-listo={listo}>
+    <div ref={caja} className="absolute inset-0 z-10 overflow-clip bg-hierro" data-testid="forja-taller" data-sucursal={nodo.codigo} data-listo={listo} data-modo={modo2D ? "2d" : "3d"}>
+      {modo2D ? (
+        <Plano2D plano={plano} sucursalId={nodo.id} eventos={fuente.eventos} enTransito={enTransito} margenDerecho={margenDerecho} margenAbajo={margenAbajo} onListo={avisar} />
+      ) : (
       <ErrorWebGL onFallo={avisar}>
         <Suspense fallback={null}>
           <Taller3D
@@ -70,7 +89,8 @@ export function NivelTaller({ fuente, nodo, modo, onListo, onPieza }: { fuente: 
           />
         </Suspense>
       </ErrorWebGL>
-      {listo && <CapaEtiquetas anclas={anclas} plano={plano} elementos={elementos} />}
+      )}
+      {listo && !modo2D && <CapaEtiquetas anclas={anclas} plano={plano} elementos={elementos} />}
       <BarraZonas plano={plano} taller={taller} />
       {zona && <PanelZona zona={zona} nodo={nodo} taller={taller} plano={plano} red={fuente.red} enlaces={fuente.enlaces} onPieza={onPieza} />}
     </div>

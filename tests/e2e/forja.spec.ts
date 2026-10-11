@@ -309,3 +309,62 @@ test.describe("Forja · pieza (nivel 3)", () => {
     await expect(panel).toContainText(serie)
   })
 })
+
+test.describe("Forja · versión 2D", () => {
+  test.use({ reducedMotion: "reduce" })
+
+  test("con movimiento reducido: mapa SVG y plano de planta, mismos paneles, sin MapLibre, deck.gl ni three.js", async ({ page }) => {
+    test.setTimeout(180_000)
+    await ingresar(page, "dueno@demo.yunque.app")
+    const scripts = registrarScripts(page)
+    await activarForja(page)
+    const red = page.getByTestId("forja-red")
+    await expect(red).toHaveAttribute("data-modo", "2d", { timeout: 60_000 })
+    await expect(page.getByTestId("nodo-forja")).toHaveCount(3)
+    await expect(page.getByTestId("alternar-2d")).toHaveAttribute("aria-pressed", "true")
+
+    // Tarjeta del nodo y detalle de la transferencia, como en el mapa
+    await page.locator("[data-nodo=CC] button").hover({ force: true })
+    await expect(page.getByTestId("tarjeta-nodo")).toContainText("Ventas de hoy")
+    await page.mouse.move(5, 5)
+    await page.getByTestId("transferencia-en-transito").first().click()
+    await expect(page.getByTestId("detalle-transferencia")).toContainText("En camino")
+    await page.getByTestId("vista-constelacion").click()
+    await expect(red).toHaveAttribute("data-vista", "constelacion")
+    await page.getByTestId("vista-mapa").click()
+
+    // Plano de planta: racks con sus productos al pasar, zonas con su panel
+    await page.locator("[data-nodo=CC] button").click({ force: true })
+    const taller = page.getByTestId("forja-taller")
+    await expect(taller).toHaveAttribute("data-listo", "true", { timeout: 30_000 })
+    await expect(taller).toHaveAttribute("data-modo", "2d")
+    await page.locator("[data-rack]").first().hover()
+    await expect(page.getByTestId("tooltip-rack")).toBeVisible()
+    await page.getByTestId("zona-servicio").click()
+    await expect(page.getByTestId("panel-zona")).toHaveAttribute("data-zona", "servicio")
+    await expect(page.getByTestId("banco-orden").first()).toBeVisible()
+    await page.keyboard.press("Escape")
+    await page.keyboard.press("Escape")
+    await expect(taller).toHaveCount(0, { timeout: 10_000 })
+
+    const texto = await scripts()
+    expect(texto).not.toContain("maplibregl-canvas")
+    expect(texto).not.toContain("THREE.WebGLRenderer")
+  })
+})
+
+test.describe("Forja · interruptor 2D/3D", () => {
+  test("se puede pasar a 2D a mano y queda recordado en el navegador", async ({ page }) => {
+    test.setTimeout(150_000)
+    await ingresar(page, "dueno@demo.yunque.app")
+    await activarForja(page)
+    const red = page.getByTestId("forja-red")
+    await expect(red).toHaveAttribute("data-modo", "3d", { timeout: 60_000 })
+    await page.getByTestId("alternar-2d").click()
+    await expect(red).toHaveAttribute("data-modo", "2d")
+    await page.reload()
+    await expect(page.getByTestId("forja-red")).toHaveAttribute("data-modo", "2d", { timeout: 60_000 })
+    await page.getByTestId("alternar-2d").click()
+    await expect(page.getByTestId("forja-red")).toHaveAttribute("data-modo", "3d", { timeout: 60_000 })
+  })
+})

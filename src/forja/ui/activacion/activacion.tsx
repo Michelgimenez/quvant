@@ -56,8 +56,8 @@ function pintarQuieta(t: number, c: Capas) {
  * saltar). La escena 3D se descarga aparte; textos, brillo e iris son del DOM
  * y se animan solo con transform y opacity, cuadro a cuadro desde un único reloj.
  */
-export function Activacion({ onFin }: { onFin: (motivo: FinActivacion) => void }) {
-  const [quieta, setQuieta] = useState(() => typeof window !== "undefined" && window.matchMedia("(prefers-reduced-motion: reduce)").matches)
+export function Activacion({ onFin, quietaDeEntrada = false }: { onFin: (motivo: FinActivacion) => void; quietaDeEntrada?: boolean }) {
+  const [quieta, setQuieta] = useState(() => quietaDeEntrada || (typeof window !== "undefined" && window.matchMedia("(prefers-reduced-motion: reduce)").matches))
   const [listo3d, setListo3d] = useState(false)
   const [sonido, setSonido] = useState(false)
   const reloj = useRef(0)

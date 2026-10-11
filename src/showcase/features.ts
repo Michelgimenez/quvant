@@ -81,7 +81,7 @@ export const FEATURES: Feature[] = [
   { id: "mercadolibre", nombre: "Mercado Libre", frase: "Stock y precios sincronizados con tus publicaciones.", estado: "próximamente", escena: "integraciones" },
   { id: "app-deposito", nombre: "App de depósito", frase: "Picking y recepción desde el celular, con lector.", estado: "próximamente", escena: "stock", nota: "Hoy el depósito usa la app web adaptada al celular." },
   { id: "migraciones", nombre: "Migración asistida", frase: "Traemos los datos de tu sistema anterior.", estado: "próximamente", escena: "plataforma", nota: "El importador de Excel/CSV existe; los conectores por sistema de origen no." },
-  { id: "forja", nombre: "Forja: el taller conectado", frase: "Todas las sucursales en vivo: ventas, stock, transferencias y reparaciones.", estado: "próximamente", escena: "forja", nota: "Extensión en construcción. Ya se ven la activación, la red de sucursales en el mapa, cada sucursal por dentro en 3D, la repetición del día, la sala de control y el recorrido de una pieza, con datos de la demo; falta la versión 2D completa." },
+  { id: "forja", nombre: "Forja: el taller conectado", frase: "Todas las sucursales en vivo: ventas, stock, transferencias y reparaciones.", estado: "próximamente", escena: "forja", nota: "Extensión en construcción. Ya se ven la activación, la red de sucursales en el mapa, cada sucursal por dentro en 3D, la repetición del día, la sala de control, el recorrido de una pieza y la versión 2D, con datos de la demo; faltan la demo pública y los videos." },
 ]
 
 export function featuresPorEstado(estado: EstadoFeature) {

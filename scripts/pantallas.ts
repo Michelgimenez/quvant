@@ -29,6 +29,8 @@ export type Pantalla = {
   carpeta?: string
   /** Captura con animaciones (por defecto se pide movimiento reducido para que salgan estables). */
   conMovimiento?: boolean
+  /** Forja: versión 3D o 2D (con movimiento reducido iría sola a 2D; por defecto se fija la 3D). */
+  vista?: "2d" | "3d"
 }
 
 /** Entra a una presentación con clave (si hace falta) y va a la escena n. */
@@ -303,6 +305,22 @@ export const PANTALLAS: Pantalla[] = [
       await p.getByTestId("faltante").first().hover()
       await p.getByTestId("tooltip-rack").waitFor()
       await p.waitForTimeout(400)
+    }),
+  },
+  { id: "forja-2d-mapa", ruta: "/app", usuario: "dueno@demo.yunque.app", esperar: "#contenido h1", carpeta: "forja", vista: "2d", antes: activarForja },
+  { id: "forja-2d-taller", ruta: "/app", usuario: "dueno@demo.yunque.app", esperar: "#contenido h1", carpeta: "forja", vista: "2d", antes: entrarAlTaller() },
+  {
+    id: "forja-2d-rack",
+    ruta: "/app",
+    usuario: "dueno@demo.yunque.app",
+    esperar: "#contenido h1",
+    carpeta: "forja",
+    vista: "2d",
+    soloEscritorio: true,
+    antes: entrarAlTaller(async (p) => {
+      await p.getByTestId("zona-servicio").click()
+      await p.locator("[data-rack]").nth(16).hover()
+      await p.getByTestId("tooltip-rack").waitFor()
     }),
   },
   {

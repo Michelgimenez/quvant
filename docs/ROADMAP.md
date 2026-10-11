@@ -44,7 +44,7 @@ Forja convierte los datos de Yunque en un taller conectado: las sucursales en un
 4. **Línea de tiempo del día y modo sala de control** ✔︎ — repetición a 1×, 60×, 600× o 1200× con la red reconstruida a cada hora, y recorrido de 20 s por sucursal con titulares para una TV.
 5. **Animación de activación y página de extensiones** ✔︎ — el yunque se convierte en forja (4,5 s, se puede saltar, queda guardada por persona) y versión quieta para movimiento reducido.
 6. **Recorrido de una pieza** ✔︎ — el camino de un SKU por las sucursales (arcos, stock y movimientos con saldo) y la historia de una máquina por número de serie, desde el buscador ⌘K o el taller.
-7. Versión 2D completa (movimiento reducido y equipos modestos).
+7. **Versión 2D completa** ✔︎ — mapa SVG y plano de planta con los mismos datos e interacciones, automática con movimiento reducido o equipos modestos y elegible a mano; no descarga nada de 3D.
 8. Demo pública para Ferremix, videos, sitio y presentación.
 9. Rendimiento, accesibilidad y documentación.
 

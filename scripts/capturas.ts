@@ -89,6 +89,8 @@ async function capturar(browser: Browser, p: Pantalla) {
     // Reloj fijo (miércoles 16:30 en Argentina): datos de demo idénticos en todas las capturas.
     await page.clock.install({ time: new Date(RELOJ) })
     if (p.usuario) await ingresar(page, p.usuario)
+    // Forja: con movimiento reducido iría sola a la versión 2D; cada captura fija la suya
+    if (p.carpeta === "forja") await page.addInitScript((v) => localStorage.setItem("forja.vista", v), p.vista ?? "3d")
     if (p.tema === "claro") {
       await page.addInitScript(() => localStorage.setItem("theme", "light"))
     }

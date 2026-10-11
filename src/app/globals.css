@@ -537,3 +537,31 @@
     animation: none;
   }
 }
+
+/* Forja 2D · sentido de los arcos (trazo SVG que corre) y halos que se encienden con las sucursales */
+.forja-flujo {
+  animation: forja-flujo 1.6s linear infinite;
+}
+@keyframes forja-flujo {
+  to {
+    stroke-dashoffset: -22;
+  }
+}
+[data-entrada="esperando"] .forja-halo {
+  opacity: 0;
+}
+[data-entrada="encender"] .forja-halo {
+  animation: forja-encender-halo 0.7s ease-out both;
+  animation-delay: calc(var(--i) * 180ms + 150ms);
+}
+@keyframes forja-encender-halo {
+  from {
+    opacity: 0;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .forja-flujo,
+  [data-entrada="encender"] .forja-halo {
+    animation: none;
+  }
+}

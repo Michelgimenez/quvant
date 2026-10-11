@@ -8,25 +8,26 @@ import { colorCalor, nombreCalor } from "@/forja/dominio/calor"
 import type { NodoForja } from "@/forja/dominio/modelo"
 
 /** Tarjeta al pasar el cursor (o con el foco) por un nodo: el día de la sucursal en números. */
-export function TarjetaNodo({ nodo, elemento, contenedor }: { nodo: NodoForja; elemento: HTMLElement | null; contenedor: HTMLElement | null }) {
-  const [pos, setPos] = useState<{ x: number; y: number } | null>(null)
+export function TarjetaNodo({ nodo, elemento: buscarElemento, contenedor: buscarContenedor }: { nodo: NodoForja; elemento: () => HTMLElement | null; contenedor: () => HTMLElement | null }) {
+  const [pos, setPos] = useState<{ x: number; y: number; ancho: number; alto: number } | null>(null)
   useEffect(() => {
     let marco = 0
     const seguir = () => {
+      const elemento = buscarElemento()
+      const contenedor = buscarContenedor()
       if (elemento && contenedor) {
         const r = elemento.getBoundingClientRect()
         const c = contenedor.getBoundingClientRect()
-        setPos({ x: r.left - c.left, y: r.top - c.top })
+        setPos({ x: r.left - c.left, y: r.top - c.top, ancho: c.width, alto: c.height })
       }
       marco = requestAnimationFrame(seguir)
     }
     seguir()
     return () => cancelAnimationFrame(marco)
-  }, [elemento, contenedor])
+  }, [buscarElemento, buscarContenedor])
   if (!pos) return null
   const ordenes = Object.entries(nodo.ordenes) as [EstadoServicio, number][]
-  const ancho = contenedor?.clientWidth ?? 1200
-  const alto = contenedor?.clientHeight ?? 800
+  const { ancho, alto } = pos
   const izquierda = pos.x + 36 + 280 > ancho ? pos.x - 36 - 280 : pos.x + 36
   // La tarjeta mide unos 270 px: nunca se corta abajo
   const arriba = Math.min(Math.max(12, pos.y - 70), Math.max(12, alto - 290))
