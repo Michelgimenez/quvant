@@ -21,7 +21,7 @@ test.describe("sitio del producto", () => {
     await demo.getByRole("button").nth(2).click()
     await expect(demo.getByTestId("demo-estado")).toContainText("2 ventas en cola")
     await demo.getByTestId("demo-interruptor").click()
-    await expect(page.getByTestId("momento-chispa").first()).toBeVisible({ timeout: 10_000 })
+    await expect(page.getByTestId("momento-salto").first()).toBeVisible({ timeout: 10_000 })
     await expect(demo.getByTestId("demo-estado")).toHaveText("Sincronizado", { timeout: 10_000 })
   })
 

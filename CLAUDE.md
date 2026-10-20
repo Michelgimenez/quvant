@@ -27,7 +27,7 @@ Al terminar o cambiar una funcionalidad:
 - Animación solo con `transform`, `opacity` y trazos SVG. Respetar `prefers-reduced-motion`.
 - Componentes compartidos en `src/components/`, nunca importados desde la carpeta de otra ruta de `src/app/` (provoca recargas en bucle en desarrollo).
 - Dentro del escenario de las presentaciones, usar consultas de contenedor (`@container`) en vez de breakpoints de ventana.
-- La chispa (`lanzarChispa`) solo en logros: cola sincronizada, presupuesto → venta, cierre de caja, conteo sin diferencias.
+- El salto del punto (`lanzarSalto`, `src/components/marca/salto.tsx`) solo en logros: cola sincronizada, presupuesto → venta, cierre de caja, conteo sin diferencias, aprobación completa.
 
 ## Antes de commitear
 `npm run verificar` (typecheck, lint, tests unitarios y de RLS, build). Tests de punta a punta: `npm run test:e2e`.

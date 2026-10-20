@@ -8,7 +8,7 @@ import { useApp, useDatos } from "@/cliente/app-contexto"
 import { Ficha } from "@/components/base/sellos"
 import { AreaImpresion, Comprobante } from "@/components/comercial/ticket"
 import { DialogoWhatsApp } from "@/components/comercial/whatsapp"
-import { lanzarChispa } from "@/components/marca/momento-chispa"
+import { lanzarSalto } from "@/components/marca/salto"
 import { Button } from "@/components/ui/button"
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle } from "@/components/ui/sheet"
 import { formatoCantidad, formatoPesos } from "@/dominio/dinero"
@@ -73,7 +73,7 @@ export function DetallePresupuesto({ id, onCerrar }: { id: Id | null; onCerrar: 
     setProcesando(false)
     if (!r.ok) return toast.error(r.error)
     setCobro(false)
-    lanzarChispa({ desde: botonConvertir.current, mensaje: "Presupuesto → venta" })
+    lanzarSalto({ desde: botonConvertir.current, mensaje: "Presupuesto → venta" })
     toast.success("Presupuesto convertido en venta", { description: r.avisos.find((a) => a.startsWith("presupuesto_vencido")) ? "Era un presupuesto vencido: revisá los precios." : undefined })
   }
 

@@ -4,7 +4,7 @@ import { useRef, useState } from "react"
 import { ArrowDownToLine, Lock, LockOpen, Wallet } from "lucide-react"
 import { toast } from "sonner"
 import { useApp, useDatos } from "@/cliente/app-contexto"
-import { lanzarChispa } from "@/components/marca/momento-chispa"
+import { lanzarSalto } from "@/components/marca/salto"
 import { Button } from "@/components/ui/button"
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import { Input } from "@/components/ui/input"
@@ -194,7 +194,7 @@ function DialogoCierre({ caja, onCerrar }: { caja: SesionCaja; onCerrar: () => v
             onClick={async () => {
               const r = await ejecutar("caja.cerrar", { sesionId: caja.id, montoContado: contadoC }, caja.sucursalId)
               if (!r.ok) return toast.error(r.error)
-              lanzarChispa({ desde: boton.current, mensaje: "Caja cerrada" })
+              lanzarSalto({ desde: boton.current, mensaje: "Caja cerrada" })
               toast.success("Caja cerrada", { description: diferencia === 0 ? "Sin diferencias." : `Diferencia registrada: ${formatoPesos(diferencia, { signo: true })}` })
               onCerrar()
             }}

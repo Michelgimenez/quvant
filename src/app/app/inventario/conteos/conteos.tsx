@@ -10,7 +10,7 @@ import { BuscadorProductos } from "@/components/app/buscador-productos"
 import { EncabezadoPagina, Panel, Requiere, Vacio } from "@/components/app/pagina"
 import { MiniaturaProducto } from "@/components/base/ilustracion"
 import { Ficha } from "@/components/base/sellos"
-import { lanzarChispa } from "@/components/marca/momento-chispa"
+import { lanzarSalto } from "@/components/marca/salto"
 import { Button } from "@/components/ui/button"
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import { Input } from "@/components/ui/input"
@@ -201,7 +201,7 @@ function DetalleConteo({ id }: { id: Id }) {
                   if (!r.ok) return toast.error(r.error)
                   const dif = Number(r.asignado?.diferencias ?? 0)
                   if (dif === 0) {
-                    lanzarChispa({ desde: botonCerrar.current, mensaje: "Conteo sin diferencias" })
+                    lanzarSalto({ desde: botonCerrar.current, mensaje: "Conteo sin diferencias" })
                     toast.success("Conteo cerrado sin diferencias.")
                   } else toast.success(`Conteo cerrado. Se ajustaron ${dif} producto(s).`)
                 }}

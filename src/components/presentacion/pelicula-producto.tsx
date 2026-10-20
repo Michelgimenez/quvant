@@ -9,7 +9,7 @@ import { LogoOrg } from "@/components/base/logo-org"
 import { MiniaturaProducto } from "@/components/base/ilustracion"
 import { Punto } from "@/components/base/sellos"
 import { Carrito } from "@/components/comercial/carrito"
-import { lanzarChispa } from "@/components/marca/momento-chispa"
+import { lanzarSalto } from "@/components/marca/salto"
 import { buscarProductos } from "@/dominio/busqueda"
 import { formatoCantidad, formatoPesos } from "@/dominio/dinero"
 import { claveStock, listaDefault } from "@/dominio/estado"
@@ -177,7 +177,7 @@ function Pelicula({ demo, textos, bucle }: { demo: DemoEmbebida; textos: TextosP
         { sucursalId: pres.sucursalId },
       )
       if (r.ok) {
-        lanzarChispa({ desde: refConvertir.current, mensaje: "Presupuesto → venta" })
+        lanzarSalto({ desde: refConvertir.current, mensaje: "Presupuesto → venta" })
         setConvertido(motor.estado.presupuestos[pres.id]?.ventaId ?? "")
       }
       if (bucle) {

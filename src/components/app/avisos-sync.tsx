@@ -3,7 +3,7 @@
 import { useEffect } from "react"
 import { toast } from "sonner"
 import { useApp } from "@/cliente/app-contexto"
-import { lanzarChispa } from "@/components/marca/momento-chispa"
+import { lanzarSalto } from "@/components/marca/salto"
 
 const TEXTO_AVISO: Record<string, string> = {
   stock_negativo: "Stock negativo",
@@ -33,7 +33,7 @@ export function AvisosSincronizacion() {
           const que = ev.ventasSinConexion
             ? `${ev.ventasSinConexion} ${ev.ventasSinConexion === 1 ? "venta" : "ventas"}`
             : `${ev.sinConexion} cambio${ev.sinConexion === 1 ? "" : "s"}`
-          lanzarChispa({ desde: indicador, mensaje: `Cola sincronizada · ${que}` })
+          lanzarSalto({ desde: indicador, mensaje: `Cola sincronizada · ${que}` })
           toast.success(`Volvió la conexión: se sincronizaron ${que} hechas sin conexión.`, { id: "conexion" })
         }
         for (const r of ev.rechazadas) {

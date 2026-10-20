@@ -5,7 +5,7 @@ import { Cloud, CloudOff, Wifi, WifiOff } from "lucide-react"
 import { crearDemoEmbebida, type DemoEmbebida } from "@/cliente/demo-embebida"
 import { MiniaturaProducto } from "@/components/base/ilustracion"
 import { Punto } from "@/components/base/sellos"
-import { CapaChispas, lanzarChispa } from "@/components/marca/momento-chispa"
+import { CapaSaltos, lanzarSalto } from "@/components/marca/salto"
 import { Switch } from "@/components/ui/switch"
 import { formatoPesos } from "@/dominio/dinero"
 import { listaDefault, precioDe } from "@/dominio/estado"
@@ -41,7 +41,7 @@ export function DemoConexion({ compacta = false, guion }: { compacta?: boolean; 
   return (
     <>
       <Mostrador demo={demo} compacta={compacta} guion={guion} />
-      <CapaChispas />
+      <CapaSaltos />
     </>
   )
 }
@@ -77,7 +77,7 @@ function Mostrador({ demo, compacta, guion }: { demo: DemoEmbebida; compacta: bo
           return [...nuevas.reverse(), ...prev].slice(0, 8)
         })
         if (ev.ventasSinConexion > 0) {
-          lanzarChispa({ desde: panelServidor.current, mensaje: `Cola sincronizada · ${ev.ventasSinConexion} ${ev.ventasSinConexion === 1 ? "venta" : "ventas"}` })
+          lanzarSalto({ desde: panelServidor.current, mensaje: `Cola sincronizada · ${ev.ventasSinConexion} ${ev.ventasSinConexion === 1 ? "venta" : "ventas"}` })
         }
       }),
     [motor, demo, mias],

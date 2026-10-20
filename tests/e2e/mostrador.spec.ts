@@ -16,7 +16,7 @@ test.describe("mostrador", () => {
     await expect(page.getByText(/Venta #\d+/).first()).toBeVisible()
   })
 
-  test("presupuesto que pasa a venta (con chispa)", async ({ page }) => {
+  test("presupuesto que pasa a venta (con el salto)", async ({ page }) => {
     await ingresar(page, "mostrador@demo.yunque.app", "/app/presupuestos/nuevo")
     await page.getByLabel("Nombre del cliente").fill("Obra Calle Falsa")
     const buscador = page.getByTestId("buscador-productos")
@@ -29,7 +29,7 @@ test.describe("mostrador", () => {
     await expect(detalle.getByText("Obra Calle Falsa")).toBeVisible()
     await detalle.getByTestId("convertir-venta").click()
     await page.getByTestId("confirmar-venta").click()
-    await expect(page.getByTestId("momento-chispa").first()).toBeVisible()
+    await expect(page.getByTestId("momento-salto").first()).toBeVisible()
     await expect(detalle.getByText("Convertido en venta").first()).toBeVisible()
   })
 
@@ -56,9 +56,9 @@ test.describe("mostrador", () => {
     await page.getByRole("button", { name: "Nueva venta" }).click()
     await expect(page.getByTestId("estado-conexion")).toContainText("2 ventas en cola")
 
-    // Vuelve internet: se sincroniza sola y salta la chispa
+    // Vuelve internet: se sincroniza sola y salta el punto
     await context.setOffline(false)
-    await expect(page.getByTestId("momento-chispa").first()).toBeVisible({ timeout: 30_000 })
+    await expect(page.getByTestId("momento-salto").first()).toBeVisible({ timeout: 30_000 })
     await expect(page.getByTestId("estado-conexion")).toHaveText("Sincronizado", { timeout: 30_000 })
   })
 })

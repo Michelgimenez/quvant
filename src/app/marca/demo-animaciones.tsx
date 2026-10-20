@@ -4,7 +4,7 @@ import { useState } from "react"
 import { RotateCcw, Sparkles } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { YunqueArmado } from "@/components/marca/yunque-armado"
-import { CapaChispas, lanzarChispa } from "@/components/marca/momento-chispa"
+import { CapaSaltos, lanzarSalto } from "@/components/marca/salto"
 
 export function DemoAnimaciones() {
   const [vuelta, setVuelta] = useState(0)
@@ -22,10 +22,10 @@ export function DemoAnimaciones() {
           <p className="max-w-sm text-sm text-muted-foreground">
             La chispa aparece solo en logros: cola sincronizada, presupuesto convertido, cierre de caja, conteo sin diferencias.
           </p>
-          <Button onClick={(e) => lanzarChispa({ desde: e.currentTarget, mensaje: "Cola sincronizada · 3 ventas" })}>
+          <Button onClick={(e) => lanzarSalto({ desde: e.currentTarget, mensaje: "Cola sincronizada · 3 ventas" })}>
             <Sparkles /> Probar momento chispa
           </Button>
-          <CapaChispas />
+          <CapaSaltos />
         </div>
       </div>
     </section>
