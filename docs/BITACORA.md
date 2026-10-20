@@ -28,3 +28,15 @@ Cambiar el nombre de un producto tiene tres capas, y cada una pide un cuidado di
 3. **Lo que ya está aplicado afuera** (las migraciones de la base): no se edita nunca. Una migración aplicada es historia; cambiarla hace que la base real y el repo dejen de coincidir.
 
 El reemplazo automático tuvo un efecto inesperado que vale recordar: `yunque-app` también transformó `yunque-app-icon` en `quvant-app-icon`, un archivo que no existe. Por eso, después de un reemplazo masivo, conviene comprobar que cada ruta a un archivo siga existiendo (eso se hizo y se corrigió).
+
+## Tanda 3 · Un simulador que es una función del tiempo
+
+La demo tiene que verse viva (una venta del kiosco cada pocos segundos) y, a la vez, salir **siempre igual**, para poder filmarla cuadro por cuadro. La solución es no "tirar dados" en cada tic del reloj: el tiempo desde la ancla se parte en ranuras, y cada ranura decide con un hash si hay evento y de qué tipo.
+
+```ts
+const k = Math.floor((t - ANCLA_MS) / ritmo.cada)        // la ranura de este momento
+if (u01(semilla, "hay", k) > 0.86) return null            // ¿hay evento en esta ranura?
+const tipo = elegirPonderado(u01(semilla, "tipo", k), ritmo.tipos)
+```
+
+Así, `eventosEntre(desde, hasta)` devuelve lo mismo si se lo pide en vivo, al volver a una empresa o en el cuadro 1.234 de un video. No hay estado escondido: el tablero es una función de (datos generados, momento, lo que hizo el visitante). El mismo truco sirve para el stock del grupo: `stockGrupo(producto, sucursal)` es un hash, así 25.000 productos × 40 sucursales no ocupan un millón de filas en memoria.

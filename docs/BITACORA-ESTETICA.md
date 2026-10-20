@@ -44,3 +44,18 @@ Se compone a 1600×1000 y se captura a 1,5× (2400×1500). Así los estilos de t
 **Vuelta 3**
 - El sello vuelve a `.t-etiqueta`. El botón de retiro queda solo con su ícono (con su nombre accesible) y el estado de la caja se recorta con puntos suspensivos si no entra.
 - En oscuro y en claro: los totales se leen primero, nada se parte y el claro queda plano y prolijo, sin grilla.
+
+## Tanda 3 · Los tableros de las cuatro escalas (`docs/capturas/quvant/tanda-3/`)
+
+**Vuelta 1**
+- Se nota la escala: el kiosco tiene números grandes y pocas tarjetas; el grupo, seis cifras, el mapa, una tabla de 40 filas y la auditoría. El selector, con sus cuatro tarjetas sobre la grilla, se lee de un vistazo, y los logos ficticios se distinguen sin competir con la Q.
+- El color de cada empresa no llegaba a sus gráficos: `--serie-1` no estaba definido en la escena.
+- La comparación "vs el viernes pasado" daba −35 % en el kiosco porque comparaba media tarde contra un día entero.
+- "Las últimas ventas" y "Actividad" arrancaban vacías hasta el primer evento simulado.
+- En el grupo, las etiquetas de las cifras se cortaban, el stock valorizado salía como "$ 11 mil M" y la columna "Hoy" de la comparación se partía en tres renglones.
+
+**Vuelta 2**
+- El color de la empresa se define en la escena (`--marca`, `--serie-1`): verde en la ferretería, frambuesa en el grupo, tomate en la hora en curso del kiosco.
+- El kiosco, la distribuidora y el grupo se comparan con el viernes pasado a la misma hora. La ferretería, cuyo seed reparte el día completo, contra el día entero.
+- Las listas arrancan con lo que pasó hoy antes de las 17:30.
+- El grupo pasa a etiquetas cortas, a una tabla con anchos fijos (números sin cortes) y a cifras grandes del tipo "$ 11.012 M". En la ferretería, el taller pasa de una grilla 2×2 apretada a una lista.

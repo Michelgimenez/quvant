@@ -28,3 +28,10 @@ Lo que el modo boceto deja para después: celular, respaldos, accesibilidad fina
 - **Tests de punta a punta:** no se corrieron en esta tanda. Cambiaron los usuarios de prueba (`@demo.quvant.app`), el testid del salto y la cantidad de escenas de `/inversores` (12 mientras Forja esté oculta). Correr `npm run build && npm run test:e2e` y ajustar.
 - **Claves de almacenamiento:** pasaron de `yunque:` a `quvant:` sin migración. En producción habría que leer las viejas como respaldo.
 - **El manifiesto:** no hay ícono vectorial porque la Q es PNG.
+
+## De la tanda 3 · Las cuatro empresas y la demo
+
+- **Celular (fase 1):** `/demo` está pensada para escritorio (1440×900). En el celular, la barra lateral tiene que pasar a un menú y los tableros densos (grupo, distribuidora), a una sola columna.
+- **Accesibilidad (fase 3):** el selector de empresas es un diálogo sin trampa de foco. Las tablas del grupo se ordenan con botones, pero el orden no se anuncia. El mapa necesita una alternativa en tabla (la comparación cumple ese papel, pero falta enlazarlas).
+- **Rendimiento (fase 4):** el snapshot de la ferretería (129 kB) y los catálogos generados viajan en el paquete de `/demo`. Medir y, si hace falta, cargar cada empresa recién al elegirla.
+- **Movimiento reducido (fase 2):** el fundido y el simulador no miran `prefers-reduced-motion`.

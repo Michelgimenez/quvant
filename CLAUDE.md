@@ -14,7 +14,8 @@ Al terminar o cambiar una funcionalidad:
 ## Regla de honestidad
 - Nada de métricas, clientes, testimonios ni logos de clientes inventados presentados como reales.
 - Donde no hay dato real: `[COMPLETAR: ...]` visible (se renderiza resaltado con `<TextoConfig />`).
-- Datos de ejemplo = "Ferretería Industrial Demo", siempre con el sello `DEMO` visible.
+- Datos de ejemplo = las cuatro empresas ficticias de `src/demo/empresas.ts` (Kiosco La Esquina, Ferretería Industrial Demo, Distribuidora Ruta Clara, Grupo Cordal), siempre con el sello `DEMO` visible. Los eventos simulados llevan la etiqueta `SIMULACIÓN`.
+- La demo pública (`/demo`) no lee ni escribe la base: lee `src/demo/` y guarda lo del visitante en su navegador.
 - Ferremix aparece solo en `/demo/ferremix` como "propuesta" / "así se vería", nunca como cliente activo. En el código, solo en `src/config/clientes/` (lo verifica `tests/unit/honestidad.test.ts`).
 - Textos y números de las presentaciones y del sitio se editan en `src/config/` (lo sensible de inversores, en `inversion.ts`, que es `server-only`). Prospectos nuevos: `src/config/clientes/_plantilla.ts`.
 

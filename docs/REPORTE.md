@@ -2,6 +2,47 @@
 
 > Yunque pasa a ser Quvant (`PROMPT-QUVANT.md`), en 10 tandas, en la rama `quvant`. Arriba, lo último; abajo, el historial de Yunque.
 
+## Resumen · tanda 3 de 10 · Las cuatro empresas y la demo (20/10/2026)
+
+1. **Las cuatro empresas** (`src/demo/empresas.ts`), todas ficticias y con el sello DEMO:
+
+   | Empresa | Escala | Color |
+   |---|---|---|
+   | Kiosco La Esquina | 1 caja, 327 productos | tomate |
+   | Ferretería Industrial Demo | 3 sucursales, 290 productos (sale del seed de la app) | verde azulado |
+   | Distribuidora Ruta Clara | 12 preventistas, 400 clientes, 1.800 productos | azul |
+   | Grupo Cordal | 40 sucursales en 6 provincias, 24.996 productos | ciruela |
+
+   - **Nombres:** se buscaron en la web y no aparece ninguna marca conocida igual o parecida. "La Esquina" es un nombre genérico; solo aparece en restaurantes, que son otro rubro. Michel los puede cambiar en la configuración.
+   - **Logos ficticios:** una palabra en una tipografía libre (OFL: Fredoka, Oswald, DM Serif Display y Marcellus), convertida a trazados en `src/demo/logos-empresas.ts`. No suman fuentes a la web.
+   - **Módulos:** con la misma forma que `Organizacion.modulos`.
+   - **Terminología propia:** Caja y Fiado en el kiosco; Preventa, Reparto y Cobranzas en la distribuidora; Consolidado, Sucursales y Aprobaciones en el grupo.
+2. **Los datos, con dos implementaciones del mismo modelo** (`src/dominio/negocio.ts`):
+   - **App:** `src/datos/negocio-desde-estado.ts` lo arma desde la réplica local.
+   - **Demo:** `src/demo/`.
+     - La ferretería se exporta del seed con ese mismo adaptador a `src/demo/ferreteria-snapshot.json` (129 kB, `npx tsx scripts/generar-snapshot-ferreteria.ts`).
+     - Las otras tres se generan con semilla fija desde la fecha ancla (viernes 16/10/2026, 17:30), con 90 días de ventas con estacionalidad: viernes en el kiosco, fin de mes en la distribuidora.
+     - El catálogo del grupo se arma al elegirlo (40 ms) y el stock por sucursal se calcula a pedido con un hash.
+   - **El simulador del día** (`src/demo/simulador.ts`) es una función del tiempo y de la semilla, con la etiqueta SIMULACIÓN:
+     - el kiosco vende cada pocos segundos;
+     - en el grupo se mueven decenas de sucursales a la vez.
+3. **`/demo`:**
+   - Es pública, sin login, con `noindex`, y no toca la base.
+   - Tiene una barra con "Estás viendo: [empresa] · DEMO", el selector de cuatro tarjetas sobre la grilla, el recorrido guiado y reiniciar.
+   - Atajos: teclas 1 a 4 (salvo en un campo o en un mostrador) y ⌘E o Ctrl+E.
+   - La empresa elegida queda en la dirección (`/demo?empresa=grupo`, con `history.replaceState`).
+   - Lo que hace el visitante se guarda en su navegador (zustand con persist, `skipHydration`, `version` y `partialize`), y la dirección manda sobre lo guardado.
+4. **Los tableros:**
+   - El kiosco es amplio: cuánto vendí, la caja, el fiado, qué pedir y los precios.
+   - La ferretería tiene densidad media: las sucursales, los 30 días por negocio y lo que hay que atender.
+   - La distribuidora muestra preventistas contra su objetivo, cobranzas, deuda en la calle, reparto y los picos de fin de mes.
+   - El grupo es denso: consolidado, mapa de Argentina con la grilla de puntos, la comparación de las 40 sucursales ordenable, provincias, aprobaciones y auditoría.
+   - Productos y clientes van en tablas virtualizadas; en el grupo, sobre los 25.000 productos.
+   - El cambio de empresa es, por ahora, un fundido simple.
+5. **Tests:** `tests/unit/demo-empresas.test.ts` (14), que cubren estructura, determinismo, estacionalidad, códigos de barras, simulador y resúmenes.
+
+**El mapa:** el contorno sale de Natural Earth (dominio público), simplificado, e incluye las Islas Malvinas, sin rótulos.
+
 ## Resumen · tanda 2 de 10 · El renombre y la app (20/10/2026)
 
 **Pedido de Michel:** hacer todas las tandas restantes seguidas, con ejemplos dinámicos. Donde el prompt pedía esperar una elección, queda una por defecto que se cambia en la configuración.
