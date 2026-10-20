@@ -51,7 +51,13 @@ export type EstadoDemo = {
 
 export const VERSION_ESTADO_DEMO = 2
 
-export function crearEstadoDemo(inicial: IdEmpresa) {
+/** Un almacenamiento en memoria: para una demo que no tiene que tocar lo que el visitante guardó (la escala del sitio). */
+function memoria() {
+  const m = new Map<string, string>()
+  return { getItem: (k: string) => m.get(k) ?? null, setItem: (k: string, v: string) => void m.set(k, v), removeItem: (k: string) => void m.delete(k) }
+}
+
+export function crearEstadoDemo(inicial: IdEmpresa, { guardar = true }: { guardar?: boolean } = {}) {
   return createStore<EstadoDemo>()(
     persist(
       (set) => ({
@@ -73,7 +79,7 @@ export function crearEstadoDemo(inicial: IdEmpresa) {
       {
         name: "quvant:demo",
         version: VERSION_ESTADO_DEMO,
-        storage: createJSONStorage(() => localStorage),
+        storage: createJSONStorage(() => (guardar ? localStorage : memoria())),
         skipHydration: true,
         // Solo lo que hizo el visitante: nunca los datos generados ni el interruptor de conexión.
         partialize: (s) => ({ empresa: s.empresa, porEmpresa: s.porEmpresa }),

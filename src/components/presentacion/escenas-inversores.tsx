@@ -11,7 +11,7 @@ import { DemoConexion } from "@/components/sitio/demo-conexion"
 import { VideoForja } from "@/components/sitio/video-forja"
 import { ETAPAS } from "@/config/hoja-de-ruta"
 import { MERCADO, PILARES, TERRENO } from "@/config/inversores"
-import { PRECIOS, textoPrecioExtension } from "@/config/precios"
+import { textoPrecioExtension } from "@/config/precios"
 import { proyectar, SUPUESTOS } from "@/config/proyecciones"
 import { SITIO } from "@/config/sitio"
 import { FEATURES, type EstadoFeature } from "@/showcase/features"
@@ -229,7 +229,7 @@ function Modelo() {
           <Aparecer demora={0.4} className="rounded-3xl border border-white/10 bg-superficie-1/80 p-7">
             <p className="text-[20px] uppercase tracking-widest text-acero">Ingreso recurrente</p>
             <p className="mt-2 text-[30px] text-blanco">
-              negocios activos × <span className="font-bold">USD {PRECIOS.desdePorNegocio}</span> por mes
+              negocios activos × <span className="font-bold">licencia mensual de su plan</span>
             </p>
           </Aparecer>
           <Aparecer demora={0.55} className="rounded-3xl border border-white/10 bg-superficie-1/80 p-7">

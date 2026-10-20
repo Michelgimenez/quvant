@@ -23,6 +23,7 @@ Clases en `src/app/globals.css` (`@layer components`). Cada una resuelve tamaño
 | `.t-marca-sm` | Michroma 400, mayúsculas | 13 px / 1,2 | +0,20 em | Lo mismo, chico (placas, sellos de producto) |
 | `.t-marca-lg` | Michroma 400, mayúsculas | 40 px / 1,1 | +0,16 em | Portadas y cierres de video |
 | `.t-hero` | Plex Mono 700 | 64 px / 1,04 | −0,02 em | Titular del sitio y portadas |
+| `.t-titulo-lg` | Plex Mono 700 **[EXTENSIÓN]** | 40 px / 1,08 | −0,02 em | Título de sección del sitio y de las presentaciones (tanda 7) |
 | `.t-titulo` | Plex Mono 700 | 28 px / 1,15 | −0,01 em | Título de pantalla ("Cerrar la caja") |
 | `.t-titulo-sm` | Plex Mono 600 **[EXTENSIÓN]** | 18 px / 1,3 | 0 | Título de tarjeta o de panel |
 | `.t-texto` | Plex Mono 400 | 15 px / 1,6 | 0 | Texto corrido (el manual: 15 px o 10 pt) |

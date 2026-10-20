@@ -14,7 +14,7 @@ import { Logotipo } from "@/components/marca/quvant"
 import { DemoConexion } from "@/components/sitio/demo-conexion"
 import type { ClienteDemo } from "@/config/clientes"
 import { IMPLEMENTACION } from "@/config/hoja-de-ruta"
-import { PRECIOS } from "@/config/precios"
+import { PRECIOS, textoPrecioPlan } from "@/config/precios"
 import { textoSobre } from "@/lib/color"
 import { cn } from "@/lib/utils"
 import { Aparecer, Bajada, Lienzo, Titulo, TrazoAnimado } from "./kit"
@@ -324,7 +324,7 @@ function ComoEmpezamos() {
 function SocioFundador() {
   const { cliente } = useCliente()
   const socios = PRECIOS.sociosFundadores
-  const plan = PRECIOS.planes[0]
+  const plan = PRECIOS.planes.find((p) => p.id === "comercio") ?? PRECIOS.planes[0]
   return (
     <LienzoCliente numero="07" etiqueta="Socio fundador">
       <div className="grid h-full grid-cols-[1fr_560px] gap-16">
@@ -334,7 +334,7 @@ function SocioFundador() {
               <Acento>{cliente.nombre}</Acento> como socio fundador.
             </Titulo>
             <Bajada className="mt-5 text-[28px]">
-              Programa para los primeros {socios.cupos} negocios que usen Quvant de verdad. {socios.estado}.
+              Programa para los primeros negocios que usen Quvant de verdad. Programa {socios.estado.toLowerCase()}.
             </Bajada>
           </Aparecer>
           <ul className="mt-12 space-y-6">
@@ -350,8 +350,8 @@ function SocioFundador() {
         </div>
         <Aparecer demora={0.8} className="flex flex-col self-start rounded-3xl border border-white/10 bg-superficie-1/80 p-10">
           <p className="font-mono text-[20px] uppercase tracking-widest text-acero">Plan {plan.nombre}</p>
-          <p className="mt-4 text-[80px] font-extrabold leading-none tracking-tight text-blanco">USD {plan.precioMensual}</p>
-          <p className="mt-2 text-[26px] text-acero">{plan.unidad}</p>
+          <p className="mt-4 text-[80px] font-bold leading-none tracking-tight text-blanco">{textoPrecioPlan(plan).precio}</p>
+          {textoPrecioPlan(plan).unidad && <p className="mt-2 text-[26px] text-acero">{textoPrecioPlan(plan).unidad}</p>}
           <p className="mt-4 text-[22px] text-acero">{plan.para}. Implementación: {PRECIOS.implementacion.toLowerCase()}</p>
           <div className="mt-8 border-t border-white/10 pt-8 text-[22px] text-blanco">
             <p className="font-mono text-[16px] uppercase tracking-widest text-acero">Hablemos</p>

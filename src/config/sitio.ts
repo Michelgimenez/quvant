@@ -44,6 +44,8 @@ export const SITIO = {
    */
   titularElegido: TITULAR_ELEGIDO,
   titular: TITULARES_ALTERNATIVOS.find((t) => t.id === TITULAR_ELEGIDO)!.titular as string,
+  /** La bajada que acompaña al titular elegido en el hero. */
+  bajadaTitular: TITULARES_ALTERNATIVOS.find((t) => t.id === TITULAR_ELEGIDO)!.bajada as string,
   descripcion:
     "El sistema de gestión que se adapta a cada negocio: ventas, caja, stock, precios, compras, clientes y sucursales en un solo lugar. Del kiosco de barrio a la empresa con decenas de sucursales.",
   estado: "Demo funcional · primer piloto en negociación",
@@ -61,7 +63,10 @@ export const SITIO = {
 /** Rubros del formulario "Pedir una demo": del kiosco a la empresa. */
 export const RUBROS = ["Kiosco o almacén", "Comercio", "Ferretería", "Distribuidora o mayorista", "Empresa con sucursales", "Otro"] as const
 
-/** Tamaño del negocio, para el formulario. */
+/**
+ * Tamaño del negocio, para el formulario. Sin cambiar la base: se guarda junto al rubro ("Kiosco o almacén · 1 caja")
+ * y la cantidad de sucursales sigue en su columna.
+ */
 export const TAMANOS = ["1 caja", "2 a 5 cajas", "Varias sucursales", "Más de 10 sucursales"] as const
 
 export const ES_COMPLETAR = /\[COMPLETAR[^\]]*\]/

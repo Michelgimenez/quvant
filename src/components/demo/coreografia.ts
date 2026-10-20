@@ -34,6 +34,11 @@ export type OpcionesCambio = {
   cerrarSelector: () => void
   /** Cambia la empresa en React de forma síncrona (flushSync). */
   aplicarCambio: () => void
+  /**
+   * Si la escena está achicada con transform: scale (la escala del sitio), cuánto. Las medidas de la pantalla
+   * se pasan a las de la escena dividiendo por esto. Por defecto, 1.
+   */
+  escala?: number
 }
 
 const centro = (el: Element | null) => {
@@ -87,6 +92,7 @@ function clonFijo(el: Element) {
 }
 
 export function cambiarEmpresa(o: OpcionesCambio): Promise<void> {
+  const k = o.escala ?? 1
   return new Promise((listo) => {
     const tl = gsap.timeline({ onComplete: () => listo(), defaults: { ease: "power3.inOut" } })
     let capa: ReturnType<typeof capaDelSalto> | null = null
@@ -120,7 +126,7 @@ export function cambiarEmpresa(o: OpcionesCambio): Promise<void> {
       // La foto del estado viejo, debajo de la escena viva.
       foto = escena.cloneNode(true) as HTMLElement
       foto.removeAttribute("data-escena-empresa")
-      Object.assign(foto.style, { position: "absolute", left: "0", top: "0", width: `${rEscena.width}px`, height: `${rEscena.height}px`, zIndex: "0", pointerEvents: "none" })
+      Object.assign(foto.style, { position: "absolute", left: "0", top: "0", width: `${rEscena.width / k}px`, height: `${rEscena.height / k}px`, zIndex: "0", pointerEvents: "none" })
       foto.querySelectorAll("main").forEach((m, i) => (m.scrollTop = escena.querySelectorAll("main")[i]?.scrollTop ?? 0))
       marco.prepend(foto)
       limpiar.push(() => foto?.remove())
@@ -139,9 +145,9 @@ export function cambiarEmpresa(o: OpcionesCambio): Promise<void> {
       Object.assign(escena.style, { position: "relative", zIndex: "1" })
 
       // 3 · El barrido circular desde la caída.
-      const cx = caida.x - rEscena.left
-      const cy = caida.y - rEscena.top
-      const radio = Math.hypot(Math.max(cx, rEscena.width - cx), Math.max(cy, rEscena.height - cy)) + 40
+      const cx = (caida.x - rEscena.left) / k
+      const cy = (caida.y - rEscena.top) / k
+      const radio = Math.hypot(Math.max(cx, rEscena.width / k - cx), Math.max(cy, rEscena.height / k - cy)) + 40
       tl.fromTo(escena, { clipPath: `circle(0px at ${cx}px ${cy}px)` }, { clipPath: `circle(${radio}px at ${cx}px ${cy}px)`, duration: 0.7, ease: "power2.inOut", clearProps: "clipPath" }, t0)
       // En la foto, lo que no sigue en la empresa nueva se apaga mientras pasa el barrido.
       const idsNavNuevo = new Set([...escena.querySelectorAll("[data-lateral] [data-flip-id^='nav-']")].map((e) => e.getAttribute("data-flip-id")))
@@ -181,7 +187,7 @@ export function cambiarEmpresa(o: OpcionesCambio): Promise<void> {
       escena.querySelectorAll<HTMLElement>("[data-flip-id^='t-']").forEach((el, i) => {
         const vieja = tarjetasViejas.get(el.getAttribute("data-flip-id"))
         const nueva = el.getBoundingClientRect()
-        if (vieja) tl.fromTo(el, { x: vieja.left - nueva.left, y: vieja.top - nueva.top, opacity: 0.4 }, { x: 0, y: 0, opacity: 1, duration: 0.72, ease: "power3.inOut", clearProps: "transform,opacity" }, t0)
+        if (vieja) tl.fromTo(el, { x: (vieja.left - nueva.left) / k, y: (vieja.top - nueva.top) / k, opacity: 0.4 }, { x: 0, y: 0, opacity: 1, duration: 0.72, ease: "power3.inOut", clearProps: "transform,opacity" }, t0)
         else tl.fromTo(el, { y: 14, opacity: 0 }, { y: 0, opacity: 1, duration: 0.5, ease: "power2.out", clearProps: "transform,opacity" }, t0 + 0.12 + Math.min(i, 10) * 0.025)
       })
 

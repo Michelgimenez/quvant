@@ -1,11 +1,10 @@
 import type { Metadata } from "next"
-import { Punto } from "@/components/marca/quvant"
 import { TextoConfig } from "@/components/base/sellos"
 import { EncabezadoSitio } from "@/components/sitio/encabezado-sitio"
 import { FormularioDemo } from "@/components/sitio/formulario-demo"
 import { Hero } from "@/components/sitio/hero"
 import { DemoConexionPerezosa, PreciosAlDiaPerezoso } from "@/components/sitio/interactivos"
-import { Encabezado, EstadoProducto, Modulos, ParaQuien, PieSitio, Precios, Preguntas, Problema, Seguridad } from "@/components/sitio/secciones"
+import { CuatroNegocios, DesarrolloAMedida, Encabezado, EstadoProducto, Modulos, PieSitio, Planes, Preguntas, Problema, Seguridad } from "@/components/sitio/secciones"
 import { PRECIOS } from "@/config/precios"
 import { SITIO } from "@/config/sitio"
 
@@ -17,13 +16,14 @@ export const metadata: Metadata = {
     type: "website",
     locale: "es_AR",
     siteName: "Quvant",
-    title: `Quvant · ${SITIO.tagline}`,
+    title: `Quvant · ${SITIO.titular}`,
     description: SITIO.descripcion,
     url: "/",
   },
-  twitter: { card: "summary_large_image", title: `Quvant · ${SITIO.tagline}`, description: SITIO.descripcion },
+  twitter: { card: "summary_large_image", title: `Quvant · ${SITIO.titular}`, description: SITIO.descripcion },
 }
 
+// Sin precio en los datos estructurados mientras los planes digan "Consultá" (nada de números inventados).
 const JSON_LD = {
   "@context": "https://schema.org",
   "@graph": [
@@ -44,12 +44,6 @@ const JSON_LD = {
       description: SITIO.descripcion,
       inLanguage: "es-AR",
       publisher: { "@id": `${SITIO.url}/#organizacion` },
-      offers: {
-        "@type": "Offer",
-        price: String(PRECIOS.desdePorNegocio),
-        priceCurrency: "USD",
-        description: "Desde, por mes por negocio. Implementación cotizada aparte.",
-      },
     },
   ],
 }
@@ -63,7 +57,7 @@ export default function Inicio() {
         <Hero />
         <Problema />
 
-        <section id="nunca-se-cae" className="diferida mx-auto max-w-6xl scroll-mt-24 px-4 py-20" aria-labelledby="titulo-nunca">
+        <section id="nunca-se-cae" className="diferida mx-auto max-w-6xl scroll-mt-24 px-4 py-24" aria-labelledby="titulo-nunca">
           <Encabezado
             id="titulo-nunca"
             ficha="02 · Nunca se cae"
@@ -73,12 +67,13 @@ export default function Inicio() {
           <DemoConexionPerezosa />
         </section>
 
+        <CuatroNegocios />
         <Modulos />
 
-        <section id="precios-al-dia" className="diferida mx-auto max-w-6xl scroll-mt-24 px-4 py-20" aria-labelledby="titulo-precios-dia">
+        <section id="precios-al-dia" className="diferida mx-auto max-w-6xl scroll-mt-24 px-4 py-24" aria-labelledby="titulo-precios-dia">
           <Encabezado
             id="titulo-precios-dia"
-            ficha="04 · Precios al día"
+            ficha="05 · Precios al día"
             titulo="Llega la lista del proveedor. La cargás en minutos."
             bajada="Elegí una marca y un porcentaje: antes de aplicar ves cuántos productos cambian, el aumento real después del redondeo, qué márgenes quedan bajos y cuánto sube tu stock valorizado."
           />
@@ -87,33 +82,23 @@ export default function Inicio() {
 
         {/* Forja con la marca nueva vuelve en la tanda 10 (el material viejo mostraba el yunque). */}
 
-        <ParaQuien />
         <Seguridad />
-        <Precios />
+        <Planes />
+        <DesarrolloAMedida />
 
-        <section id="socios" className="diferida mx-auto max-w-6xl scroll-mt-24 px-4 py-20" aria-labelledby="titulo-socios">
-          <div className="grid gap-10 rounded-3xl border border-alerta/30 bg-gradient-to-br from-superficie-1 to-negro p-6 sm:p-10 lg:grid-cols-2">
-            <div className="space-y-5">
-              <p className="ficha flex items-center gap-2 text-alerta">
-                <Punto /> 08 · Programa de socios fundadores
-              </p>
-              <h2 id="titulo-socios" className="text-balance text-3xl font-extrabold sm:text-4xl">
-                Los primeros negocios construyen Quvant con nosotros.
-              </h2>
-              <p className="text-acero">
-                {PRECIOS.sociosFundadores.cupos} cupos · <span className="text-blanco">{PRECIOS.sociosFundadores.estado}</span>
-              </p>
-              <ul className="space-y-2">
+        <section id="socios" className="diferida mx-auto max-w-6xl scroll-mt-24 px-4 py-24" aria-labelledby="titulo-socios">
+          <div className="grid gap-12 rounded-lg border border-gris-3 p-6 sm:p-10 lg:grid-cols-2">
+            <div className="space-y-6">
+              <Encabezado id="titulo-socios" ficha="09 · Socios fundadores" titulo="Los primeros negocios construyen Quvant con nosotros." bajada={`Programa ${PRECIOS.sociosFundadores.estado.toLowerCase()}. Condiciones especiales para quienes empiezan primero.`} />
+              <ul className="lista-punto t-texto -mt-6 space-y-2.5 text-blanco">
                 {PRECIOS.sociosFundadores.condiciones.map((c) => (
-                  <li key={c} className="flex gap-2 text-blanco">
-                    <span className="mt-2 size-1.5 shrink-0 rounded-full bg-alerta" aria-hidden /> {c}
-                  </li>
+                  <li key={c}>{c}</li>
                 ))}
               </ul>
-              <p className="text-sm text-acero">A cambio: {PRECIOS.sociosFundadores.aCambio}</p>
+              <p className="t-texto-sm text-acero">A cambio: {PRECIOS.sociosFundadores.aCambio.charAt(0).toLowerCase() + PRECIOS.sociosFundadores.aCambio.slice(1)}</p>
             </div>
             <div>
-              <h3 className="mb-4 text-lg font-semibold">Quiero ser socio fundador</h3>
+              <h3 className="t-titulo-sm mb-5 text-blanco">Quiero ser socio fundador</h3>
               <FormularioDemo origen="socios" boton="Postularme" />
             </div>
           </div>
@@ -122,12 +107,12 @@ export default function Inicio() {
         <EstadoProducto />
         <Preguntas />
 
-        <section id="pedir-demo" className="diferida mx-auto max-w-3xl scroll-mt-24 px-4 py-20" aria-labelledby="titulo-pedir">
-          <Encabezado id="titulo-pedir" ficha="10 · Pedir una demo" titulo="Te mostramos Quvant con tus productos." bajada="Media hora, por videollamada o en tu negocio. Sin compromiso." centrado />
-          <div className="rounded-2xl border border-white/10 bg-superficie-1/70 p-6 sm:p-8">
+        <section id="pedir-demo" className="diferida mx-auto max-w-3xl scroll-mt-24 px-4 py-24" aria-labelledby="titulo-pedir">
+          <Encabezado id="titulo-pedir" ficha="11 · Pedir una demo" titulo="Te mostramos Quvant con tus productos." bajada="Media hora, por videollamada o en tu negocio. Sin compromiso." centrado />
+          <div className="rounded-lg border border-gris-3 bg-superficie-1 p-6 sm:p-8">
             <FormularioDemo origen="sitio" />
           </div>
-          <p className="mt-4 text-center text-sm text-acero">
+          <p className="t-texto-sm mt-4 text-center text-acero">
             ¿Preferís escribirnos? <TextoConfig texto={SITIO.contacto.whatsapp} />
           </p>
         </section>

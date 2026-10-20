@@ -1,6 +1,7 @@
 "use client"
 
 import { useEffect, useMemo, useRef, useState, useSyncExternalStore } from "react"
+import gsap from "gsap"
 import { Cloud, CloudOff, Wifi, WifiOff } from "lucide-react"
 import { crearDemoEmbebida, type DemoEmbebida } from "@/cliente/demo-embebida"
 import { MiniaturaProducto } from "@/components/base/ilustracion"
@@ -33,7 +34,7 @@ export function DemoConexion({ compacta = false, guion }: { compacta?: boolean; 
   }, [])
   if (!demo) {
     return (
-      <div className="flex h-[420px] items-center justify-center rounded-2xl border border-linea bg-superficie-1/60 text-sm text-acero" role="status">
+      <div className="t-texto-sm flex h-[420px] items-center justify-center rounded-lg border border-linea bg-superficie-1/60 text-acero" role="status">
         Preparando el mostrador de demostración…
       </div>
     )
@@ -139,6 +140,18 @@ function Mostrador({ demo, compacta, guion }: { demo: DemoEmbebida; compacta: bo
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [guion?.activo, guion?.reinicio])
 
+  // El pulso de la red: un cuadradito que viaja por la línea mientras hay conexión (GSAP, el único reloj).
+  const flujo = useRef<HTMLSpanElement>(null)
+  useEffect(() => {
+    const el = flujo.current
+    if (!el || !conectado || window.matchMedia("(prefers-reduced-motion: reduce)").matches) return
+    const vertical = el.parentElement ? el.parentElement.clientHeight > el.parentElement.clientWidth : false
+    const t = gsap.fromTo(el, vertical ? { yPercent: -100, y: 0 } : { xPercent: -100, x: 0 }, vertical ? { y: () => el.parentElement?.clientHeight ?? 96, duration: 1.2, ease: "none", repeat: -1 } : { x: () => el.parentElement?.clientWidth ?? 96, duration: 1.2, ease: "none", repeat: -1 })
+    return () => {
+      t.kill()
+    }
+  }, [conectado])
+
   const pendientes = motor.pendientes.filter((o) => o.tipo === "venta.crear").length
   const sinConexion = !conectado
   void version // fuerza el re-render cuando cambia el motor
@@ -146,29 +159,29 @@ function Mostrador({ demo, compacta, guion }: { demo: DemoEmbebida; compacta: bo
   return (
     // Consultas de contenedor (no de ventana): se ve igual en el sitio y dentro del escenario de las presentaciones
     <div className="@container">
-      <div className={cn("grid gap-4 rounded-2xl border border-linea bg-superficie-1/60 p-4 @xl:p-6", compacta ? "" : "@3xl:grid-cols-[minmax(0,1.25fr)_auto_minmax(0,1fr)]")} data-testid="demo-conexion">
+      <div className={cn("grid gap-4 rounded-lg border border-linea bg-superficie-1 p-4 @xl:p-6", compacta ? "" : "@3xl:grid-cols-[minmax(0,1.25fr)_auto_minmax(0,1fr)]")} data-testid="demo-conexion">
         {/* Mostrador */}
-        <section className="space-y-3 rounded-xl border border-linea bg-negro/70 p-4" aria-label="Mostrador de demostración">
+        <section className="space-y-3 rounded-md border border-linea bg-negro p-4" aria-label="Mostrador de demostración">
           <div className="flex items-center justify-between gap-2">
-            <p className="ficha">Mostrador · CC · puesto 1</p>
-            <span className={cn("inline-flex h-7 items-center gap-2 rounded-full border px-3 text-xs", sinConexion ? "border-alerta/50 bg-alerta/10" : "border-linea bg-superficie-1")} data-testid="demo-estado">
+            <p className="t-etiqueta text-acero">Mostrador · CC · puesto 1</p>
+            <span className={cn("t-texto-sm inline-flex h-7 items-center gap-2 border px-2.5", sinConexion ? "border-alerta" : "border-linea")} data-testid="demo-estado">
               <Punto tono={sinConexion ? "alerta" : pendientes ? "acero" : "ok"} pulso={sinConexion} />
               {sinConexion ? `Sin conexión${pendientes ? ` · ${pendientes} ${pendientes === 1 ? "venta" : "ventas"} en cola` : ""}` : pendientes ? "Sincronizando" : "Sincronizado"}
             </span>
           </div>
-          <p className="text-sm text-acero">Tocá un producto para venderlo.</p>
+          <p className="t-texto-sm text-acero">Tocá un producto para venderlo.</p>
           <div className="grid grid-cols-2 gap-2 @xl:grid-cols-3">
             {productos.map((p) => (
               <button
                 key={p.id}
                 type="button"
                 onClick={() => vender(p)}
-                className="flex items-center gap-2 rounded-lg border border-linea bg-superficie-1 px-2.5 py-2 text-left transition-colors hover:border-foreground/60 active:translate-y-px"
+                className="flex items-center gap-2 rounded-md border border-linea bg-superficie-1 px-2.5 py-2 text-left transition-colors hover:border-gris-8 active:translate-y-px"
               >
                 <MiniaturaProducto tipo={p.ilustracion} className="size-8" />
                 <span className="min-w-0">
-                  <span className="block truncate text-xs text-blanco">{p.nombre.replace(/ (Abrasur|Corta|Escudo|Protek|Lumen|Conductel|Lubrimax|Arkon|Vulkor|Torkan|Brava)$/, "")}</span>
-                  <span className="num block text-[11px] text-acero">{formatoPesos(precioDe(e, lista.id, p.id), { sinDecimales: true })}</span>
+                  <span className="t-texto-sm block truncate text-blanco">{p.nombre.replace(/ (Abrasur|Corta|Escudo|Protek|Lumen|Conductel|Lubrimax|Arkon|Vulkor|Torkan|Brava)$/, "")}</span>
+                  <span className="t-dato block text-acero">{formatoPesos(precioDe(e, lista.id, p.id), { sinDecimales: true })}</span>
                 </span>
               </button>
             ))}
@@ -179,15 +192,15 @@ function Mostrador({ demo, compacta, guion }: { demo: DemoEmbebida; compacta: bo
               if (!v) return null
               const enCola = v.numero === null
               return (
-                <li key={id} className="flex items-center gap-2 rounded-md bg-superficie-1 px-2.5 py-1.5 text-xs">
+                <li key={id} className="t-dato flex items-center gap-2 bg-superficie-1 px-2.5 py-1.5">
                   <span className={cn("num", enCola ? "text-alerta" : "text-ok")}>{enCola ? v.numeroLocal : `#${v.numero}`}</span>
                   <span className="min-w-0 flex-1 truncate text-acero">{v.items[0]?.descripcion}</span>
                   <span className="num text-blanco">{formatoPesos(v.total, { sinDecimales: true })}</span>
-                  <span className={cn("rounded px-1.5 py-0.5 text-[10px]", enCola ? "bg-alerta/15 text-alerta" : "bg-ok/15 text-ok")}>{enCola ? "en cola" : "sincronizada"}</span>
+                  <span className={cn("t-etiqueta border px-1.5 py-0.5", enCola ? "border-alerta text-alerta" : "border-ok text-ok")}>{enCola ? "en cola" : "sincronizada"}</span>
                 </li>
               )
             })}
-            {mias.length === 0 && <li className="rounded-md border border-dashed border-linea px-3 py-3 text-center text-xs text-acero">Todavía no vendiste nada.</li>}
+            {mias.length === 0 && <li className="t-texto-sm border border-dashed border-linea px-3 py-3 text-center text-acero">Todavía no vendiste nada.</li>}
           </ul>
         </section>
 
@@ -197,15 +210,15 @@ function Mostrador({ demo, compacta, guion }: { demo: DemoEmbebida; compacta: bo
             {conectado ? (
               <>
                 <span className="absolute inset-0 bg-foreground/30" />
-                <span className="flujo-red absolute size-1.5 rounded-full bg-foreground @3xl:left-[-1px]" />
+                <span ref={flujo} className="absolute -top-px size-1.5 bg-foreground @3xl:left-[-1px] @3xl:top-0" />
               </>
             ) : (
               <span className="absolute inset-0 border-t-2 border-dashed border-error/70 @3xl:border-l-2 @3xl:border-t-0" />
             )}
           </div>
-          <label className={cn("flex cursor-pointer flex-col items-center gap-2 rounded-xl border px-4 py-3 text-center", conectado ? "border-linea bg-negro/70" : "border-error/50 bg-error/10")}>
+          <label className={cn("flex cursor-pointer flex-col items-center gap-2 rounded-md border px-4 py-3 text-center", conectado ? "border-linea bg-negro" : "border-error bg-negro")}>
             {conectado ? <Wifi className="size-5 text-ok" /> : <WifiOff className="size-5 text-error" />}
-            <span className="text-xs font-semibold text-blanco">{conectado ? "Internet: conectado" : "Internet: cortado"}</span>
+            <span className="t-texto-sm font-semibold text-blanco">{conectado ? "Internet: conectado" : "Internet: cortado"}</span>
             <Switch
               checked={conectado}
               onCheckedChange={(v) => {
@@ -215,7 +228,7 @@ function Mostrador({ demo, compacta, guion }: { demo: DemoEmbebida; compacta: bo
               aria-label="Internet"
               data-testid="demo-interruptor"
             />
-            <span className="text-[11px] text-acero">{conectado ? "Cortá la conexión" : "Volvé a conectar"}</span>
+            <span className="t-etiqueta text-acero">{conectado ? "Cortá la conexión" : "Volvé a conectar"}</span>
           </label>
           <div className="relative h-1 w-24 overflow-hidden @3xl:h-24 @3xl:w-1" aria-hidden>
             {conectado ? <span className="absolute inset-0 bg-foreground/30" /> : <span className="absolute inset-0 border-t-2 border-dashed border-error/70 @3xl:border-l-2 @3xl:border-t-0" />}
@@ -223,21 +236,21 @@ function Mostrador({ demo, compacta, guion }: { demo: DemoEmbebida; compacta: bo
         </div>
 
         {/* Servidor */}
-        <section ref={panelServidor} className="space-y-3 rounded-xl border border-linea bg-negro/70 p-4" aria-label="Servidor">
+        <section ref={panelServidor} className="space-y-3 rounded-md border border-linea bg-negro p-4" aria-label="Servidor">
           <div className="flex items-center justify-between">
-            <p className="ficha">Servidor · la nube</p>
+            <p className="t-etiqueta text-acero">Servidor · la nube</p>
             {conectado ? <Cloud className="size-4 text-ok" /> : <CloudOff className="size-4 text-error" />}
           </div>
-          <p className="text-sm text-acero">{conectado ? "Recibe cada venta y le pone su número definitivo." : "No le llega nada. El mostrador no se entera: sigue vendiendo."}</p>
+          <p className="t-texto-sm text-acero">{conectado ? "Recibe cada venta y le pone su número definitivo." : "No le llega nada. El mostrador no se entera: sigue vendiendo."}</p>
           <ul className="space-y-1.5">
             {recibidas.map((r) => (
-              <li key={r.id} className="flex items-center gap-2 rounded-md bg-superficie-1 px-2.5 py-1.5 text-xs">
+              <li key={r.id} className="t-dato flex items-center gap-2 bg-superficie-1 px-2.5 py-1.5">
                 <span className="num text-ok">#{r.numero}</span>
                 <span className="flex-1 text-acero">venta recibida</span>
                 <span className="num text-blanco">{formatoPesos(r.total, { sinDecimales: true })}</span>
               </li>
             ))}
-            {recibidas.length === 0 && <li className="rounded-md border border-dashed border-linea px-3 py-3 text-center text-xs text-acero">Esperando ventas…</li>}
+            {recibidas.length === 0 && <li className="t-texto-sm border border-dashed border-linea px-3 py-3 text-center text-acero">Esperando ventas…</li>}
           </ul>
         </section>
       </div>

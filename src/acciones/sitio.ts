@@ -2,7 +2,7 @@
 
 import { headers } from "next/headers"
 import { z } from "zod"
-import { RUBROS } from "@/config/sitio"
+import { RUBROS, TAMANOS } from "@/config/sitio"
 import { guardarSolicitud } from "@/lib/solicitudes"
 
 export type EstadoSolicitud = { ok?: boolean; error?: string; errores?: Partial<Record<string, string>> }
@@ -12,6 +12,7 @@ const esquema = z.object({
   nombre: z.string().trim().min(2, "Contanos tu nombre").max(120),
   negocio: z.string().trim().min(2, "¿Cómo se llama el negocio?").max(160),
   rubro: z.enum(RUBROS, { message: "Elegí un rubro" }),
+  tamano: z.enum(TAMANOS, { message: "Elegí el tamaño" }),
   sucursales: z.coerce.number({ message: "Indicá cuántas sucursales" }).int().min(1, "Al menos 1").max(500),
   sistemaActual: z.string().trim().max(160).default(""),
   whatsapp: z.string().trim().regex(/^\+?[0-9 ()-]{8,24}$/, "Revisá el número (con característica)"),
@@ -47,7 +48,8 @@ export async function pedirDemo(_: EstadoSolicitud, form: FormData): Promise<Est
   const fila = {
     nombre: d.nombre,
     negocio: d.negocio,
-    rubro: d.rubro,
+    // El tamaño viaja con el rubro (la tabla no tiene columna propia; ver TAMANOS en src/config/sitio.ts).
+    rubro: `${d.rubro} · ${d.tamano}`,
     sucursales: d.sucursales,
     sistema_actual: d.sistemaActual,
     whatsapp: d.whatsapp,

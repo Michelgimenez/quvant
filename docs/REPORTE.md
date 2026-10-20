@@ -2,6 +2,59 @@
 
 > Yunque pasa a ser Quvant (`PROMPT-QUVANT.md`), en 10 tandas, en la rama `quvant`. Arriba, lo último; abajo, el historial de Yunque.
 
+## Resumen · tanda 7 de 10 · El sitio del producto (20/10/2026)
+
+**El hero con la escala** (`src/components/sitio/hero.tsx`, `escala.tsx`):
+- La firma con la bajada de la marca, el titular («Del kiosco a la empresa.») con su bajada, "Probar la demo" y "Pedir una demo".
+- **Debajo, la escala:** un control de Kiosco a Empresa, con cuatro paradas (Kiosco, Comercio, Distribuidora y Empresa).
+  - Transforma en vivo una vista del tablero, achicada, con los mismos componentes de `/demo`.
+  - Usa la misma coreografía del cambio de empresa: cada paso es un salto del punto, con el barrido, la barra lateral con Flip y los números que ruedan.
+  - Avanza solo mientras se ve (cada 4,6 s, con GSAP), con un botón "Pausar el recorrido". Se corta apenas alguien lo toca.
+  - Se maneja con el mouse o con las flechas (es un `role="slider"`).
+  - No guarda nada: lo que el visitante hizo en `/demo` queda intacto (la tienda de la demo ahora acepta `guardar: false`).
+  - Mientras carga se ve la "escala quieta": el mismo armado con la captura del tablero del kiosco. Así no se mueve nada al cargar.
+
+**Las secciones** (`src/components/sitio/secciones.tsx`), en el orden del punto 6:
+1. El problema, contado por tamaño (kiosco, comercio, distribuidora y empresa).
+2. Nunca se cae: la demo del mostrador sin conexión, con la identidad nueva. El pulso de la red ahora es de GSAP, no CSS.
+3. Un sistema, cuatro negocios: las cuatro empresas, con su logo, su tablero y un link directo a la demo. Sello DEMO.
+4. Los módulos: ocho capturas de la demo en un marco sobrio, cada una con el estado real de sus funciones.
+5. Precios al día: el aumento masivo con la vista previa.
+6. Forja: sigue oculta hasta la tanda 10.
+7. Seguridad y tus datos: cada punto con su estado real. Copias y doble factor dicen "En demo", con su nota.
+8. Planes: Kiosco, Comercio, Distribuidora y Empresa.
+9. Desarrollo a medida, con el sello BORRADOR.
+10. Socios fundadores, sin cupos.
+11. Estado real.
+12. Preguntas.
+13. Pedir una demo.
+14. El pie, con la firma y la bajada.
+
+**Los planes** (`src/config/precios.ts`):
+- Cuatro planes con el precio en `[COMPLETAR]`: el sitio muestra **"Consultá"**.
+- Se fueron los USD 290 de Yunque. Los datos estructurados (JSON-LD) ya no publican precio.
+- Cada cosa que incluye un plan apunta a su ficha del registro. Si está "En demo" o "Próximamente", lo dice al lado.
+
+**El formulario:** suma el campo **Tamaño** ("1 caja", "2 a 5 cajas", "Varias sucursales", "Más de 10 sucursales"). Ver la decisión T7-3.
+
+**Las capturas del sitio** salen de la demo (`scripts/marca/capturar-sitio.mts` → `public/capturas/sitio/`, 12 imágenes). Se borraron las capturas viejas de la app de Yunque (`public/capturas/app-*.png`).
+
+**Verificación:**
+- typecheck sin errores, lint limpio en `src`, `scripts` y `tests`, y tests unitarios 117 de 117.
+- `scripts/marca/revisar-sitio.mts` recorre el sitio a 1440 y a 1280 px: sin errores de página ni de consola y sin desborde horizontal. Capturas en `docs/capturas/quvant/tanda-7/` (14).
+- Los e2e del sitio y del panel se actualizaron (titular desde la configuración, planes sin USD 290, el campo Tamaño y un test nuevo de la escala con el teclado). Se corren con el `build` de la tanda 8.
+
+### Decisiones de la tanda 7
+
+| # | Decisión | Motivo |
+|---|---|---|
+| T7-1 | La escala dibuja la demo a 1440 × 852 y la achica con `transform: scale` (≈0,78 en escritorio). La coreografía recibe la escala y corrige sus medidas. | Con los mismos componentes y la misma coreografía de `/demo`. A 1280 px, las tarjetas del grupo se cortaban. |
+| T7-2 | La escala avanza sola, pero con un botón para pausarla, solo mientras se ve y nunca con movimiento reducido. | Un hero vivo sin violar WCAG 2.2.2 (contenido que se mueve solo más de 5 s necesita pausa). |
+| T7-3 | El tamaño del formulario se guarda junto al rubro ("Ferretería · 2 a 5 cajas"), sin columna nueva. | Una columna nueva necesita una migración que hay que aplicar en Supabase antes de publicar; si no, el formulario se rompe en producción. Así funciona hoy y el panel lo muestra. Si querés una columna propia, es una migración chica (anotada en el cierre). |
+| T7-4 | Los socios fundadores, sin "5 cupos". | El prompt pide no inventar cupos. Si hay un número real, se agrega en `src/config/precios.ts`. |
+| T7-5 | Estilo nuevo `.t-titulo-lg` (40 px) para los títulos de sección. | Entre el titular (64 px) y el de pantalla (28 px) faltaba un escalón. Está documentado en `docs/TIPOGRAFIA.md` como extensión. |
+| T7-6 | En el plan, lo disponible no lleva chip; lo que está "En demo" o "Próximamente", sí. | La honestidad sin ruido: se marca la excepción, no la regla. |
+
 ## Resumen · tanda 6 de 10 · La distribuidora, el grupo y el recorrido guiado (20/10/2026)
 
 **La distribuidora** (`src/components/demo/vistas/distribuidora.tsx`):
@@ -183,19 +236,24 @@
 
 ## Para Michel
 
-> Al día con la tanda 6. Lo que tenés que elegir, completar o mirar, de lo más nuevo a lo más viejo.
+> Al día con la tanda 7. Lo que tenés que elegir, completar o mirar, de lo más nuevo a lo más viejo.
 
-1. **Mirá el recorrido guiado de punta a punta,** como si estuvieras en una reunión: `/demo?recorrido=1` (o "Recorrido guiado" en la barra). Dura ~60 s. Espacio pausa, las flechas cambian de paso y Esc sale. Los subtítulos están en `src/demo/recorrido.ts`. Si cambiás alguno, el test controla que se pueda leer en su tiempo. Es la base del video de 60 segundos (tanda 8): conviene ajustarlo antes de filmar.
-2. **Los nombres de las cuatro empresas:** Kiosco La Esquina, Ferretería Industrial Demo, Distribuidora Ruta Clara y Grupo Cordal. Si alguno no te gusta, se cambia en `src/demo/empresas.ts`.
-3. **El titular quedó en A** («Del kiosco a la empresa.») por defecto, porque pediste seguir sin frenar. Se cambia con una línea en `src/config/sitio.ts` (`TITULAR_ELEGIDO = "B"` o `"C"`). Ojo con la B: hoy las cuarenta sucursales existen solo en la demo, no en un cliente.
-4. **Mirá la lámina** contra tu manual: la Q, los colores y las letras. Revisá las piezas marcadas como **Extensión**: el modo claro, la escala de grises, los estados, Plex Mono 500 y 600, el salto como recompensa y la bajada en el pie del sitio.
-5. **El logo: faltan tus archivos.** En `marca/` solo estaban los de Yunque. Usé la Q que trae el manual (un PNG de 2000 px, tal cual) y armé QUVANT en Michroma como **provisorio**, con las proporciones de la firma del manual. Michroma es más extendida y más fina que la letra del PDF: la firma provisoria queda un poco más ancha que la del manual. Mandá a `marca/`:
+1. **Recorré el sitio de punta a punta** (`npm run dev -- -p 3010` → http://localhost:3010). Mové la escala del hero: tiene que sentirse como la demo, en chico.
+2. **Los precios de los planes:** completalos en `src/config/precios.ts` (`precioMensual` de cada plan). Mientras digan `[COMPLETAR]`, el sitio muestra "Consultá". Revisá también qué incluye cada plan: lo armé por tamaño, con lo que existe hoy.
+3. **El texto de desarrollo a medida** (sección 08, con el sello BORRADOR) está en `src/components/sitio/secciones.tsx` (`DesarrolloAMedida`). Confirmalo o cambialo. Cuando lo apruebes, se saca el sello.
+4. **Socios fundadores:** quedó sin cupos y con las condiciones que ya había (precio congelado 24 meses, implementación bonificada, línea directa). ¿Siguen valiendo?
+5. **El email y el WhatsApp de contacto** siguen en `[COMPLETAR]` (`src/config/sitio.ts`): se ven resaltados en el pie y en "Pedir una demo".
+6. **Mirá el recorrido guiado de punta a punta,** como si estuvieras en una reunión: `/demo?recorrido=1` (o "Recorrido guiado" en la barra). Dura ~60 s. Espacio pausa, las flechas cambian de paso y Esc sale. Los subtítulos están en `src/demo/recorrido.ts`. Si cambiás alguno, el test controla que se pueda leer en su tiempo. Es la base del video de 60 segundos (tanda 8): conviene ajustarlo antes de filmar.
+7. **Los nombres de las cuatro empresas:** Kiosco La Esquina, Ferretería Industrial Demo, Distribuidora Ruta Clara y Grupo Cordal. Si alguno no te gusta, se cambia en `src/demo/empresas.ts`.
+8. **El titular quedó en A** («Del kiosco a la empresa.») por defecto, porque pediste seguir sin frenar. Se cambia con una línea en `src/config/sitio.ts` (`TITULAR_ELEGIDO = "B"` o `"C"`). Ojo con la B: hoy las cuarenta sucursales existen solo en la demo, no en un cliente.
+9. **Mirá la lámina** contra tu manual: la Q, los colores y las letras. Revisá las piezas marcadas como **Extensión**: el modo claro, la escala de grises, los estados, Plex Mono 500 y 600, el salto como recompensa y la bajada en el pie del sitio.
+10. **El logo: faltan tus archivos.** En `marca/` solo estaban los de Yunque. Usé la Q que trae el manual (un PNG de 2000 px, tal cual) y armé QUVANT en Michroma como **provisorio**, con las proporciones de la firma del manual. Michroma es más extendida y más fina que la letra del PDF: la firma provisoria queda un poco más ancha que la del manual. Mandá a `marca/`:
    - la firma principal y la negativa, mejor en SVG;
    - la Q en SVG, si existe. Con el aro, la cola y el punto como capas separadas, la animación se haría por capas (sin máscaras) y habría un favicon vectorial. Hoy solo hay PNG.
-6. **La página 4 del manual quedó vieja.** Dice que Yunque es un producto de Quvant ("Yunque · by Quvant", con Forja como "complemento de Yunque" y Ludus). Elegiste que Yunque pasa a ser Quvant: conviene actualizar esa página del manual.
-7. **El PDF del manual tiene texto viejo escondido.** Algunas páginas se corrigieron tapando el texto anterior. Al copiar o extraer texto del PDF sale la versión vieja (por ejemplo, "Versión 1" y una regla con "degradés" en la página 7). Yo seguí lo que se ve. Si lo vas a compartir, conviene reexportarlo limpio.
-8. **¿Se lee peor el texto largo en mono?** En los párrafos, no: se lee cómodo, como dice el manual. Lo que pasa es que la monoespaciada ocupa más ancho. En la app ya se resolvió (tanda 2); la navegación del sitio se resuelve en la tanda 7.
-9. **El puerto 3000** lo estaba usando otro proyecto tuyo (`firmamento-1-proyecto`), así que no lo toqué. Esta app corrió en el 3010: `npm run dev -- -p 3010`.
+11. **La página 4 del manual quedó vieja.** Dice que Yunque es un producto de Quvant ("Yunque · by Quvant", con Forja como "complemento de Yunque" y Ludus). Elegiste que Yunque pasa a ser Quvant: conviene actualizar esa página del manual.
+12. **El PDF del manual tiene texto viejo escondido.** Algunas páginas se corrigieron tapando el texto anterior. Al copiar o extraer texto del PDF sale la versión vieja (por ejemplo, "Versión 1" y una regla con "degradés" en la página 7). Yo seguí lo que se ve. Si lo vas a compartir, conviene reexportarlo limpio.
+13. **¿Se lee peor el texto largo en mono?** En los párrafos, no: se lee cómodo, como dice el manual. Lo que pasa es que la monoespaciada ocupa más ancho. En la app ya se resolvió (tanda 2); la navegación del sitio se resuelve en la tanda 7.
+14. **El puerto 3000** lo estaba usando otro proyecto tuyo (`firmamento-1-proyecto`), así que no lo toqué. Esta app corrió en el 3010: `npm run dev -- -p 3010`.
 
 ## Decisiones de la tanda 1
 

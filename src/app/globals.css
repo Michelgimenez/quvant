@@ -347,6 +347,15 @@
     letter-spacing: -0.01em;
     text-wrap: balance;
   }
+  /* [EXTENSIÓN] Títulos de sección del sitio: entre el titular (t-hero) y el de pantalla (t-titulo). */
+  .t-titulo-lg {
+    font-family: var(--font-sans);
+    font-weight: 700;
+    font-size: 2.5rem;
+    line-height: 1.08;
+    letter-spacing: -0.02em;
+    text-wrap: balance;
+  }
   .t-titulo-sm {
     font-family: var(--font-sans);
     font-weight: 600;

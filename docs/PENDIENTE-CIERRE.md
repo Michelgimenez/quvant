@@ -56,3 +56,12 @@ Lo que el modo boceto deja para después: celular, respaldos, accesibilidad fina
 - **Accesibilidad (fase 3):** el mapa del reparto es un SVG con `role="img"`; sus paradas se pueden tocar pero no se alcanzan con el teclado (la lista de la derecha cumple ese papel). En el recorrido, la barra espaciadora también puede activar el botón que tiene el foco: conviene sacar el foco de los botones al empezar.
 - **El recorrido en otra resolución:** el panel está ubicado para 1440 px (al lado de la barra lateral). Revisarlo en 1280 y en 1920.
 
+## De la tanda 7 · El sitio
+
+- **Celular (fase 1):** la escala achicada a 360 px queda muy chica (≈0,25). En el celular conviene otra vista: el control arriba y una tarjeta por empresa, o la vista con zoom en una parte del tablero. El titular a 64 px se parte en cuatro renglones.
+- **Rendimiento (fase 4):** la escala trae el paquete de la demo (los datos de las cuatro empresas se generan cuando el navegador está libre). Medir el LCP (la imagen de la escala quieta tiene `priority`) y el peso del bloque de JavaScript del hero.
+- **Movimiento reducido (fase 2):** con `prefers-reduced-motion`, la escala cambia de empresa sin coreografía y no avanza sola. Revisarlo con el lector de pantalla.
+- **Accesibilidad (fase 3):** la vista achicada es `inert` (es una representación); el control anuncia la empresa con `aria-valuetext`. Probar con NVDA y VoiceOver.
+- **El tamaño en el formulario:** hoy viaja dentro del rubro ("Ferretería · 2 a 5 cajas"). Si se quiere una columna propia, es una migración nueva y reversible (`alter table public.solicitudes_demo add column tamano text` y el `grant insert` de esa columna), aplicada en Supabase **antes** de publicar.
+- **SEO (fase 7):** el título para redes es «Quvant · Del kiosco a la empresa.» y la imagen sigue siendo la firma sobre la grilla. Revisar cómo se ve compartido.
+

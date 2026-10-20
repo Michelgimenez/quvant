@@ -106,3 +106,25 @@ Se compone a 1600×1000 y se captura a 1,5× (2400×1500). Así los estilos de t
 - Las columnas numéricas de la comparación quedan fijas en 96 px y la sucursal gana el resto. Los permisos se acortan ("Precios", "Aprobar", "Todo el grupo", "Usuarios").
 - El panel del recorrido pasa a 500 px para que el rótulo no se parta. El último subtítulo repetía la bajada, que ya está en la firma: ahora invita a probar.
 
+## Tanda 7 · El sitio (`docs/capturas/quvant/tanda-7/`)
+
+**Vuelta 1**
+- El hero se lee en dos columnas: el titular grande a la izquierda y la bajada con los botones a la derecha. Debajo, la escala con sus cuatro paradas sobre una línea; el punto es el cursor.
+- Las secciones comparten un lenguaje: tablas de celdas separadas por una línea de 1 px (no tarjetas sueltas con sombra), esquinas de 4 px, títulos en `.t-titulo-lg`.
+- Las capturas van en un marco sobrio con tres cuadrados (no los círculos de macOS) y la ruta en la demo.
+- Quedaba:
+  - a 1280 px de base, las tarjetas del grupo cortaban sus rótulos ("OBJETIVO DEL…");
+  - el foco del control era un recuadro blanco enorme;
+  - en "Un sistema, cuatro negocios", el pie de cada tarjeta se partía en dos renglones;
+  - la bajada de los planes decía "Cotizada aparte…" sin sujeto;
+  - en el formulario, dos rótulos salían más grandes que el resto (una variable pisada);
+  - el estado real era una pared de notas.
+
+**Vuelta 2**
+- La escala dibuja a 1440 × 852, como la demo, y se achica: entra todo, en chico.
+- El foco del control pasa a un contorno fino de 1 px.
+- El pie de las empresas dice solo "N módulos encendidos".
+- "La implementación, cotizada aparte…".
+- Los rótulos del formulario, todos iguales; "Sistema actual (opcional)" ya no se parte.
+- En el estado real, cada nota se abre con un clic ("Nota"): la lista se lee de un vistazo y la aclaración sigue a mano.
+

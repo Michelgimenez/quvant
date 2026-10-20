@@ -87,3 +87,17 @@ linea.add(() => boton("aprobar").click(), contenido + 1.4)     // un clic sobre 
 
 Pausar es `linea.pause()`. Avanzar un paso es `linea.seek("paso-4", true)`, y el `true` evita disparar los clics de los pasos que se saltean. Para filmar, el reloj global se mueve a mano (`__seek(t)`) y la línea lo sigue, porque es hija de ese reloj. Los tiempos son una función pura (`inicioDePasos`) con su test, que controla que el total dé ~60 s.
 
+## Tanda 7 · Una coreografía que funciona achicada
+
+La escala del hero muestra la demo achicada con `transform: scale(k)`. El problema: la coreografía mide la pantalla con `getBoundingClientRect()`, que devuelve medidas **ya achicadas**, pero después mueve elementos con `transform` **dentro** de la escena, donde un píxel vale `1/k` píxeles de pantalla. Si no se corrige, las tarjetas viajan a la mitad de camino y el barrido nace corrido.
+
+La solución es dividir por la escala cada vez que una medida de la pantalla entra a la escena:
+
+```ts
+const cx = (caida.x - rEscena.left) / k                         // el centro del barrido, en coordenadas de la escena
+tl.fromTo(el, { x: (vieja.left - nueva.left) / k, ... })        // el viaje de cada tarjeta
+foto.style.width = `${rEscena.width / k}px`                     // la foto del estado viejo, a tamaño real
+```
+
+Lo que vive afuera de la escena (el salto del punto y los logos que vuelan, que se dibujan en una capa fija sobre la página) no se corrige: ya está en coordenadas de pantalla. Flip también se las arregla solo, porque compone las matrices de los padres.
+

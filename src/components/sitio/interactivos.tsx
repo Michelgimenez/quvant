@@ -2,6 +2,7 @@
 
 import dynamic from "next/dynamic"
 import { useEffect, useRef, useState } from "react"
+import { EscalaQuieta } from "./escala-quieta"
 
 /**
  * Las demos interactivas del sitio cargan su código recién cuando están por
@@ -10,10 +11,17 @@ import { useEffect, useRef, useState } from "react"
  */
 function Cargando({ alto, texto }: { alto: number; texto: string }) {
   return (
-    <div className="flex items-center justify-center rounded-2xl border border-white/10 bg-superficie-1/60 text-sm text-acero" style={{ minHeight: alto }} role="status">
+    <div className="t-texto-sm flex items-center justify-center rounded-lg border border-linea bg-superficie-1/60 text-acero" style={{ minHeight: alto }} role="status">
       {texto}
     </div>
   )
+}
+
+/** La escala del hero: se carga enseguida (está arriba de todo); mientras tanto, la escala quieta. */
+const Escala = dynamic(() => import("./escala").then((m) => m.Escala), { ssr: false, loading: () => <EscalaQuieta /> })
+
+export function EscalaPerezosa() {
+  return <Escala quieta={<EscalaQuieta />} />
 }
 
 const DemoConexion = dynamic(() => import("./demo-conexion").then((m) => m.DemoConexion), {

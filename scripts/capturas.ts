@@ -7,7 +7,8 @@
  *   npm run capturas -- app-mostrador sitio      # solo las que contienen esos textos
  *
  * Levanta `next start` en el puerto 3200 si no hay un servidor corriendo.
- * Con --sitio copia además las capturas de la app a public/capturas/ (las usa el sitio).
+ * Con --sitio copia además las capturas de la app a public/capturas/. (Desde Quvant, el sitio usa las de la demo:
+ * scripts/marca/capturar-sitio.mts → public/capturas/sitio/.)
  */
 import { chromium, type Browser, type Page } from "@playwright/test"
 import { spawn, spawnSync, type ChildProcess } from "node:child_process"

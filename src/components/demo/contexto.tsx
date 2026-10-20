@@ -55,8 +55,21 @@ function crearReloj(filmando: boolean): RelojDemo {
   }
 }
 
-export function ProveedorDemo({ empresaInicial, filmando = false, children }: { empresaInicial: IdEmpresa | null; filmando?: boolean; children: React.ReactNode }) {
-  const [tienda] = useState<TiendaDemo>(() => crearEstadoDemo(empresaInicial ?? "kiosco"))
+export function ProveedorDemo({
+  empresaInicial,
+  filmando = false,
+  guardar = true,
+  cargando,
+  children,
+}: {
+  empresaInicial: IdEmpresa | null
+  filmando?: boolean
+  /** false: no lee ni escribe lo guardado del visitante (la escala del sitio no pisa lo que hizo en /demo). */
+  guardar?: boolean
+  cargando?: React.ReactNode
+  children: React.ReactNode
+}) {
+  const [tienda] = useState<TiendaDemo>(() => crearEstadoDemo(empresaInicial ?? "kiosco", { guardar }))
   const reloj = useMemo(() => crearReloj(filmando), [filmando])
   const [listo, setListo] = useState(false)
   useEffect(() => {
@@ -67,7 +80,7 @@ export function ProveedorDemo({ empresaInicial, filmando = false, children }: { 
       setListo(true)
     })
   }, [empresaInicial, tienda])
-  if (!listo) return <div className="dark min-h-dvh bg-negro" aria-busy />
+  if (!listo) return cargando ?? <div className="dark min-h-dvh bg-negro" aria-busy />
   return <Contexto.Provider value={{ tienda, reloj }}>{children}</Contexto.Provider>
 }
 
