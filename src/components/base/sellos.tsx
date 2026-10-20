@@ -16,7 +16,7 @@ export function Sello({
     <span
       title={titulo ?? (texto === "DEMO" ? "Datos ficticios de demostración" : undefined)}
       className={cn(
-        "inline-flex h-5 shrink-0 -rotate-2 items-center rounded-[4px] border-[1.5px] border-dashed border-chispa px-1.5 font-mono text-[10px] font-bold leading-none tracking-[0.18em] text-chispa-texto",
+        "inline-flex h-5 shrink-0 items-center border border-dashed border-alerta px-1.5 font-mono text-[10px] font-semibold leading-none tracking-[0.2em] text-alerta",
         className,
       )}
     >

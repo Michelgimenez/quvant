@@ -311,7 +311,7 @@ function PantallaMostrador() {
             </dl>
             {caja ? (
               <Button size="lg" className="h-12 w-full text-base" disabled={!b.items.length} onClick={() => setCobrando(true)} data-testid="cobrar">
-                Cobrar <Kbd className="ml-1 bg-white/20 text-white">F8</Kbd>
+                Cobrar <Kbd className="ml-1 bg-primary-foreground/15 text-primary-foreground">F8</Kbd>
               </Button>
             ) : (
               <Button size="lg" className="h-12 w-full text-base" onClick={() => setAbrirCaja(true)}>

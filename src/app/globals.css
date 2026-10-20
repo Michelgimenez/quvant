@@ -3,11 +3,11 @@
 @import "shadcn/tailwind.css";
 
 /*
- * Yunque — sistema de diseño.
- * Modo oscuro primero: `.dark` va en <html> por defecto (next-themes).
- * Los tokens de marca (--hierro, --superficie, ...) son fijos; los semánticos
- * (--background, --primary, ...) cambian por tema y son los que usa shadcn/ui.
- * Contraste AA verificado a mano para texto normal (ver docs/ARQUITECTURA.md).
+ * Quvant — sistema de diseño (manual de identidad, págs. 6 a 11).
+ * Negro y blanco hacen el 90 % de la marca. Modo oscuro primero: `.dark` va en <html> por defecto (next-themes).
+ * Capas: marca (fija) → escala de grises (fija) → estados y semánticos (cambian por tema, los usa shadcn/ui).
+ * Lo que el manual no dice va marcado como EXTENSIÓN DEL PROMPT (ver docs/TIPOGRAFIA.md y la lámina).
+ * Contraste AA verificado en tests/unit/color.test.ts.
  */
 
 @custom-variant dark (&:is(.dark *):not(:is(.light *)));
@@ -15,42 +15,76 @@
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
-  --font-mono: var(--font-jetbrains), ui-monospace, monospace;
-  --font-heading: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
 
-  /* Paleta de marca */
-  --color-hierro: var(--hierro);
+  /* Tipografía: dos familias y nada más. Michroma, solo con .t-marca */
+  --font-sans: var(--marca-texto), ui-monospace, monospace;
+  --font-mono: var(--marca-texto), ui-monospace, monospace;
+  --font-heading: var(--marca-texto), ui-monospace, monospace;
+  --font-marca: var(--marca-display), var(--marca-texto), sans-serif;
+
+  /* Marca Quvant (manual, pág. 8) */
+  --color-negro: var(--negro);
+  --color-blanco: var(--blanco);
   --color-acero: var(--acero);
-  --color-niebla: var(--niebla);
-  --color-temple: var(--temple);
-  --color-chispa: var(--chispa);
-  --color-ok: var(--ok);
-  --color-error: var(--error);
-  --color-superficie: var(--superficie);
+  --color-profundo: var(--profundo);
 
-  /* Forja: escala de calor (frío → ascua → brasa → chispa → blanco caliente) */
+  /* Escala de la marca: grises entre negro, profundo, acero y blanco, sin otros tonos */
+  --color-gris-0: var(--gris-0);
+  --color-gris-1: var(--gris-1);
+  --color-gris-2: var(--gris-2);
+  --color-gris-3: var(--gris-3);
+  --color-gris-4: var(--gris-4);
+  --color-gris-5: var(--gris-5);
+  --color-gris-6: var(--gris-6);
+  --color-gris-7: var(--gris-7);
+  --color-gris-8: var(--gris-8);
+  --color-gris-9: var(--gris-9);
+  --color-gris-10: var(--gris-10);
+  --color-gris-11: var(--gris-11);
+  --color-gris-12: var(--gris-12);
+  --color-gris-13: var(--gris-13);
+
+  /* Estados del sistema (EXTENSIÓN DEL PROMPT): solo puntos, chips y bordes */
+  --color-ok: var(--ok);
+  --color-alerta: var(--alerta);
+  --color-error: var(--error);
+  --color-info: var(--info);
+
+  /* Texto por jerarquía y superficies, resueltos por tema */
+  --color-texto-2: var(--texto-2);
+  --color-texto-3: var(--texto-3);
+  --color-superficie-1: var(--superficie-1);
+  --color-superficie-2: var(--superficie-2);
+  --color-linea: var(--linea);
+  --color-grilla: var(--grilla);
+
+  /* Forja: escala de calor. Única excepción a la paleta, solo como visualización de datos (se rehace en la tanda 9) */
   --color-frio: var(--frio);
   --color-ascua: var(--ascua);
   --color-brasa: var(--brasa);
   --color-blanco-caliente: var(--blanco-caliente);
 
-  /* Semánticos extra */
-  --color-enlace: var(--enlace);
-  --color-chispa-texto: var(--chispa-texto);
-  --color-ok-texto: var(--ok-texto);
-  --color-error-texto: var(--error-texto);
-  --color-superficie-2: var(--superficie-2);
-  --color-linea: var(--linea);
+  /* Series de gráficos: la primera es el color de la empresa; el resto, la escala de grises */
   --color-serie-1: var(--serie-1);
   --color-serie-2: var(--serie-2);
   --color-serie-3: var(--serie-3);
   --color-serie-4: var(--serie-4);
   --color-serie-tenue: var(--serie-tenue);
 
-  /* Color de la organización (co-branding), lo define el AppShell */
+  /* Color de la empresa (co-branding): solo su logo, el indicador de navegación activo y su serie principal */
   --color-marca: var(--marca);
   --color-marca-contraste: var(--marca-contraste);
+
+  /* Alias de transición (Yunque → Quvant). Apuntan a los tokens nuevos; se borran en la tanda 2. */
+  --color-hierro: var(--hierro);
+  --color-niebla: var(--niebla);
+  --color-temple: var(--temple);
+  --color-chispa: var(--chispa);
+  --color-superficie: var(--superficie);
+  --color-enlace: var(--enlace);
+  --color-chispa-texto: var(--chispa-texto);
+  --color-ok-texto: var(--ok-texto);
+  --color-error-texto: var(--error-texto);
 
   --color-sidebar-ring: var(--sidebar-ring);
   --color-sidebar-border: var(--sidebar-border);
@@ -89,134 +123,185 @@
   --radius-3xl: calc(var(--radius) * 2.2);
   --radius-4xl: calc(var(--radius) * 2.6);
 
-  --animate-chispa: chispa 900ms cubic-bezier(0.2, 0.8, 0.2, 1) both;
+  /* El salto: sube decidido y cae calmo, sin rebote */
+  --ease-salto: cubic-bezier(0.3, 0, 0.2, 1);
 }
 
-/* Tokens de marca: no cambian con el tema */
+/* Marca y escala: fijas, no cambian con el tema */
 :root {
-  --hierro: #0e1116;
-  --superficie: #1a1f27;
-  --acero: #9aa3ae;
-  --niebla: #eef1f4;
-  --temple: #3b6ef5;
-  --chispa: #ffb224;
-  --ok: #2fb36e;
-  --error: #e5484d;
-  /* Forja (extensión): calor del trabajo. --temple sigue siendo solo selección y foco. */
+  /* Manual, pág. 8 */
+  --negro: #0d0d0f;
+  --blanco: #ececee;
+  --acero: #9c9ca3;
+  --profundo: #26262b;
+  --plata: #b9bbbf; /* solo impresos: en pantalla no se usa */
+
+  /* Escala de la marca (L = luminosidad OKLab). (m): valor que ya usa el manual; el resto se interpola en OKLab. */
+  --gris-0: var(--negro); /*    L 16 · fondo */
+  --gris-1: #141416; /*         L 19 (m) · superficie */
+  --gris-2: #1c1c1f; /*         L 23 · superficie elevada */
+  --gris-3: var(--profundo); /* L 27 · bordes, apoyo y grilla */
+  --gris-4: #2e2e33; /*         L 30 (m) · borde fuerte, campos */
+  --gris-5: #3a3a40; /*         L 35 (m) */
+  --gris-6: #55555b; /*         L 45 (m) · texto secundario en claro (6,3:1) */
+  --gris-7: #6e6e75; /*         L 54 (m) · deshabilitado */
+  --gris-8: #8d8d94; /*         L 65 (m) · texto terciario en oscuro (5,9:1) */
+  --gris-9: var(--acero); /*    L 70 · texto secundario en oscuro (7,1:1) */
+  --gris-10: #b4b4ba; /*        L 77 (m) · campos en claro */
+  --gris-11: #cdcdd1; /*        L 85 · bordes en claro */
+  --gris-12: #dedee1; /*        L 90 · superficie hundida en claro */
+  --gris-13: var(--blanco); /*  L 94 · texto en oscuro, fondo en claro */
+
+  /* Forja (extensión): calor del trabajo, solo como dato */
   --frio: #3a4450;
   --ascua: #c2410c;
   --brasa: #ff6a1f;
   --blanco-caliente: #fff4e0;
-  /* Temple accesible para superficies llenas con texto blanco (4,9:1) */
-  --temple-accion: #3466f0;
 
-  --marca: var(--temple-accion);
-  --marca-contraste: #ffffff;
-  --radius: 0.625rem;
+  /* Alias fijos de Yunque (tanda 2: se reemplazan en los componentes y se borran) */
+  --hierro: var(--negro);
+  --niebla: var(--blanco);
+  --superficie: var(--gris-1);
+
+  --radius: 0.25rem;
 }
 
-/* Modo claro (también como clase, para vistas previas dentro del modo oscuro) */
+/* Modo claro, la versión negativa: el mostrador con luz de día y los documentos (EXTENSIÓN DEL PROMPT). Sin grilla. */
 :root,
 .light {
-  --background: var(--niebla);
-  --foreground: var(--hierro);
-  --card: #ffffff;
-  --card-foreground: var(--hierro);
-  --popover: #ffffff;
-  --popover-foreground: var(--hierro);
-  --primary: var(--temple-accion);
-  --primary-foreground: #ffffff;
-  --secondary: #e2e6eb;
-  --secondary-foreground: var(--hierro);
-  --muted: #e2e6eb;
-  --muted-foreground: #5b6470;
-  --accent: #e2e6eb;
-  --accent-foreground: var(--hierro);
-  --destructive: #c62f35;
-  --border: #d5dae0;
-  --input: #c9cfd6;
-  --ring: var(--temple);
+  --background: var(--blanco);
+  --foreground: var(--negro);
+  --card: var(--blanco);
+  --card-foreground: var(--negro);
+  --popover: var(--blanco);
+  --popover-foreground: var(--negro);
+  --primary: var(--negro);
+  --primary-foreground: var(--blanco);
+  --secondary: var(--gris-12);
+  --secondary-foreground: var(--negro);
+  --muted: var(--gris-12);
+  --muted-foreground: var(--gris-6);
+  --accent: var(--gris-12);
+  --accent-foreground: var(--negro);
+  --destructive: var(--error);
+  --border: var(--gris-11);
+  --input: var(--gris-10);
+  --ring: var(--negro);
 
-  --enlace: #2a55d0;
-  --chispa-texto: #8a5200;
-  --ok-texto: #17794a;
-  --error-texto: #b42329;
-  --superficie-2: #f6f8fa;
-  --linea: #d5dae0;
-  --grilla: rgb(14 17 22 / 0.045);
+  --texto-2: var(--gris-6);
+  --texto-3: var(--gris-6);
+  --superficie-1: var(--blanco);
+  --superficie-2: var(--gris-12);
+  --linea: var(--gris-11);
+  --grilla: transparent;
 
-  /* Series de gráficos (validadas con el validador de dataviz, modo claro sobre #fff).
-     El aqua queda bajo 3:1: los gráficos llevan etiquetas o vista de tabla. */
-  --serie-1: #3466f0;
-  --serie-2: #eb6834;
-  --serie-3: #1baf7a;
-  --serie-4: #c98500;
-  --serie-tenue: #c9cfd6;
+  /* Estados sobre blanco Quvant y gris-12: 4,6 a 5,5:1 */
+  --ok: #296d40;
+  --alerta: #8a560c;
+  --error: #a43b35;
+  --info: #286193;
+
+  --marca: var(--negro);
+  --marca-contraste: var(--blanco);
+
+  --serie-1: var(--marca);
+  --serie-2: var(--gris-6);
+  --serie-3: var(--gris-8);
+  --serie-4: var(--gris-10);
+  --serie-tenue: var(--gris-11);
   --chart-1: var(--serie-1);
   --chart-2: var(--serie-2);
   --chart-3: var(--serie-3);
   --chart-4: var(--serie-4);
-  --chart-5: #5b6470;
+  --chart-5: var(--gris-7);
 
-  --sidebar: #ffffff;
-  --sidebar-foreground: var(--hierro);
-  --sidebar-primary: var(--temple-accion);
-  --sidebar-primary-foreground: #ffffff;
-  --sidebar-accent: #e2e6eb;
-  --sidebar-accent-foreground: var(--hierro);
-  --sidebar-border: #d5dae0;
-  --sidebar-ring: var(--temple);
+  --sidebar: var(--blanco);
+  --sidebar-foreground: var(--negro);
+  --sidebar-primary: var(--negro);
+  --sidebar-primary-foreground: var(--blanco);
+  --sidebar-accent: var(--gris-12);
+  --sidebar-accent-foreground: var(--negro);
+  --sidebar-border: var(--gris-11);
+  --sidebar-ring: var(--negro);
+
+  /* Alias de Yunque que dependen del tema */
+  --temple: var(--negro);
+  --temple-accion: var(--primary);
+  --chispa: var(--alerta);
+  --chispa-texto: var(--alerta);
+  --ok-texto: var(--ok);
+  --error-texto: var(--error);
+  --enlace: var(--negro);
+
+  --seleccion: rgb(13 13 15 / 0.14);
 }
 
-/* Modo oscuro (por defecto) */
+/* Modo oscuro: el principal, como la marca */
 .dark {
-  --background: var(--hierro);
-  --foreground: var(--niebla);
-  --card: var(--superficie);
-  --card-foreground: var(--niebla);
-  --popover: var(--superficie);
-  --popover-foreground: var(--niebla);
-  --primary: var(--temple-accion);
-  --primary-foreground: #ffffff;
-  --secondary: #242a34;
-  --secondary-foreground: var(--niebla);
-  --muted: #242a34;
+  --background: var(--negro);
+  --foreground: var(--blanco);
+  --card: var(--gris-1);
+  --card-foreground: var(--blanco);
+  --popover: var(--gris-2);
+  --popover-foreground: var(--blanco);
+  --primary: var(--blanco);
+  --primary-foreground: var(--negro);
+  --secondary: var(--gris-2);
+  --secondary-foreground: var(--blanco);
+  --muted: var(--gris-2);
   --muted-foreground: var(--acero);
-  --accent: #242a34;
-  --accent-foreground: var(--niebla);
-  --destructive: #f06368;
-  --border: rgb(154 163 174 / 0.16);
-  --input: rgb(154 163 174 / 0.22);
-  --ring: var(--temple);
+  --accent: var(--gris-3);
+  --accent-foreground: var(--blanco);
+  --destructive: var(--error);
+  --border: var(--gris-3);
+  --input: var(--gris-4);
+  --ring: var(--blanco);
 
-  --enlace: #6e93f8;
-  --chispa-texto: var(--chispa);
-  --ok-texto: #3fc580;
-  --error-texto: #f06368;
-  --superficie-2: #151a21;
-  --linea: rgb(154 163 174 / 0.16);
-  --grilla: rgb(238 241 244 / 0.035);
+  --texto-2: var(--acero);
+  --texto-3: var(--gris-8);
+  --superficie-1: var(--gris-1);
+  --superficie-2: var(--gris-2);
+  --linea: var(--gris-3);
+  --grilla: var(--profundo);
 
-  /* Series de gráficos, modo oscuro (validadas sobre #1a1f27 y #0e1116). */
-  --serie-1: #5b83f6;
-  --serie-2: #d95926;
-  --serie-3: #199e70;
-  --serie-4: #c98500;
-  --serie-tenue: #3a414c;
+  /* Estados sobre negro, gris-1 y gris-2: 6,5 a 9,2:1 */
+  --ok: #7fbc8f;
+  --alerta: #d7ac68;
+  --error: #e18881;
+  --info: #80b1da;
+
+  --marca: var(--blanco);
+  --marca-contraste: var(--negro);
+
+  --serie-1: var(--marca);
+  --serie-2: var(--acero);
+  --serie-3: var(--gris-7);
+  --serie-4: var(--gris-5);
+  --serie-tenue: var(--gris-3);
   --chart-1: var(--serie-1);
   --chart-2: var(--serie-2);
   --chart-3: var(--serie-3);
   --chart-4: var(--serie-4);
-  --chart-5: #9aa3ae;
+  --chart-5: var(--gris-8);
 
-  --sidebar: #12161c;
-  --sidebar-foreground: var(--niebla);
-  --sidebar-primary: var(--temple-accion);
-  --sidebar-primary-foreground: #ffffff;
-  --sidebar-accent: #1f252e;
-  --sidebar-accent-foreground: var(--niebla);
-  --sidebar-border: rgb(154 163 174 / 0.14);
-  --sidebar-ring: var(--temple);
+  --sidebar: var(--negro);
+  --sidebar-foreground: var(--blanco);
+  --sidebar-primary: var(--blanco);
+  --sidebar-primary-foreground: var(--negro);
+  --sidebar-accent: var(--gris-2);
+  --sidebar-accent-foreground: var(--blanco);
+  --sidebar-border: var(--gris-3);
+  --sidebar-ring: var(--blanco);
+
+  --temple: var(--blanco);
+  --temple-accion: var(--primary);
+  --chispa: var(--alerta);
+  --chispa-texto: var(--alerta);
+  --ok-texto: var(--ok);
+  --error-texto: var(--error);
+  --enlace: var(--blanco);
+
+  --seleccion: rgb(236 236 238 / 0.22);
 }
 
 @layer base {
@@ -226,10 +311,11 @@
   html {
     @apply font-sans;
     -webkit-tap-highlight-color: transparent;
+    /* Ni Michroma en negrita ni itálicas inventadas por el navegador */
+    font-synthesis: none;
   }
   body {
     @apply bg-background text-foreground;
-    font-feature-settings: "cv11", "ss01";
   }
   button:not(:disabled),
   [role="button"]:not(:disabled) {
@@ -240,36 +326,164 @@
   h3,
   .font-display {
     font-family: var(--font-heading);
-    font-variation-settings: "opsz" 32;
-    letter-spacing: -0.025em;
+    letter-spacing: -0.01em;
   }
   :focus-visible {
-    outline: 2px solid var(--temple);
+    outline: 2px solid var(--ring);
     outline-offset: 2px;
   }
   ::selection {
-    background: rgb(59 110 245 / 0.35);
+    background: var(--seleccion);
   }
 }
 
 @layer components {
-  /* Etiqueta tipo ficha técnica: VENTA #10482 · MOSTRADOR 2 */
-  .ficha {
-    font-family: var(--font-mono);
+  /*
+   * Estilos tipográficos cerrados (docs/TIPOGRAFIA.md): tamaño, interlineado e interletrado resueltos.
+   * Los componentes usan estas clases y no tamaños sueltos. Los sufijos -sm, -lg y -xl son los únicos escalones.
+   */
+  .t-marca,
+  .t-marca-sm,
+  .t-marca-lg {
+    font-family: var(--font-marca);
+    font-weight: 400;
+    text-transform: uppercase;
+  }
+  .t-marca {
+    font-size: 1.125rem;
+    line-height: 1.2;
+    letter-spacing: 0.18em;
+  }
+  .t-marca-sm {
+    font-size: 0.8125rem;
+    line-height: 1.2;
+    letter-spacing: 0.2em;
+  }
+  .t-marca-lg {
+    font-size: 2.5rem;
+    line-height: 1.1;
+    letter-spacing: 0.16em;
+  }
+  .t-hero {
+    font-family: var(--font-sans);
+    font-weight: 700;
+    font-size: 4rem;
+    line-height: 1.04;
+    letter-spacing: -0.02em;
+    text-wrap: balance;
+  }
+  .t-titulo {
+    font-family: var(--font-sans);
+    font-weight: 700;
+    font-size: 1.75rem;
+    line-height: 1.15;
+    letter-spacing: -0.01em;
+    text-wrap: balance;
+  }
+  .t-titulo-sm {
+    font-family: var(--font-sans);
+    font-weight: 600;
+    font-size: 1.125rem;
+    line-height: 1.3;
+    letter-spacing: 0;
+  }
+  .t-texto {
+    font-family: var(--font-sans);
+    font-weight: 400;
+    font-size: 0.9375rem;
+    line-height: 1.6;
+    letter-spacing: 0;
+    text-wrap: pretty;
+  }
+  .t-texto-sm {
+    font-family: var(--font-sans);
+    font-weight: 400;
+    font-size: 0.8125rem;
+    line-height: 1.55;
+    letter-spacing: 0;
+  }
+  .t-etiqueta {
+    font-family: var(--font-sans);
+    font-weight: 500;
     font-size: 0.6875rem;
-    letter-spacing: 0.08em;
+    line-height: 1.3;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+  }
+  .t-dato {
+    font-family: var(--font-sans);
+    font-weight: 400;
+    font-size: 0.8125rem;
+    line-height: 1.4;
+    letter-spacing: 0;
+    font-variant-numeric: tabular-nums;
+  }
+  .t-numero,
+  .t-numero-lg,
+  .t-numero-xl {
+    font-family: var(--font-sans);
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+  }
+  .t-numero {
+    font-weight: 600;
+    font-size: 1rem;
+    line-height: 1.2;
+    letter-spacing: -0.01em;
+  }
+  .t-numero-lg {
+    font-weight: 700;
+    font-size: 2rem;
+    line-height: 1.05;
+    letter-spacing: -0.02em;
+  }
+  .t-numero-xl {
+    font-weight: 700;
+    font-size: 3.5rem;
+    line-height: 1;
+    letter-spacing: -0.03em;
+  }
+
+  /* Viñeta: el punto cuadrado reemplaza a la redonda (manual, pág. 11) */
+  .lista-punto {
+    list-style: none;
+    padding-left: 0;
+  }
+  .lista-punto > li {
+    position: relative;
+    padding-left: 1.4em;
+  }
+  .lista-punto > li::before {
+    content: "";
+    position: absolute;
+    left: 0.15em;
+    top: calc(0.8lh - 0.5em);
+    width: 0.42em;
+    height: 0.42em;
+    background: currentColor;
+  }
+
+  /* La grilla de puntos: gris profundo sobre negro. En claro no hay grilla (--grilla: transparent). */
+  .grilla-puntos,
+  .grilla-tecnica {
+    background-image: radial-gradient(circle at center, var(--grilla) 0 1.15px, transparent 1.35px);
+    background-size: var(--grilla-paso, 28px) var(--grilla-paso, 28px);
+    background-position: calc(var(--grilla-paso, 28px) / 2) calc(var(--grilla-paso, 28px) / 2);
+  }
+
+  /* Alias de Yunque: .ficha es la etiqueta y .num el número tabular (tanda 2: pasan a .t-etiqueta y .t-dato) */
+  .ficha {
+    font-family: var(--font-sans);
+    font-weight: 500;
+    font-size: 0.6875rem;
+    line-height: 1.3;
+    letter-spacing: 0.2em;
     text-transform: uppercase;
     color: var(--muted-foreground);
     font-variant-numeric: tabular-nums;
   }
-  .grilla-tecnica {
-    background-image:
-      linear-gradient(to right, var(--grilla) 1px, transparent 1px),
-      linear-gradient(to bottom, var(--grilla) 1px, transparent 1px);
-    background-size: 32px 32px;
-  }
   .num {
-    font-family: var(--font-mono);
+    font-family: var(--font-sans);
     font-variant-numeric: tabular-nums;
   }
   .sin-scrollbar {
@@ -278,30 +492,11 @@
   .sin-scrollbar::-webkit-scrollbar {
     display: none;
   }
-  /* Presentaciones: fondo hierro hasta en el rebote del scroll */
+  /* Presentaciones: fondo negro hasta en el rebote del scroll */
   html.presentando,
   html.presentando body {
-    background: var(--hierro);
+    background: var(--negro);
     overscroll-behavior: none;
-  }
-}
-
-@keyframes chispa {
-  0% {
-    opacity: 0;
-    transform: scale(0.2) rotate(-45deg);
-  }
-  40% {
-    opacity: 1;
-    transform: scale(1.25) rotate(8deg);
-  }
-  70% {
-    opacity: 1;
-    transform: scale(0.95) rotate(0deg);
-  }
-  100% {
-    opacity: 0;
-    transform: scale(1) rotate(0deg);
   }
 }
 
@@ -314,44 +509,6 @@
     animation-iteration-count: 1 !important;
     transition-duration: 1ms !important;
     scroll-behavior: auto !important;
-  }
-}
-
-.chispa-rayo {
-  stroke-dasharray: 1;
-  stroke-dashoffset: 1;
-  animation: rayo 700ms cubic-bezier(0.2, 0.8, 0.2, 1) 120ms both;
-}
-.chispa-mensaje {
-  animation: mensaje-chispa 1300ms ease both;
-}
-@keyframes rayo {
-  0% {
-    stroke-dashoffset: 1;
-    opacity: 1;
-  }
-  60% {
-    stroke-dashoffset: 0;
-    opacity: 1;
-  }
-  100% {
-    stroke-dashoffset: -1;
-    opacity: 0;
-  }
-}
-@keyframes mensaje-chispa {
-  0% {
-    opacity: 0;
-    transform: translate(-50%, 4px);
-  }
-  15%,
-  75% {
-    opacity: 1;
-    transform: translate(-50%, 0);
-  }
-  100% {
-    opacity: 0;
-    transform: translate(-50%, -4px);
   }
 }
 
@@ -459,6 +616,20 @@
   100% {
     opacity: 1;
     transform: scale(1) rotate(0deg);
+  }
+}
+@keyframes rayo {
+  0% {
+    stroke-dashoffset: 1;
+    opacity: 1;
+  }
+  60% {
+    stroke-dashoffset: 0;
+    opacity: 1;
+  }
+  100% {
+    stroke-dashoffset: -1;
+    opacity: 0;
   }
 }
 .rayo-hero {

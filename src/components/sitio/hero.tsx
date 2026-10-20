@@ -65,7 +65,7 @@ export function Hero() {
           {SITIO.descripcion}
         </p>
         <div className="aparecer mt-8 flex flex-wrap items-center justify-center gap-3" style={{ animationDelay: "1.45s" }}>
-          <a href="#pedir-demo" className="inline-flex h-12 items-center gap-2 rounded-lg bg-[var(--temple-accion)] px-6 text-base font-semibold text-white transition-colors hover:bg-[#2c5ae0]">
+          <a href="#pedir-demo" className="inline-flex h-12 items-center gap-2 rounded-lg bg-primary px-6 text-base font-semibold text-primary-foreground transition-colors hover:bg-primary/90">
             Pedir una demo <ArrowRight className="size-4" />
           </a>
           <a href="#nunca-se-cae" className="inline-flex h-12 items-center gap-2 rounded-lg border border-white/15 px-5 text-base text-niebla transition-colors hover:border-white/30">

@@ -1,6 +1,6 @@
 /**
  * Utilidades de color para el co-branding: cada organización elige su color de
- * acento y Yunque calcula el texto que va encima para mantener contraste AA.
+ * acento y Quvant calcula el texto que va encima para mantener contraste AA.
  */
 
 export function hexARgb(hex: string): [number, number, number] {
@@ -34,12 +34,13 @@ export function contraste(a: string, b: string) {
   return (claro + 0.05) / (oscuro + 0.05)
 }
 
-export const BLANCO = "#ffffff"
-export const HIERRO = "#0e1116"
+/** Blanco y negro Quvant (manual, pág. 8). */
+export const BLANCO = "#ececee"
+export const NEGRO = "#0d0d0f"
 
-/** Elige el texto (blanco o hierro) con mejor contraste sobre el color dado. */
+/** Elige el texto (blanco o negro Quvant) con mejor contraste sobre el color dado. */
 export function textoSobre(fondo: string) {
-  return contraste(fondo, BLANCO) >= contraste(fondo, HIERRO) ? BLANCO : HIERRO
+  return contraste(fondo, BLANCO) >= contraste(fondo, NEGRO) ? BLANCO : NEGRO
 }
 
 /** Nivel WCAG alcanzado por un par de colores para texto normal. */

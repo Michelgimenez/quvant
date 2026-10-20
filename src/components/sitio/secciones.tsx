@@ -209,7 +209,7 @@ export function Precios() {
                 </li>
               ))}
             </ul>
-            <a href="#pedir-demo" className={cn("mt-8 inline-flex h-11 items-center justify-center rounded-lg text-sm font-semibold", i === 0 ? "bg-[var(--temple-accion)] text-white hover:bg-[#2c5ae0]" : "border border-white/15 text-niebla hover:border-white/30")}>
+            <a href="#pedir-demo" className={cn("mt-8 inline-flex h-11 items-center justify-center rounded-lg text-sm font-semibold", i === 0 ? "bg-primary text-primary-foreground hover:bg-primary/90" : "border border-white/15 text-niebla hover:border-white/30")}>
               {p.precioMensual ? "Pedir una demo" : "Hablemos"}
             </a>
           </article>

@@ -16,7 +16,7 @@ const ENLACES = [
 export function EncabezadoSitio() {
   return (
     <header className="fixed inset-x-0 top-0 z-40 border-b border-white/10 bg-hierro/90">
-      <a href="#contenido-sitio" className="sr-only focus:not-sr-only focus:absolute focus:left-3 focus:top-3 focus:rounded focus:bg-[var(--temple-accion)] focus:px-3 focus:py-2 focus:text-white">
+      <a href="#contenido-sitio" className="sr-only focus:not-sr-only focus:absolute focus:left-3 focus:top-3 focus:rounded focus:bg-primary focus:px-3 focus:py-2 focus:text-primary-foreground">
         Saltar al contenido
       </a>
       <div className="mx-auto flex h-16 max-w-6xl items-center gap-6 px-4">
@@ -34,7 +34,7 @@ export function EncabezadoSitio() {
           <a href="/ingresar" className="hidden h-9 items-center rounded-lg px-3 text-sm text-acero hover:text-niebla sm:inline-flex">
             Ingresar
           </a>
-          <a href="#pedir-demo" className="inline-flex h-9 items-center rounded-lg bg-[var(--temple-accion)] px-4 text-sm font-semibold text-white hover:bg-[#2c5ae0]">
+          <a href="#pedir-demo" className="inline-flex h-9 items-center rounded-lg bg-primary px-4 text-sm font-semibold text-primary-foreground hover:bg-primary/90">
             Pedir una demo
           </a>
           <details className="group relative lg:hidden">

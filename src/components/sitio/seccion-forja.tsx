@@ -46,7 +46,7 @@ export function SeccionForja() {
             ))}
           </ul>
           <div className="flex flex-wrap items-center gap-4 border-t border-white/10 pt-5">
-            <Link href="/forja" className="inline-flex h-10 items-center gap-2 rounded-lg bg-[var(--temple-accion)] px-4 text-sm font-semibold text-white hover:bg-[#2c5ae0]" data-testid="ver-demo-forja">
+            <Link href="/forja" className="inline-flex h-10 items-center gap-2 rounded-lg bg-primary px-4 text-sm font-semibold text-primary-foreground hover:bg-primary/90" data-testid="ver-demo-forja">
               Ver la demo <ArrowRight className="size-4" aria-hidden />
             </Link>
             <p className="text-sm text-acero">

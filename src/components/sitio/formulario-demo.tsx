@@ -87,7 +87,7 @@ export function FormularioDemo({ origen = "sitio", boton = "Pedir una demo" }: {
         </p>
       )}
       <div className="flex flex-wrap items-center gap-3 sm:col-span-2">
-        <button type="submit" disabled={pendiente} className="inline-flex h-12 items-center gap-2 rounded-lg bg-[var(--temple-accion)] px-6 font-semibold text-white hover:bg-[#2c5ae0] disabled:opacity-60" data-testid={`enviar-${origen}`}>
+        <button type="submit" disabled={pendiente} className="inline-flex h-12 items-center gap-2 rounded-lg bg-primary px-6 font-semibold text-primary-foreground hover:bg-primary/90 disabled:opacity-60" data-testid={`enviar-${origen}`}>
           {pendiente && <Loader2 className="size-4 animate-spin" />}
           {boton}
         </button>
