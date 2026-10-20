@@ -24,7 +24,7 @@ export function Muelle3D({ plano, enTransito, salidas, reducir }: { plano: Plano
       {/* Umbral del portón: brasa tenue si hay mercadería en camino */}
       <mesh position={[X0 + 0.04, 0.012, porton.z]} rotation-x={-Math.PI / 2}>
         <planeGeometry args={[0.08, porton.ancho]} />
-        <meshBasicMaterial color={enTransito ? COLOR.brasa : COLOR.lineaPiso} toneMapped={false} />
+        <meshBasicMaterial color={enTransito ? COLOR.blancoCaliente : COLOR.lineaPiso} toneMapped={false} />
       </mesh>
       {plano.palets.map((p) => (
         <group
@@ -84,7 +84,7 @@ function BultoSaliente({ lugar, salidas, desde, hasta, reducir }: { lugar: numbe
       {/* Zuncho brasa: es una transferencia, no una entrega */}
       <mesh position-y={0.3}>
         <boxGeometry args={[0.72, 0.06, 0.62]} />
-        <meshBasicMaterial color={COLOR.brasa} toneMapped={false} />
+        <meshBasicMaterial color={COLOR.blancoCaliente} toneMapped={false} />
       </mesh>
     </group>
   )

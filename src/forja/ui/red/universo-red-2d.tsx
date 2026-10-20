@@ -171,7 +171,7 @@ export function UniversoRed2D({
         const a = posiciones.get(f.desdeId)
         const b = posiciones.get(f.haciaId)
         if (!a || !b) return []
-        return [{ id: `pieza:${f.desdeId}>${f.haciaId}`, a, b, c: curva(a, b), color: "#ff6a1f", opacidad: 0.85, ancho: 1.5 + 3 * (f.cantidad / max), avance: null as number | null, vivo: true }]
+        return [{ id: `pieza:${f.desdeId}>${f.haciaId}`, a, b, c: curva(a, b), color: "#ececee", opacidad: 0.85, ancho: 1.5 + 3 * (f.cantidad / max), avance: null as number | null, vivo: true }]
       })
     }
     return red.transferencias.flatMap((t) => {
@@ -180,7 +180,7 @@ export function UniversoRed2D({
       if (!a || !b) return []
       const enTransito = t.estado === "en_transito"
       if (vista !== "mapa" && !enTransito) return []
-      return [{ id: t.id, a, b, c: curva(a, b), color: enTransito ? "#ff6a1f" : "#3a4450", opacidad: enTransito ? 0.75 : 0.6, ancho: t.id === transferenciaId ? 3 : enTransito ? 1.6 : 1, avance: enTransito ? avanceTransito(t.despachadaEn, t.llegadaEstimada, ahora) : null, vivo: enTransito }]
+      return [{ id: t.id, a, b, c: curva(a, b), color: enTransito ? "#ececee" : "#3a3a40", opacidad: enTransito ? 0.75 : 0.6, ancho: t.id === transferenciaId ? 3 : enTransito ? 1.6 : 1, avance: enTransito ? avanceTransito(t.despachadaEn, t.llegadaEstimada, ahora) : null, vivo: enTransito }]
     })
   }, [vista, pieza, red.transferencias, posiciones, transferenciaId, ahora])
 
@@ -226,7 +226,7 @@ export function UniversoRed2D({
               const a = posiciones.get(f.desdeId)
               const b = posiciones.get(f.haciaId)
               if (!a || !b) return null
-              return <line key={`${f.desdeId}>${f.haciaId}`} x1={a.x} y1={a.y} x2={b.x} y2={b.y} stroke="#3a4450" strokeWidth={grosorEnlace(f.unidades, maxUnidades)} strokeLinecap="round" />
+              return <line key={`${f.desdeId}>${f.haciaId}`} x1={a.x} y1={a.y} x2={b.x} y2={b.y} stroke="#3a3a40" strokeWidth={grosorEnlace(f.unidades, maxUnidades)} strokeLinecap="round" />
             })}
           {/* Halos de calor, fijos */}
           {red.nodos.map((n, i) => {
@@ -242,8 +242,8 @@ export function UniversoRed2D({
               <g key={a.id}>
                 <path d={d} fill="none" stroke={a.color} strokeOpacity={a.opacidad} strokeWidth={a.ancho} strokeLinecap="round" />
                 {/* Sentido: un trazo que corre sobre el arco (salvo con movimiento reducido) */}
-                {a.vivo && !reducir && <path d={d} fill="none" stroke="#ffb224" strokeOpacity={0.8} strokeWidth={1.2} strokeDasharray="4 18" className="forja-flujo" />}
-                {bulto && <circle cx={bulto.x} cy={bulto.y} r={4} fill="#fff4e0" stroke="#ff6a1f" strokeWidth={1.5} />}
+                {a.vivo && !reducir && <path d={d} fill="none" stroke="#ececee" strokeOpacity={0.8} strokeWidth={1.2} strokeDasharray="4 18" className="forja-flujo" />}
+                {bulto && <circle cx={bulto.x} cy={bulto.y} r={4} fill="#ececee" stroke="#ececee" strokeWidth={1.5} />}
                 {!pieza && (
                   <path
                     d={d}

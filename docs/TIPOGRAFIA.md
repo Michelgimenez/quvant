@@ -82,7 +82,11 @@ Negro y blanco hacen el 90 % de la marca. Los tokens viven en un solo lugar, `sr
 
 **El color de cada empresa** (`--marca`, lo fija el AppShell) va solo en su logo, en el indicador de navegación activo y en la primera serie de sus gráficos (`--serie-1`). Sin empresa, `--marca` es el blanco (oscuro) o el negro (claro). El resto de la interfaz es de Quvant.
 
-**Única excepción a la paleta:** la escala de calor de Forja (`--frio`, `--ascua`, `--brasa`, `--blanco-caliente`), solo como visualización de datos. Se rehace en la tanda 9.
+**Única excepción a la paleta:** la escala de calor de Forja (`--frio`, `--ascua`, `--brasa`, `--blanco-caliente`), solo como visualización de datos (cuánto se vende en la última hora contra el promedio de la sucursal).
+
+- **Es discreta** (tanda 9): sube en luminosidad del gris profundo al blanco, con un tibio apagado en el medio que es el mismo tono del estado de alerta. Los pasos son `#26262B` → `#4A3F38` → `#8A6A4C` → `#D7AC68` → `#ECECEE`, interpolados en OKLab.
+- **No es color de marca:** no se usa en botones, fondos ni textos. Vive en `src/forja/dominio/calor.ts`.
+- **Todo lo demás de Forja va en los grises de la marca:** los materiales del taller, el mapa, las transferencias en viaje (en blanco) y la selección (en blanco). Los estados usan los mismos alerta y error de la app.
 
 **Alias de transición:** `--hierro`, `--niebla`, `--temple`, `--chispa`, `--superficie`, `--enlace`, `--chispa-texto`, `--ok-texto` y `--error-texto` apuntan a los tokens nuevos para que la app no se rompa. La tanda 2 los reemplaza en los componentes y los borra.
 

@@ -24,7 +24,7 @@ const NOMBRE_MOVIMIENTO: Record<TipoMovimiento, string> = {
   inicial: "Carga inicial",
 }
 
-const COLOR_ESTADO = { normal: "bg-[#6b7684]", critico: "bg-alerta", sin_stock: "bg-brasa" } as const
+const COLOR_ESTADO = { normal: "bg-gris-6", critico: "bg-alerta", sin_stock: "bg-error" } as const
 
 function dia(iso: string) {
   return new Date(iso).toLocaleDateString("es-AR", { weekday: "short", day: "2-digit", month: "2-digit", timeZone: "America/Argentina/Buenos_Aires" })
@@ -91,7 +91,7 @@ function Producto({ r, nombre, enlaces }: { r: RecorridoProducto; nombre: (id: I
               <span className={cn("size-1.5 shrink-0 rounded-full", COLOR_ESTADO[s.estado])} aria-hidden />
               <span className="truncate text-[13px]">{nombre(s.sucursalId)}</span>
             </span>
-            <span className={cn("text-right font-mono text-[12px]", s.estado === "sin_stock" ? "text-brasa" : s.estado === "critico" ? "text-alerta" : "text-blanco")}>
+            <span className={cn("text-right font-mono text-[12px]", s.estado === "sin_stock" ? "text-error" : s.estado === "critico" ? "text-alerta" : "text-blanco")}>
               {formatoCantidad(s.cantidad)}
               {s.minimo > 0 && <span className="text-acero"> / mín. {s.minimo}</span>}
             </span>
@@ -110,7 +110,7 @@ function Producto({ r, nombre, enlaces }: { r: RecorridoProducto; nombre: (id: I
         <ul className="mt-2 space-y-1">
           {r.flujos.map((f) => (
             <li key={`${f.desdeId}>${f.haciaId}`} className="flex items-baseline gap-2 text-[13px]">
-              <span className="size-1.5 shrink-0 rounded-full bg-brasa" aria-hidden />
+              <span className="size-1.5 shrink-0 bg-blanco" aria-hidden />
               <span className="min-w-0 flex-1 truncate">
                 {nombre(f.desdeId)} → {nombre(f.haciaId)}
               </span>

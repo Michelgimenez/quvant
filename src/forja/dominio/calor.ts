@@ -1,5 +1,7 @@
 /**
- * Escala de calor de Forja: el calor del trabajo.
+ * Escala de calor de Forja: el calor del trabajo. Es la ÚNICA excepción a la paleta negro y blanco de Quvant,
+ * y solo como visualización de datos: discreta, del gris profundo al blanco con un tibio apagado en el medio
+ * (el mismo tono del estado de alerta). Documentada en docs/TIPOGRAFIA.md.
  *
  * frío → ascua → brasa → chispa → blanco caliente. El valor de calor es
  * relativo a cada sucursal: ventas de la última hora sobre su promedio por
@@ -7,11 +9,11 @@
  * en OKLab para que el degradé avance parejo a la vista (en sRGB se "embarra").
  */
 export const PARADAS_CALOR = [
-  { calor: 0, hex: "#3a4450", nombre: "frío", token: "--frio" },
-  { calor: 0.6, hex: "#c2410c", nombre: "ascua", token: "--ascua" },
-  { calor: 1.1, hex: "#ff6a1f", nombre: "brasa", token: "--brasa" },
-  { calor: 1.7, hex: "#ffb224", nombre: "chispa", token: "--chispa" },
-  { calor: 2.5, hex: "#fff4e0", nombre: "blanco caliente", token: "--blanco-caliente" },
+  { calor: 0, hex: "#26262b", nombre: "frío", token: "--frio" },
+  { calor: 0.6, hex: "#4a3f38", nombre: "ascua", token: "--ascua" },
+  { calor: 1.1, hex: "#8a6a4c", nombre: "brasa", token: "--brasa" },
+  { calor: 1.7, hex: "#d7ac68", nombre: "chispa", token: "--chispa" },
+  { calor: 2.5, hex: "#ececee", nombre: "blanco caliente", token: "--blanco-caliente" },
 ] as const
 
 export const CALOR_MAXIMO = PARADAS_CALOR[PARADAS_CALOR.length - 1].calor

@@ -1,37 +1,29 @@
 import type { ValorPreferencia } from "@/dominio/tipos"
 
 /**
- * Activación de Forja: "el yunque se convierte en forja". Cronograma en
- * segundos, todo en función de un solo reloj (así se puede saltar, pausar con
- * la pestaña oculta y grabar cuadro a cuadro).
+ * Activación de Forja con la marca de Quvant (tanda 9): la Q se traza, el punto salta y, donde cae, se enciende
+ * la primera sucursal; desde ahí, la grilla de puntos se convierte en el mapa con las demás. Cronograma en
+ * segundos sobre un solo reloj (GSAP): se puede saltar y filmar cuadro por cuadro. Sin deformar el logo.
  */
 export const DURACION_ACTIVACION = 4.5
 
 export const CRONOGRAMA = {
-  /** El yunque cae y apoya con peso. */
-  caida: { desde: 0, hasta: 0.72 },
-  /** Temblor de cámara de 2 px al apoyar. */
-  temblor: { desde: 0.72, hasta: 0.92 },
-  /** Polvo fino que se levanta y se asienta. */
-  polvo: { desde: 0.72, hasta: 2.4 },
-  /** Chispas desde la cara del yunque (tres golpes). */
-  chispas: [0.72, 1.25, 1.8],
-  /** Las placas del hogar suben desde abajo, una tras otra. */
-  placas: { desde: 0.95, hasta: 1.9 },
-  /** Campana y chimenea dibujadas con líneas de luz. */
-  campana: { desde: 1.3, hasta: 2.6 },
-  /** Se enciende el núcleo de brasa y late. */
-  brasa: { desde: 1.9, hasta: 2.5 },
-  /** Los bordes del yunque pasan de acero a naranja incandescente. */
-  calor: { desde: 1.9, hasta: 3.2 },
-  /** "yunque + forja" y la frase. */
-  texto: { desde: 2.45, hasta: 2.95 },
-  /** La cámara empuja hacia el núcleo de la brasa. */
-  empuje: { desde: 3.3, hasta: 4.1 },
-  /** El brillo llena la pantalla… */
-  brillo: { desde: 3.8, hasta: 4.1 },
-  /** …y se abre en un iris hacia el universo del taller. */
-  iris: { desde: 4.1, hasta: DURACION_ACTIVACION },
+  /** El aro de la Q se traza. */
+  aro: { desde: 0.15, hasta: 1.15 },
+  /** El punto aparece en su lugar, abajo a la derecha del aro. */
+  punto: { desde: 1.0, hasta: 1.25 },
+  /** El punto salta en arco hasta la primera sucursal. */
+  salto: { desde: 1.3, hasta: 1.95 },
+  /** Donde cae, se enciende la primera sucursal. */
+  enciende: { desde: 1.95, hasta: 2.3 },
+  /** La Q se retira. */
+  retiro: { desde: 2.0, hasta: 2.5 },
+  /** La grilla se vuelve el mapa: se encienden las demás sucursales, de la más cercana a la más lejana. */
+  mapa: { desde: 2.2, hasta: 3.6 },
+  /** La placa y la frase. */
+  placa: { desde: 2.9, hasta: 3.4 },
+  /** Fundido hacia el universo. */
+  salida: { desde: 3.95, hasta: DURACION_ACTIVACION },
 } as const
 
 /** Avance 0..1 dentro de un tramo del cronograma. */
@@ -52,7 +44,22 @@ export function debeMostrarActivacion(pedida: boolean, preferencias: Record<stri
   return pedida || !preferencias[PREFERENCIA_ACTIVACION]
 }
 
-/** Vértices de un trazo poligonal del isotipo ("M x,y L x,y … Z"), para extruirlo en 3D. */
-export function poligonoDeTrazo(d: string): [number, number][] {
-  return [...d.matchAll(/[ML]\s*(-?[\d.]+)\s*,\s*(-?[\d.]+)/g)].map((m) => [Number(m[1]), Number(m[2])])
+export type PuntoMapa = { x: number; y: number }
+
+/**
+ * Las sucursales en la caja de la activación (0..1, con margen), con la misma forma que en el mapa:
+ * longitud a la derecha, latitud hacia arriba, sin deformar. La primera es la que se enciende con el salto.
+ */
+export function puntosActivacion(nodos: { lat: number | null; lng: number | null }[], margen = 0.18): PuntoMapa[] {
+  const con = nodos.filter((n): n is { lat: number; lng: number } => n.lat !== null && n.lng !== null)
+  if (!con.length) return []
+  const xs = con.map((n) => n.lng * Math.cos((con[0].lat * Math.PI) / 180))
+  const ys = con.map((n) => -n.lat)
+  const [x0, x1, y0, y1] = [Math.min(...xs), Math.max(...xs), Math.min(...ys), Math.max(...ys)]
+  const lado = Math.max(x1 - x0, y1 - y0) || 1
+  const util = 1 - margen * 2
+  return con.map((_, i) => ({
+    x: margen + ((xs[i] - x0) / lado) * util + (util - ((x1 - x0) / lado) * util) / 2,
+    y: margen + ((ys[i] - y0) / lado) * util + (util - ((y1 - y0) / lado) * util) / 2,
+  }))
 }

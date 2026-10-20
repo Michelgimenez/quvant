@@ -2,33 +2,39 @@ import type { EstadoServicio } from "@/dominio/tipos"
 import type { EstadoBloque } from "@/forja/dominio/plano"
 
 /**
- * Paleta del taller: materiales monocromos (hormigón, grafito, acero) y el
- * color solo como emisión (estado, calor, chispas). --temple queda para el
- * contorno de selección y foco.
+ * Paleta del taller: el negro y blanco de Quvant. Materiales monocromos con la escala de grises de la marca
+ * (sin el azul ni los naranjas de Yunque). El color aparece solo como dato: los estados (alerta y error, los
+ * mismos de la app) y la escala de calor de la actividad (src/forja/dominio/calor.ts, la única excepción).
+ * La selección y el foco van en blanco.
  */
 export const COLOR = {
-  fondo: "#0e1116",
-  losa: "#1a1f27",
-  losaCanto: "#11151b",
-  piso: "#1f252e",
-  lineaPiso: "#2c343f",
-  pared: "#262d36",
-  corte: "#4a5361",
-  estructura: "#4a5361",
-  estante: "#333b46",
-  mueble: "#2c343f",
-  tapa: "#3a4450",
-  equipo: "#7d8692",
-  caja: "#6f747b",
-  palet: "#2a2f36",
-  frio: "#6b7684",
-  temple: "#3b6ef5",
-  chispa: "#ffb224",
-  ascua: "#c2410c",
-  brasa: "#ff6a1f",
-  blancoCaliente: "#fff4e0",
-  acero: "#9aa3ae",
-  pantalla: "#c9d4e2",
+  fondo: "#0d0d0f",
+  losa: "#141416",
+  losaCanto: "#0d0d0f",
+  piso: "#1c1c1f",
+  lineaPiso: "#26262b",
+  pared: "#1c1c1f",
+  corte: "#3a3a40",
+  estructura: "#3a3a40",
+  estante: "#2e2e33",
+  mueble: "#26262b",
+  tapa: "#3a3a40",
+  equipo: "#8d8d94",
+  caja: "#6e6e75",
+  palet: "#26262b",
+  frio: "#55555b",
+  /** La selección y el foco (era el azul temple de Yunque). */
+  temple: "#ececee",
+  /** Estado de alerta (stock crítico, esperando aprobación): el mismo de la app. */
+  chispa: "#d7ac68",
+  /** Estado de error (sin stock). */
+  ascua: "#e18881",
+  /** En reparación: lo que está trabajando. */
+  brasa: "#d7ac68",
+  /** Listo: blanco. */
+  blancoCaliente: "#ececee",
+  acero: "#9c9ca3",
+  pantalla: "#cdcdd1",
 } as const
 
 export const COLOR_BLOQUE: Record<EstadoBloque, string> = {

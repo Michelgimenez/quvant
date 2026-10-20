@@ -155,7 +155,7 @@ function PanelDeposito({ taller, nodo, enlaces }: Props) {
               >
                 <span className="w-11 shrink-0 font-mono text-[10px] text-acero">{p.rackId}</span>
                 <span className="min-w-0 flex-1 truncate text-[13px]">{p.nombre}</span>
-                <span className={cn("font-mono text-[11px]", p.estado === "sin_stock" ? "text-brasa" : "text-alerta")}>{p.estado === "sin_stock" ? "sin stock" : `${formatoCantidad(p.cantidad)} / ${p.minimo}`}</span>
+                <span className={cn("font-mono text-[11px]", p.estado === "sin_stock" ? "text-error" : "text-alerta")}>{p.estado === "sin_stock" ? "sin stock" : `${formatoCantidad(p.cantidad)} / ${p.minimo}`}</span>
               </button>
             </li>
           ))}
@@ -195,7 +195,7 @@ function PanelRack({ taller, nodo, enlaces, rackId, onPieza }: Props & { rackId:
                 <span className="block truncate text-[13px]">{p.nombre}</span>
                 <span className="block font-mono text-[10px] text-acero">{p.sku}</span>
               </span>
-              <span className={cn("text-right font-mono text-[12px]", estado === "sin_stock" ? "text-brasa" : estado === "critico" ? "text-alerta" : "text-blanco")}>
+              <span className={cn("text-right font-mono text-[12px]", estado === "sin_stock" ? "text-error" : estado === "critico" ? "text-alerta" : "text-blanco")}>
                 {formatoCantidad(p.cantidad)}
                 {p.minimo > 0 && <span className="block text-[10px] text-acero">mín. {p.minimo}</span>}
               </span>
@@ -367,7 +367,7 @@ function PanelMuelle({ taller, red, enlaces }: Props) {
           <ul className="space-y-1">
             {transferencias.map((b) => (
               <li key={b.id} className="flex items-baseline gap-2 text-[13px]">
-                <span className="size-1.5 shrink-0 rounded-full bg-brasa" aria-hidden />
+                <span className="size-1.5 shrink-0 bg-blanco" aria-hidden />
                 <span className="min-w-0 flex-1 truncate">A {nombre(b.destinoId)}</span>
                 <span className="font-mono text-[10px] text-acero">{b.estado === "en_transito" ? "en tránsito" : "recibida"}</span>
               </li>
@@ -390,13 +390,13 @@ export function Leyenda({ className }: { className?: string }) {
   return (
     <ul className={cn("mt-3 flex flex-wrap gap-x-3 gap-y-1 font-mono text-[10px] text-acero", className)} aria-label="Cómo leer el depósito">
       <li className="flex items-center gap-1.5">
-        <span className="h-2.5 w-2 rounded-[1px] bg-[#6b7684]" aria-hidden /> stock normal
+        <span className="h-2.5 w-2 rounded-[1px] bg-gris-6" aria-hidden /> stock normal
       </li>
       <li className="flex items-center gap-1.5">
         <span className="h-2.5 w-2 rounded-[1px] bg-alerta" aria-hidden /> en el mínimo
       </li>
       <li className="flex items-center gap-1.5">
-        <span className="h-0.5 w-2.5 bg-ascua" aria-hidden /> hueco: sin stock
+        <span className="h-0.5 w-2.5 bg-error" aria-hidden /> hueco: sin stock
       </li>
     </ul>
   )

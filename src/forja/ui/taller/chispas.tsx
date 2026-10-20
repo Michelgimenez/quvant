@@ -13,8 +13,8 @@ export type ControlChispas = { lanzar: (x: number, y: number, z: number, cantida
 
 const MAX = 320
 const GRAVEDAD = -7.5
-const CALIENTE = new THREE.Color("#fff4e0")
-const BRASA = new THREE.Color("#ff6a1f")
+const CALIENTE = new THREE.Color("#ececee")
+const BRASA = new THREE.Color("#9c9ca3")
 
 export const Chispas = forwardRef<ControlChispas, { reducir: boolean }>(function Chispas({ reducir }, ref) {
   const sim = useMemo(

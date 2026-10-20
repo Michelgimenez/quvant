@@ -13,7 +13,7 @@ export function SelectorArcos({ red, onElegir }: { red: RedForja; onElegir: (id:
     <div className="pointer-events-auto absolute bottom-[4.5rem] left-4 flex max-w-[60%] flex-wrap gap-2" aria-label="Transferencias en tránsito">
       {enTransito.map((t) => (
         <button key={t.id} type="button" onClick={() => onElegir(t.id)} className="rounded-md border border-white/10 bg-negro/85 px-2.5 py-1.5 font-mono text-[11px] text-blanco backdrop-blur hover:border-white/25 focus-visible:outline focus-visible:outline-1 focus-visible:outline-foreground" data-testid="transferencia-en-transito">
-          <span className="mr-1.5 inline-block size-1.5 rounded-full bg-brasa align-middle" aria-hidden />
+          <span className="mr-1.5 inline-block size-1.5 rounded-full bg-blanco align-middle" aria-hidden />
           {nombre(t.desdeId)} → {nombre(t.haciaId)} · llega {hora(t.llegadaEstimada)}
         </button>
       ))}

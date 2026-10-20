@@ -14,9 +14,9 @@ import { REGISTRO_EXTENSIONES, type DefinicionExtension } from "@/extensiones/re
 import { MarcaForja } from "@/forja/ui/marca-forja"
 import { usaVersion2D } from "@/forja/ui/modo-2d"
 
-/** Al acercarse al botón, la escena de la activación empieza a bajar (salvo en la versión 2D, que no la usa). */
+/** Al acercarse al botón, la activación empieza a bajar (salvo en la versión 2D, que usa la versión quieta). */
 const precargarActivacion = () => {
-  if (!usaVersion2D()) void import("@/forja/ui/activacion/escena-activacion").catch(() => {})
+  if (!usaVersion2D()) void import("@/forja/ui/activacion/activacion").catch(() => {})
 }
 
 export function Extensiones() {

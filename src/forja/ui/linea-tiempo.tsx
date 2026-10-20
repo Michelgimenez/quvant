@@ -113,7 +113,7 @@ export function LineaTiempo({ eventos, tramo }: { eventos: EventoForja[]; tramo:
         {/* El pulso del día: ventas por franja; lo ya reproducido, en brasa */}
         <svg viewBox={`0 0 ${densidad.length} 1`} preserveAspectRatio="none" className="absolute inset-x-0 top-0 h-6 w-full" aria-hidden>
           {densidad.map((d, i) => (
-            <rect key={i} x={i + 0.15} width={0.7} y={1 - Math.max(0.04, d)} height={Math.max(0.04, d)} fill={(i + 0.5) / densidad.length <= avance ? "#ff6a1f" : "#3a4450"} opacity={(i + 0.5) / densidad.length <= avance ? 0.85 : 0.7} />
+            <rect key={i} x={i + 0.15} width={0.7} y={1 - Math.max(0.04, d)} height={Math.max(0.04, d)} fill={(i + 0.5) / densidad.length <= avance ? "#ececee" : "#3a3a40"} opacity={(i + 0.5) / densidad.length <= avance ? 0.85 : 0.7} />
           ))}
         </svg>
         <div className="pointer-events-none absolute inset-y-0 left-0 w-full" style={{ transform: `translateX(${avance * 100}%)` }} aria-hidden>

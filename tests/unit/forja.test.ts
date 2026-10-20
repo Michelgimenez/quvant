@@ -27,8 +27,8 @@ function aplicarComoServidor(estado: EstadoEmpresa, op: Operacion, autor: Usuari
 
 describe("Forja · escala de calor", () => {
   it("va de frío a blanco caliente pasando por las paradas de la paleta", () => {
-    expect(colorCalor(0)).toBe("#3a4450")
-    expect(colorCalor(CALOR_MAXIMO)).toBe("#fff4e0")
+    expect(colorCalor(0)).toBe("#26262b")
+    expect(colorCalor(CALOR_MAXIMO)).toBe("#ececee")
     for (const p of PARADAS_CALOR) expect(colorCalor(p.calor)).toBe(p.hex)
   })
 
@@ -379,20 +379,22 @@ describe("Forja · repetición y titulares", () => {
 })
 
 describe("Forja · activación", () => {
-  it("dura 4,5 s como máximo y cada tramo cae dentro", async () => {
+  it("dura 4,5 s como máximo, cada tramo cae dentro y en orden: aro, punto, salto, sucursal, mapa", async () => {
     const { CRONOGRAMA, DURACION_ACTIVACION, tramo } = await import("@/forja/dominio/activacion")
     expect(DURACION_ACTIVACION).toBeLessThanOrEqual(4.5)
     for (const r of Object.values(CRONOGRAMA)) {
-      const lista = "desde" in r ? [r] : r.map((x) => ({ desde: x, hasta: x }))
-      for (const x of lista) {
-        expect(x.desde).toBeGreaterThanOrEqual(0)
-        expect(x.hasta).toBeLessThanOrEqual(DURACION_ACTIVACION)
-        expect(x.desde).toBeLessThanOrEqual(x.hasta)
-      }
+      expect(r.desde).toBeGreaterThanOrEqual(0)
+      expect(r.hasta).toBeLessThanOrEqual(DURACION_ACTIVACION)
+      expect(r.desde).toBeLessThanOrEqual(r.hasta)
     }
-    expect(tramo(0, CRONOGRAMA.caida)).toBe(0)
-    expect(tramo(0.36, CRONOGRAMA.caida)).toBeCloseTo(0.5)
-    expect(tramo(9, CRONOGRAMA.iris)).toBe(1)
+    const C = CRONOGRAMA
+    expect(C.aro.desde).toBeLessThan(C.punto.desde)
+    expect(C.punto.hasta).toBeLessThanOrEqual(C.salto.desde)
+    expect(C.salto.hasta).toBeLessThanOrEqual(C.enciende.desde)
+    expect(C.enciende.desde).toBeLessThan(C.mapa.desde)
+    expect(tramo(0, C.aro)).toBe(0)
+    expect(tramo((C.salto.desde + C.salto.hasta) / 2, C.salto)).toBeCloseTo(0.5)
+    expect(tramo(9, C.salida)).toBe(1)
   })
 
   it("se muestra la primera vez o cuando se pide, y no otra vez sola", async () => {
@@ -402,18 +404,26 @@ describe("Forja · activación", () => {
     expect(debeMostrarActivacion(true, { [PREFERENCIA_ACTIVACION]: "2026-10-07T18:30:00.000Z" })).toBe(true)
   })
 
-  it("el isotipo se extruye desde su trazo poligonal", async () => {
-    const { poligonoDeTrazo } = await import("@/forja/dominio/activacion")
-    const { TRAZO_YUNQUE } = await import("@/components/marca/trazos")
-    const p = poligonoDeTrazo(TRAZO_YUNQUE)
-    expect(p.length).toBe(19)
-    expect(p[0]).toEqual([2, 34])
-    for (const [x, y] of p) {
-      expect(x).toBeGreaterThanOrEqual(0)
-      expect(x).toBeLessThanOrEqual(100)
-      expect(y).toBeGreaterThanOrEqual(0)
-      expect(y).toBeLessThanOrEqual(88)
+  it("las sucursales caen en la caja del mapa, sin deformar y con el norte arriba", async () => {
+    const { puntosActivacion } = await import("@/forja/dominio/activacion")
+    // Buenos Aires, Córdoba (más al norte y al oeste) y Mar del Plata (al sur y al este)
+    const p = puntosActivacion([
+      { lat: -34.6, lng: -58.4 },
+      { lat: -31.4, lng: -64.2 },
+      { lat: -38.0, lng: -57.6 },
+      { lat: null, lng: null },
+    ])
+    expect(p).toHaveLength(3)
+    for (const q of p) {
+      expect(q.x).toBeGreaterThanOrEqual(0.18 - 1e-9)
+      expect(q.x).toBeLessThanOrEqual(0.82 + 1e-9)
+      expect(q.y).toBeGreaterThanOrEqual(0.18 - 1e-9)
+      expect(q.y).toBeLessThanOrEqual(0.82 + 1e-9)
     }
+    expect(p[1].y).toBeLessThan(p[0].y) // Córdoba, más arriba
+    expect(p[1].x).toBeLessThan(p[0].x) // y más a la izquierda
+    expect(p[2].y).toBeGreaterThan(p[0].y) // Mar del Plata, más abajo
+    expect(puntosActivacion([])).toEqual([])
   })
 })
 

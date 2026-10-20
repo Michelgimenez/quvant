@@ -104,7 +104,7 @@ function Etiqueta({ a, activa }: { a: Ancla; activa: boolean }) {
       )
     case "transito":
       return (
-        <span className="block -translate-y-full whitespace-nowrap font-mono text-[10px] text-brasa" data-testid="muelle-en-transito">
+        <span className="block -translate-y-full whitespace-nowrap font-mono text-[10px] text-blanco" data-testid="muelle-en-transito">
           ← {a.n} en tránsito
         </span>
       )
@@ -130,7 +130,7 @@ function TooltipRack({ rack }: { rack: PlanoTaller["racks"][number]["rack"] }) {
             <li key={p.productoId} className="flex items-baseline gap-2 text-[11px]">
               <span className="w-6 shrink-0 font-mono text-[10px] text-acero">E{p.estante}</span>
               <span className="min-w-0 flex-1 truncate">{p.nombre}</span>
-              <span className={cn("font-mono", p.cantidad <= 0 ? "text-brasa" : alerta ? "text-alerta" : "text-blanco")}>{p.cantidad <= 0 ? "sin stock" : formatoCantidad(p.cantidad)}</span>
+              <span className={cn("font-mono", p.cantidad <= 0 ? "text-error" : alerta ? "text-alerta" : "text-blanco")}>{p.cantidad <= 0 ? "sin stock" : formatoCantidad(p.cantidad)}</span>
             </li>
           )
         })}

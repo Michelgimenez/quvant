@@ -73,3 +73,11 @@ Lo que el modo boceto deja para después: celular, respaldos, accesibilidad fina
 - **Rendimiento (fase 4):** `/inversores` monta la demo de las cuatro empresas en la escena estrella. Medir la memoria en una notebook modesta.
 - **Peso del repositorio:** los videos viven en `public/videos/`. Si crecen, conviene un almacenamiento aparte (CDN) en lugar del repositorio.
 
+## De la tanda 9 · Forja
+
+- **La vista por dentro sigue siendo la de la ferretería** (mostrador, depósito, servicio técnico y muelle), aun en el grupo y en la distribuidora. La adaptación por rubro es de la tanda 10.
+- **Movimiento reducido (fase 2):** la activación quieta muestra la composición final; revisar que el fundido corto también se respete.
+- **Celular (fase 1):** la activación se ve entera en vertical (el escenario se encaja), pero la grilla queda chica. Probarla en un teléfono.
+- **Rendimiento (fase 4):** Forja del grupo arma ~2.500 eventos del día. Medir el tiempo de la repetición y del mapa con 40 nodos en una máquina modesta.
+- **Accesibilidad (fase 3):** con 40 sucursales, los nombres ocultos siguen en el `aria-label` de cada nodo. Verificarlo con un lector de pantalla.
+

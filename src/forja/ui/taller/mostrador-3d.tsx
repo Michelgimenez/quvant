@@ -81,7 +81,7 @@ function Puesto({ p, ultimasVentas }: { p: PuestoPlano; ultimasVentas: React.Ref
         </mesh>
         <mesh position-z={0.019}>
           <planeGeometry args={[0.5, 0.3]} />
-          <meshStandardMaterial ref={pantalla} color="#0e1116" emissive={COLOR.pantalla} emissiveIntensity={base} toneMapped={false} />
+          <meshStandardMaterial ref={pantalla} color="#0d0d0f" emissive={COLOR.pantalla} emissiveIntensity={base} toneMapped={false} />
         </mesh>
       </group>
       {cola > 0 && (

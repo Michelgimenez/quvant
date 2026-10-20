@@ -111,7 +111,7 @@ function Escena({ plano, sucursalId, eventos, enTransito, modo, reducir, margenD
   return (
     <>
       <color attach="background" args={[COLOR.fondo]} />
-      <hemisphereLight args={["#dfe5ec", "#0e1116", 1.1]} />
+      <hemisphereLight args={["#ececee", "#0d0d0f", 1.1]} />
       <directionalLight position={[6, 24, 12]} intensity={1.6} color="#f4f6f8" />
       <directionalLight position={[-14, 10, 18]} intensity={0.35} color="#b8c4d2" />
       <CamaraTaller modo={modo} reducir={reducir} margenDerecho={margenDerecho} margenAbajo={margenAbajo} />

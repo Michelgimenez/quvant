@@ -11,6 +11,7 @@ import { hastaCursor, tramoDelDia } from "@/forja/dominio/repeticion"
 import type { FuenteForja } from "@/forja/datos/fuente"
 import { cn } from "@/lib/utils"
 import { Activacion, type FinActivacion } from "./activacion/activacion"
+import { puntosActivacion } from "@/forja/dominio/activacion"
 import { hora } from "./formato"
 import { LineaTiempo, useMotorRepeticion } from "./linea-tiempo"
 import { MarcaForja } from "./marca-forja"
@@ -164,7 +165,7 @@ function Escena({
     // Radio para que la parte opaca del degradado (48 %) cubra la esquina más lejana
     const lejos = Math.max(Math.hypot(pos.x, pos.y), Math.hypot(caja.width - pos.x, pos.y), Math.hypot(pos.x, caja.height - pos.y), Math.hypot(caja.width - pos.x, caja.height - pos.y))
     const d = (lejos / 0.48) * 2
-    Object.assign(el.style, { width: `${d}px`, height: `${d}px`, left: `${pos.x - d / 2}px`, top: `${pos.y - d / 2}px`, background: `radial-gradient(circle, #fff4e0 0%, ${color} 6%, rgb(194 65 12 / 0.5) 18%, #0e1116 48%)` })
+    Object.assign(el.style, { width: `${d}px`, height: `${d}px`, left: `${pos.x - d / 2}px`, top: `${pos.y - d / 2}px`, background: `radial-gradient(circle, #ececee 0%, ${color} 6%, rgb(156 156 163 / 0.35) 18%, #0d0d0f 48%)` })
     return el
   }
   const centro = () => {
@@ -407,6 +408,7 @@ function Escena({
           <Activacion
             quietaDeEntrada={es2D}
             arranqueManual={activacion.arranqueManual}
+            puntos={puntosActivacion(fuente.red.nodos)}
             onFin={(motivo) => {
               setEntrada("encender")
               activacion.alTerminar(motivo)

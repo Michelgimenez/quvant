@@ -2,6 +2,60 @@
 
 > Yunque pasa a ser Quvant (`PROMPT-QUVANT.md`), en 10 tandas, en la rama `quvant`. Arriba, lo último; abajo, el historial de Yunque.
 
+## Resumen · tanda 9 de 10 · Forja: la base y la activación (20/10/2026)
+
+**La base en negro y blanco** (`src/forja/ui/taller/materiales.ts`, `red/estilo-mapa.ts`):
+- Los materiales del taller pasan a la escala de grises de la marca. Se fueron el grafito azulado y el azul "temple" de Yunque: la selección ahora es blanca.
+- El mapa se tiñe con el negro de Quvant y sus grises.
+- Las transferencias en viaje, las estelas y los bultos van en blanco (eran naranjas). Los estados usan los mismos alerta y error de la app: sin stock en error y crítico en alerta.
+
+**La escala de actividad, discreta** (`src/forja/dominio/calor.ts`):
+- Es la única excepción a la paleta y está documentada en `docs/TIPOGRAFIA.md`.
+- Sube del gris profundo al blanco, con un tibio apagado en el medio (el tono del alerta). Antes iba de naranja a amarillo.
+- Solo dibuja datos: el calor de cada sucursal.
+
+**La placa:** «FORJA · by Quvant» (Michroma y la Q) con una frase nueva, en `src/config/forja.ts`: **«Todo el negocio, en vivo.»** Es BORRADOR; abajo, en "Para Michel", van dos alternativas.
+
+**La activación nueva** (`src/forja/ui/activacion/activacion.tsx`):
+- **Cómo se ve, en 4,5 s:**
+  1. El aro de la Q se traza y el punto aparece en su lugar.
+  2. El punto salta en arco (la misma geometría del salto de la marca) y, donde cae, se enciende la primera sucursal.
+  3. La Q se retira y la grilla de puntos se vuelve el mapa: se encienden los puntos cerca de cada sucursal, en onda, y aparecen las demás con las líneas de la red.
+  4. Aparecen la placa y la frase, y todo se funde hacia el universo.
+- **Cómo funciona:**
+  - Es SVG con una línea de tiempo de GSAP, sin la escena 3D del yunque (se borraron `escena-activacion.tsx`, `sonido.ts` y el trazo del yunque).
+  - Se salta con el botón, Esc o Enter.
+  - Con movimiento reducido o en la versión 2D, muestra la composición final quieta y se funde.
+  - Las sucursales salen de la red real (`puntosActivacion`: el norte arriba, sin deformar).
+
+**Forja dentro de la demo** (`src/demo/forja-demo.ts`, `src/components/demo/vistas/forja-*.tsx`):
+- **Desde la barra lateral del grupo y de la distribuidora,** con la misma fuente de datos de la demo: sin base, sin Realtime y con los sellos DEMO y SIMULACIÓN.
+- **El grupo:** sus 40 sucursales en el mapa del país, con las ventas del día, el calor de la última hora y transferencias en viaje entre sucursales de la misma provincia.
+- **La distribuidora:** el depósito de Rosario y sus 12 zonas de reparto (con coordenadas reales aproximadas de esos barrios y localidades). Los pedidos del día y los camiones del reparto aparecen en viaje.
+- **El día antes de la hora de la demo** se reconstruye de los totales: muestras con su hora, siempre iguales. Lo de después lo pone el simulador. Así funciona también la repetición del día.
+- **La activación** aparece la primera vez que se abre en la visita.
+- **Con muchas sucursales,** el mapa muestra el nombre solo de las 8 que más venden; el resto aparece al pasar o con el foco. Si no, 40 nombres se pisaban.
+
+**Registro de funcionalidades:** la nota de "Forja" suma que se prueba dentro de `/demo`, en el grupo y la distribuidora.
+
+**Verificación:**
+- Typecheck sin errores, lint limpio en lo tocado y tests unitarios: 123 de 123. Hay cuatro nuevos para la Forja de la demo (el grupo con 40 nodos y simulación, la repetición, la distribuidora con 13 nodos y el taller). El de la activación se rehízo (el orden de los tramos y la proyección de las sucursales).
+- `npm run build`, completo (no lo pide la tanda: se hizo porque Forja cambió mucho).
+- **Tests de punta a punta de Forja** (`forja.spec.ts` y `forja-publica.spec.ts`, contra el build): 17 pasan y 2 quedan en pausa.
+  - Las dos pausas son la sección de Forja del sitio, que vuelve en la tanda 10, y una prueba de celular que corre en su propio proyecto (también pasó).
+  - Pasan la activación nueva (termina sola, con la placa y su frase, y se salta con Esc) y el recorrido con el teclado, que en la tanda 8 había fallado.
+- Capturas en `docs/capturas/quvant/tanda-9/` (9): la activación en tres momentos, y la red y el taller del grupo, de la distribuidora y de `/forja`. Sin errores de página ni de consola.
+
+### Decisiones de la tanda 9
+
+| # | Decisión | Motivo |
+|---|---|---|
+| T9-1 | La activación es SVG + GSAP, no 3D. | Lo que cuenta (el aro, el salto y la grilla que se vuelve mapa) es plano por naturaleza. Así carga al instante, no necesita WebGL ni una versión de reemplazo y se puede filmar cuadro por cuadro. |
+| T9-2 | La Q de la activación es la versión blanca del isotipo, armada con su geometría (el aro y el punto). | Para que el aro se trace y el punto salte sin deformar el logo. La Q cromada es un PNG y no se puede trazar. |
+| T9-3 | En la distribuidora, cada zona de reparto es un nodo del mapa. | Una distribuidora tiene un solo depósito. Su "red" es la calle: los pedidos que llegan de cada zona y los camiones que salen hacia ellas. |
+| T9-4 | Se quitó el sonido de la activación. | Eran golpes de yunque y chisporroteo, de la marca vieja. |
+| T9-5 | La escala de calor conserva sus nombres (frío, ascua, brasa, chispa, blanco caliente). | Son los del código y los anuncios ("calor brasa"); cambia el color, no el sentido. |
+
 ## Resumen · tanda 8 de 10 · Presentaciones y videos (20/10/2026)
 
 **`/inversores`** (`src/components/presentacion/escenas-inversores.tsx`), 12 escenas con Forja todavía oculta:
@@ -306,35 +360,38 @@
 
 ## Para Michel
 
-> Al día con la tanda 8. Lo que tenés que elegir, completar o mirar, de lo más nuevo a lo más viejo.
+> Al día con la tanda 9. Lo que tenés que elegir, completar o mirar, de lo más nuevo a lo más viejo.
 
-1. **Mirá los videos** en `public/videos/`:
+1. **Mirá la activación de Forja:** en `/demo`, el grupo o la distribuidora, módulo Forja (la primera vez en la visita), o en `/forja`. Tiene que sentirse como la marca: la Q se traza, el punto salta y el mapa se enciende.
+2. **El nombre y la frase:** «FORJA · by Quvant» y «Todo el negocio, en vivo.» (BORRADOR, en `src/config/forja.ts`). Alternativas: «Cada sucursal, en tiempo real.» o «El día entero, de un vistazo.». Elegí una o escribí la tuya; cuando la confirmes, `fraseBorrador` pasa a `false`.
+3. **La escala de calor** es la única excepción a la paleta: ahora es discreta (del gris al blanco, con un tibio apagado en el medio). Fijate si te convence o si la querés todavía más sobria.
+4. **Mirá los videos** en `public/videos/`:
    - `quvant-60s.mp4`;
    - `quvant-60s-vertical.mp4`;
    - `quvant-cambio-de-empresa.mp4`.
 
    Si cambiás un texto (`src/demo/peliculas.ts`) o un precio, se vuelven a filmar con `npm run build`, `npx next start -p 3020` y `BASE=http://localhost:3020 npx tsx scripts/videos/filmar.mts`.
-2. **El dominio:** "Probá la demo" muestra `[COMPLETAR: dominio del sitio]`. Cuando lo registres, cargalo en `src/config/sitio.ts` (`dominio`) y volvé a filmar.
-3. **Los `[COMPLETAR]` de `/inversores`:**
+5. **El dominio:** "Probá la demo" muestra `[COMPLETAR: dominio del sitio]`. Cuando lo registres, cargalo en `src/config/sitio.ts` (`dominio`) y volvé a filmar.
+6. **Los `[COMPLETAR]` de `/inversores`:**
    - en `src/config/inversores.ts`: los datos de mercado por tamaño (con fuente) y el estado del piloto;
    - en `src/config/inversion.ts`: el monto, el equipo y el contacto;
    - en `src/config/precios.ts`: los precios. Con ellos aparece el escenario numérico del modelo de negocio.
-4. **Recorré el sitio de punta a punta** (`npm run dev -- -p 3010` → http://localhost:3010). Mové la escala del hero: tiene que sentirse como la demo, en chico.
-5. **Los precios de los planes:** completalos en `src/config/precios.ts` (`precioMensual` de cada plan). Mientras digan `[COMPLETAR]`, el sitio muestra "Consultá". Revisá también qué incluye cada plan: lo armé por tamaño, con lo que existe hoy.
-6. **El texto de desarrollo a medida** (sección 08, con el sello BORRADOR) está en `src/components/sitio/secciones.tsx` (`DesarrolloAMedida`). Confirmalo o cambialo. Cuando lo apruebes, se saca el sello.
-7. **Socios fundadores:** quedó sin cupos y con las condiciones que ya había (precio congelado 24 meses, implementación bonificada, línea directa). ¿Siguen valiendo?
-8. **El email y el WhatsApp de contacto** siguen en `[COMPLETAR]` (`src/config/sitio.ts`): se ven resaltados en el pie y en "Pedir una demo".
-9. **Mirá el recorrido guiado de punta a punta,** como si estuvieras en una reunión: `/demo?recorrido=1` (o "Recorrido guiado" en la barra). Dura ~60 s. Espacio pausa, las flechas cambian de paso y Esc sale. Los subtítulos están en `src/demo/recorrido.ts`. Si cambiás alguno, el test controla que se pueda leer en su tiempo. Es la base del video de 60 segundos (tanda 8): conviene ajustarlo antes de filmar.
-10. **Los nombres de las cuatro empresas:** Kiosco La Esquina, Ferretería Industrial Demo, Distribuidora Ruta Clara y Grupo Cordal. Si alguno no te gusta, se cambia en `src/demo/empresas.ts`.
-11. **El titular quedó en A** («Del kiosco a la empresa.») por defecto, porque pediste seguir sin frenar. Se cambia con una línea en `src/config/sitio.ts` (`TITULAR_ELEGIDO = "B"` o `"C"`). Ojo con la B: hoy las cuarenta sucursales existen solo en la demo, no en un cliente.
-12. **Mirá la lámina** contra tu manual: la Q, los colores y las letras. Revisá las piezas marcadas como **Extensión**: el modo claro, la escala de grises, los estados, Plex Mono 500 y 600, el salto como recompensa y la bajada en el pie del sitio.
-13. **El logo: faltan tus archivos.** En `marca/` solo estaban los de Yunque. Usé la Q que trae el manual (un PNG de 2000 px, tal cual) y armé QUVANT en Michroma como **provisorio**, con las proporciones de la firma del manual. Michroma es más extendida y más fina que la letra del PDF: la firma provisoria queda un poco más ancha que la del manual. Mandá a `marca/`:
+7. **Recorré el sitio de punta a punta** (`npm run dev -- -p 3010` → http://localhost:3010). Mové la escala del hero: tiene que sentirse como la demo, en chico.
+8. **Los precios de los planes:** completalos en `src/config/precios.ts` (`precioMensual` de cada plan). Mientras digan `[COMPLETAR]`, el sitio muestra "Consultá". Revisá también qué incluye cada plan: lo armé por tamaño, con lo que existe hoy.
+9. **El texto de desarrollo a medida** (sección 08, con el sello BORRADOR) está en `src/components/sitio/secciones.tsx` (`DesarrolloAMedida`). Confirmalo o cambialo. Cuando lo apruebes, se saca el sello.
+10. **Socios fundadores:** quedó sin cupos y con las condiciones que ya había (precio congelado 24 meses, implementación bonificada, línea directa). ¿Siguen valiendo?
+11. **El email y el WhatsApp de contacto** siguen en `[COMPLETAR]` (`src/config/sitio.ts`): se ven resaltados en el pie y en "Pedir una demo".
+12. **Mirá el recorrido guiado de punta a punta,** como si estuvieras en una reunión: `/demo?recorrido=1` (o "Recorrido guiado" en la barra). Dura ~60 s. Espacio pausa, las flechas cambian de paso y Esc sale. Los subtítulos están en `src/demo/recorrido.ts`. Si cambiás alguno, el test controla que se pueda leer en su tiempo. Es la base del video de 60 segundos (tanda 8): conviene ajustarlo antes de filmar.
+13. **Los nombres de las cuatro empresas:** Kiosco La Esquina, Ferretería Industrial Demo, Distribuidora Ruta Clara y Grupo Cordal. Si alguno no te gusta, se cambia en `src/demo/empresas.ts`.
+14. **El titular quedó en A** («Del kiosco a la empresa.») por defecto, porque pediste seguir sin frenar. Se cambia con una línea en `src/config/sitio.ts` (`TITULAR_ELEGIDO = "B"` o `"C"`). Ojo con la B: hoy las cuarenta sucursales existen solo en la demo, no en un cliente.
+15. **Mirá la lámina** contra tu manual: la Q, los colores y las letras. Revisá las piezas marcadas como **Extensión**: el modo claro, la escala de grises, los estados, Plex Mono 500 y 600, el salto como recompensa y la bajada en el pie del sitio.
+16. **El logo: faltan tus archivos.** En `marca/` solo estaban los de Yunque. Usé la Q que trae el manual (un PNG de 2000 px, tal cual) y armé QUVANT en Michroma como **provisorio**, con las proporciones de la firma del manual. Michroma es más extendida y más fina que la letra del PDF: la firma provisoria queda un poco más ancha que la del manual. Mandá a `marca/`:
    - la firma principal y la negativa, mejor en SVG;
    - la Q en SVG, si existe. Con el aro, la cola y el punto como capas separadas, la animación se haría por capas (sin máscaras) y habría un favicon vectorial. Hoy solo hay PNG.
-14. **La página 4 del manual quedó vieja.** Dice que Yunque es un producto de Quvant ("Yunque · by Quvant", con Forja como "complemento de Yunque" y Ludus). Elegiste que Yunque pasa a ser Quvant: conviene actualizar esa página del manual.
-15. **El PDF del manual tiene texto viejo escondido.** Algunas páginas se corrigieron tapando el texto anterior. Al copiar o extraer texto del PDF sale la versión vieja (por ejemplo, "Versión 1" y una regla con "degradés" en la página 7). Yo seguí lo que se ve. Si lo vas a compartir, conviene reexportarlo limpio.
-16. **¿Se lee peor el texto largo en mono?** En los párrafos, no: se lee cómodo, como dice el manual. Lo que pasa es que la monoespaciada ocupa más ancho. En la app ya se resolvió (tanda 2); la navegación del sitio se resuelve en la tanda 7.
-17. **El puerto 3000** lo estaba usando otro proyecto tuyo (`firmamento-1-proyecto`), así que no lo toqué. Esta app corrió en el 3010: `npm run dev -- -p 3010`.
+17. **La página 4 del manual quedó vieja.** Dice que Yunque es un producto de Quvant ("Yunque · by Quvant", con Forja como "complemento de Yunque" y Ludus). Elegiste que Yunque pasa a ser Quvant: conviene actualizar esa página del manual.
+18. **El PDF del manual tiene texto viejo escondido.** Algunas páginas se corrigieron tapando el texto anterior. Al copiar o extraer texto del PDF sale la versión vieja (por ejemplo, "Versión 1" y una regla con "degradés" en la página 7). Yo seguí lo que se ve. Si lo vas a compartir, conviene reexportarlo limpio.
+19. **¿Se lee peor el texto largo en mono?** En los párrafos, no: se lee cómodo, como dice el manual. Lo que pasa es que la monoespaciada ocupa más ancho. En la app ya se resolvió (tanda 2); la navegación del sitio se resuelve en la tanda 7.
+20. **El puerto 3000** lo estaba usando otro proyecto tuyo (`firmamento-1-proyecto`), así que no lo toqué. Esta app corrió en el 3010: `npm run dev -- -p 3010`.
 
 ## Decisiones de la tanda 1
 

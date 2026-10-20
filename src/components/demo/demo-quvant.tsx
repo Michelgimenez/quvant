@@ -20,6 +20,7 @@ import { VistaClientes, VistaModuloGenerica, VistaProductos } from "./vistas/vis
 import { CajaKiosco, FiadoKiosco, MostradorKiosco, ProveedoresKiosco } from "./vistas/kiosco"
 import { PresupuestosFerreteria, ServicioFerreteria, TransferenciasFerreteria } from "./vistas/ferreteria"
 import { VistaPrecios } from "./vistas/precios"
+import { ForjaDemo } from "./vistas/forja-demo"
 import { CobranzasDistribuidora, PreventaDistribuidora, RepartoDistribuidora } from "./vistas/distribuidora"
 import { AprobacionesGrupo, AuditoriaGrupo, ComparacionGrupo, IntegracionesGrupo, PermisosGrupo, SucursalesGrupo } from "./vistas/grupo"
 import { Recorrido } from "./recorrido"
@@ -200,7 +201,7 @@ function AppDemo({
           style={{ "--marca": EMPRESAS[empresa].color, "--serie-1": EMPRESAS[empresa].color, "--chart-1": EMPRESAS[empresa].color } as React.CSSProperties}
         >
           <LateralEmpresa empresa={empresa} modulo={modulo} onModulo={setModulo} />
-          <main className="min-w-0 flex-1 overflow-y-auto px-8 pb-10 pt-6" id="contenido">
+          <main className={cn("min-w-0 flex-1", modulo === "forja" ? "overflow-hidden" : "overflow-y-auto px-8 pb-10 pt-6")} id="contenido">
             <Vista empresa={empresa} modulo={modulo} onModulo={setModulo} />
           </main>
         </div>
@@ -237,6 +238,8 @@ function Vista({ empresa, modulo, onModulo }: { empresa: IdEmpresa; modulo: Modu
     if (modulo === "reparto") return <RepartoDistribuidora />
     if (modulo === "cobranzas") return <CobranzasDistribuidora />
   }
+  // Forja, con los datos de la demo (el grupo y la distribuidora la tienen en su barra lateral).
+  if (modulo === "forja" && (empresa === "grupo" || empresa === "distribuidora")) return <ForjaDemo empresa={empresa} />
   if (empresa === "grupo") {
     if (modulo === "sucursales") return <SucursalesGrupo />
     if (modulo === "comparacion") return <ComparacionGrupo />

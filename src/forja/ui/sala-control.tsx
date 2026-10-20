@@ -52,7 +52,7 @@ export function SalaControl({ red, eventos, control }: { red: RedForja; eventos:
     <div className="pointer-events-none absolute inset-0 z-20" data-testid="sala-control" data-parada={actual ?? "red"}>
       {/* Avance de la parada: una línea que se completa en 20 s (solo transform) */}
       <div className="absolute inset-x-0 top-0 h-0.5 bg-white/5 motion-reduce:hidden" aria-hidden>
-        <div key={indice} className="h-full origin-left bg-brasa/70" style={{ animation: `forja-parada ${SEGUNDOS_POR_PARADA}s linear forwards` }} />
+        <div key={indice} className="h-full origin-left bg-blanco/70" style={{ animation: `forja-parada ${SEGUNDOS_POR_PARADA}s linear forwards` }} />
       </div>
 
       <section className="absolute bottom-6 left-6 w-[min(560px,calc(100%-3rem))] rounded-2xl border border-white/10 bg-negro/85 p-6 backdrop-blur" aria-live="polite" aria-label="Parada actual">

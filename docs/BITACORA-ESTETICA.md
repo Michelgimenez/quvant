@@ -143,3 +143,18 @@ Se compone a 1600×1000 y se captura a 1,5× (2400×1500). Así los estilos de t
 - En el vertical, la demo se dibuja a 1440 × 1200 y se achica a 0,75: entra todo y queda entre las zonas seguras.
 - La inversión, en la escala de grises: blanco, acero y dos grises.
 
+## Tanda 9 · Forja (`docs/capturas/quvant/tanda-9/`)
+
+**Vuelta 1**
+- La activación se lee como la marca: el aro blanco que se traza, el punto cuadrado que salta con su trazo punteado y la grilla que se enciende en onda alrededor de las sucursales. Termina con la placa y la frase.
+- El taller y el mapa en grises: el negro de la marca de fondo, el calor como única nota tibia.
+- Quedaba:
+  - en el mapa del grupo, 40 nombres pisados;
+  - los arcos de las transferencias seguían naranjas (los dibuja deck.gl con colores propios);
+  - la activación no terminaba dentro de la demo (ver la bitácora).
+
+**Vuelta 2**
+- El nombre solo en las 8 sucursales que más venden; el resto, al pasar o con el foco.
+- Los arcos, las estelas y los bultos en blanco.
+- La activación toma los puntos una vez y termina en 4,5 s.
+

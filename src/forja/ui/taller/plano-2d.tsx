@@ -181,9 +181,9 @@ export function Plano2D({
         {!plano.palets.length && <Nota r={plano.zonas.find((z) => z.tipo === "muelle")!} texto="Sin entregas pendientes" />}
 
         {/* Portón: brasa si hay mercadería en camino (encima de las zonas) */}
-        <line x1={x0} y1={plano.porton.z - plano.porton.ancho / 2} x2={x0} y2={plano.porton.z + plano.porton.ancho / 2} stroke={enTransito ? COLOR.brasa : COLOR.lineaPiso} strokeWidth={2} {...NO_ESCALA} className="pointer-events-none" />
+        <line x1={x0} y1={plano.porton.z - plano.porton.ancho / 2} x2={x0} y2={plano.porton.z + plano.porton.ancho / 2} stroke={enTransito ? COLOR.blancoCaliente : COLOR.lineaPiso} strokeWidth={2} {...NO_ESCALA} className="pointer-events-none" />
         {enTransito > 0 && (
-          <text x={x0 + 0.3} y={plano.porton.z - plano.porton.ancho / 2 + 0.5} fontSize={0.38} fill={COLOR.brasa} className="pointer-events-none font-mono" data-testid="muelle-en-transito">
+          <text x={x0 + 0.3} y={plano.porton.z - plano.porton.ancho / 2 + 0.5} fontSize={0.38} fill={COLOR.blancoCaliente} className="pointer-events-none font-mono" data-testid="muelle-en-transito">
             ← {enTransito} en tránsito
           </text>
         )}
@@ -260,7 +260,7 @@ function TooltipRack2D({ r, x, y }: { r: RackPlano; x: number; y: number }) {
           <li key={p.productoId} className="flex items-baseline gap-2 text-[11px]">
             <span className="w-6 shrink-0 font-mono text-[10px] text-acero">E{p.estante}</span>
             <span className="min-w-0 flex-1 truncate">{p.nombre}</span>
-            <span className={cn("font-mono", p.cantidad <= 0 ? "text-brasa" : p.minimo > 0 && p.cantidad <= p.minimo ? "text-alerta" : "text-blanco")}>{p.cantidad <= 0 ? "sin stock" : formatoCantidad(p.cantidad)}</span>
+            <span className={cn("font-mono", p.cantidad <= 0 ? "text-error" : p.minimo > 0 && p.cantidad <= p.minimo ? "text-alerta" : "text-blanco")}>{p.cantidad <= 0 ? "sin stock" : formatoCantidad(p.cantidad)}</span>
           </li>
         ))}
       </ul>

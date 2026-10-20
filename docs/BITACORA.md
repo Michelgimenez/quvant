@@ -113,3 +113,19 @@ window.__seek = (t) => gsap.globalTimeline.totalTime(base + t)  // el script pid
 
 Funciona porque todo lo que se mueve depende de ese reloj: la coreografía del cambio de empresa, los números que ruedan, el salto, incluso la cola del kiosco que se sincroniza (era un `setTimeout`, pasó a `gsap.delayedCall`). La trampa: si el script salta muchos segundos de una vez, los clics del guion llegan antes de que React pinte el módulo donde están sus botones. Por eso el modo de revisión también avanza cuadro por cuadro, aunque solo guarde algunos.
 
+## Tanda 9 · Una animación que no se reinicia sola
+
+La activación de Forja tomaba las sucursales como prop y armaba su línea de tiempo en un efecto que dependía de ellas. Dentro de la demo, el reloj vuelve a pintar a Forja cada segundo, y cada vez llegaba un arreglo nuevo con los mismos puntos. El efecto lo veía distinto, mataba la línea de tiempo y la empezaba de nuevo: la activación no terminaba nunca.
+
+```ts
+const [puntosIniciales] = useState(puntos)   // se toman una sola vez: la animación no depende de lo que pase después
+```
+
+Y del otro lado, Forja ya no se suscribe al segundo sino al paso de 15 s que de verdad usa:
+
+```ts
+const paso = useSyncExternalStore(reloj.suscribir, () => Math.floor(reloj.ahora() / 15_000) * 15_000)
+```
+
+Si el valor no cambia, React no vuelve a pintar. Una animación con su propio reloj tiene que fijar lo que necesita al empezar.
+

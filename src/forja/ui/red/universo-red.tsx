@@ -303,6 +303,8 @@ export function UniversoRed({
   // La tarjeta consulta en su propio bucle dónde está el nodo (refs fuera del render)
   const buscarElemento = useCallback(() => elementos.current.get(resaltado ?? "") ?? null, [resaltado])
   const buscarContenedor = useCallback(() => contenedor.current, [])
+  // Con muchas sucursales, el nombre solo en las 8 que más venden hoy (el resto, al pasar o con el foco).
+  const conNombre = new Set(red.nodos.length <= 12 ? red.nodos.map((n) => n.id) : [...red.nodos].sort((a, b) => b.importeHoy - a.importeHoy).slice(0, 8).map((n) => n.id))
 
   return (
     <div ref={contenedor} className="absolute inset-0 overflow-hidden" data-testid="forja-red" data-vista={vista} data-listo={listo || Boolean(errorMapa)} data-modo="3d">
@@ -318,7 +320,7 @@ export function UniversoRed({
           const a = posConstelacion.get(f.desdeId)
           const b = posConstelacion.get(f.haciaId)
           if (!a || !b) return null
-          return <line key={`${f.desdeId}>${f.haciaId}`} x1={a.x} y1={a.y} x2={b.x} y2={b.y} stroke="#3a4450" strokeWidth={grosorEnlace(f.unidades, maxUnidades)} strokeLinecap="round" />
+          return <line key={`${f.desdeId}>${f.haciaId}`} x1={a.x} y1={a.y} x2={b.x} y2={b.y} stroke="#3a3a40" strokeWidth={grosorEnlace(f.unidades, maxUnidades)} strokeLinecap="round" />
         })}
         {red.transferencias
           .filter((t) => t.estado === "en_transito")
@@ -328,9 +330,9 @@ export function UniversoRed({
             if (!a || !b) return null
             return (
               <g key={t.id} data-enlace data-x1={a.x} data-y1={a.y} data-x2={b.x} data-y2={b.y}>
-                <line x1={a.x} y1={a.y} x2={b.x} y2={b.y} stroke="#ff6a1f" strokeOpacity={0.55} strokeWidth={1.4} />
+                <line x1={a.x} y1={a.y} x2={b.x} y2={b.y} stroke="#ececee" strokeOpacity={0.55} strokeWidth={1.4} />
                 {[0, 1, 2].map((k) => (
-                  <circle key={k} r={2.2} fill="#ffb224" data-chispa={k} />
+                  <circle key={k} r={2.2} fill="#ececee" data-chispa={k} />
                 ))}
               </g>
             )
@@ -344,6 +346,7 @@ export function UniversoRed({
             key={n.id}
             indice={i}
             nodo={n}
+            conNombre={conNombre.has(n.id)}
             radio={vista === "constelacion" ? (posConstelacion.get(n.id)?.radio ?? 18) : 18}
             ultimaVenta={ultimaVenta[n.id]}
             resaltado={resaltado === n.id}
@@ -400,7 +403,7 @@ function estelas(A: { lat: number; lng: number }, B: { lat: number; lng: number 
       const u0 = Math.max(0, fase - s * 0.012)
       const u1 = Math.max(0, fase - (s + 1) * 0.012)
       const alfa = Math.round(210 * (1 - s / 6) * Math.sin(Math.PI * fase))
-      trazos.push({ desde: puntoEnArco(A, B, u0), hasta: puntoEnArco(A, B, u1), color: [255, 178, 36, alfa] })
+      trazos.push({ desde: puntoEnArco(A, B, u0), hasta: puntoEnArco(A, B, u1), color: [236, 236, 238, alfa] })
     }
   }
 }
@@ -429,7 +432,7 @@ function capasMapa(
     const a = porId.get(f.desdeId)
     const b = porId.get(f.haciaId)
     if (!a || !b) continue
-    arcos.push({ id: `pieza:${f.desdeId}>${f.haciaId}`, path: arcoDe(f, a, b), color: [255, 106, 31, 200], ancho: 1.5 + 3 * (f.cantidad / maxFlujo) })
+    arcos.push({ id: `pieza:${f.desdeId}>${f.haciaId}`, path: arcoDe(f, a, b), color: [236, 236, 238, 200], ancho: 1.5 + 3 * (f.cantidad / maxFlujo) })
     if (!reducir) estelas({ lat: a.lat!, lng: a.lng! }, { lat: b.lat!, lng: b.lng! }, t, trazos)
   }
   for (const tr of arcosVisibles > 0 && !flujosPieza ? red.transferencias : []) {
@@ -438,13 +441,13 @@ function capasMapa(
     if (!a || !b) continue
     const enTransito = tr.estado === "en_transito"
     const elegida = tr.id === seleccion
-    arcos.push({ id: tr.id, path: arcoDe(tr, a, b), color: enTransito ? [255, 106, 31, elegida ? 230 : 150] : [58, 68, 80, 140], ancho: elegida ? 3 : enTransito ? 1.6 : 1 })
+    arcos.push({ id: tr.id, path: arcoDe(tr, a, b), color: enTransito ? [236, 236, 238, elegida ? 230 : 150] : [58, 58, 64, 140], ancho: elegida ? 3 : enTransito ? 1.6 : 1 })
     if (!enTransito) continue
     const A = { lat: a.lat!, lng: a.lng! }
     const B = { lat: b.lat!, lng: b.lng! }
     // El bulto: donde va según la llegada estimada
     const avance = avanceTransito(tr.despachadaEn, tr.llegadaEstimada, ahoraMs)
-    chispas.push({ posicion: puntoEnArco(A, B, avance), color: [255, 244, 224, 255], radio: 4 })
+    chispas.push({ posicion: puntoEnArco(A, B, avance), color: [236, 236, 238, 255], radio: 4 })
     if (!reducir) estelas(A, B, t, trazos)
   }
 
@@ -487,7 +490,7 @@ function capasMapa(
       updateTriggers: { getColor: seleccion, getWidth: seleccion },
     }),
     new LineLayer<DatoTrazo>({ id: "estelas", data: trazos, getSourcePosition: (d) => d.desde, getTargetPosition: (d) => d.hasta, getColor: (d) => d.color, getWidth: 2, widthUnits: "pixels", parameters: aditivo }),
-    new ScatterplotLayer<DatoPunto>({ id: "bultos", data: chispas, getPosition: (d) => d.posicion, getFillColor: (d) => d.color, getRadius: (d) => d.radio, radiusUnits: "pixels", billboard: true, stroked: true, getLineColor: [255, 106, 31, 200], lineWidthUnits: "pixels", getLineWidth: 1.5, parameters: { depthCompare: "always" } }),
+    new ScatterplotLayer<DatoPunto>({ id: "bultos", data: chispas, getPosition: (d) => d.posicion, getFillColor: (d) => d.color, getRadius: (d) => d.radio, radiusUnits: "pixels", billboard: true, stroked: true, getLineColor: [156, 156, 163, 200], lineWidthUnits: "pixels", getLineWidth: 1.5, parameters: { depthCompare: "always" } }),
   ]
 }
 

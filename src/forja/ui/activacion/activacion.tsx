@@ -1,66 +1,74 @@
 "use client"
 
-import { Component, Suspense, lazy, useCallback, useEffect, useRef, useState } from "react"
-import { Volume2, VolumeX } from "lucide-react"
-import { CRONOGRAMA, DURACION_ACTIVACION, tramo } from "@/forja/dominio/activacion"
-import { cn } from "@/lib/utils"
+import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from "react"
+import gsap from "gsap"
+import { Q_GEOMETRIA } from "@/components/marca/q-geometria"
+import { arcoDeSalto, fasesDelSalto, puntoEnArco, trazoDeArco } from "@/components/marca/salto-geometria"
+import { FORJA } from "@/config/forja"
+import { CRONOGRAMA, DURACION_ACTIVACION, type PuntoMapa } from "@/forja/dominio/activacion"
 import { MarcaForja } from "../marca-forja"
-import { SonidoActivacion } from "./sonido"
-
-const EscenaActivacion = lazy(() => import("./escena-activacion"))
 
 export type FinActivacion = "terminada" | "saltada"
 
-const sube = (x: number) => 1 - Math.pow(1 - x, 3)
-/** Con movimiento reducido: la composición quieta, un momento, y fundido. */
+/** Con movimiento reducido: la composición final quieta, un momento, y fundido. */
 const DURACION_QUIETA = 1.8
-/** Si el 3D no llega a cargar a tiempo, la activación no bloquea: pasa a la versión quieta. */
-const ESPERA_MAXIMA_3D = 8000
 
-type Capas = { capa: HTMLDivElement | null; fondo: HTMLDivElement | null; lienzo: HTMLDivElement | null; texto: HTMLDivElement | null; brillo: HTMLDivElement | null }
-
-/** Un cuadro de la activación en 3D: textos, brillo e iris (solo opacity y transform). */
-function pintar(t: number, c: Capas) {
-  if (c.texto) {
-    const entra = sube(tramo(t, CRONOGRAMA.texto))
-    const sale = tramo(t, { desde: CRONOGRAMA.empuje.desde + 0.15, hasta: CRONOGRAMA.brillo.desde + 0.1 })
-    c.texto.style.opacity = String(entra * (1 - sale))
-    c.texto.style.transform = `translateY(${(1 - entra) * 10}px)`
-  }
-  // El brillo llena la pantalla y se abre en un iris hacia el universo
-  const llena = tramo(t, CRONOGRAMA.brillo)
-  const abre = sube(tramo(t, CRONOGRAMA.iris))
-  if (c.brillo) {
-    c.brillo.style.opacity = String(llena * (1 - abre))
-    c.brillo.style.transform = `translate(-50%, -50%) scale(${0.85 + llena * 0.15 + abre * 1.8})`
-  }
-  const cubierto = t >= CRONOGRAMA.iris.desde
-  if (c.lienzo) c.lienzo.style.opacity = cubierto ? "0" : "1"
-  if (c.fondo) c.fondo.style.opacity = cubierto ? "0" : "1"
-}
-
-/** Un cuadro de la versión quieta (movimiento reducido o sin 3D): aparece y se funde. */
-function pintarQuieta(t: number, c: Capas) {
-  const entra = Math.min(1, t / 0.4)
-  const sale = tramo(t, { desde: DURACION_QUIETA - 0.45, hasta: DURACION_QUIETA })
-  if (c.texto) {
-    c.texto.style.opacity = String(entra)
-    c.texto.style.transform = "none"
-  }
-  if (c.capa) c.capa.style.opacity = String(1 - sale)
-}
-
-/**
- * Activación de Forja: el yunque se convierte en forja (≤ 4,5 s, se puede
- * saltar). La escena 3D se descarga aparte; textos, brillo e iris son del DOM
- * y se animan solo con transform y opacity, cuadro a cuadro desde un único reloj.
- */
 /** Con arranque manual (grabación de videos), el reloj espera este evento para empezar. */
 export const EVENTO_ARRANCAR_ACTIVACION = "forja:arrancar-activacion"
 
-export function Activacion({ onFin, quietaDeEntrada = false, arranqueManual = false }: { onFin: (motivo: FinActivacion) => void; quietaDeEntrada?: boolean; arranqueManual?: boolean }) {
-  const [quieta, setQuieta] = useState(() => quietaDeEntrada || (typeof window !== "undefined" && window.matchMedia("(prefers-reduced-motion: reduce)").matches))
-  const [listo3d, setListo3d] = useState(false)
+// El escenario: 1600 × 900 (se ve entero en cualquier pantalla), la grilla cada 40.
+const ANCHO = 1600
+const ALTO = 900
+const PASO = 40
+const COLUMNAS = Array.from({ length: ANCHO / PASO }, (_, i) => PASO / 2 + i * PASO)
+const FILAS = Array.from({ length: Math.floor(ALTO / PASO) }, (_, j) => 30 + j * PASO)
+/** La caja del mapa (las sucursales) y la Q, en el escenario. */
+const CAJA = { x: 470, y: 90, lado: 660 }
+const LADO_Q = 250
+const Q = { x: ANCHO / 2 - LADO_Q / 2, y: ALTO / 2 - LADO_Q / 2 - 20 }
+const k = LADO_Q / Q_GEOMETRIA.lado
+const ARO = { cx: Q.x + Q_GEOMETRIA.aro.cx * k, cy: Q.y + Q_GEOMETRIA.aro.cy * k, r: ((Q_GEOMETRIA.aro.radioExterior + Q_GEOMETRIA.aro.radioInterior) / 2) * k, ancho: (Q_GEOMETRIA.aro.radioExterior - Q_GEOMETRIA.aro.radioInterior) * k }
+const PUNTO = { x: Q.x + Q_GEOMETRIA.punto.x * k, y: Q.y + Q_GEOMETRIA.punto.y * k, lado: Q_GEOMETRIA.punto.lado * k }
+
+/** Una constelación genérica, si la red no trae coordenadas. */
+const GENERICA: PuntoMapa[] = [
+  { x: 0.5, y: 0.55 },
+  { x: 0.38, y: 0.4 },
+  { x: 0.66, y: 0.42 },
+  { x: 0.3, y: 0.68 },
+  { x: 0.6, y: 0.74 },
+  { x: 0.74, y: 0.6 },
+  { x: 0.46, y: 0.26 },
+  { x: 0.22, y: 0.5 },
+]
+
+/** Lleva un punto de la caja (0..1) al punto de la grilla más cercano. */
+function aGrilla(p: PuntoMapa) {
+  const x = CAJA.x + p.x * CAJA.lado
+  const y = CAJA.y + p.y * CAJA.lado
+  const cx = COLUMNAS.reduce((a, b) => (Math.abs(b - x) < Math.abs(a - x) ? b : a))
+  const cy = FILAS.reduce((a, b) => (Math.abs(b - y) < Math.abs(a - y) ? b : a))
+  return { x: cx, y: cy }
+}
+
+/**
+ * Activación de Forja con la marca de Quvant (≤ 4,5 s, se puede saltar): la Q se traza, el punto salta y donde
+ * cae se enciende la primera sucursal; desde ahí, la grilla de puntos se convierte en el mapa con las demás.
+ * Todo con una línea de tiempo de GSAP (el único reloj), solo transform, opacity y trazos SVG.
+ */
+export function Activacion({
+  onFin,
+  quietaDeEntrada = false,
+  arranqueManual = false,
+  puntos,
+}: {
+  onFin: (motivo: FinActivacion) => void
+  quietaDeEntrada?: boolean
+  arranqueManual?: boolean
+  /** Las sucursales en la caja (0..1), con la primera adelante (puntosActivacion). */
+  puntos?: PuntoMapa[]
+}) {
+  const [quieta] = useState(() => quietaDeEntrada || (typeof window !== "undefined" && window.matchMedia("(prefers-reduced-motion: reduce)").matches))
   const [arrancada, setArrancada] = useState(!arranqueManual)
   useEffect(() => {
     if (arrancada) return
@@ -68,16 +76,42 @@ export function Activacion({ onFin, quietaDeEntrada = false, arranqueManual = fa
     window.addEventListener(EVENTO_ARRANCAR_ACTIVACION, arrancar)
     return () => window.removeEventListener(EVENTO_ARRANCAR_ACTIVACION, arrancar)
   }, [arrancada])
-  const [sonido, setSonido] = useState(false)
-  const reloj = useRef(0)
+
+  // Los puntos se toman una sola vez: si quien la usa vuelve a pintar, la animación no se reinicia.
+  const [puntosIniciales] = useState(puntos)
+  // Las sucursales sobre la grilla (sin repetir un mismo punto) y, de cada una, lo lejos que está de la primera.
+  const sucursales = useMemo(() => {
+    const base = puntosIniciales?.length ? puntosIniciales : GENERICA
+    const vistos = new Set<string>()
+    const lista = base.map(aGrilla).filter((p) => {
+      const clave = `${p.x}:${p.y}`
+      if (vistos.has(clave)) return false
+      vistos.add(clave)
+      return true
+    })
+    const [p0] = lista
+    const lejos = Math.max(1, ...lista.map((p) => Math.hypot(p.x - p0.x, p.y - p0.y)))
+    return lista.map((p) => ({ ...p, orden: Math.hypot(p.x - p0.x, p.y - p0.y) / lejos }))
+  }, [puntosIniciales])
+  const primera = sucursales[0]
+  // Los puntos de la grilla que quedan cerca de alguna sucursal: el mapa que se enciende.
+  const cercanos = useMemo(() => {
+    const lista: { x: number; y: number; orden: number }[] = []
+    for (const x of COLUMNAS)
+      for (const y of FILAS) {
+        let mejor = Infinity
+        for (const s of sucursales) mejor = Math.min(mejor, Math.hypot(s.x - x, s.y - y))
+        if (mejor > 0 && mejor <= 72) lista.push({ x, y, orden: Math.hypot(x - primera.x, y - primera.y) / 900 })
+      }
+    return lista
+  }, [sucursales, primera])
+  const arco = useMemo(() => arcoDeSalto({ x: PUNTO.x + PUNTO.lado / 2, y: PUNTO.y + PUNTO.lado / 2 }, primera, Math.min(0.42, 120 / Math.max(1, Math.hypot(primera.x - PUNTO.x, primera.y - PUNTO.y)))), [primera])
+
   const capa = useRef<HTMLDivElement>(null)
-  const fondo = useRef<HTMLDivElement>(null)
-  const lienzo = useRef<HTMLDivElement>(null)
-  const texto = useRef<HTMLDivElement>(null)
-  const brillo = useRef<HTMLDivElement>(null)
+  const svg = useRef<SVGSVGElement>(null)
+  const placa = useRef<HTMLDivElement>(null)
   const saltar = useRef<HTMLButtonElement>(null)
-  const audio = useRef<SonidoActivacion | null>(null)
-  const conSonido = useRef(false)
+  const tl = useRef<gsap.core.Timeline | null>(null)
   const terminado = useRef(false)
 
   // onFin cambia en cada render de quien la usa: se guarda la última sin reiniciar el reloj
@@ -88,19 +122,16 @@ export function Activacion({ onFin, quietaDeEntrada = false, arranqueManual = fa
   const terminar = useCallback((motivo: FinActivacion) => {
     if (terminado.current) return
     terminado.current = true
-    audio.current?.cerrar()
+    tl.current?.kill()
     alFin.current(motivo)
   }, [])
 
   // Saltar: fundido corto de toda la capa y listo
   const alSaltar = useCallback(() => {
     if (terminado.current) return
-    const el = capa.current
-    if (!el) return terminar("saltada")
-    el.animate([{ opacity: 1 }, { opacity: 0 }], { duration: 220, easing: "ease-out", fill: "forwards" }).finished.then(
-      () => terminar("saltada"),
-      () => terminar("saltada"),
-    )
+    tl.current?.pause()
+    if (!capa.current) return terminar("saltada")
+    gsap.to(capa.current, { opacity: 0, duration: 0.22, ease: "power1.out", onComplete: () => terminar("saltada") })
   }, [terminar])
 
   useEffect(() => {
@@ -115,100 +146,130 @@ export function Activacion({ onFin, quietaDeEntrada = false, arranqueManual = fa
     return () => window.removeEventListener("keydown", tecla, true)
   }, [alSaltar])
 
-  // Sin 3D a tiempo (red lenta, sin WebGL): versión quieta
-  useEffect(() => {
-    if (quieta || listo3d) return
-    const id = window.setTimeout(() => setQuieta(true), ESPERA_MAXIMA_3D)
-    return () => window.clearTimeout(id)
-  }, [quieta, listo3d])
-
-  // Reloj único: avanza cuadro a cuadro (como mucho 50 ms por cuadro: con la pestaña oculta, se pausa)
-  useEffect(() => {
-    if ((!quieta && !listo3d) || !arrancada) return
-    const duracion = quieta ? DURACION_QUIETA : DURACION_ACTIVACION
-    reloj.current = 0
-    let marco = 0
-    let previo = performance.now()
-    const paso = (ahora: number) => {
-      reloj.current = Math.min(duracion, reloj.current + Math.min(50, ahora - previo) / 1000)
-      previo = ahora
-      const capas = { capa: capa.current, fondo: fondo.current, lienzo: lienzo.current, texto: texto.current, brillo: brillo.current }
-      if (quieta) pintarQuieta(reloj.current, capas)
-      else pintar(reloj.current, capas)
-      if (reloj.current >= duracion) return terminar("terminada")
-      marco = requestAnimationFrame(paso)
+  // La línea de tiempo: un solo reloj para todo.
+  useLayoutEffect(() => {
+    const raiz = svg.current
+    if (!raiz || !arrancada) return
+    const q = (s: string) => raiz.querySelectorAll<SVGElement>(s)
+    const t = gsap.timeline({ onComplete: () => terminar("terminada") })
+    tl.current = t
+    if (quieta) {
+      // La composición final, quieta: el mapa encendido y la placa.
+      gsap.set(q("[data-aro], [data-punto], [data-salto]"), { opacity: 0 })
+      gsap.set(q("[data-cercano]"), { opacity: 0.55 })
+      gsap.set(q("[data-sucursal], [data-enlace]"), { opacity: 1 })
+      gsap.set(placa.current, { opacity: 1 })
+      t.to(capa.current, { opacity: 0, duration: 0.45, ease: "power1.in" }, DURACION_QUIETA - 0.45)
+      return () => {
+        t.kill()
+      }
     }
-    marco = requestAnimationFrame(paso)
-    return () => cancelAnimationFrame(marco)
-  }, [quieta, listo3d, arrancada, terminar])
+    const C = CRONOGRAMA
+    const d = (r: { desde: number; hasta: number }) => r.hasta - r.desde
+    // 1 · El aro se traza.
+    t.fromTo(q("[data-aro]"), { strokeDashoffset: 1 }, { strokeDashoffset: 0, duration: d(C.aro), ease: "power2.inOut" }, C.aro.desde)
+    // 2 · El punto aparece en su lugar.
+    t.fromTo(q("[data-punto]"), { scale: 0, transformOrigin: "50% 50%" }, { scale: 1, duration: d(C.punto), ease: "back.out(1.6)" }, C.punto.desde)
+    // 3 · Salta en arco hasta la primera sucursal (el trazo punteado lo sigue).
+    const estado = { p: 0 }
+    const punto = q("[data-punto]")[0]
+    const mascara = q("[data-mascara-salto]")[0]
+    const origen = q("[data-origen]")[0]
+    t.to(
+      estado,
+      {
+        p: 1,
+        duration: d(C.salto),
+        ease: "none",
+        onUpdate: () => {
+          const { despegue, vuelo } = fasesDelSalto(estado.p)
+          const c = puntoEnArco(arco, vuelo)
+          gsap.set(punto, { x: c.x - (PUNTO.x + PUNTO.lado / 2), y: c.y - (PUNTO.y + PUNTO.lado / 2) })
+          gsap.set(origen, { opacity: estado.p < 0.85 ? despegue * 0.8 : (1 - estado.p) * 5 })
+          gsap.set(mascara, { strokeDashoffset: 1 - vuelo })
+        },
+      },
+      C.salto.desde,
+    )
+    t.to(q("[data-punto]"), { scale: 0.42, duration: 0.18, ease: "power2.in" }, C.salto.hasta - 0.18)
+    t.to(q("[data-salto]"), { opacity: 0, duration: 0.3 }, C.enciende.desde + 0.1)
+    // 4 · Se enciende la primera sucursal (el halo se abre).
+    t.fromTo(q("[data-sucursal='0']"), { opacity: 0, scale: 0.4, transformOrigin: "50% 50%" }, { opacity: 1, scale: 1, duration: d(C.enciende), ease: "power3.out" }, C.enciende.desde)
+    t.fromTo(q("[data-halo]"), { opacity: 0.9, scale: 0.6, transformOrigin: "50% 50%" }, { opacity: 0, scale: 3.2, duration: 0.8, ease: "power2.out" }, C.enciende.desde)
+    t.to(q("[data-punto]"), { opacity: 0, duration: 0.15 }, C.enciende.desde + 0.05)
+    // 5 · La Q se retira.
+    t.to(q("[data-aro]"), { opacity: 0, scale: 0.92, transformOrigin: `${ARO.cx}px ${ARO.cy}px`, duration: d(C.retiro), ease: "power2.in" }, C.retiro.desde)
+    // 6 · La grilla se vuelve el mapa: los puntos cercanos se encienden en onda y aparecen las demás sucursales.
+    t.to(q("[data-cercano]"), { opacity: 0.55, duration: 0.35, ease: "power1.out", stagger: { each: d(C.mapa) / Math.max(1, cercanos.length), from: 0 } }, C.mapa.desde)
+    t.fromTo(q("[data-sucursal]:not([data-sucursal='0'])"), { opacity: 0, scale: 0.2, transformOrigin: "50% 50%" }, { opacity: 1, scale: 1, duration: 0.35, ease: "back.out(2)", stagger: { each: (d(C.mapa) - 0.3) / Math.max(1, sucursales.length - 1) } }, C.mapa.desde + 0.1)
+    t.fromTo(q("[data-enlace]"), { strokeDashoffset: 1, opacity: 0.6 }, { strokeDashoffset: 0, duration: 0.7, ease: "power2.out", stagger: 0.05 }, C.mapa.desde + 0.2)
+    // 7 · La placa y la frase.
+    t.fromTo(placa.current, { opacity: 0, y: 12 }, { opacity: 1, y: 0, duration: d(C.placa), ease: "power3.out" }, C.placa.desde)
+    // 8 · Fundido hacia el universo.
+    t.to(capa.current, { opacity: 0, duration: d(C.salida), ease: "power1.in" }, C.salida.desde)
+    t.set({}, {}, DURACION_ACTIVACION)
+    return () => {
+      t.kill()
+    }
+  }, [arrancada, quieta, arco, cercanos.length, sucursales.length, terminar])
 
-  const alternarSonido = () => {
-    const prender = !sonido
-    setSonido(prender)
-    conSonido.current = prender
-    if (prender && !audio.current) audio.current = new SonidoActivacion()
-  }
-
+  // Los enlaces de la primera con las más cercanas (la red), como mucho 10.
+  const enlaces = sucursales
+    .slice(1)
+    .sort((a, b) => a.orden - b.orden)
+    .slice(0, 10)
   return (
-    <div ref={capa} className="fixed inset-0 z-50 overflow-hidden text-blanco" role="dialog" aria-modal="true" aria-label="Activación de Forja" data-testid="activacion" data-modo={quieta ? "quieta" : "3d"} data-listo={listo3d || quieta}>
-      <div ref={fondo} className="absolute inset-0 bg-negro" aria-hidden />
-      {!quieta && (
-        <div ref={lienzo} className="absolute inset-0">
-          <FalloEscena onFallo={() => setQuieta(true)}>
-            <Suspense fallback={null}>
-              <EscenaActivacion
-                reloj={reloj}
-                reducir={false}
-                onListo={() => setListo3d(true)}
-                onPerdida={() => setQuieta(true)}
-                onGolpe={() => conSonido.current && audio.current?.golpe()}
-                onChispas={() => conSonido.current && audio.current?.chisporroteo()}
-              />
-            </Suspense>
-          </FalloEscena>
-        </div>
-      )}
-      {!quieta && !listo3d && (
-        <div className="absolute inset-0 grid place-items-center" role="status" aria-label="Cargando la activación">
-          <MarcaForja tamano={26} className="animate-pulse opacity-60" />
-        </div>
-      )}
-      {/* El brillo de la brasa: llena la pantalla y se abre (solo opacity y transform) */}
-      <div
-        ref={brillo}
-        className="pointer-events-none absolute left-1/2 top-1/2 size-[260vmax] rounded-full opacity-0 will-change-transform"
-        style={{ transform: "translate(-50%, -50%)", background: "radial-gradient(circle, #fff4e0 0%, #ffb224 6%, #ff6a1f 14%, rgb(194 65 12 / 0.9) 24%, #0e1116 46%)" }}
-        aria-hidden
-      />
-      <div ref={texto} className={cn("pointer-events-none absolute inset-x-0 flex flex-col items-center gap-3 px-6 text-center opacity-0", quieta ? "inset-y-0 justify-center" : "bottom-[16%]")}>
-        <div className="flex items-center gap-4">
-          <MarcaForja tamano={28} className="sm:hidden" />
-          <MarcaForja tamano={40} className="max-sm:hidden" />
-        </div>
+    <div ref={capa} className="fixed inset-0 z-50 overflow-hidden bg-negro text-blanco" role="dialog" aria-modal="true" aria-label="Activación de Forja" data-testid="activacion" data-modo={quieta ? "quieta" : "animada"} data-listo="true">
+      <svg ref={svg} viewBox={`0 0 ${ANCHO} ${ALTO}`} preserveAspectRatio="xMidYMid meet" className="absolute inset-0 size-full" aria-hidden>
+        <defs>
+          <mask id="mascara-salto-forja" maskUnits="userSpaceOnUse" x={0} y={0} width={ANCHO} height={ALTO}>
+            <path data-mascara-salto d={trazoDeArco(arco)} fill="none" stroke="white" strokeWidth={8} pathLength={1} strokeDasharray="1 1" style={{ strokeDashoffset: 1 }} />
+          </mask>
+        </defs>
+        {/* La grilla de puntos de la marca */}
+        <g className="fill-gris-4">
+          {COLUMNAS.flatMap((x) => FILAS.map((y) => <rect key={`${x}:${y}`} x={x - 1.2} y={y - 1.2} width={2.4} height={2.4} />))}
+        </g>
+        {/* El mapa: los puntos de la grilla cerca de las sucursales, que se encienden en onda */}
+        <g className="fill-acero">
+          {cercanos.map((p) => (
+            <rect key={`${p.x}:${p.y}`} data-cercano x={p.x - 1.6} y={p.y - 1.6} width={3.2} height={3.2} style={{ opacity: 0 }} />
+          ))}
+        </g>
+        <g className="stroke-gris-6" fill="none">
+          {enlaces.map((s) => (
+            <line key={`${s.x}:${s.y}`} data-enlace x1={primera.x} y1={primera.y} x2={s.x} y2={s.y} strokeWidth={1} pathLength={1} strokeDasharray="1" style={{ strokeDashoffset: 1, opacity: 0 }} />
+          ))}
+        </g>
+        {/* Las sucursales: cuadrados, como el punto */}
+        <rect data-halo x={primera.x - 9} y={primera.y - 9} width={18} height={18} fill="none" className="stroke-blanco" strokeWidth={1.4} style={{ opacity: 0 }} />
+        {sucursales.map((s, i) => (
+          <rect key={`${s.x}:${s.y}`} data-sucursal={i} x={s.x - (i === 0 ? 7 : 4.5)} y={s.y - (i === 0 ? 7 : 4.5)} width={i === 0 ? 14 : 9} height={i === 0 ? 14 : 9} className="fill-blanco" style={{ opacity: 0 }} />
+        ))}
+        {/* La Q: el aro se traza y el punto salta (la versión blanca del isotipo, sin deformar) */}
+        <circle data-aro cx={ARO.cx} cy={ARO.cy} r={ARO.r} fill="none" className="stroke-blanco" strokeWidth={ARO.ancho} pathLength={1} strokeDasharray="1" transform={`rotate(-90 ${ARO.cx} ${ARO.cy})`} style={{ strokeDashoffset: 1 }} />
+        <g data-salto>
+          <rect data-origen x={PUNTO.x + PUNTO.lado * 0.2} y={PUNTO.y + PUNTO.lado * 0.2} width={PUNTO.lado * 0.6} height={PUNTO.lado * 0.6} fill="none" className="stroke-acero" strokeWidth={1.4} style={{ opacity: 0 }} />
+          <path d={trazoDeArco(arco)} fill="none" className="stroke-blanco" strokeOpacity={0.8} strokeWidth={2} strokeLinecap="round" strokeDasharray="0 9" mask="url(#mascara-salto-forja)" />
+        </g>
+        <rect data-punto x={PUNTO.x} y={PUNTO.y} width={PUNTO.lado} height={PUNTO.lado} className="fill-blanco" style={{ transform: "scale(0)" }} />
+      </svg>
+      <div ref={placa} className="pointer-events-none absolute inset-x-0 bottom-[12%] flex flex-col items-center gap-4 px-6 text-center" style={{ opacity: 0 }}>
+        <MarcaForja tamano={28} className="sm:hidden" />
+        <MarcaForja tamano={40} className="max-sm:hidden" />
+        <p className="t-texto text-acero" data-testid="frase-forja">
+          {FORJA.frase}
+        </p>
       </div>
       <p className="sr-only" role="status">
         Forja activada.
       </p>
-      <div className="absolute inset-x-0 bottom-0 flex items-center justify-between gap-3 p-4 sm:p-6">
-        {quieta ? (
-          <span />
-        ) : (
-          <button
-            type="button"
-            onClick={alternarSonido}
-            aria-pressed={sonido}
-            className="inline-flex items-center gap-1.5 rounded-md border border-white/15 bg-negro/60 px-3 py-1.5 text-xs text-acero backdrop-blur hover:text-blanco focus-visible:outline focus-visible:outline-1 focus-visible:outline-foreground"
-            data-testid="sonido-activacion"
-          >
-            {sonido ? <Volume2 className="size-3.5" aria-hidden /> : <VolumeX className="size-3.5" aria-hidden />}
-            {sonido ? "Sonido" : "Sin sonido"}
-          </button>
-        )}
+      <div className="absolute inset-x-0 bottom-0 flex items-center justify-end gap-3 p-4 sm:p-6">
         <button
           ref={saltar}
           type="button"
           onClick={alSaltar}
-          className="rounded-md border border-white/15 bg-negro/60 px-3 py-1.5 text-xs text-blanco backdrop-blur hover:border-white/30 focus-visible:outline focus-visible:outline-1 focus-visible:outline-foreground"
+          className="t-texto-sm rounded-md border border-gris-4 bg-negro px-3 py-1.5 text-blanco transition-colors hover:border-gris-8 focus-visible:outline focus-visible:outline-1 focus-visible:outline-blanco"
           data-testid="saltar-activacion"
         >
           Saltar
@@ -216,18 +277,4 @@ export function Activacion({ onFin, quietaDeEntrada = false, arranqueManual = fa
       </div>
     </div>
   )
-}
-
-/** Sin WebGL (o si la escena falla): la versión quieta, sin trabar la entrada a Forja. */
-class FalloEscena extends Component<{ children: React.ReactNode; onFallo: () => void }, { fallo: boolean }> {
-  state = { fallo: false }
-  static getDerivedStateFromError() {
-    return { fallo: true }
-  }
-  componentDidCatch() {
-    this.props.onFallo()
-  }
-  render() {
-    return this.state.fallo ? null : this.props.children
-  }
 }

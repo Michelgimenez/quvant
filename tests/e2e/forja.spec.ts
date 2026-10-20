@@ -1,4 +1,5 @@
 import { expect, test, type Page } from "@playwright/test"
+import { FORJA } from "../../src/config/forja"
 import { ingresar } from "./utiles"
 
 // Miércoles 15:30 en Argentina: horario comercial, con transferencias en tránsito en la demo
@@ -233,7 +234,7 @@ test.describe("Forja · repetición del día y sala de control", () => {
 })
 
 test.describe("Forja · activación", () => {
-  test("el yunque se convierte en forja: termina sola, enciende las sucursales y no vuelve a aparecer", async ({ page }) => {
+  test("la Q se traza, el punto salta y la grilla se vuelve el mapa: termina sola, enciende las sucursales y no vuelve a aparecer", async ({ page }) => {
     test.setTimeout(150_000)
     await ingresar(page, "dueno@demo.quvant.app")
     await page.goto("/app/extensiones")
@@ -241,12 +242,12 @@ test.describe("Forja · activación", () => {
     await page.waitForURL(/\/app\/forja/)
     const activacion = page.getByTestId("activacion")
     await expect(activacion).toBeVisible({ timeout: 30_000 })
-    await expect(activacion).toHaveAttribute("data-modo", "3d")
-    await expect(activacion).toContainText("Lo firme y lo vivo, trabajando juntos.")
-    // Sonido apagado por defecto, con su botón
-    await expect(page.getByTestId("sonido-activacion")).toHaveAttribute("aria-pressed", "false")
-    // Dura 4,5 s como máximo (más la descarga de la escena)
-    await expect(activacion).toHaveCount(0, { timeout: 20_000 })
+    await expect(activacion).toHaveAttribute("data-modo", "animada")
+    // La placa nueva: «Forja · by Quvant» y su frase (borrador en src/config/forja.ts)
+    await expect(activacion.getByRole("img", { name: "Forja, by Quvant" }).first()).toBeAttached()
+    await expect(activacion.getByTestId("frase-forja")).toHaveText(FORJA.frase)
+    // Dura 4,5 s como máximo
+    await expect(activacion).toHaveCount(0, { timeout: 10_000 })
     await expect(page.locator("[data-entrada=encender]")).toHaveCount(1)
     await expect(page).not.toHaveURL(/activacion=1/)
 

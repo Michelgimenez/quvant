@@ -141,11 +141,11 @@
   --gris-12: #dedee1; /*        L 90 · superficie hundida en claro */
   --gris-13: var(--blanco); /*  L 94 · texto en oscuro, fondo en claro */
 
-  /* Forja (extensión): calor del trabajo, solo como dato */
-  --frio: #3a4450;
-  --ascua: #c2410c;
-  --brasa: #ff6a1f;
-  --blanco-caliente: #fff4e0;
+  /* Forja (extensión): calor del trabajo, solo como dato. La única excepción a la paleta, discreta (src/forja/dominio/calor.ts). */
+  --frio: #26262b;
+  --ascua: #4a3f38;
+  --brasa: #8a6a4c;
+  --blanco-caliente: #ececee;
 
   --radius: 0.25rem;
 }

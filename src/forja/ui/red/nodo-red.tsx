@@ -9,7 +9,7 @@ import type { MarcaNodo } from "../pieza/vista"
 const TONO_MARCA: Record<MarcaNodo["tono"], string> = {
   normal: "border-white/25 text-blanco",
   critico: "border-alerta/70 text-alerta",
-  sin_stock: "border-brasa/70 text-brasa",
+  sin_stock: "border-error/70 text-error",
   activo: "border-blanco-caliente/60 text-blanco-caliente",
 }
 
@@ -28,9 +28,12 @@ export function NodoRed({
   onResaltar,
   onEntrar,
   marca,
+  conNombre = true,
 }: {
   /** Orden en la red: marca el turno en el encendido escalonado. */
   indice: number
+  /** Con muchas sucursales, el nombre va solo en las que más venden (y en la resaltada): si no, se pisan. */
+  conNombre?: boolean
   nodo: NodoForja
   radio: number
   ultimaVenta: string | undefined
@@ -97,7 +100,7 @@ export function NodoRed({
         </svg>
         <span ref={pulso} className="pointer-events-none absolute left-1/2 top-1/2 rounded-full border opacity-0" style={{ width: radio * 1.4, height: radio * 1.4, borderColor: color }} aria-hidden />
       </button>
-      <span className="pointer-events-none absolute left-0 top-0 flex -translate-x-1/2 flex-col items-center whitespace-nowrap" style={{ transform: `translate(-50%, ${anillo + 10}px)` }} aria-hidden>
+      <span className={cn("pointer-events-none absolute left-0 top-0 flex -translate-x-1/2 flex-col items-center whitespace-nowrap", !conNombre && !resaltado && "opacity-0")} style={{ transform: `translate(-50%, ${anillo + 10}px)` }} aria-hidden>
         {/* Nombres largos en dos renglones: que no se corten contra el borde */}
         <span className="w-max max-w-[9rem] whitespace-normal text-balance text-center font-heading text-[13px] font-bold leading-tight tracking-tight text-blanco [text-shadow:0_1px_8px_rgb(0_0_0/0.9)]">{nodo.nombre}</span>
         <span className="mt-0.5 flex items-center gap-1.5 font-mono text-[10px] uppercase tracking-widest text-acero">
