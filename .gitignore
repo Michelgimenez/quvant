@@ -51,3 +51,6 @@ next-env.d.ts
 
 # Copiado de node_modules antes de dev/build (scripts/copiar-maplibre.mjs)
 /public/vendor/
+
+# Registros de trabajos largos (dev, filmaciones)
+/logs
