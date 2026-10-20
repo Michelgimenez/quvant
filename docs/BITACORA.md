@@ -73,3 +73,17 @@ const leer = (texto: string) => {
 ```
 
 La consecuencia de diseño: mientras el mostrador está en pantalla, ninguna tecla puede tener otro significado. Por eso el mostrador marca `data-lector-activo` y el atajo de las teclas 1 a 4 (cambiar de empresa) lo respeta. Si no, escanear un producto cuyo código empieza con 2 cambiaría de empresa en medio de la venta.
+
+## Tanda 6 · Un recorrido que es una línea de tiempo
+
+El recorrido guiado podría haberse hecho con `setTimeout` encadenados, pero así no se puede pausar, ni volver un paso, ni filmar cuadro por cuadro. Por eso es una sola línea de tiempo de GSAP, donde cada paso es una etiqueta y cada acción es un callback en su segundo exacto:
+
+```ts
+linea.addLabel(`paso-${i}`, inicio)
+linea.add(() => onCambiarEmpresa(p.empresa), inicio)          // el salto entre empresas
+linea.add(() => onModulo(p.modulo), inicio + ESPERA_CAMBIO)    // cuando terminó la coreografía
+linea.add(() => boton("aprobar").click(), contenido + 1.4)     // un clic sobre la interfaz real
+```
+
+Pausar es `linea.pause()`. Avanzar un paso es `linea.seek("paso-4", true)`, y el `true` evita disparar los clics de los pasos que se saltean. Para filmar, el reloj global se mueve a mano (`__seek(t)`) y la línea lo sigue, porque es hija de ese reloj. Los tiempos son una función pura (`inicioDePasos`) con su test, que controla que el total dé ~60 s.
+

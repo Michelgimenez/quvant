@@ -2,6 +2,35 @@
 
 > Yunque pasa a ser Quvant (`PROMPT-QUVANT.md`), en 10 tandas, en la rama `quvant`. Arriba, lo último; abajo, el historial de Yunque.
 
+## Resumen · tanda 6 de 10 · La distribuidora, el grupo y el recorrido guiado (20/10/2026)
+
+**La distribuidora** (`src/components/demo/vistas/distribuidora.tsx`):
+- **Preventa:** los pedidos de hoy llegan desde la calle, con quién los cargó y su zona. Al tocar uno se ve el detalle con la lista de precios del cliente (por ejemplo "Interior · +6 %") y su cuenta corriente. "Simular un pedido desde la calle" hace entrar uno nuevo arriba de todo.
+- **Reparto:** la hoja de ruta sobre un mapa esquemático en la grilla de puntos: el depósito al centro y cuatro camiones con sus paradas (entregado, en camino y pendiente). Las entregas del simulador van completando paradas a lo largo del día. Al elegir un camión, su ruta se dibuja desde el depósito.
+- **Cobranzas:** la deuda en la calle, la vencida y lo cobrado hoy; los clientes ordenados por antigüedad de la deuda. Registrar una cobranza baja la deuda en el momento.
+
+**El grupo** (`vistas/grupo.tsx`):
+- **Sucursales:** el mapa del país con las 40 sucursales, la lista filtrable por provincia y la ficha de cada una (ventas, objetivo, margen, críticos y la semana).
+- **Comparación:** las 40 sucursales en una tabla ordenable por cualquier columna, con las barras de los últimos 14 días.
+- **Aprobaciones en dos niveles:** hasta $ 8 M aprueba la gerencia regional; por encima, también dirección. La segunda firma lanza el salto ("Aprobación completa"). Se puede rechazar.
+- **Auditoría:** quién hizo qué, cuándo, con qué rol y en qué sucursal, con filtro por acción. Lo que aprueba el visitante aparece arriba como "Vos (demo)".
+- **Permisos** (roles × permisos, 312 usuarios en 7 roles) e **Integraciones** (cada una con su estado real).
+
+**El recorrido guiado** (`src/components/demo/recorrido.tsx`, pasos en `src/demo/recorrido.ts`):
+- Un paseo automático de ~60 s por las cuatro empresas, con un subtítulo breve abajo a la izquierda: el kiosco (tablero, una venta, la caja que cierra en cero), la ferretería (tablero, presupuesto → venta), la distribuidora (tablero, reparto) y el grupo (consolidado, una aprobación en dos niveles). Termina en la firma de Quvant.
+- Las acciones se hacen sobre la interfaz real: los mismos botones que tocaría una persona.
+- **Teclas:** espacio pausa, las flechas avanzan o retroceden un paso y Esc sale. Se abre con "Recorrido guiado" en la barra o con `/demo?recorrido=1`.
+- Es una sola línea de tiempo de GSAP: con `?film=1` la mueve quien filma. Es la base del video de 60 segundos de la tanda 8.
+
+**Registro de funcionalidades:** se suman "Preventa en la calle", "Hoja de ruta en el mapa", "Cobranzas en la calle", "Comparación de sucursales" y "Aprobaciones por niveles", todas en estado `demo`, con su nota. Ejemplo: las aprobaciones no existen en la app real, y el mapa del reparto es esquemático (sin GPS).
+
+**Verificación:** typecheck sin errores, lint limpio y un test nuevo (`tests/unit/recorrido.test.ts`): pasa por las cuatro empresas, dura ~60 s y ningún subtítulo pide leer más de 3 palabras por segundo. Capturas en `docs/capturas/quvant/tanda-6/` (15), sin errores de página ni de consola.
+
+**Corregido en el camino:**
+- La preventa mostraba pedidos repetidos: los de la historia entraban dos veces.
+- La auditoría repetía las mismas frases, y a veces con roles que no corresponden (una cajera ajustando stock). Ahora cada acción la hace un rol que puede hacerla, con un detalle distinto.
+- Los márgenes salían con punto decimal ("30.7 %") en lugar de coma.
+
 ## Resumen · tanda 5 de 10 · El kiosco y la ferretería por dentro (20/10/2026)
 
 **El kiosco** (`src/components/demo/vistas/kiosco.tsx`):
@@ -154,18 +183,19 @@
 
 ## Para Michel
 
-1. **Elegí el titular** (se ven compuestos en `docs/marca/quvant-titulares.png`). Pedí la tanda 2 con `Titular: A`, `B` o `C`:
-   - **A** · «Del kiosco a la empresa.»
-   - **B** · «Una caja o cuarenta sucursales.» Ojo: hoy las cuarenta sucursales existen solo en la demo, no en un cliente.
-   - **C** · «Se adapta a tu negocio. No al revés.»
-2. **Mirá la lámina** contra tu manual: la Q, los colores y las letras. Revisá las piezas marcadas como **Extensión**: el modo claro, la escala de grises, los estados, Plex Mono 500 y 600, el salto como recompensa y la bajada en el pie del sitio.
-3. **El logo: faltan tus archivos.** En `marca/` solo estaban los de Yunque. Usé la Q que trae el manual (un PNG de 2000 px, tal cual) y armé QUVANT en Michroma como **provisorio**, con las proporciones de la firma del manual. Michroma es más extendida y más fina que la letra del PDF: la firma provisoria queda un poco más ancha que la del manual. Mandá a `marca/`:
+> Al día con la tanda 6. Lo que tenés que elegir, completar o mirar, de lo más nuevo a lo más viejo.
+
+1. **Mirá el recorrido guiado de punta a punta,** como si estuvieras en una reunión: `/demo?recorrido=1` (o "Recorrido guiado" en la barra). Dura ~60 s. Espacio pausa, las flechas cambian de paso y Esc sale. Los subtítulos están en `src/demo/recorrido.ts`. Si cambiás alguno, el test controla que se pueda leer en su tiempo. Es la base del video de 60 segundos (tanda 8): conviene ajustarlo antes de filmar.
+2. **Los nombres de las cuatro empresas:** Kiosco La Esquina, Ferretería Industrial Demo, Distribuidora Ruta Clara y Grupo Cordal. Si alguno no te gusta, se cambia en `src/demo/empresas.ts`.
+3. **El titular quedó en A** («Del kiosco a la empresa.») por defecto, porque pediste seguir sin frenar. Se cambia con una línea en `src/config/sitio.ts` (`TITULAR_ELEGIDO = "B"` o `"C"`). Ojo con la B: hoy las cuarenta sucursales existen solo en la demo, no en un cliente.
+4. **Mirá la lámina** contra tu manual: la Q, los colores y las letras. Revisá las piezas marcadas como **Extensión**: el modo claro, la escala de grises, los estados, Plex Mono 500 y 600, el salto como recompensa y la bajada en el pie del sitio.
+5. **El logo: faltan tus archivos.** En `marca/` solo estaban los de Yunque. Usé la Q que trae el manual (un PNG de 2000 px, tal cual) y armé QUVANT en Michroma como **provisorio**, con las proporciones de la firma del manual. Michroma es más extendida y más fina que la letra del PDF: la firma provisoria queda un poco más ancha que la del manual. Mandá a `marca/`:
    - la firma principal y la negativa, mejor en SVG;
    - la Q en SVG, si existe. Con el aro, la cola y el punto como capas separadas, la animación se haría por capas (sin máscaras) y habría un favicon vectorial. Hoy solo hay PNG.
-4. **La página 4 del manual quedó vieja.** Dice que Yunque es un producto de Quvant ("Yunque · by Quvant", con Forja como "complemento de Yunque" y Ludus). Elegiste que Yunque pasa a ser Quvant: conviene actualizar esa página del manual.
-5. **El PDF del manual tiene texto viejo escondido.** Algunas páginas se corrigieron tapando el texto anterior. Al copiar o extraer texto del PDF sale la versión vieja (por ejemplo, "Versión 1" y una regla con "degradés" en la página 7). Yo seguí lo que se ve. Si lo vas a compartir, conviene reexportarlo limpio.
-6. **¿Se lee peor el texto largo en mono?** En los párrafos del sitio y de la app, no lo noté: se lee cómodo, como dice el manual. Lo que sí pasa es que la monoespaciada ocupa más ancho. El buscador del encabezado y la navegación del sitio se parten en dos renglones, y en el tablero los nombres largos se cortan antes. Lo arreglan la tanda 2 (app) y la 7 (sitio). Capturas: `docs/capturas/quvant/tanda-1/app-tablero-oscuro.png` y `sitio-texto-largo.png`.
-7. **El puerto 3000** lo estaba usando otro proyecto tuyo (`firmamento-1-proyecto`), así que no lo toqué. Esta app corrió en el 3010: `npm run dev -- -p 3010`.
+6. **La página 4 del manual quedó vieja.** Dice que Yunque es un producto de Quvant ("Yunque · by Quvant", con Forja como "complemento de Yunque" y Ludus). Elegiste que Yunque pasa a ser Quvant: conviene actualizar esa página del manual.
+7. **El PDF del manual tiene texto viejo escondido.** Algunas páginas se corrigieron tapando el texto anterior. Al copiar o extraer texto del PDF sale la versión vieja (por ejemplo, "Versión 1" y una regla con "degradés" en la página 7). Yo seguí lo que se ve. Si lo vas a compartir, conviene reexportarlo limpio.
+8. **¿Se lee peor el texto largo en mono?** En los párrafos, no: se lee cómodo, como dice el manual. Lo que pasa es que la monoespaciada ocupa más ancho. En la app ya se resolvió (tanda 2); la navegación del sitio se resuelve en la tanda 7.
+9. **El puerto 3000** lo estaba usando otro proyecto tuyo (`firmamento-1-proyecto`), así que no lo toqué. Esta app corrió en el 3010: `npm run dev -- -p 3010`.
 
 ## Decisiones de la tanda 1
 

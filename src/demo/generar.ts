@@ -408,16 +408,18 @@ function generarGrupo(): DatosNegocio {
       t: new Date(ANCLA_MS - entero(r, 8, 400) * 60000).toISOString(),
     }
   }).sort((a, b) => b.t.localeCompare(a.t))
-  const ACCIONES: [string, string][] = [
-    ["Cambió precios", "Aumento de 3,5 % en Pinturas · 1.284 productos"],
-    ["Aprobó una compra", "OC-070385 · Sanitarios del Litoral"],
-    ["Anuló una venta", "Ticket 4-00812 · error de cobro"],
-    ["Cambió permisos", "Encargado de sucursal · puede ver costos: no"],
-    ["Exportó un reporte", "Ventas por sucursal · semana 41"],
-    ["Ajustó stock", "Conteo cíclico · 38 productos · diferencia $ 0"],
-    ["Ingresó desde un equipo nuevo", "Doble factor verificado"],
-    ["Transfirió mercadería", "TR-022140 · 64 productos"],
-    ["Creó un usuario", "Cajero · alcance: una sucursal"],
+  // Cada acción la hace un rol que puede hacerla, con un detalle variado (no la misma frase repetida).
+  const miles = (n: number) => (n >= 1000 ? `${Math.floor(n / 1000)}.${String(n % 1000).padStart(3, "0")}` : String(n))
+  const ACCIONES: { accion: string; roles: string[]; detalle: () => string }[] = [
+    { accion: "Cambió precios", roles: ["Dirección", "Gerencia regional"], detalle: () => `Aumento de ${entero(r, 2, 6)},${entero(r, 0, 9)} % en ${elegir(r, RUBROS_GRUPO)[0]} · ${miles(entero(r, 180, 2400))} productos` },
+    { accion: "Aprobó una compra", roles: ["Gerencia regional", "Dirección"], detalle: () => `OC-${String(entero(r, 70300, 70400)).padStart(6, "0")} · ${elegir(r, PROVEEDORES_GRUPO)}` },
+    { accion: "Anuló una venta", roles: ["Encargado de sucursal"], detalle: () => `Ticket ${entero(r, 1, 6)}-${String(entero(r, 100, 990)).padStart(5, "0")} · ${elegir(r, ["error de cobro", "el cliente se arrepintió", "precio mal cargado"])}` },
+    { accion: "Cambió permisos", roles: ["Dirección", "Administración"], detalle: () => elegir(r, ["Encargado de sucursal · puede ver costos: no", "Caja · puede anular ventas: no", "Depósito · puede ajustar stock: sí"]) },
+    { accion: "Exportó un reporte", roles: ["Administración", "Compras", "Dirección"], detalle: () => `${elegir(r, ["Ventas por sucursal", "Margen por rubro", "Stock valorizado", "Compras del mes"])} · semana ${entero(r, 38, 41)}` },
+    { accion: "Ajustó stock", roles: ["Depósito", "Encargado de sucursal"], detalle: () => { const d = entero(r, 0, 3); return `Conteo cíclico · ${entero(r, 12, 64)} productos · ${d === 0 ? "sin diferencias" : `${d} con diferencia`}` } },
+    { accion: "Ingresó desde un equipo nuevo", roles: ["Dirección", "Gerencia regional", "Encargado de sucursal", "Administración"], detalle: () => "Doble factor verificado" },
+    { accion: "Transfirió mercadería", roles: ["Depósito", "Encargado de sucursal"], detalle: () => `TR-${String(entero(r, 22100, 22190)).padStart(6, "0")} · ${entero(r, 8, 90)} productos` },
+    { accion: "Creó un usuario", roles: ["Administración", "Encargado de sucursal"], detalle: () => elegir(r, ["Cajero · alcance: una sucursal", "Repositor · alcance: una sucursal", "Vendedora · alcance: una sucursal"]) },
   ]
   const roles = [
     { rol: "Dirección", usuarios: 4, alcance: "Todo el grupo" },
@@ -429,9 +431,10 @@ function generarGrupo(): DatosNegocio {
     { rol: "Caja", usuarios: 168, alcance: "Su sucursal · mostrador" },
   ]
   const auditoria = Array.from({ length: 36 }, (_, i) => {
-    const [accion, detalle] = elegir(r, ACCIONES)
-    const rol = elegir(r, roles).rol
-    return { id: `au-${i}`, t: new Date(ANCLA_MS - (i * 11 + entero(r, 0, 9)) * 60000).toISOString(), usuario: persona(r), rol, sucursal: rol === "Dirección" || rol === "Compras" ? null : entero(r, 0, 39), accion, detalle }
+    const a = elegir(r, ACCIONES)
+    const rol = elegir(r, a.roles)
+    const detalle = a.detalle()
+    return { id: `au-${i}`, t: new Date(ANCLA_MS - (i * 11 + entero(r, 0, 9)) * 60000).toISOString(), usuario: persona(r), rol, sucursal: ["Dirección", "Compras", "Administración"].includes(rol) ? null : entero(r, 0, 39), accion: a.accion, detalle }
   })
   return {
     empresaId: "grupo",

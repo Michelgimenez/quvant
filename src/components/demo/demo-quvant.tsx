@@ -19,13 +19,16 @@ import { VistaClientes, VistaModuloGenerica, VistaProductos } from "./vistas/vis
 import { CajaKiosco, FiadoKiosco, MostradorKiosco, ProveedoresKiosco } from "./vistas/kiosco"
 import { PresupuestosFerreteria, ServicioFerreteria, TransferenciasFerreteria } from "./vistas/ferreteria"
 import { VistaPrecios } from "./vistas/precios"
+import { CobranzasDistribuidora, PreventaDistribuidora, RepartoDistribuidora } from "./vistas/distribuidora"
+import { AprobacionesGrupo, AuditoriaGrupo, ComparacionGrupo, IntegracionesGrupo, PermisosGrupo, SucursalesGrupo } from "./vistas/grupo"
+import { Recorrido } from "./recorrido"
 
 /**
  * La demo que cambia de empresa (/demo): pública, sin login y sin tocar la base. El mismo Quvant en un kiosco,
  * una ferretería, una distribuidora y un grupo de 40 sucursales. La empresa elegida queda en la dirección
  * (/demo?empresa=kiosco) con history.replaceState, sin navegar.
  */
-export function DemoQuvant({ empresaInicial, filmando = false }: { empresaInicial: IdEmpresa | null; filmando?: boolean }) {
+export function DemoQuvant({ empresaInicial, filmando = false, recorrido = false }: { empresaInicial: IdEmpresa | null; filmando?: boolean; recorrido?: boolean }) {
   useEffect(() => {
     if (!filmando) return
     // Modo filmación (?film=1): el reloj global de GSAP se pausa y lo mueve quien filma, solo hacia adelante.
@@ -40,7 +43,7 @@ export function DemoQuvant({ empresaInicial, filmando = false }: { empresaInicia
   }, [filmando])
   return (
     <ProveedorDemo empresaInicial={empresaInicial} filmando={filmando}>
-      <AppDemo />
+      <AppDemo filmando={filmando} recorridoInicial={recorrido} />
     </ProveedorDemo>
   )
 }
@@ -52,11 +55,12 @@ function tecladoLibre() {
   return !document.querySelector("[data-lector-activo]")
 }
 
-function AppDemo() {
+function AppDemo({ filmando, recorridoInicial }: { filmando: boolean; recorridoInicial: boolean }) {
   const empresa = useDemo((s) => s.empresa)
   const tienda = useTiendaDemo()
   const [modulo, setModulo] = useState<ModuloDemo>("tablero")
   const [selector, setSelector] = useState(false)
+  const [recorrido, setRecorrido] = useState(recorridoInicial)
   const escena = useRef<HTMLDivElement>(null)
   const selectorRef = useRef<HTMLDivElement>(null)
   const cambiando = useRef(false)
@@ -84,6 +88,10 @@ function AppDemo() {
   }, [selector])
 
   const raiz = useRef<HTMLDivElement>(null)
+  const recorridoActivo = useRef(recorrido)
+  useEffect(() => {
+    recorridoActivo.current = recorrido
+  }, [recorrido])
   const selectorAbierto = useRef(selector)
   useEffect(() => {
     selectorAbierto.current = selector
@@ -126,7 +134,7 @@ function AppDemo() {
         return
       }
       if (e.key === "Escape") setSelector(false)
-      if (e.metaKey || e.ctrlKey || e.altKey || !tecladoLibre()) return
+      if (e.metaKey || e.ctrlKey || e.altKey || !tecladoLibre() || recorridoActivo.current) return
       const n = Number(e.key)
       if (n >= 1 && n <= 4) {
         e.preventDefault()
@@ -145,7 +153,7 @@ function AppDemo() {
 
   return (
     <div ref={raiz} className="dark flex h-dvh flex-col overflow-hidden bg-background text-foreground" data-demo data-empresa={empresa}>
-      <BarraDemo empresa={empresa} selectorAbierto={selector} onSelector={() => setSelector((v) => !v)} onRecorrido={() => {}} onReiniciar={reiniciar} recorridoActivo={false} />
+      <BarraDemo empresa={empresa} selectorAbierto={selector} onSelector={() => setSelector((v) => !v)} onRecorrido={() => setRecorrido((v) => !v)} onReiniciar={reiniciar} recorridoActivo={recorrido} />
       <div className="relative flex min-h-0 flex-1">
         <div ref={selectorRef} className="pointer-events-none absolute inset-x-0 top-0 z-30 [&>[data-abierto]]:pointer-events-auto">
           <SelectorEmpresas empresa={empresa} abierto={selector} onElegir={cambiar} />
@@ -162,6 +170,7 @@ function AppDemo() {
           </main>
         </div>
       </div>
+      {recorrido && <Recorrido empresaActual={empresa} onCambiarEmpresa={cambiar} onModulo={setModulo} onSalir={() => setRecorrido(false)} filmando={filmando} />}
       <CapaSaltos />
       <Toaster position="bottom-right" />
     </div>
@@ -186,6 +195,19 @@ function Vista({ empresa, modulo, onModulo }: { empresa: IdEmpresa; modulo: Modu
     if (modulo === "presupuestos") return <PresupuestosFerreteria />
     if (modulo === "transferencias") return <TransferenciasFerreteria />
     if (modulo === "servicio") return <ServicioFerreteria />
+  }
+  if (empresa === "distribuidora") {
+    if (modulo === "preventa") return <PreventaDistribuidora />
+    if (modulo === "reparto") return <RepartoDistribuidora />
+    if (modulo === "cobranzas") return <CobranzasDistribuidora />
+  }
+  if (empresa === "grupo") {
+    if (modulo === "sucursales") return <SucursalesGrupo />
+    if (modulo === "comparacion") return <ComparacionGrupo />
+    if (modulo === "aprobaciones") return <AprobacionesGrupo />
+    if (modulo === "auditoria") return <AuditoriaGrupo />
+    if (modulo === "permisos") return <PermisosGrupo />
+    if (modulo === "integraciones") return <IntegracionesGrupo />
   }
   if (modulo === "precios") return <VistaPrecios empresa={empresa} />
   if (modulo === "inventario") return <VistaProductos empresa={empresa} modulo={modulo} />

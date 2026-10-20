@@ -37,6 +37,8 @@ const FEATURE_DE: Partial<Record<ModuloDemo, string>> = {
 /** Lo que en una empresa en particular tiene su propia ficha en el registro. */
 const FEATURE_POR_EMPRESA: Partial<Record<IdEmpresa, Partial<Record<ModuloDemo, string>>>> = {
   kiosco: { mostrador: "mostrador-kiosco", fiado: "fiado", proveedores: "pedido-sugerido" },
+  distribuidora: { preventa: "preventa", reparto: "hoja-ruta-mapa", cobranzas: "cobranzas-calle" },
+  grupo: { sucursales: "comparacion-sucursales", comparacion: "comparacion-sucursales", aprobaciones: "aprobaciones-niveles" },
 }
 
 export function SelloModulo({ modulo, empresa }: { modulo: ModuloDemo; empresa?: IdEmpresa }) {

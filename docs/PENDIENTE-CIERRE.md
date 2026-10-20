@@ -48,3 +48,11 @@ Lo que el modo boceto deja para después: celular, respaldos, accesibilidad fina
 - **Celular y tablet (fase 1):** el mostrador del kiosco está diseñado para pantalla táctil pero probado en escritorio. Falta el lector con la cámara del celular, y que los favoritos y el carrito se reacomoden en una tablet vertical.
 - **Accesibilidad (fase 3):** el interruptor de conexión es un botón con `aria-pressed`; revisar que se anuncie como interruptor. Las columnas del servicio técnico necesitan títulos de región.
 - **La app real:** la pantalla de fiado y el mostrador con favoritos existen solo en la demo (estado `demo` en el registro). Para pasarlos a la app hay que conectarlos al motor de operaciones (`cuenta.pago`, `venta.crear`).
+
+## De la tanda 6 · La distribuidora, el grupo y el recorrido
+
+- **Celular (fase 1):** la app del preventista (el pedido cargado desde el celular) es justamente la pantalla que falta: hoy solo se simula desde el escritorio. El reparto y la comparación necesitan una versión de una columna.
+- **Movimiento reducido (fase 2):** el recorrido guiado no tiene versión quieta. Con `prefers-reduced-motion`, los cambios de empresa del recorrido tienen que ser cortes.
+- **Accesibilidad (fase 3):** el mapa del reparto es un SVG con `role="img"`; sus paradas se pueden tocar pero no se alcanzan con el teclado (la lista de la derecha cumple ese papel). En el recorrido, la barra espaciadora también puede activar el botón que tiene el foco: conviene sacar el foco de los botones al empezar.
+- **El recorrido en otra resolución:** el panel está ubicado para 1440 px (al lado de la barra lateral). Revisarlo en 1280 y en 1920.
+

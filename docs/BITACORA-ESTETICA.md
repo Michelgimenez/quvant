@@ -88,3 +88,21 @@ Se compone a 1600×1000 y se captura a 1,5× (2400×1500). Así los estilos de t
 - Debajo de los favoritos va "Lo último que vendiste": lo del visitante (en cola o sincronizado) y la simulación.
 - La caja cerrada suma "El día" (ventas, efectivo, otros medios y el fondo para mañana).
 - La lista de presupuestos gana ancho. El fiado pasa a $ 148.950.
+
+## Tanda 6 · La distribuidora, el grupo y el recorrido (`docs/capturas/quvant/tanda-6/`)
+
+**Vuelta 1**
+- El reparto se lee como un mapa sin serlo: el depósito es un cuadrado blanco al centro y las rutas usan el lenguaje de la grilla (cuadrados, no pines). El camión elegido va en el color de la empresa; los otros, en gris punteado.
+- Las aprobaciones muestran los dos niveles como una escalera de casillas. La segunda firma lanza el salto desde el botón.
+- Quedaba:
+  - en la preventa, pedidos repetidos;
+  - en el reparto, el rótulo "DEPÓSITO" pisaba la ruta;
+  - en la comparación, los nombres de las sucursales se cortaban y los números sobraban de ancho;
+  - en permisos, "Ver todo el grupo" se pegaba con "Gestionar usuarios";
+  - en la auditoría, la misma frase diez veces.
+
+**Vuelta 2**
+- El rótulo del depósito pasa arriba del cuadrado, centrado. La ruta del camión elegido se dibuja como trazo SVG (quieta si se pidió menos movimiento).
+- Las columnas numéricas de la comparación quedan fijas en 96 px y la sucursal gana el resto. Los permisos se acortan ("Precios", "Aprobar", "Todo el grupo", "Usuarios").
+- El panel del recorrido pasa a 500 px para que el rótulo no se parta. El último subtítulo repetía la bajada, que ya está en la firma: ahora invita a probar.
+
