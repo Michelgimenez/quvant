@@ -2,6 +2,441 @@
 
 > Yunque pasa a ser Quvant (`PROMPT-QUVANT.md`), en 10 tandas, en la rama `quvant`. Arriba, lo último; abajo, el historial de Yunque.
 
+## Reporte final · Quvant, de la tanda 1 a la 10 (20/10/2026)
+
+**Qué quedó.** Yunque pasó a ser Quvant en todo lo visible, con la identidad del manual y el alcance abierto del kiosco a la empresa. Todo está en la rama `quvant`, con un commit por tanda, sin deploy ni push.
+
+| Pieza | Dónde | En una frase |
+|---|---|---|
+| La marca en el sistema | `/marca`, `/marca/sistema`, `docs/TIPOGRAFIA.md` | La Q del manual, Michroma y Plex Mono con estilos cerrados, negro y blanco con su escala de grises, la grilla y el salto. |
+| La app | `/app` | La misma app de Yunque con la identidad nueva, en oscuro y en claro. |
+| La demo que cambia de empresa | `/demo` | Un kiosco, una ferretería, una distribuidora y un grupo de 40 sucursales. El salto del punto transforma la app entera. Tiene recorrido guiado y Forja en el grupo y la distribuidora. |
+| El sitio | `/` | La escala de kiosco a empresa en el hero, las secciones del punto 6, los cuatro planes ("Consultá"), desarrollo a medida y Forja. |
+| Las presentaciones | `/inversores`, `/demo/ferremix` | La demo que cambia de empresa como escena estrella, el modelo por plan sin números inventados y la propuesta para Ferremix con su marca. |
+| Los videos | `public/videos/`, `public/demo/` | Quvant en 60 s (horizontal y vertical), el loop del cambio de empresa y los dos de Forja, todos cuadro por cuadro. |
+| Forja | `/forja`, `/demo/ferremix/forja`, `/app/forja`, `/demo` | Negro y blanco, la activación nueva y cada local por dentro según su rubro. |
+
+**Cómo se verificó lo último (tanda 10):**
+- **`npm run verificar`, completo:** typecheck sin errores, lint limpio en todo el repositorio, tests unitarios y de RLS 190 de 190, y `build`.
+  - Tests nuevos: la vista de Forja por rubro (cinco tests) y la Forja de la demo.
+  - Después hubo tres cambios chicos (la espera de las transiciones y el stock por sucursal). Se repitieron typecheck, lint, los tests unitarios (128 de 128) y un build limpio.
+- **Tests de punta a punta, la corrida completa contra el build:** 44 pasan y 1 queda en pausa (`PUERTO_E2E=3110 npm run test:e2e`). La pausa es la prueba de celular de Forja, que corre en su propio proyecto.
+  - Volvieron la sección de Forja del sitio y su escena de `/inversores`.
+  - **Una falla intermitente, arreglada:** el test de teclado de Forja ("Esc para volver") y el de la pieza a veces perdían una tecla o un clic que llegaba durante una transición de cámara. Ahora "volver" y "entrar" esperan a que la transición termine y no pierden la orden. Los tests de Forja pasaron dos veces seguidas cada uno, y el de teclado, tres más.
+- **Los videos de Forja, verificados con `ffprobe`:** H.264, `yuv420p`, BT.709, 30 fps.
+  - `forja.mp4`: 1920 × 1080, 42 s, 1260 cuadros, 7,6 MB.
+  - `forja-ferremix.mp4`: 1920 × 1080, 42 s, 1260 cuadros, 6,3 MB.
+  - Se miraron tres cuadros de cada uno, sacados del archivo final.
+- Capturas en `docs/capturas/quvant/tanda-10/` (7): la red del grupo, su sucursal por dentro, los andenes de la distribuidora y cuatro cuadros de los videos de Forja.
+
+**Lo que falta, en orden** (`docs/PENDIENTE-CIERRE.md`, para `PROMPT-QUVANT-CIERRE.md`):
+1. **El celular:** la demo, el sitio y el mostrador táctil están pensados para escritorio.
+2. **La versión quieta:** cada animación con su respaldo para movimiento reducido, revisada una por una.
+3. **Accesibilidad, rendimiento, seguridad, navegadores y SEO,** fase por fase.
+4. **Los videos finales,** cuando estén el dominio, los precios y el logo oficial.
+
+## Resumen · tanda 10 de 10 · Forja por rubro y el final (20/10/2026)
+
+**La vista por dentro según el rubro** (`src/forja/dominio/plano.ts`, `modelo.ts` → `RubroTaller`):
+- **Comercio:** el de siempre. Mostrador, depósito, servicio técnico y muelle (la ferretería, `/forja` y la app).
+- **Kiosco:** mostrador y góndolas, sin servicio técnico ni muelle.
+- **Distribuidora:** el depósito con "Andenes y camiones". Cada camión del reparto en su andén: el que está en la calle deja el andén vacío y dos cargan para mañana.
+- **Sucursal de una cadena:** "Salón y depósito", el mostrador con todas sus cajas y la carga. Sin servicio técnico.
+- En la demo, el grupo usa la sucursal y la distribuidora su depósito. Una zona de reparto no es un edificio: muestra el depósito con los camiones que van hacia ella.
+- Los racks de la demo pasan a cuatro por categoría (se veían ralos). Los nombres de las zonas siguen al rubro en la barra, el panel y el plano 2D.
+
+**`/demo/ferremix/forja`:** con la marca nueva (la base en grises, la activación y la placa), el co-branding de Ferremix y el sello PROPUESTA. Sin cambios de contenido.
+
+**Los videos de Forja, rehechos** (`scripts/videos/filmar-forja.mts`, reemplaza a `scripts/grabar-forja.mjs`):
+- **Las dos tomas:** `public/demo/forja.mp4` (la genérica, para el sitio e `/inversores`) y `public/demo/forja-ferremix.mp4` (la propuesta), más el póster `forja-poster.jpg`.
+- **Cómo se filman:**
+  - con `?film=1`, la página arma el guion en una línea de tiempo maestra de GSAP (`src/forja/ui/guion-video.ts`): la activación, la red, la Casa Central por dentro, dos ventas, el depósito, un rack que pasa a crítico y la repetición del día;
+  - como MapLibre y three.js tienen su propio bucle, el reloj que avanza cuadro por cuadro es el de la página entera (Playwright), y la línea de tiempo lo sigue;
+  - la codificación es la del punto 8.2: 30 fps, `-crf 18`, BT.709 y `+faststart`.
+
+**De vuelta a la vista:**
+- la sección de Forja del sitio (con la frase nueva y la vista por rubro);
+- la escena de Forja en `/inversores` (13 escenas otra vez);
+- sus dos tests de punta a punta.
+
+**Verificación:** ver arriba, en el reporte final.
+
+### Decisiones de la tanda 10
+
+| # | Decisión | Motivo |
+|---|---|---|
+| T10-1 | El rubro es un dato del taller (`TallerForja.rubro`), no de la red. | Lo arma cada fuente: la app dice "comercio" y la demo dice "sucursal" o "distribuidora". El plano 3D y el 2D lo leen igual. |
+| T10-2 | El kiosco tiene su vista, pero ningún kiosco de la demo abre Forja. | Una red de una sola sucursal no muestra nada nuevo. La vista queda lista para un kiosco cliente y tiene su test. |
+| T10-3 | Los videos de Forja avanzan con el reloj de la página entera, no con `__seek` de GSAP. | MapLibre, deck.gl y three.js no viven en el reloj de GSAP. Así cada cuadro sale exacto igual, con la línea de tiempo maestra marcando el guion. |
+| T10-4 | En Forja, "entrar" y "volver" esperan a que termine la transición en curso, en vez de ignorar la orden. | Un Esc o un clic durante el movimiento de cámara se perdía: los tests de teclado fallaban a veces, y a una persona le pasaría lo mismo. |
+| T10-5 | Los racks de la Forja del grupo usan el stock de esa sucursal (`stockGrupo`), el mismo que muestra la demo. | Antes dividía el stock total entre 40 y casi todo salía "sin stock". |
+
+## Resumen · tanda 9 de 10 · Forja: la base y la activación (20/10/2026)
+
+**La base en negro y blanco** (`src/forja/ui/taller/materiales.ts`, `red/estilo-mapa.ts`):
+- Los materiales del taller pasan a la escala de grises de la marca. Se fueron el grafito azulado y el azul "temple" de Yunque: la selección ahora es blanca.
+- El mapa se tiñe con el negro de Quvant y sus grises.
+- Las transferencias en viaje, las estelas y los bultos van en blanco (eran naranjas). Los estados usan los mismos alerta y error de la app: sin stock en error y crítico en alerta.
+
+**La escala de actividad, discreta** (`src/forja/dominio/calor.ts`):
+- Es la única excepción a la paleta y está documentada en `docs/TIPOGRAFIA.md`.
+- Sube del gris profundo al blanco, con un tibio apagado en el medio (el tono del alerta). Antes iba de naranja a amarillo.
+- Solo dibuja datos: el calor de cada sucursal.
+
+**La placa:** «FORJA · by Quvant» (Michroma y la Q) con una frase nueva, en `src/config/forja.ts`: **«Todo el negocio, en vivo.»** Es BORRADOR; abajo, en "Para Michel", van dos alternativas.
+
+**La activación nueva** (`src/forja/ui/activacion/activacion.tsx`):
+- **Cómo se ve, en 4,5 s:**
+  1. El aro de la Q se traza y el punto aparece en su lugar.
+  2. El punto salta en arco (la misma geometría del salto de la marca) y, donde cae, se enciende la primera sucursal.
+  3. La Q se retira y la grilla de puntos se vuelve el mapa: se encienden los puntos cerca de cada sucursal, en onda, y aparecen las demás con las líneas de la red.
+  4. Aparecen la placa y la frase, y todo se funde hacia el universo.
+- **Cómo funciona:**
+  - Es SVG con una línea de tiempo de GSAP, sin la escena 3D del yunque (se borraron `escena-activacion.tsx`, `sonido.ts` y el trazo del yunque).
+  - Se salta con el botón, Esc o Enter.
+  - Con movimiento reducido o en la versión 2D, muestra la composición final quieta y se funde.
+  - Las sucursales salen de la red real (`puntosActivacion`: el norte arriba, sin deformar).
+
+**Forja dentro de la demo** (`src/demo/forja-demo.ts`, `src/components/demo/vistas/forja-*.tsx`):
+- **Desde la barra lateral del grupo y de la distribuidora,** con la misma fuente de datos de la demo: sin base, sin Realtime y con los sellos DEMO y SIMULACIÓN.
+- **El grupo:** sus 40 sucursales en el mapa del país, con las ventas del día, el calor de la última hora y transferencias en viaje entre sucursales de la misma provincia.
+- **La distribuidora:** el depósito de Rosario y sus 12 zonas de reparto (con coordenadas reales aproximadas de esos barrios y localidades). Los pedidos del día y los camiones del reparto aparecen en viaje.
+- **El día antes de la hora de la demo** se reconstruye de los totales: muestras con su hora, siempre iguales. Lo de después lo pone el simulador. Así funciona también la repetición del día.
+- **La activación** aparece la primera vez que se abre en la visita.
+- **Con muchas sucursales,** el mapa muestra el nombre solo de las 8 que más venden; el resto aparece al pasar o con el foco. Si no, 40 nombres se pisaban.
+
+**Registro de funcionalidades:** la nota de "Forja" suma que se prueba dentro de `/demo`, en el grupo y la distribuidora.
+
+**Verificación:**
+- Typecheck sin errores, lint limpio en lo tocado y tests unitarios: 123 de 123. Hay cuatro nuevos para la Forja de la demo (el grupo con 40 nodos y simulación, la repetición, la distribuidora con 13 nodos y el taller). El de la activación se rehízo (el orden de los tramos y la proyección de las sucursales).
+- `npm run build`, completo (no lo pide la tanda: se hizo porque Forja cambió mucho).
+- **Tests de punta a punta de Forja** (`forja.spec.ts` y `forja-publica.spec.ts`, contra el build): 17 pasan y 2 quedan en pausa.
+  - Las dos pausas son la sección de Forja del sitio, que vuelve en la tanda 10, y una prueba de celular que corre en su propio proyecto (también pasó).
+  - Pasan la activación nueva (termina sola, con la placa y su frase, y se salta con Esc) y el recorrido con el teclado, que en la tanda 8 había fallado.
+- Capturas en `docs/capturas/quvant/tanda-9/` (9): la activación en tres momentos, y la red y el taller del grupo, de la distribuidora y de `/forja`. Sin errores de página ni de consola.
+
+### Decisiones de la tanda 9
+
+| # | Decisión | Motivo |
+|---|---|---|
+| T9-1 | La activación es SVG + GSAP, no 3D. | Lo que cuenta (el aro, el salto y la grilla que se vuelve mapa) es plano por naturaleza. Así carga al instante, no necesita WebGL ni una versión de reemplazo y se puede filmar cuadro por cuadro. |
+| T9-2 | La Q de la activación es la versión blanca del isotipo, armada con su geometría (el aro y el punto). | Para que el aro se trace y el punto salte sin deformar el logo. La Q cromada es un PNG y no se puede trazar. |
+| T9-3 | En la distribuidora, cada zona de reparto es un nodo del mapa. | Una distribuidora tiene un solo depósito. Su "red" es la calle: los pedidos que llegan de cada zona y los camiones que salen hacia ellas. |
+| T9-4 | Se quitó el sonido de la activación. | Eran golpes de yunque y chisporroteo, de la marca vieja. |
+| T9-5 | La escala de calor conserva sus nombres (frío, ascua, brasa, chispa, blanco caliente). | Son los del código y los anuncios ("calor brasa"); cambia el color, no el sentido. |
+
+## Resumen · tanda 8 de 10 · Presentaciones y videos (20/10/2026)
+
+**`/inversores`** (`src/components/presentacion/escenas-inversores.tsx`), 12 escenas con Forja todavía oculta:
+- **El problema, por tamaño:** kioscos, comercios, distribuidoras y empresas con sucursales. Cada uno con su dato de mercado en `[COMPLETAR con dato y fuente]` (no se inventó ninguno) y sus dolores.
+- **La escena estrella es la demo que cambia de empresa, en vivo:** la misma escala del sitio, más grande, que avanza sola mientras la escena está activa.
+- **El modelo por plan:** los cuatro planes con su precio ("Consultá") y la fórmula: Σ por plan, negocios activos × licencia del plan, más la implementación. Mientras falte algún precio no hay números: un recuadro dice "Sin números todavía". Cuando se carguen los precios, aparece solo el escenario ilustrativo, con una mezcla de planes que es un supuesto editable (`src/config/proyecciones.ts`).
+- **Se fueron los USD 290 de Yunque:** no quedan en ninguna escena ni en la configuración. Un test lo controla.
+- **El estado actual:** "Demo funcional. Primer piloto en negociación", con el detalle del piloto en `[COMPLETAR]` (`src/config/inversores.ts`). La hoja de ruta y el equipo siguen como estaban, con sus `[COMPLETAR]`.
+- **Las transiciones:** el fundido entre escenas y, abajo a la izquierda, un índice de escenas donde el punto salta en arco de la escena vieja a la nueva. Fondo con la grilla de puntos.
+- El gráfico de la inversión pasa a la escala de grises (tenía azul, naranja, verde y amarillo, ajenos al manual).
+- Se fue la "Demo del producto" con la película vieja de la ferretería: su lugar lo toma la escena estrella.
+
+**El motor de las presentaciones** (`motor.tsx`, `kit.tsx`):
+- Sin `motion/react`: todo con GSAP, que es el único reloj de animación. Las entradas, los trazos, el fundido entre escenas, el cursor de la película del producto y el bucle del tablero de la demo comercial.
+- El paquete `motion` queda instalado pero sin uso; se puede desinstalar en el cierre.
+- Títulos en Plex Mono 700 (antes pedían un 800 que la fuente no tiene), esquinas de 6 px y marcos con cuadrados.
+
+**`/demo/ferremix`:** con Quvant, el sello PROPUESTA y su co-branding, como estaba. Lo que cambió: GSAP en lugar de `motion`, esquinas y viñetas de la marca, y el plan "Comercio" con su precio en "Consultá".
+
+**Los videos** (`public/videos/`), filmados cuadro por cuadro contra `next start`:
+- `quvant-60s.mp4`, horizontal, 1920 × 1080. En orden:
+  1. La firma se arma.
+  2. El kiosco vende sin conexión y la cola se sincroniza con el salto.
+  3. La caja cierra con diferencia cero.
+  4. El salto lleva a la ferretería (presupuesto → venta), a la distribuidora (un pedido llega desde la calle) y al grupo (aprobación en dos niveles).
+  5. "Probá la demo".
+  6. El cierre del manual: «Quvant.», una pausa y «Software a la vanguardia de cada nicho.».
+- `quvant-60s-vertical.mp4`, 1080 × 1920, compuesto para el vertical (no recortado):
+  - la app va entre los 260 y los 1160 px;
+  - los subtítulos van a 50 px, abajo de la app;
+  - nada importante en los 250 px de arriba ni en los 420 de abajo.
+- `quvant-cambio-de-empresa.mp4`, 1920 × 1080, un loop de 14 s con las cuatro transiciones: termina en el mismo cuadro en que empieza.
+
+**Cómo se filman** (`scripts/videos/filmar.mts`):
+- Cada video es una página (`/videos/<id>`) con una línea de tiempo maestra de GSAP que maneja la demo real: cambios de empresa, módulos y clics en sus botones.
+- Con `?film=1` expone `__ready`, `__duration` y `__seek(t)`. Por cada cuadro, a 30 fps: `__seek`, dos `requestAnimationFrame` y un JPEG por pipe a `ffmpeg-static`. La salida es libx264, `-crf 18`, BT.709 y `+faststart`.
+- Para que cada cuadro salga igual:
+  - la sincronización del kiosco y la lectura simulada usan `gsap.delayedCall` (antes, `setTimeout`);
+  - al filmar se congelan las animaciones de CSS;
+  - el reloj de la demo avanza con la línea de tiempo.
+- `--cuadros 0,12,30` guarda solo esos instantes como PNG, avanzando cuadro por cuadro igual que al filmar. Sirve para revisar sin codificar.
+
+**Verificación:**
+- Typecheck sin errores, lint limpio en lo tocado y tests unitarios: 119 de 119 (dos nuevos). Uno controla que sin precios no hay números. El otro, que no queda ningún "USD 290" en `src/`.
+- **`npm run build`, completo.** `/videos/*`, `/demo` e `/inversores` como prerender parcial; `/demo/ferremix`, estático.
+- **Los videos, verificados con `ffprobe`:** los tres en H.264, `yuv420p`, BT.709 (espacio, primarios y transferencia), rango `tv` y 30 fps.
+
+  | Video | Medidas | Duración | Cuadros | Peso |
+  |---|---|---|---|---|
+  | `quvant-60s.mp4` | 1920 × 1080 | 58,6 s | 1758 | 6,3 MB |
+  | `quvant-60s-vertical.mp4` | 1080 × 1920 | 58,6 s | 1758 | 4,5 MB |
+  | `quvant-cambio-de-empresa.mp4` | 1920 × 1080 | 14 s | 420 | 3,9 MB |
+
+  Se miraron 3 cuadros de cada uno, sacados del archivo final.
+- **Tests de punta a punta** (`npm run test:e2e`, contra el build): 39 pasan, 4 fallan y 2 quedan en pausa.
+  - Dos fallas se arreglaron en el test: el co-branding ya no es una barra arriba (se sacó en la tanda 2; ahora se controla el indicador del módulo activo) y la sección de Forja del sitio vuelve en la tanda 10.
+  - Las otras dos son de Forja y se resuelven en la tanda 9: la activación vieja (busca la frase de Yunque) y "Esc para volver del taller", que hay que volver a mirar ahí.
+  - Se corrieron en el puerto 3110 (`PUERTO_E2E=3110`): el 3100 lo tenía ocupado otro programa.
+- Capturas en `docs/capturas/quvant/tanda-8/` (11): seis escenas de `/inversores`, dos de `/demo/ferremix` y un cuadro de cada video.
+
+### Decisiones de la tanda 8
+
+| # | Decisión | Motivo |
+|---|---|---|
+| T8-1 | En el video horizontal la demo se dibuja a 1600 × 900 y se agranda 1,2 veces. | A tamaño de escritorio, la interfaz en un video de 1080p se lee chica. |
+| T8-2 | El dominio de "Probá la demo" es `[COMPLETAR: dominio del sitio]` (`SITIO.dominio`). | No hay dominio registrado. Cuando lo esté, se cambia una línea y se vuelve a filmar con un comando. |
+| T8-3 | La coreografía del cambio de empresa mide su propia escala (lo que se ve sobre lo que mide). La capa del salto va en un portal a `<body>`. | Así funciona igual en `/demo`, en la escala del sitio, en el escenario de inversores y en los videos, achicada o agrandada. |
+| T8-4 | En `/inversores`, la escala solo avanza cuando su escena está activa. | Si no, sus saltos (que se dibujan sobre la página) se verían encima de otras escenas. |
+| T8-5 | El paquete `motion` no se desinstaló. | Quedó sin uso; sacarlo cambia el lockfile y es tarea del cierre. |
+
+## Resumen · tanda 7 de 10 · El sitio del producto (20/10/2026)
+
+**El hero con la escala** (`src/components/sitio/hero.tsx`, `escala.tsx`):
+- La firma con la bajada de la marca, el titular («Del kiosco a la empresa.») con su bajada, "Probar la demo" y "Pedir una demo".
+- **Debajo, la escala:** un control de Kiosco a Empresa, con cuatro paradas (Kiosco, Comercio, Distribuidora y Empresa).
+  - Transforma en vivo una vista del tablero, achicada, con los mismos componentes de `/demo`.
+  - Usa la misma coreografía del cambio de empresa: cada paso es un salto del punto, con el barrido, la barra lateral con Flip y los números que ruedan.
+  - Avanza solo mientras se ve (cada 4,6 s, con GSAP), con un botón "Pausar el recorrido". Se corta apenas alguien lo toca.
+  - Se maneja con el mouse o con las flechas (es un `role="slider"`).
+  - No guarda nada: lo que el visitante hizo en `/demo` queda intacto (la tienda de la demo ahora acepta `guardar: false`).
+  - Mientras carga se ve la "escala quieta": el mismo armado con la captura del tablero del kiosco. Así no se mueve nada al cargar.
+
+**Las secciones** (`src/components/sitio/secciones.tsx`), en el orden del punto 6:
+1. El problema, contado por tamaño (kiosco, comercio, distribuidora y empresa).
+2. Nunca se cae: la demo del mostrador sin conexión, con la identidad nueva. El pulso de la red ahora es de GSAP, no CSS.
+3. Un sistema, cuatro negocios: las cuatro empresas, con su logo, su tablero y un link directo a la demo. Sello DEMO.
+4. Los módulos: ocho capturas de la demo en un marco sobrio, cada una con el estado real de sus funciones.
+5. Precios al día: el aumento masivo con la vista previa.
+6. Forja: sigue oculta hasta la tanda 10.
+7. Seguridad y tus datos: cada punto con su estado real. Copias y doble factor dicen "En demo", con su nota.
+8. Planes: Kiosco, Comercio, Distribuidora y Empresa.
+9. Desarrollo a medida, con el sello BORRADOR.
+10. Socios fundadores, sin cupos.
+11. Estado real.
+12. Preguntas.
+13. Pedir una demo.
+14. El pie, con la firma y la bajada.
+
+**Los planes** (`src/config/precios.ts`):
+- Cuatro planes con el precio en `[COMPLETAR]`: el sitio muestra **"Consultá"**.
+- Se fueron los USD 290 de Yunque. Los datos estructurados (JSON-LD) ya no publican precio.
+- Cada cosa que incluye un plan apunta a su ficha del registro. Si está "En demo" o "Próximamente", lo dice al lado.
+
+**El formulario:** suma el campo **Tamaño** ("1 caja", "2 a 5 cajas", "Varias sucursales", "Más de 10 sucursales"). Ver la decisión T7-3.
+
+**Las capturas del sitio** salen de la demo (`scripts/marca/capturar-sitio.mts` → `public/capturas/sitio/`, 12 imágenes). Se borraron las capturas viejas de la app de Yunque (`public/capturas/app-*.png`).
+
+**Verificación:**
+- typecheck sin errores, lint limpio en `src`, `scripts` y `tests`, y tests unitarios 117 de 117.
+- `scripts/marca/revisar-sitio.mts` recorre el sitio a 1440 y a 1280 px: sin errores de página ni de consola y sin desborde horizontal. Capturas en `docs/capturas/quvant/tanda-7/` (14).
+- Los e2e del sitio y del panel se actualizaron (titular desde la configuración, planes sin USD 290, el campo Tamaño y un test nuevo de la escala con el teclado). Se corren con el `build` de la tanda 8.
+
+### Decisiones de la tanda 7
+
+| # | Decisión | Motivo |
+|---|---|---|
+| T7-1 | La escala dibuja la demo a 1440 × 852 y la achica con `transform: scale` (≈0,78 en escritorio). La coreografía recibe la escala y corrige sus medidas. | Con los mismos componentes y la misma coreografía de `/demo`. A 1280 px, las tarjetas del grupo se cortaban. |
+| T7-2 | La escala avanza sola, pero con un botón para pausarla, solo mientras se ve y nunca con movimiento reducido. | Un hero vivo sin violar WCAG 2.2.2 (contenido que se mueve solo más de 5 s necesita pausa). |
+| T7-3 | El tamaño del formulario se guarda junto al rubro ("Ferretería · 2 a 5 cajas"), sin columna nueva. | Una columna nueva necesita una migración que hay que aplicar en Supabase antes de publicar; si no, el formulario se rompe en producción. Así funciona hoy y el panel lo muestra. Si querés una columna propia, es una migración chica (anotada en el cierre). |
+| T7-4 | Los socios fundadores, sin "5 cupos". | El prompt pide no inventar cupos. Si hay un número real, se agrega en `src/config/precios.ts`. |
+| T7-5 | Estilo nuevo `.t-titulo-lg` (40 px) para los títulos de sección. | Entre el titular (64 px) y el de pantalla (28 px) faltaba un escalón. Está documentado en `docs/TIPOGRAFIA.md` como extensión. |
+| T7-6 | En el plan, lo disponible no lleva chip; lo que está "En demo" o "Próximamente", sí. | La honestidad sin ruido: se marca la excepción, no la regla. |
+
+## Resumen · tanda 6 de 10 · La distribuidora, el grupo y el recorrido guiado (20/10/2026)
+
+**La distribuidora** (`src/components/demo/vistas/distribuidora.tsx`):
+- **Preventa:** los pedidos de hoy llegan desde la calle, con quién los cargó y su zona. Al tocar uno se ve el detalle con la lista de precios del cliente (por ejemplo "Interior · +6 %") y su cuenta corriente. "Simular un pedido desde la calle" hace entrar uno nuevo arriba de todo.
+- **Reparto:** la hoja de ruta sobre un mapa esquemático en la grilla de puntos: el depósito al centro y cuatro camiones con sus paradas (entregado, en camino y pendiente). Las entregas del simulador van completando paradas a lo largo del día. Al elegir un camión, su ruta se dibuja desde el depósito.
+- **Cobranzas:** la deuda en la calle, la vencida y lo cobrado hoy; los clientes ordenados por antigüedad de la deuda. Registrar una cobranza baja la deuda en el momento.
+
+**El grupo** (`vistas/grupo.tsx`):
+- **Sucursales:** el mapa del país con las 40 sucursales, la lista filtrable por provincia y la ficha de cada una (ventas, objetivo, margen, críticos y la semana).
+- **Comparación:** las 40 sucursales en una tabla ordenable por cualquier columna, con las barras de los últimos 14 días.
+- **Aprobaciones en dos niveles:** hasta $ 8 M aprueba la gerencia regional; por encima, también dirección. La segunda firma lanza el salto ("Aprobación completa"). Se puede rechazar.
+- **Auditoría:** quién hizo qué, cuándo, con qué rol y en qué sucursal, con filtro por acción. Lo que aprueba el visitante aparece arriba como "Vos (demo)".
+- **Permisos** (roles × permisos, 312 usuarios en 7 roles) e **Integraciones** (cada una con su estado real).
+
+**El recorrido guiado** (`src/components/demo/recorrido.tsx`, pasos en `src/demo/recorrido.ts`):
+- Un paseo automático de ~60 s por las cuatro empresas, con un subtítulo breve abajo a la izquierda: el kiosco (tablero, una venta, la caja que cierra en cero), la ferretería (tablero, presupuesto → venta), la distribuidora (tablero, reparto) y el grupo (consolidado, una aprobación en dos niveles). Termina en la firma de Quvant.
+- Las acciones se hacen sobre la interfaz real: los mismos botones que tocaría una persona.
+- **Teclas:** espacio pausa, las flechas avanzan o retroceden un paso y Esc sale. Se abre con "Recorrido guiado" en la barra o con `/demo?recorrido=1`.
+- Es una sola línea de tiempo de GSAP: con `?film=1` la mueve quien filma. Es la base del video de 60 segundos de la tanda 8.
+
+**Registro de funcionalidades:** se suman "Preventa en la calle", "Hoja de ruta en el mapa", "Cobranzas en la calle", "Comparación de sucursales" y "Aprobaciones por niveles", todas en estado `demo`, con su nota. Ejemplo: las aprobaciones no existen en la app real, y el mapa del reparto es esquemático (sin GPS).
+
+**Verificación:** typecheck sin errores, lint limpio y un test nuevo (`tests/unit/recorrido.test.ts`): pasa por las cuatro empresas, dura ~60 s y ningún subtítulo pide leer más de 3 palabras por segundo. Capturas en `docs/capturas/quvant/tanda-6/` (15), sin errores de página ni de consola.
+
+**Corregido en el camino:**
+- La preventa mostraba pedidos repetidos: los de la historia entraban dos veces.
+- La auditoría repetía las mismas frases, y a veces con roles que no corresponden (una cajera ajustando stock). Ahora cada acción la hace un rol que puede hacerla, con un detalle distinto.
+- Los márgenes salían con punto decimal ("30.7 %") en lugar de coma.
+
+## Resumen · tanda 5 de 10 · El kiosco y la ferretería por dentro (20/10/2026)
+
+**El kiosco** (`src/components/demo/vistas/kiosco.tsx`):
+- **Vender:** un mostrador grande y táctil en su diseño.
+  - Lector simulado con el teclado: se escribe un código y Enter. El botón "Simular lector" tipea uno rápido.
+  - Doce favoritos, cantidades con botones grandes, el total en `.t-numero-xl`, los medios de pago y "Anotar como fiado".
+  - Mientras está abierto, las teclas 1 a 4 no cambian de empresa: el teclado es el lector.
+- **Cortar la conexión:** un interruptor. Se sigue vendiendo y las ventas quedan "en cola". Al volver, la cola se sincroniza sola con el salto ("Cola sincronizada · 2 ventas").
+- **Caja:** el arqueo contra lo que dice el sistema (fondo + efectivo).
+  - Se cuenta con un campo, con botones de billetes o con "Contar todo de una vez".
+  - Con diferencia $ 0, el cierre lanza el salto ("Caja cerrada · sin diferencias"). Con diferencia, solo un aviso.
+- **Fiado:** quién debe, cuánto y desde cuándo. Se puede anotar un fiado, registrar "Pagó" y "Avisar" (WhatsApp emulado, con aviso).
+- **Proveedores:** el pedido sugerido por proveedor y su día de visita.
+- **Precios:** el aumento masivo con la vista previa del impacto (sirve para las cuatro empresas: por proveedor en el kiosco, por categoría en las demás).
+
+**La ferretería** (`vistas/ferreteria.tsx`):
+- **Presupuestos:** la lista con su vencimiento y el detalle. "Pasar a venta" lanza el salto ("Presupuesto → venta") y suma la venta al tablero.
+- **Transferencias:** se arma desde una sucursal hacia otra con lo que falta en el destino. Se despacha y queda "en viaje"; después se recibe.
+- **Servicio técnico:** las órdenes en cuatro columnas por estado, una orden nueva y "Avanzar" hasta "Listo", con "Avisar" (emulado) y "Entregado".
+
+**Registro de funcionalidades:** se suman "Mostrador de kiosco", "Fiado de los vecinos" y "Pedido sugerido por proveedor", las tres en estado `demo`, con su nota honesta. El sello de cada pantalla muestra su estado real.
+
+**Verificación:** typecheck sin errores, lint limpio y cada flujo recorrido con capturas (`docs/capturas/quvant/tanda-5/`), sin errores de página. Un detalle que se corrigió: el fiado del kiosco sumaba justo $ 150.000 por casualidad del generador; un total tan redondo parece inventado, así que se movió apenas el rango ($ 148.950).
+
+## Resumen · tanda 4 de 10 · El cambio de empresa (20/10/2026)
+
+**La coreografía** (`src/components/demo/coreografia.ts`) es una sola línea de tiempo de GSAP, con el plugin Flip, de ~1,5 s con el selector cerrado y ~1,2 s si ya estaba abierto:
+
+1. **El salto:** el punto cuadrado sale de la tarjeta de la empresa actual, traza su arco punteado (la misma geometría del salto de la marca) y cae en la tarjeta de la nueva. Si el selector está cerrado, el cambio primero lo abre.
+2. **Los logos:** el de la empresa actual vuelve a su tarjeta y el de la nueva sale de la suya y se instala en la barra lateral (`Flip.fit`).
+3. **El barrido:** un círculo (`clip-path`) que nace donde cayó el punto revela el estado nuevo sobre una foto del estado viejo. Lo que sale queda montado en esa foto y se apaga mientras pasa el barrido.
+4. **La barra lateral** se reorganiza con `Flip.from`: los módulos que siguen se reacomodan y los nuevos entran. Cada ítem tiene un `data-flip-id` estable.
+5. **Los números** ruedan del valor viejo al nuevo (los que no existían, desde cero).
+6. **Las tarjetas** que existen en las dos empresas viajan de su lugar viejo al nuevo. Las demás entran. Solo `transform` y `opacity`.
+
+**Con React:**
+- La foto y el estado viejo se toman antes del cambio.
+- El cambio se aplica con `flushSync` justo cuando cae el punto, y todo lo que se mueve después se agrega a la misma línea de tiempo en tiempos absolutos.
+- Sin cortes ni parpadeos: es la misma app que se transforma.
+
+**Para filmar (adelanto de la tanda 8):**
+- Con `?film=1`, `/demo` expone `window.__seek(t)` y `window.__ready`.
+- `__seek(t)` pausa el reloj global de GSAP y lo lleva a `t`.
+- `scripts/marca/capturar-cambio.mts` saca cuadros clave del cambio, y `scripts/marca/hoja-contacto.mjs` los junta en una hoja.
+
+**Verificación:** typecheck sin errores, lint de lo tocado limpio y `npm run build` sin errores (`/demo` compila como prerender parcial). Hubo tres vueltas con cuadros clave en `docs/capturas/quvant/tanda-4/`.
+
+## Resumen · tanda 3 de 10 · Las cuatro empresas y la demo (20/10/2026)
+
+1. **Las cuatro empresas** (`src/demo/empresas.ts`), todas ficticias y con el sello DEMO:
+
+   | Empresa | Escala | Color |
+   |---|---|---|
+   | Kiosco La Esquina | 1 caja, 327 productos | tomate |
+   | Ferretería Industrial Demo | 3 sucursales, 290 productos (sale del seed de la app) | verde azulado |
+   | Distribuidora Ruta Clara | 12 preventistas, 400 clientes, 1.800 productos | azul |
+   | Grupo Cordal | 40 sucursales en 6 provincias, 24.996 productos | ciruela |
+
+   - **Nombres:** se buscaron en la web y no aparece ninguna marca conocida igual o parecida. "La Esquina" es un nombre genérico; solo aparece en restaurantes, que son otro rubro. Michel los puede cambiar en la configuración.
+   - **Logos ficticios:** una palabra en una tipografía libre (OFL: Fredoka, Oswald, DM Serif Display y Marcellus), convertida a trazados en `src/demo/logos-empresas.ts`. No suman fuentes a la web.
+   - **Módulos:** con la misma forma que `Organizacion.modulos`.
+   - **Terminología propia:** Caja y Fiado en el kiosco; Preventa, Reparto y Cobranzas en la distribuidora; Consolidado, Sucursales y Aprobaciones en el grupo.
+2. **Los datos, con dos implementaciones del mismo modelo** (`src/dominio/negocio.ts`):
+   - **App:** `src/datos/negocio-desde-estado.ts` lo arma desde la réplica local.
+   - **Demo:** `src/demo/`.
+     - La ferretería se exporta del seed con ese mismo adaptador a `src/demo/ferreteria-snapshot.json` (129 kB, `npx tsx scripts/generar-snapshot-ferreteria.ts`).
+     - Las otras tres se generan con semilla fija desde la fecha ancla (viernes 16/10/2026, 17:30), con 90 días de ventas con estacionalidad: viernes en el kiosco, fin de mes en la distribuidora.
+     - El catálogo del grupo se arma al elegirlo (40 ms) y el stock por sucursal se calcula a pedido con un hash.
+   - **El simulador del día** (`src/demo/simulador.ts`) es una función del tiempo y de la semilla, con la etiqueta SIMULACIÓN:
+     - el kiosco vende cada pocos segundos;
+     - en el grupo se mueven decenas de sucursales a la vez.
+3. **`/demo`:**
+   - Es pública, sin login, con `noindex`, y no toca la base.
+   - Tiene una barra con "Estás viendo: [empresa] · DEMO", el selector de cuatro tarjetas sobre la grilla, el recorrido guiado y reiniciar.
+   - Atajos: teclas 1 a 4 (salvo en un campo o en un mostrador) y ⌘E o Ctrl+E.
+   - La empresa elegida queda en la dirección (`/demo?empresa=grupo`, con `history.replaceState`).
+   - Lo que hace el visitante se guarda en su navegador (zustand con persist, `skipHydration`, `version` y `partialize`), y la dirección manda sobre lo guardado.
+4. **Los tableros:**
+   - El kiosco es amplio: cuánto vendí, la caja, el fiado, qué pedir y los precios.
+   - La ferretería tiene densidad media: las sucursales, los 30 días por negocio y lo que hay que atender.
+   - La distribuidora muestra preventistas contra su objetivo, cobranzas, deuda en la calle, reparto y los picos de fin de mes.
+   - El grupo es denso: consolidado, mapa de Argentina con la grilla de puntos, la comparación de las 40 sucursales ordenable, provincias, aprobaciones y auditoría.
+   - Productos y clientes van en tablas virtualizadas; en el grupo, sobre los 25.000 productos.
+   - El cambio de empresa es, por ahora, un fundido simple.
+5. **Tests:** `tests/unit/demo-empresas.test.ts` (14), que cubren estructura, determinismo, estacionalidad, códigos de barras, simulador y resúmenes.
+
+**El mapa:** el contorno sale de Natural Earth (dominio público), simplificado, e incluye las Islas Malvinas, sin rótulos.
+
+## Resumen · tanda 2 de 10 · El renombre y la app (20/10/2026)
+
+**Pedido de Michel:** hacer todas las tandas restantes seguidas, con ejemplos dinámicos. Donde el prompt pedía esperar una elección, queda una por defecto que se cambia en la configuración.
+
+1. **Titular:** queda la propuesta A, «Del kiosco a la empresa.» (`TITULAR_ELEGIDO` en `src/config/sitio.ts`). B y C siguen en `TITULARES_ALTERNATIVOS`. La bajada de la marca es «Software a la vanguardia de cada nicho.».
+2. **El renombre:**
+   - Todo lo visible pasa de Yunque a Quvant: el sitio, la app, los metadatos, los datos estructurados, el manifiesto, los íconos, el favicon (`src/app/favicon.ico`, `icon.png`, `apple-icon.png`), la imagen para redes (`opengraph-image.png`, `twitter-image.png`), los usuarios de prueba (`@demo.quvant.app`), las presentaciones, el ticket y el panel.
+   - En el código: `<ConQuvant />` y `<ConQuvantDiscreto />`, y sellos estáticos en `public/marca/con-quvant-*.svg`.
+   - Las claves internas (localStorage, cookies, eventos, base local) pasan a `quvant`. Efecto: en la demo se pierde una vez la sesión guardada.
+   - La variable `QUVANT_PERMITIR_SECRETO_DEV` reemplaza a `YUNQUE_PERMITIR_SECRETO_DEV`, que se sigue leyendo como respaldo (documentado en `.env.example`).
+   - Docs: README, CLAUDE.md, ARQUITECTURA, SEGURIDAD, ROADMAP y FORJA.
+   - Los logos viejos ya no se publican: de `public/marca/` queda solo `antes-yunque-brand-board.png`, como "el antes".
+3. **Material viejo de Forja, oculto hasta la tanda 10:**
+   - la sección del sitio;
+   - la escena de `/inversores`, con su test e2e marcado como omitido;
+   - la frase «Lo firme y lo vivo, trabajando juntos»;
+   - la placa «yunque + forja», que pasa a «FORJA · by Quvant».
+
+   Los videos `public/demo/forja*.mp4` quedan en el repo, pero nada los muestra.
+4. **Componentes base:**
+   - el chip de estado y el punto, cuadrados;
+   - el sello DEMO, sin rotación;
+   - las cifras con `.t-numero-lg`, y los encabezados y paneles con las clases cerradas;
+   - los diálogos sin desenfoque de vidrio;
+   - los avisos con Plex Mono.
+5. **El marco de la app:** el color de la empresa va solo en su logo, en el indicador del módulo activo y en la serie principal de sus gráficos. La barra de color de arriba y el avatar teñido se fueron. Los alias de Yunque se borraron de `globals.css` después de pasar 454 usos a los tokens nuevos.
+6. **Tablero, mostrador y caja:** tres vueltas (ver `BITACORA-ESTETICA.md`), con todos los tamaños en clases cerradas. El resto de los módulos tuvo una pasada: sus textos chicos ya usan `.t-texto-sm`. Capturas en `docs/capturas/quvant/tanda-2/`.
+
+**Verificación:** typecheck sin errores. `next dev` sin errores de página ni de consola en tablero, mostrador, caja, inventario, presupuestos, clientes, reportes e ingreso.
+
+**Sin tocar a propósito:**
+- las migraciones de Supabase ya aplicadas (solo dicen "Yunque" en comentarios);
+- `src/forja/` por dentro (tandas 9 y 10);
+- `docs/PITCH.md` (el guion se reescribe con `/inversores` en la tanda 8);
+- las capturas de la app que usa el sitio (se regeneran en la tanda 7).
+
+## Resumen · tanda 1 de 10 · La marca en el sistema (20/10/2026)
+
+**Estado real:** demo funcional / piloto. Todavía no hay clientes pagando. Sin deploy ni `git push`.
+
+**Qué se hizo**
+1. **Logos** (`public/marca/quvant-*`, generados por `node scripts/marca/generar-marca.mjs`):
+   - La Q cromada oficial, extraída sin cambios del PDF del manual (2000 px con transparencia).
+   - La Q en una tinta (blanca y negra), sacada del alfa del original.
+   - La firma principal y la negativa (SVG y PNG de 2400 px), los favicons (16, 32, 48 y `.ico`), los íconos de la app y la PWA (180, 192, 512, 1024 y *maskable*) y la imagen para redes de 1200×630.
+   - Las proporciones de la firma se midieron en el manual y viven en `src/components/marca/q-geometria.ts`.
+   - Todas las versiones se verificaron sobre negro, sobre claro y en su tamaño mínimo.
+2. **Color:** los tokens del manual, la escala de grises 0 a 13, los cuatro colores de estado y los modos oscuro y claro completos, en un solo lugar (`src/app/globals.css`). Los tokens de Yunque quedan como alias hasta la tanda 2. El test de contraste (`tests/unit/color.test.ts`) lee los valores del CSS: si alguien cambia un token, se entera.
+3. **Tipografía:** Michroma e IBM Plex Mono con `next/font` (se van Inter y JetBrains Mono), `font-synthesis: none` y 13 estilos cerrados (`.t-marca`, `.t-hero`, `.t-titulo`, `.t-texto`, `.t-etiqueta`, `.t-dato` y `.t-numero`, con sus escalones). Documentado en [`docs/TIPOGRAFIA.md`](TIPOGRAFIA.md).
+4. **Componentes de marca** (`src/components/marca/`):
+   - `<Firma />` e `<Isotipo />`: los archivos con `<img>`, con los mínimos y el resguardo.
+   - `<IsotipoAnimado />`: el aro se traza, la cola aparece y el punto salta. Son máscaras sobre el PNG original.
+   - `<Grilla />` y `<SaltoEnGrilla />`, con la geometría pura en `salto-geometria.ts`.
+   - `lanzarSalto()`: reemplaza a la chispa en los cinco lugares donde se lanzaba.
+   - `.lista-punto`: la viñeta cuadrada.
+5. **Lámina** [`docs/marca/quvant-sistema.png`](marca/quvant-sistema.png) (2400×1500, tres vueltas en [`BITACORA-ESTETICA.md`](BITACORA-ESTETICA.md)) y **3 titulares** compuestos como hero en [`docs/marca/quvant-titulares.png`](marca/quvant-titulares.png). Las dos se generan desde `/marca/sistema` con `npx tsx scripts/marca/capturar-lamina.mts`.
+
+**Verificación:**
+- `typecheck`, sin errores. Tests unitarios y de RLS: 164 de 164. `eslint` de lo tocado, limpio.
+- `next dev`: la lámina, el tablero, el mostrador (oscuro y claro) y el sitio cargan sin errores de página. En la consola solo aparecen los avisos de desarrollo de Next sobre navegación instantánea en `/app`, que no tienen que ver con esta tanda.
+- Los e2e no se corrieron (piden `build`). Tres esperan ahora `momento-salto` en lugar de `momento-chispa`.
+
+## Decisiones de la tanda 10
+
+| # | Decisión | Motivo |
+|---|---|---|
+| T10-1 | El rubro es un dato del taller (`TallerForja.rubro`), no de la red. | Lo arma cada fuente: la app dice "comercio" y la demo dice "sucursal" o "distribuidora". El plano 3D y el 2D lo leen igual. |
+| T10-2 | El kiosco tiene su vista, pero ningún kiosco de la demo abre Forja. | Una red de una sola sucursal no muestra nada nuevo. La vista queda lista para un kiosco cliente y tiene su test. |
+| T10-3 | Los videos de Forja avanzan con el reloj de la página entera, no con `__seek` de GSAP. | MapLibre, deck.gl y three.js no viven en el reloj de GSAP. Así cada cuadro sale exacto igual, con la línea de tiempo maestra marcando el guion. |
+| T10-4 | En Forja, "entrar" y "volver" esperan a que termine la transición en curso, en vez de ignorar la orden. | Un Esc o un clic durante el movimiento de cámara se perdía: los tests de teclado fallaban a veces, y a una persona le pasaría lo mismo. |
+| T10-5 | Los racks de la Forja del grupo usan el stock de esa sucursal (`stockGrupo`), el mismo que muestra la demo. | Antes dividía el stock total entre 40 y casi todo salía "sin stock". |
+
 ## Resumen · tanda 9 de 10 · Forja: la base y la activación (20/10/2026)
 
 **La base en negro y blanco** (`src/forja/ui/taller/materiales.ts`, `red/estilo-mapa.ts`):
@@ -360,8 +795,11 @@
 
 ## Para Michel
 
-> Al día con la tanda 9. Lo que tenés que elegir, completar o mirar, de lo más nuevo a lo más viejo.
+> Al día con la tanda 10 (el final del boceto). Lo que tenés que elegir, completar o mirar, de lo más nuevo a lo más viejo.
 
+1. **Mirá Forja en la demo del grupo** (`/demo?empresa=grupo` → Forja): la red de 40 sucursales, entrar a una (salón y depósito, cajas y carga) y la repetición del día. Y en la distribuidora, los andenes con sus camiones.
+2. **Los videos de Forja:** `public/demo/forja.mp4` y `forja-ferremix.mp4`. Se vuelven a filmar con `npm run filmar-forja` (con el build corriendo en el 3020).
+3. **El reporte final** está arriba de todo, y lo que falta, en `docs/PENDIENTE-CIERRE.md`. El paso siguiente es `PROMPT-QUVANT-CIERRE.md`, una fase por sesión.
 1. **Mirá la activación de Forja:** en `/demo`, el grupo o la distribuidora, módulo Forja (la primera vez en la visita), o en `/forja`. Tiene que sentirse como la marca: la Q se traza, el punto salta y el mapa se enciende.
 2. **El nombre y la frase:** «FORJA · by Quvant» y «Todo el negocio, en vivo.» (BORRADOR, en `src/config/forja.ts`). Alternativas: «Cada sucursal, en tiempo real.» o «El día entero, de un vistazo.». Elegí una o escribí la tuya; cuando la confirmes, `fraseBorrador` pasa a `false`.
 3. **La escala de calor** es la única excepción a la paleta: ahora es discreta (del gris al blanco, con un tibio apagado en el medio). Fijate si te convence o si la querés todavía más sobria.

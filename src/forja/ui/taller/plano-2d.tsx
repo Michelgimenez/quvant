@@ -161,7 +161,7 @@ export function Plano2D({
         ))}
 
         {/* Servicio técnico: estante de retiro y bancos con su orden */}
-        <rect x={plano.estanteRetiro.x} y={plano.estanteRetiro.z} width={plano.estanteRetiro.ancho} height={plano.estanteRetiro.fondo} fill={COLOR.estante} className="pointer-events-none" />
+        {plano.estanteRetiro.ancho > 0 && <rect x={plano.estanteRetiro.x} y={plano.estanteRetiro.z} width={plano.estanteRetiro.ancho} height={plano.estanteRetiro.fondo} fill={COLOR.estante} className="pointer-events-none" />}
         {plano.retiro.map((r) => (
           <rect key={r.banco.id} x={r.x - 0.16} y={r.z - 0.14 + (r.y > 0.5 ? 0.06 : -0.06)} width={0.32} height={0.24} fill={r.banco.estado === "listo" ? COLOR.blancoCaliente : COLOR.equipo} opacity={r.banco.estado === "listo" ? 0.8 : 0.6} className="cursor-pointer" onClick={() => elegirZona({ tipo: "servicio", id: r.banco.id })} />
         ))}
@@ -178,7 +178,19 @@ export function Plano2D({
             ))}
           </g>
         ))}
-        {!plano.palets.length && <Nota r={plano.zonas.find((z) => z.tipo === "muelle")!} texto="Sin entregas pendientes" />}
+        {/* La distribuidora: los camiones en sus andenes */}
+        {plano.camiones.map((c) => (
+          <g key={c.bulto.id} className="cursor-pointer" onClick={() => elegirZona({ tipo: "muelle", id: c.bulto.id })}>
+            <rect x={c.x - 1.2} y={c.z - 2.5} width={2.4} height={5} fill={c.enViaje ? COLOR.losa : COLOR.lineaPiso} />
+            {!c.enViaje && (
+              <>
+                <rect x={c.x - 0.95} y={c.z - 2.15} width={1.9} height={3.2} fill={COLOR.equipo} />
+                <rect x={c.x - 0.9} y={c.z + 1.05} width={1.8} height={1} fill={COLOR.acero} />
+              </>
+            )}
+          </g>
+        ))}
+        {!plano.palets.length && !plano.camiones.length && plano.zonas.some((z) => z.tipo === "muelle") && <Nota r={plano.zonas.find((z) => z.tipo === "muelle")!} texto="Sin entregas pendientes" />}
 
         {/* Portón: brasa si hay mercadería en camino (encima de las zonas) */}
         <line x1={x0} y1={plano.porton.z - plano.porton.ancho / 2} x2={x0} y2={plano.porton.z + plano.porton.ancho / 2} stroke={enTransito ? COLOR.blancoCaliente : COLOR.lineaPiso} strokeWidth={2} {...NO_ESCALA} className="pointer-events-none" />

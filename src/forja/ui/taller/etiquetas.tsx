@@ -46,7 +46,7 @@ export function anclasTaller(plano: PlanoTaller, taller: TallerForja): Ancla[] {
   const servicio = zonaDe(plano, "servicio")
   if (servicio && !plano.retiro.length && plano.bancos.every((b) => !b.banco)) anclas.push({ id: "nota:servicio", tipo: "nota", texto: "Sin órdenes activas", pos: [servicio.x + servicio.ancho / 2, 0.05, servicio.z + servicio.fondo / 2 + 1] })
   const muelle = zonaDe(plano, "muelle")
-  if (muelle && !plano.palets.length) anclas.push({ id: "nota:muelle", tipo: "nota", texto: "Sin entregas pendientes", pos: [muelle.x + muelle.ancho / 2 + 1, 0.05, muelle.z + muelle.fondo / 2] })
+  if (muelle && !plano.palets.length && !plano.camiones.length) anclas.push({ id: "nota:muelle", tipo: "nota", texto: "Sin entregas pendientes", pos: [muelle.x + muelle.ancho / 2 + 1, 0.05, muelle.z + muelle.fondo / 2] })
   return anclas
 }
 

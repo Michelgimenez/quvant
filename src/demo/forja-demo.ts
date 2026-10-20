@@ -5,7 +5,7 @@ import { HORAS_HABILES, type EventoForja, type FlujoForja, type NodoForja, type 
 import { hash, u01 } from "./azar"
 import { ZONAS_DISTRIBUIDORA } from "./catalogos"
 import { datosEmpresa } from "./datos"
-import { ANCLA_MS, CURVAS } from "./generar"
+import { ANCLA_MS, CURVAS, stockGrupo } from "./generar"
 import { eventosEntre } from "./simulador"
 
 /**
@@ -200,10 +200,15 @@ function eventos(m: Mundo, t: number): EventoForja[] {
   return lista.sort((a, b) => a.en.localeCompare(b.en))
 }
 
-/** El taller de una sede: sus puestos, los racks del depósito (por categoría) y lo que espera en el muelle. */
+/**
+ * El local por dentro, según el rubro: en el grupo, una sucursal de la cadena (salón y depósito, cajas y carga);
+ * en la distribuidora, el depósito con sus andenes y camiones. Una zona de reparto no es un edificio: muestra el
+ * depósito con los camiones que van hacia esa zona.
+ */
 function taller(m: Mundo, id: IdForjaDemo, sedeId: string, t: number): TallerForja | null {
-  const i = m.sedes.findIndex((s) => s.id === sedeId)
-  if (i < 0) return null
+  const pedida = m.sedes.findIndex((s) => s.id === sedeId)
+  if (pedida < 0) return null
+  const i = id === "distribuidora" ? 0 : pedida
   const s = m.sedes[i]
   const datos = datosEmpresa(id)
   const propias = m.ventas.filter((v) => v.sede === i && v.t <= t)
@@ -212,12 +217,19 @@ function taller(m: Mundo, id: IdForjaDemo, sedeId: string, t: number): TallerFor
     return { puesto: p + 1, ventasHoy: delPuesto.length, importeHoy: delPuesto.reduce((a, v) => a + v.importe, 0), cajaAbierta: true, sinConexion: 0, ultimaVenta: delPuesto.length ? iso(delPuesto[delPuesto.length - 1].t) : null }
   })
   const categorias = [...new Set(datos.productos.map((p) => p.categoria))].slice(0, 8)
-  const racks: RackForja[] = categorias.map((cat, c) => {
+  const indice = new Map(datos.productos.map((p, k) => [p.id, k]))
+  // Cada categoría, una sección con cuatro racks (A a D) de hasta 10 productos.
+  const racks: RackForja[] = categorias.flatMap((cat, c) =>
+    [0, 1, 2, 3].map((letra) => rackDe(cat, c, letra)),
+  )
+  function rackDe(cat: string, c: number, letra: number): RackForja {
+    const codigo = `${cat.slice(0, 2).toUpperCase()}${c}`
     const productos = datos.productos
       .filter((p) => p.categoria === cat)
-      .slice(0, 24)
+      .slice(letra * 10, letra * 10 + 10)
       .map((p, j) => {
-        const cantidad = Math.max(0, Math.round(p.stock / (id === "grupo" ? 40 : 1) + (hash(sedeId, p.id) % 9) - 4))
+        // En el grupo, el stock de esta sucursal (el mismo que muestra la demo); en la distribuidora, el del depósito.
+        const cantidad = id === "grupo" ? stockGrupo(indice.get(p.id) ?? 0, i) : Math.max(0, p.stock + (hash(sedeId, p.id) % 9) - 4)
         const ilustracion = ILUSTRACIONES[hash(cat) % ILUSTRACIONES.length] as Ilustracion
         return { productoId: p.id, nombre: p.nombre, sku: p.sku, cantidad, minimo: Math.max(1, Math.round(p.minimo / (id === "grupo" ? 40 : 1))), estante: 1 + (j % 12), ilustracion }
       })
@@ -226,21 +238,33 @@ function taller(m: Mundo, id: IdForjaDemo, sedeId: string, t: number): TallerFor
       return del.length ? Math.min(1, del.reduce((a, p) => a + p.cantidad / Math.max(1, p.minimo * 3), 0) / del.length) : 0
     })
     return {
-      id: `${cat.slice(0, 2).toUpperCase()}-${String.fromCharCode(65 + c)}`,
-      categoria: cat.slice(0, 2).toUpperCase(),
+      id: `${codigo}-${String.fromCharCode(65 + letra)}`,
+      categoria: codigo,
       categoriaNombre: cat,
-      pasillo: String(1 + Math.floor(c / 2)),
+      // La letra del rack (A, B, C, D): el plano la usa para ubicarlo en su sección.
+      pasillo: String.fromCharCode(65 + letra),
       productos,
       unidades: productos.reduce((a, p) => a + p.cantidad, 0),
       criticos: productos.filter((p) => p.cantidad > 0 && p.cantidad <= p.minimo).length,
       sinStock: productos.filter((p) => p.cantidad <= 0).length,
       niveles,
     }
-  })
-  const muelle = m.transferencias
-    .filter((tr) => tr.estado === "en_transito" && (tr.desdeId === sedeId || tr.haciaId === sedeId))
-    .map((tr) => ({ id: tr.id, tipo: "transferencia" as const, estado: "en_transito" as const, detalle: tr.items.map((it) => it.nombre).join(" · "), franja: null, destinoId: tr.haciaId }))
-  return { sucursalId: sedeId, puestos, racks, bancos: [], muelle }
+  }
+  const muelle: TallerForja["muelle"] =
+    id === "distribuidora"
+      ? [
+          // Los camiones del reparto (los que están en la calle dejan el andén vacío) y dos que cargan para mañana.
+          ...m.transferencias
+            .filter((tr) => pedida === 0 || tr.haciaId === sedeId)
+            .map((tr) => ({ id: tr.id, tipo: "transferencia" as const, estado: tr.estado, detalle: tr.items.map((it) => it.nombre).join(" · "), franja: null, destinoId: tr.haciaId })),
+          ...(pedida === 0
+            ? [5, 6].map((n) => ({ id: `camion-${n}`, tipo: "transferencia" as const, estado: "pendiente" as const, detalle: `Camión ${n} · cargando los pedidos de mañana`, franja: "mañana" as const, destinoId: null }))
+            : []),
+        ]
+      : m.transferencias
+          .filter((tr) => tr.estado === "en_transito" && (tr.desdeId === sedeId || tr.haciaId === sedeId))
+          .map((tr) => ({ id: tr.id, tipo: "transferencia" as const, estado: "en_transito" as const, detalle: tr.items.map((it) => it.nombre).join(" · "), franja: null, destinoId: tr.haciaId }))
+  return { rubro: id === "grupo" ? "sucursal" : "distribuidora", sucursalId: sedeId, puestos: id === "distribuidora" ? [] : puestos, racks, bancos: [], muelle }
 }
 
 /**

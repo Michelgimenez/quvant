@@ -158,3 +158,17 @@ Se compone a 1600×1000 y se captura a 1,5× (2400×1500). Así los estilos de t
 - Los arcos, las estelas y los bultos en blanco.
 - La activación toma los puntos una vez y termina en 4,5 s.
 
+## Tanda 10 · Forja por rubro (`docs/capturas/quvant/tanda-10/`)
+
+**Vuelta 1**
+- La sucursal del grupo se lee como un local de cadena: el salón con sus racks al fondo, una fila larga de cajas y la carga al costado. La distribuidora, como un depósito: racks al fondo y una fila de andenes al frente.
+- Quedaba:
+  - los racks ralos (uno por categoría, perdidos en secciones anchas);
+  - la nota "Sin entregas pendientes" encima de los andenes;
+  - con todos los camiones en la calle a las 17:30, los andenes vacíos no contaban nada.
+
+**Vuelta 2**
+- Cuatro racks por categoría.
+- La nota solo cuando no hay ni entregas ni camiones.
+- Dos camiones que cargan los pedidos de mañana: un andén ocupado al lado de los vacíos cuenta el reparto de un vistazo.
+

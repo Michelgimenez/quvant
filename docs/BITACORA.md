@@ -129,3 +129,17 @@ const paso = useSyncExternalStore(reloj.suscribir, () => Math.floor(reloj.ahora(
 
 Si el valor no cambia, React no vuelve a pintar. Una animación con su propio reloj tiene que fijar lo que necesita al empezar.
 
+## Tanda 10 · El rubro como dato, no como pantalla
+
+La primera tentación para "la vista por dentro según el rubro" era hacer cuatro escenas 3D. En cambio, el rubro es un campo más del taller, y el plano decide qué zonas hay y dónde:
+
+```ts
+function zonasDe(rubro: RubroTaller, conMostrador: boolean): Partial<Record<TipoZona, Rect>> {
+  if (rubro === "kiosco") return { deposito: GONDOLAS, mostrador: CAJA }
+  if (rubro === "distribuidora") return { deposito: DEPOSITO, muelle: ANDENES }
+  // …
+}
+```
+
+La escena 3D y el plano 2D no saben de rubros: dibujan las zonas que hay. El servicio técnico se dibuja solo si existe; el muelle, igual; los camiones son una lista más del plano. Un rubro nuevo es una entrada más en `zonasDe` y un test.
+

@@ -89,7 +89,7 @@ export const FEATURES: Feature[] = [
   { id: "mercadolibre", nombre: "Mercado Libre", frase: "Stock y precios sincronizados con tus publicaciones.", estado: "próximamente", escena: "integraciones" },
   { id: "app-deposito", nombre: "App de depósito", frase: "Picking y recepción desde el celular, con lector.", estado: "próximamente", escena: "stock", nota: "Hoy el depósito usa la app web adaptada al celular." },
   { id: "migraciones", nombre: "Migración asistida", frase: "Traemos los datos de tu sistema anterior.", estado: "próximamente", escena: "plataforma", nota: "El importador de Excel/CSV existe; los conectores por sistema de origen no." },
-  { id: "forja", nombre: "Forja: el taller conectado", frase: "Todas las sucursales en vivo: ventas, stock, transferencias y reparaciones.", estado: "demo", escena: "forja", nota: "Se puede probar en /forja (la empresa de demostración y su simulador) y dentro de /demo, en el grupo y la distribuidora: la red de sucursales, cada sucursal por dentro, la repetición del día y la sala de control. Falta conectarla a una base real con clientes." },
+  { id: "forja", nombre: "Forja: el taller conectado", frase: "Todas las sucursales en vivo: ventas, stock, transferencias y reparaciones.", estado: "demo", escena: "forja", nota: "Se puede probar en /forja (la empresa de demostración y su simulador) y dentro de /demo, en el grupo y la distribuidora: la red de sucursales, cada local por dentro según su rubro (comercio, kiosco, distribuidora o sucursal de cadena), la repetición del día y la sala de control. Falta conectarla a una base real con clientes." },
 ]
 
 export function featuresPorEstado(estado: EstadoFeature) {

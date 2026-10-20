@@ -4,7 +4,7 @@ import { Component, Suspense, lazy, useEffect, useMemo, useRef, useState } from 
 import type { FuenteForja } from "@/forja/datos/fuente"
 import type { NodoForja, TallerForja } from "@/forja/dominio/modelo"
 import type { Pieza } from "@/forja/dominio/pieza"
-import { NOMBRE_ZONA, TIPOS_ZONA, estadoBloque, planoTaller, type PlanoTaller, type TipoZona } from "@/forja/dominio/plano"
+import { TIPOS_ZONA, estadoBloque, nombreZona, planoTaller, type PlanoTaller, type TipoZona } from "@/forja/dominio/plano"
 import { cn } from "@/lib/utils"
 import { useEscenaForja } from "../store"
 import { moverConFlechas } from "../teclado"
@@ -157,7 +157,7 @@ function BarraZonas({ plano, taller }: { plano: PlanoTaller; taller: TallerForja
             )}
             data-testid={`zona-${t}`}
           >
-            <span className="block text-xs font-semibold text-blanco">{NOMBRE_ZONA[t]}</span>
+            <span className="block text-xs font-semibold text-blanco">{nombreZona(plano.rubro, t)}</span>
             <span className="block font-mono text-[10px] text-acero">{resumenZona(t, taller)}</span>
           </button>
         )

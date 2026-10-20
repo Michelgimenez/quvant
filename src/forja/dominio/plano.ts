@@ -1,5 +1,5 @@
 import type { Id } from "@/dominio/tipos"
-import type { BancoForja, BultoForja, ProductoRack, PuestoForja, RackForja, TallerForja } from "./modelo"
+import type { BancoForja, BultoForja, ProductoRack, PuestoForja, RackForja, RubroTaller, TallerForja } from "./modelo"
 
 /**
  * Plano de planta de una sucursal (nivel 2), en metros. x crece hacia la
@@ -26,8 +26,11 @@ export type BancoPlano = { banco: BancoForja | null; x: number; z: number }
 /** Equipos listos o sin reparación, esperando que los retiren. */
 export type RetiroPlano = { banco: BancoForja; x: number; y: number; z: number }
 export type PaletPlano = { bulto: BultoForja; x: number; z: number; cajas: number }
+/** Un camión de reparto en su andén (la distribuidora): mira hacia el frente, con la caja contra el depósito. */
+export type CamionPlano = { bulto: BultoForja; x: number; z: number; enViaje: boolean }
 
 export type PlanoTaller = {
+  rubro: RubroTaller
   ancho: number
   fondo: number
   zonas: ZonaPlano[]
@@ -40,6 +43,7 @@ export type PlanoTaller = {
   retiro: RetiroPlano[]
   estanteRetiro: Rect
   palets: PaletPlano[]
+  camiones: CamionPlano[]
   /** Portón del muelle sobre la pared izquierda (z del centro y ancho). */
   porton: { z: number; ancho: number }
   /** Punto por donde salen las transferencias (afuera del portón). */
@@ -60,6 +64,43 @@ export const NOMBRE_ZONA: Record<TipoZona, string> = {
   deposito: "Depósito",
   servicio: "Servicio técnico",
   muelle: "Carga y entregas",
+}
+
+/** Los nombres que cambian con el rubro (lo demás, NOMBRE_ZONA). */
+const NOMBRE_POR_RUBRO: Partial<Record<RubroTaller, Partial<Record<TipoZona, string>>>> = {
+  kiosco: { deposito: "Góndolas" },
+  sucursal: { deposito: "Salón y depósito" },
+  distribuidora: { muelle: "Andenes y camiones" },
+}
+
+export function nombreZona(rubro: RubroTaller, tipo: TipoZona) {
+  return NOMBRE_POR_RUBRO[rubro]?.[tipo] ?? NOMBRE_ZONA[tipo]
+}
+
+/** Las zonas de cada rubro, en el mismo corte de 26 × 18 m (lo alto al fondo, lo bajo al frente). */
+function zonasDe(rubro: RubroTaller, conMostrador: boolean): Partial<Record<TipoZona, Rect>> {
+  if (rubro === "kiosco")
+    return {
+      deposito: { x: X0 + 0.6, z: Z0 + 0.6, ancho: 15.6, fondo: 16.8 },
+      ...(conMostrador ? { mostrador: { x: X0 + 16.8, z: Z0 + 7.6, ancho: 8.6, fondo: 9.8 } } : {}),
+    }
+  if (rubro === "distribuidora")
+    return {
+      deposito: { x: X0 + 0.6, z: Z0 + 0.6, ancho: 24.8, fondo: 10.2 },
+      muelle: { x: X0 + 0.6, z: Z0 + 11.4, ancho: 24.8, fondo: 6 },
+    }
+  if (rubro === "sucursal")
+    return {
+      deposito: { x: X0 + 0.6, z: Z0 + 0.6, ancho: 24.8, fondo: 9.8 },
+      ...(conMostrador ? { mostrador: { x: X0 + 10.8, z: Z0 + 11, ancho: 14.6, fondo: 6.4 } } : {}),
+      muelle: { x: X0 + 0.6, z: Z0 + 11, ancho: 9.6, fondo: 6.4 },
+    }
+  return {
+    deposito: { x: X0 + 0.6, z: Z0 + 0.6, ancho: 14.2, fondo: 11.6 },
+    servicio: { x: X0 + 15.6, z: Z0 + 0.6, ancho: 9.8, fondo: 8.2 },
+    ...(conMostrador ? { mostrador: { x: X0 + 15.6, z: Z0 + 9.6, ancho: 9.8, fondo: 7.8 } } : {}),
+    muelle: { x: X0 + 0.6, z: Z0 + 13, ancho: 14.2, fondo: 4.4 },
+  }
 }
 
 /** Estado de un producto en el estante: sin stock (hueco), crítico (ámbar) o normal (frío). */
@@ -100,24 +141,23 @@ function hash(id: string, n: number) {
 }
 
 export function planoTaller(t: TallerForja, tipo: "sucursal" | "deposito"): PlanoTaller {
+  const rubro: RubroTaller = t.rubro ?? "comercio"
   const conMostrador = tipo === "sucursal" && t.puestos.length > 0
-  const zDeposito: Rect = { x: X0 + 0.6, z: Z0 + 0.6, ancho: 14.2, fondo: 11.6 }
-  const zServicio: Rect = { x: X0 + 15.6, z: Z0 + 0.6, ancho: 9.8, fondo: 8.2 }
-  const zMostrador: Rect = { x: X0 + 15.6, z: Z0 + 9.6, ancho: 9.8, fondo: 7.8 }
-  const zMuelle: Rect = { x: X0 + 0.6, z: Z0 + 13, ancho: 14.2, fondo: 4.4 }
+  const z = zonasDe(rubro, conMostrador)
+  const zDeposito = z.deposito!
+  // Las que el rubro no tiene quedan como rectángulos vacíos (no se dibujan ni se listan).
+  const VACIO: Rect = { x: X0, z: Z0, ancho: 0, fondo: 0 }
+  const zServicio = z.servicio ?? VACIO
+  const zMostrador = z.mostrador ?? VACIO
+  const zMuelle = z.muelle ?? VACIO
 
-  const zonas: ZonaPlano[] = [
-    { tipo: "deposito", nombre: NOMBRE_ZONA.deposito, ...zDeposito },
-    { tipo: "servicio", nombre: NOMBRE_ZONA.servicio, ...zServicio },
-    ...(conMostrador ? [{ tipo: "mostrador" as const, nombre: NOMBRE_ZONA.mostrador, ...zMostrador }] : []),
-    { tipo: "muelle", nombre: NOMBRE_ZONA.muelle, ...zMuelle },
-  ]
+  const zonas: ZonaPlano[] = TIPOS_ZONA.flatMap((tz) => (z[tz] ? [{ tipo: tz, nombre: nombreZona(rubro, tz), ...z[tz]! }] : []))
 
-  // ── Depósito: una sección por categoría (3 por fila) y un rack por letra de la ubicación ──
+  // ── Depósito: una sección por categoría (3 o 4 por fila) y un rack por letra de la ubicación ──
   const porCategoria = new Map<string, RackForja[]>()
   for (const r of t.racks) porCategoria.set(r.categoria, [...(porCategoria.get(r.categoria) ?? []), r])
   const categorias = [...porCategoria.keys()].sort()
-  const COLS = 3
+  const COLS = zDeposito.ancho > 20 ? 4 : 3
   const margen = 0.5
   const separacion = 0.6
   const anchoSeccion = (zDeposito.ancho - 2 * margen - (COLS - 1) * separacion) / COLS
@@ -168,13 +208,14 @@ export function planoTaller(t: TallerForja, tipo: "sucursal" | "deposito"): Plan
   })
 
   // ── Mostrador: un puesto por caja sobre el mostrador ──
-  const mostrador: Rect | null = conMostrador ? { x: zMostrador.x + 0.8, z: zMostrador.z + 2.6, ancho: zMostrador.ancho - 1.6, fondo: 0.7 } : null
+  const mostrador: Rect | null = z.mostrador ? { x: zMostrador.x + 0.8, z: zMostrador.z + Math.min(2.6, zMostrador.fondo * 0.4), ancho: zMostrador.ancho - 1.6, fondo: 0.7 } : null
   const puestos = mostrador ? t.puestos.map((puesto, i) => ({ puesto, x: mostrador.x + (mostrador.ancho / t.puestos.length) * (i + 0.5), z: mostrador.z + mostrador.fondo / 2 })) : []
 
   // ── Servicio técnico: estante de retiro contra la pared y bancos con las órdenes en curso ──
-  const enBanco = t.bancos.filter((b) => !ESTADOS_RETIRO.has(b.estado))
-  const paraRetirar = t.bancos.filter((b) => ESTADOS_RETIRO.has(b.estado))
-  const estanteRetiro: Rect = { x: zServicio.x + 0.5, z: zServicio.z + 0.3, ancho: zServicio.ancho - 1, fondo: 0.5 }
+  const conServicio = Boolean(z.servicio)
+  const enBanco = conServicio ? t.bancos.filter((b) => !ESTADOS_RETIRO.has(b.estado)) : []
+  const paraRetirar = conServicio ? t.bancos.filter((b) => ESTADOS_RETIRO.has(b.estado)) : []
+  const estanteRetiro: Rect = conServicio ? { x: zServicio.x + 0.5, z: zServicio.z + 0.3, ancho: zServicio.ancho - 1, fondo: 0.5 } : VACIO
   const porFila = 12
   const retiro = paraRetirar.slice(0, porFila * 2).map((banco, i) => ({
     banco,
@@ -184,15 +225,21 @@ export function planoTaller(t: TallerForja, tipo: "sucursal" | "deposito"): Plan
   }))
   const cantidadBancos = Math.max(3, Math.min(12, enBanco.length))
   const areaBancos: Rect = { x: zServicio.x + 0.3, z: zServicio.z + 1.5, ancho: zServicio.ancho - 0.6, fondo: zServicio.fondo - 1.8 }
-  const bancos = grilla(cantidadBancos, areaBancos, 3.05, 2.2).map((p, i) => ({ banco: enBanco[i] ?? null, x: p.x, z: p.z }))
+  const bancos = conServicio ? grilla(cantidadBancos, areaBancos, 3.05, 2.2).map((p, i) => ({ banco: enBanco[i] ?? null, x: p.x, z: p.z })) : []
 
   // ── Carga y entregas: un palet por entrega pendiente; lo despachado ya no está en el muelle ──
-  const pendientes = t.muelle.filter((b) => b.tipo === "entrega" && b.estado === "pendiente").slice(0, 12)
-  const areaPalets: Rect = { x: zMuelle.x + 2.2, z: zMuelle.z + 0.6, ancho: zMuelle.ancho - 2.8, fondo: zMuelle.fondo - 1 }
+  // La distribuidora: los camiones del reparto en sus andenes (los que están en viaje dejan el andén vacío).
+  const camionesBultos = rubro === "distribuidora" ? t.muelle.filter((b) => b.tipo === "transferencia").slice(0, 6) : []
+  const pasoAnden = z.muelle ? Math.min(3.6, (zMuelle.ancho - 3) / Math.max(1, camionesBultos.length)) : 0
+  const camiones: CamionPlano[] = camionesBultos.map((bulto, i) => ({ bulto, x: zMuelle.x + 3 + pasoAnden * i + pasoAnden / 2, z: zMuelle.z + zMuelle.fondo / 2, enViaje: bulto.estado === "en_transito" }))
+  const pendientes = z.muelle ? t.muelle.filter((b) => b.tipo === "entrega" && b.estado === "pendiente").slice(0, 12) : []
+  const areaPalets: Rect = rubro === "distribuidora" ? { x: zMuelle.x + 0.4, z: zMuelle.z + 0.4, ancho: 2.4, fondo: zMuelle.fondo - 0.8 } : { x: zMuelle.x + 2.2, z: zMuelle.z + 0.6, ancho: zMuelle.ancho - 2.8, fondo: zMuelle.fondo - 1 }
   const palets = grilla(pendientes.length, areaPalets, 1.7, 1.7).map((p, i) => ({ bulto: pendientes[i], x: p.x, z: p.z, cajas: 1 + hash(pendientes[i].id, 3) }))
-  const porton = { z: zMuelle.z + zMuelle.fondo / 2, ancho: 3.2 }
+  // El portón: sobre la pared izquierda, a la altura del muelle (en el kiosco, la puerta del frente).
+  const porton = { z: z.muelle ? zMuelle.z + zMuelle.fondo / 2 : Z0 + FONDO - 3, ancho: 3.2 }
 
   return {
+    rubro,
     ancho: ANCHO,
     fondo: FONDO,
     zonas,
@@ -205,6 +252,7 @@ export function planoTaller(t: TallerForja, tipo: "sucursal" | "deposito"): Plan
     retiro,
     estanteRetiro,
     palets,
+    camiones,
     porton,
     salida: { x: X0 - 4, z: porton.z },
   }

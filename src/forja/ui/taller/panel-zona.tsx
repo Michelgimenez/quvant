@@ -7,7 +7,7 @@ import { NOMBRE_ESTADO_SERVICIO } from "@/dominio/servicio"
 import type { EnlacesForja } from "@/forja/datos/fuente"
 import type { BancoForja, NodoForja, RedForja, TallerForja } from "@/forja/dominio/modelo"
 import type { Pieza } from "@/forja/dominio/pieza"
-import { NOMBRE_ZONA, estadoBloque, type PlanoTaller, type TipoZona } from "@/forja/dominio/plano"
+import { estadoBloque, nombreZona, type PlanoTaller, type TipoZona } from "@/forja/dominio/plano"
 import { cn } from "@/lib/utils"
 import { duracionHoras, hora } from "../formato"
 import { useEscenaForja } from "../store"
@@ -27,18 +27,18 @@ type Props = {
 /** Panel lateral del taller: los datos de Quvant de la zona y enlaces directos al módulo. */
 export function PanelZona(props: Props) {
   const elegirZona = useEscenaForja((s) => s.elegirZona)
-  const { zona, nodo } = props
+  const { zona, nodo, plano } = props
   return (
     <aside
       className="pointer-events-auto absolute inset-x-0 bottom-0 z-20 flex max-h-[58%] flex-col rounded-t-2xl border border-white/10 bg-negro/95 text-blanco shadow-2xl backdrop-blur md:inset-x-auto md:bottom-4 md:right-4 md:top-4 md:max-h-none md:w-[360px] md:rounded-2xl"
-      aria-label={`${NOMBRE_ZONA[zona.tipo]} de ${nodo.nombre}`}
+      aria-label={`${nombreZona(plano.rubro, zona.tipo)} de ${nodo.nombre}`}
       data-testid="panel-zona"
       data-zona={zona.tipo}
     >
       <header className="flex items-start justify-between gap-2 border-b border-white/10 px-4 py-3">
         <div className="min-w-0">
           <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-acero">{nodo.nombre}</p>
-          <h2 className="mt-0.5 font-heading text-lg font-extrabold leading-tight">{NOMBRE_ZONA[zona.tipo]}</h2>
+          <h2 className="mt-0.5 font-heading text-lg font-extrabold leading-tight">{nombreZona(plano.rubro, zona.tipo)}</h2>
         </div>
         <button type="button" onClick={() => elegirZona(null)} className="rounded-md p-1.5 text-acero hover:text-blanco focus-visible:outline focus-visible:outline-1 focus-visible:outline-foreground" aria-label="Cerrar panel">
           <X className="size-4" />

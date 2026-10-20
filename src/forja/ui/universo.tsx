@@ -177,7 +177,16 @@ function Escena({
   async function entrar(id: Id) {
     const st = store.getState()
     const nodo = red.nodos.find((n) => n.id === id)
-    if (st.transicion || st.nivel === "taller" || st.sala || !nodo) return
+    if (st.nivel === "taller" || st.sala || !nodo) return
+    // Si hay una transición en curso (volver de una pieza, por ejemplo), entra cuando termina: el clic no se pierde.
+    if (st.transicion) {
+      const dejar = store.subscribe((s) => {
+        if (s.transicion) return
+        dejar()
+        void entrar(id)
+      })
+      return
+    }
     if (st.nivel === "pieza") st.verPieza(null)
     alEntrar?.(id)
     // En 2D no hay vuelo ni descenso de cámara: el mismo camino corto que con movimiento reducido
@@ -209,7 +218,16 @@ function Escena({
 
   async function volver() {
     const st = store.getState()
-    if (st.transicion || st.nivel !== "taller" || !st.sucursalId) return
+    if (st.nivel !== "taller" || !st.sucursalId) return
+    // Si todavía se está entrando (o hay otra transición), "volver" espera a que termine: un Esc no se pierde.
+    if (st.transicion) {
+      const dejar = store.subscribe((s) => {
+        if (s.transicion) return
+        dejar()
+        void volver()
+      })
+      return
+    }
     const id = st.sucursalId
     const nodo = red.nodos.find((n) => n.id === id)
     const reducir = reducirMovimiento() || es2D

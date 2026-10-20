@@ -3,6 +3,7 @@ import { TextoConfig } from "@/components/base/sellos"
 import { EncabezadoSitio } from "@/components/sitio/encabezado-sitio"
 import { FormularioDemo } from "@/components/sitio/formulario-demo"
 import { Hero } from "@/components/sitio/hero"
+import { SeccionForja } from "@/components/sitio/seccion-forja"
 import { DemoConexionPerezosa, PreciosAlDiaPerezoso } from "@/components/sitio/interactivos"
 import { CuatroNegocios, DesarrolloAMedida, Encabezado, EstadoProducto, Modulos, PieSitio, Planes, Preguntas, Problema, Seguridad } from "@/components/sitio/secciones"
 import { PRECIOS } from "@/config/precios"
@@ -80,7 +81,7 @@ export default function Inicio() {
           <PreciosAlDiaPerezoso />
         </section>
 
-        {/* Forja con la marca nueva vuelve en la tanda 10 (el material viejo mostraba el yunque). */}
+        <SeccionForja />
 
         <Seguridad />
         <Planes />

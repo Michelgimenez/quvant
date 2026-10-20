@@ -81,3 +81,11 @@ Lo que el modo boceto deja para después: celular, respaldos, accesibilidad fina
 - **Rendimiento (fase 4):** Forja del grupo arma ~2.500 eventos del día. Medir el tiempo de la repetición y del mapa con 40 nodos en una máquina modesta.
 - **Accesibilidad (fase 3):** con 40 sucursales, los nombres ocultos siguen en el `aria-label` de cada nodo. Verificarlo con un lector de pantalla.
 
+## De la tanda 10 · Forja por rubro y el final
+
+- **Forja por rubro:** el kiosco tiene su vista pero ningún kiosco de la demo abre Forja. Con un cliente real, probarla con sus datos. La vista de la zona de reparto (el depósito con los camiones hacia esa zona) es una aproximación: revisarla con una distribuidora real.
+- **Los videos de Forja (fase 8):** volver a filmarlos con el logo oficial. Revisar el póster (se toma en el segundo 14).
+- **El paquete `motion`** sigue instalado sin uso (de la tanda 8).
+- **El proceso de `next start`:** en Windows, detener la tarea no siempre mata el proceso hijo. Si un puerto queda ocupado, cerrarlo antes de volver a filmar (un servidor viejo sirve un build viejo).
+- **Lint:** limpio en `src`, `scripts` y `tests` al cierre de la tanda 10.
+

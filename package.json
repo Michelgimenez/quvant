@@ -17,7 +17,8 @@
     "verificar": "npm run typecheck && npm run lint && npm run test && npm run build",
     "sellos": "node scripts/generar-sellos.mjs",
     "snapshot-forja": "tsx scripts/generar-snapshot-forja.ts",
-    "grabar-forja": "tsx scripts/grabar-forja.mjs"
+    "filmar": "tsx scripts/videos/filmar.mts",
+    "filmar-forja": "tsx scripts/videos/filmar-forja.mts"
   },
   "dependencies": {
     "@deck.gl/core": "^9.3.11",

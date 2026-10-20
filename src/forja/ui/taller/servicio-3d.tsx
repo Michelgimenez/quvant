@@ -18,6 +18,8 @@ export function Servicio3D({ plano }: { plano: PlanoTaller }) {
   const elegirZona = useEscenaForja((s) => s.elegirZona)
   const elegido = zona?.tipo === "servicio" ? zona.id : null
   const e = plano.estanteRetiro
+  // El kiosco, la distribuidora y la sucursal de una cadena no tienen servicio técnico.
+  if (!plano.zonas.some((z) => z.tipo === "servicio")) return null
 
   return (
     <group>

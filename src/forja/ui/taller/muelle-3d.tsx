@@ -17,10 +17,41 @@ const X0 = -ANCHO / 2
  */
 export function Muelle3D({ plano, enTransito, salidas, reducir }: { plano: PlanoTaller; enTransito: number; salidas: React.RefObject<{ id: string; t0: number }[]>; reducir: boolean }) {
   const elegirZona = useEscenaForja((s) => s.elegirZona)
-  const z = zonaDe(plano, "muelle")!
+  const z = zonaDe(plano, "muelle")
   const { porton } = plano
+  if (!z) return null
   return (
     <group>
+      {/* La distribuidora: los camiones del reparto en sus andenes (el que está en viaje deja el andén vacío) */}
+      {plano.camiones.map((c) => (
+        <group
+          key={c.bulto.id}
+          position={[c.x, 0, c.z]}
+          onClick={(ev) => {
+            ev.stopPropagation()
+            elegirZona({ tipo: "muelle", id: c.bulto.id })
+          }}
+        >
+          {/* El andén: una franja en el piso */}
+          <mesh position-y={0.013} rotation-x={-Math.PI / 2}>
+            <planeGeometry args={[2.4, 5]} />
+            <meshBasicMaterial color={c.enViaje ? COLOR.losa : COLOR.lineaPiso} toneMapped={false} />
+          </mesh>
+          {!c.enViaje && (
+            <>
+              {/* La caja, contra el depósito, y la cabina al frente */}
+              <mesh position={[0, 0.85, -0.55]}>
+                <boxGeometry args={[1.9, 1.5, 3.2]} />
+                <meshStandardMaterial color={COLOR.equipo} roughness={0.7} />
+              </mesh>
+              <mesh position={[0, 0.62, 1.55]}>
+                <boxGeometry args={[1.8, 1.1, 1]} />
+                <meshStandardMaterial color={COLOR.acero} roughness={0.5} />
+              </mesh>
+            </>
+          )}
+        </group>
+      ))}
       {/* Umbral del portón: brasa tenue si hay mercadería en camino */}
       <mesh position={[X0 + 0.04, 0.012, porton.z]} rotation-x={-Math.PI / 2}>
         <planeGeometry args={[0.08, porton.ancho]} />

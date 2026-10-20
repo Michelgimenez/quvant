@@ -73,8 +73,7 @@ test.describe("Forja · demos públicas", () => {
     await expect(anuncios).toContainText(/quedan|se quedó sin/, { timeout: 10_000 })
   })
 
-  // Oculta hasta la tanda 10 de Quvant: la sección vuelve con el video nuevo de Forja.
-  test.skip("el sitio presenta Quvant + Forja con la toma genérica y el botón a la demo", async ({ page }) => {
+  test("el sitio presenta Quvant + Forja con la toma genérica y el botón a la demo", async ({ page }) => {
     await page.goto("/")
     const seccion = page.locator("#forja")
     await seccion.scrollIntoViewIfNeeded()

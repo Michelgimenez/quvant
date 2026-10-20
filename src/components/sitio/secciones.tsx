@@ -31,7 +31,7 @@ export function Encabezado({ ficha, titulo, bajada, id, centrado = false, sello 
 }
 
 /** Un botón del sitio: blanco (principal) o con borde. */
-export function BotonSitio({ href, children, variante = "principal", className }: { href: string; children: React.ReactNode; variante?: "principal" | "borde"; className?: string }) {
+export function BotonSitio({ href, children, variante = "principal", className, testid }: { href: string; children: React.ReactNode; variante?: "principal" | "borde"; className?: string; testid?: string }) {
   const clases = cn(
     "t-texto inline-flex h-12 items-center justify-center gap-2 rounded-md px-6 font-semibold transition-colors",
     variante === "principal" ? "bg-blanco text-negro hover:bg-gris-11" : "border border-gris-4 text-blanco hover:border-gris-8",
@@ -39,12 +39,12 @@ export function BotonSitio({ href, children, variante = "principal", className }
   )
   if (href.startsWith("/"))
     return (
-      <Link href={href} prefetch={false} className={clases}>
+      <Link href={href} prefetch={false} className={clases} data-testid={testid}>
         {children}
       </Link>
     )
   return (
-    <a href={href} className={clases}>
+    <a href={href} className={clases} data-testid={testid}>
       {children}
     </a>
   )

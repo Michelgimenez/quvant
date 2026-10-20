@@ -63,11 +63,11 @@ src/forja/
 - `/forja` (empresa de demostración, sello DEMO) y `/demo/<prospecto>/forja` (sello PROPUESTA): sin sesión ni base. Un **snapshot del seed** (`npm run snapshot-forja` → `src/demo/*.json`) en memoria, un **reloj de demo** que arranca en el momento del snapshot y el **simulador en el navegador** aplicando operaciones con el reductor de Quvant.
 - Los snapshots de prospectos no guardan nombres: los pone su configuración (`src/config/clientes/<prospecto>.ts` → `forja`), que también define sus sucursales (reales o DEMO), lo que falta (`[COMPLETAR]`) y desde qué orígenes se puede embeber.
 - **Embebible solo esa ruta**: `frame-ancestors 'self'` + los orígenes de la configuración, sin `X-Frame-Options`. El resto del sitio, `frame-ancestors 'none'`.
-- **Sumar un prospecto**: agregar `forja` a su configuración, correr `npm run snapshot-forja` y `npm run grabar-forja -- <slug>`.
+- **Sumar un prospecto**: agregar `forja` a su configuración, correr `npm run snapshot-forja` y, con el build corriendo en el 3020, `BASE=http://localhost:3020 npm run filmar-forja -- <slug>`.
 
 ## Videos
 
-`npm run build && npm run grabar-forja`: Chromium con GPU, cuadro a cuadro con el reloj de la página en pausa (60 fps exactos), H.264 con `ffmpeg-static`. En modo `?grabar` el simulador se detiene y el guion pide los eventos: las tomas salen siempre iguales.
+`npm run build`, `npx next start -p 3020` y `BASE=http://localhost:3020 npm run filmar-forja` (tanda 10 de Quvant, método del punto 8.2). Con `?film=1`, la página arma el guion en una línea de tiempo maestra de GSAP (`src/forja/ui/guion-video.ts`) y expone `__duration` y `__arrancar()`. El reloj de la página entera (Playwright) avanza cuadro por cuadro, porque MapLibre y three.js tienen su propio bucle. Salen 30 fps, H.264 con `-crf 18`, BT.709 y `+faststart`, siempre iguales.
 
 - `public/demo/forja.mp4` — genérica (sitio e `/inversores`).
 - `public/demo/forja-<prospecto>.mp4` — para la presentación de cada prospecto.

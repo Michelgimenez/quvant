@@ -289,8 +289,9 @@ test.describe("Forja · pieza (nivel 3)", () => {
     await expect(panel).toHaveCount(0)
     await expect(page.locator("[data-nivel=red]")).toBeVisible()
 
-    // Historia de una máquina desde una orden del taller
-    await page.locator("[data-nodo=CC] button").click({ force: true })
+    // Historia de una máquina desde una orden del taller (el nodo sigue al mapa: se entra con el teclado, no con un clic por coordenadas)
+    await page.locator("[data-nodo=CC] button").focus()
+    await page.keyboard.press("Enter")
     await expect(page.getByTestId("forja-taller")).toHaveAttribute("data-listo", "true", { timeout: 60_000 })
     await page.getByTestId("zona-servicio").click()
     await page.getByTestId("fila-orden").first().click()

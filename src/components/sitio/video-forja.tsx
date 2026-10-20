@@ -28,7 +28,7 @@ export function VideoForja({ className, activo, reinicio = 0, etiqueta }: { clas
   return (
     <video
       ref={video}
-      className={cn("aspect-video w-full rounded-2xl border border-white/10 bg-negro object-cover", className)}
+      className={cn("aspect-video w-full rounded-lg border border-gris-3 bg-negro object-cover", className)}
       src={VIDEO_FORJA.mp4}
       poster={VIDEO_FORJA.poster}
       muted

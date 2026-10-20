@@ -107,7 +107,16 @@ export type BultoForja = {
   destinoId: Id | null
 }
 
+/**
+ * Cómo es el local por dentro según el rubro (tanda 10): el comercio (mostrador, depósito, servicio técnico y
+ * muelle, el de siempre), el kiosco (mostrador y góndolas), la distribuidora (depósito con andenes y camiones)
+ * y la sucursal de una cadena (salón y depósito, muchas cajas y carga).
+ */
+export type RubroTaller = "comercio" | "kiosco" | "distribuidora" | "sucursal"
+
 export type TallerForja = {
+  /** Sin rubro, el comercio. */
+  rubro?: RubroTaller
   sucursalId: Id
   puestos: PuestoForja[]
   racks: RackForja[]
