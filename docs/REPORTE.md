@@ -1,4 +1,77 @@
-# Yunque — reporte de trabajo
+# Quvant — reporte de trabajo
+
+> Yunque pasa a ser Quvant (`PROMPT-QUVANT.md`), en 10 tandas, en la rama `quvant`. Arriba, lo último; abajo, el historial de Yunque.
+
+## Resumen · tanda 1 de 10 · La marca en el sistema (20/10/2026)
+
+**Estado real:** demo funcional / piloto. Todavía no hay clientes pagando. Sin deploy ni `git push`.
+
+**Qué se hizo**
+1. **Logos** (`public/marca/quvant-*`, generados por `node scripts/marca/generar-marca.mjs`):
+   - La Q cromada oficial, extraída sin cambios del PDF del manual (2000 px con transparencia).
+   - La Q en una tinta (blanca y negra), sacada del alfa del original.
+   - La firma principal y la negativa (SVG y PNG de 2400 px), los favicons (16, 32, 48 y `.ico`), los íconos de la app y la PWA (180, 192, 512, 1024 y *maskable*) y la imagen para redes de 1200×630.
+   - Las proporciones de la firma se midieron en el manual y viven en `src/components/marca/q-geometria.ts`.
+   - Todas las versiones se verificaron sobre negro, sobre claro y en su tamaño mínimo.
+2. **Color:** los tokens del manual, la escala de grises 0 a 13, los cuatro colores de estado y los modos oscuro y claro completos, en un solo lugar (`src/app/globals.css`). Los tokens de Yunque quedan como alias hasta la tanda 2. El test de contraste (`tests/unit/color.test.ts`) lee los valores del CSS: si alguien cambia un token, se entera.
+3. **Tipografía:** Michroma e IBM Plex Mono con `next/font` (se van Inter y JetBrains Mono), `font-synthesis: none` y 13 estilos cerrados (`.t-marca`, `.t-hero`, `.t-titulo`, `.t-texto`, `.t-etiqueta`, `.t-dato` y `.t-numero`, con sus escalones). Documentado en [`docs/TIPOGRAFIA.md`](TIPOGRAFIA.md).
+4. **Componentes de marca** (`src/components/marca/`):
+   - `<Firma />` e `<Isotipo />`: los archivos con `<img>`, con los mínimos y el resguardo.
+   - `<IsotipoAnimado />`: el aro se traza, la cola aparece y el punto salta. Son máscaras sobre el PNG original.
+   - `<Grilla />` y `<SaltoEnGrilla />`, con la geometría pura en `salto-geometria.ts`.
+   - `lanzarSalto()`: reemplaza a la chispa en los cinco lugares donde se lanzaba.
+   - `.lista-punto`: la viñeta cuadrada.
+5. **Lámina** [`docs/marca/quvant-sistema.png`](marca/quvant-sistema.png) (2400×1500, tres vueltas en [`BITACORA-ESTETICA.md`](BITACORA-ESTETICA.md)) y **3 titulares** compuestos como hero en [`docs/marca/quvant-titulares.png`](marca/quvant-titulares.png). Las dos se generan desde `/marca/sistema` con `npx tsx scripts/marca/capturar-lamina.mts`.
+
+**Verificación:**
+- `typecheck`, sin errores. Tests unitarios y de RLS: 164 de 164. `eslint` de lo tocado, limpio.
+- `next dev`: la lámina, el tablero, el mostrador (oscuro y claro) y el sitio cargan sin errores de página. En la consola solo aparecen los avisos de desarrollo de Next sobre navegación instantánea en `/app`, que no tienen que ver con esta tanda.
+- Los e2e no se corrieron (piden `build`). Tres esperan ahora `momento-salto` en lugar de `momento-chispa`.
+
+## Para Michel
+
+1. **Elegí el titular** (se ven compuestos en `docs/marca/quvant-titulares.png`). Pedí la tanda 2 con `Titular: A`, `B` o `C`:
+   - **A** · «Del kiosco a la empresa.»
+   - **B** · «Una caja o cuarenta sucursales.» Ojo: hoy las cuarenta sucursales existen solo en la demo, no en un cliente.
+   - **C** · «Se adapta a tu negocio. No al revés.»
+2. **Mirá la lámina** contra tu manual: la Q, los colores y las letras. Revisá las piezas marcadas como **Extensión**: el modo claro, la escala de grises, los estados, Plex Mono 500 y 600, el salto como recompensa y la bajada en el pie del sitio.
+3. **El logo: faltan tus archivos.** En `marca/` solo estaban los de Yunque. Usé la Q que trae el manual (un PNG de 2000 px, tal cual) y armé QUVANT en Michroma como **provisorio**, con las proporciones de la firma del manual. Michroma es más extendida y más fina que la letra del PDF: la firma provisoria queda un poco más ancha que la del manual. Mandá a `marca/`:
+   - la firma principal y la negativa, mejor en SVG;
+   - la Q en SVG, si existe. Con el aro, la cola y el punto como capas separadas, la animación se haría por capas (sin máscaras) y habría un favicon vectorial. Hoy solo hay PNG.
+4. **La página 4 del manual quedó vieja.** Dice que Yunque es un producto de Quvant ("Yunque · by Quvant", con Forja como "complemento de Yunque" y Ludus). Elegiste que Yunque pasa a ser Quvant: conviene actualizar esa página del manual.
+5. **El PDF del manual tiene texto viejo escondido.** Algunas páginas se corrigieron tapando el texto anterior. Al copiar o extraer texto del PDF sale la versión vieja (por ejemplo, "Versión 1" y una regla con "degradés" en la página 7). Yo seguí lo que se ve. Si lo vas a compartir, conviene reexportarlo limpio.
+6. **¿Se lee peor el texto largo en mono?** En los párrafos del sitio y de la app, no lo noté: se lee cómodo, como dice el manual. Lo que sí pasa es que la monoespaciada ocupa más ancho. El buscador del encabezado y la navegación del sitio se parten en dos renglones, y en el tablero los nombres largos se cortan antes. Lo arreglan la tanda 2 (app) y la 7 (sitio). Capturas: `docs/capturas/quvant/tanda-1/app-tablero-oscuro.png` y `sitio-texto-largo.png`.
+7. **El puerto 3000** lo estaba usando otro proyecto tuyo (`firmamento-1-proyecto`), así que no lo toqué. Esta app corrió en el 3010: `npm run dev -- -p 3010`.
+
+## Decisiones de la tanda 1
+
+| # | Decisión | Motivo |
+|---|---|---|
+| Q1 | La Q sale del PDF del manual, sin tocar sus píxeles (las cuatro copias del PDF son idénticas). | No había archivo de Quvant en `marca/`. Es el original que tiene el manual. |
+| Q2 | Logotipo provisorio en Michroma +0,18 em. Q = 1, mayúsculas 0,46, separación 0,435, centrado en el alto del cuadrado (medido en las págs. 2, 5 y 6). | Lo aprobó Michel. El manual dice que la versión final se arma con Michroma (pág. 9). |
+| Q3 | Yunque pasa a ser Quvant, aunque la pág. 4 del manual diga otra cosa. | Lo decidió Michel. Es la única contradicción entre el manual y el prompt que encontré. |
+| Q4 | La lámina se compone a 1600×1000 y se captura a 1,5×. | Los estilos se ven a tamaño real y la imagen queda nítida a 2400×1500. |
+| Q5 | Escala de 14 pasos, con siete valores tomados de las páginas del manual y tres interpolados en OKLab. | "Sin otros tonos": todo sale de la paleta y del propio manual. |
+| Q6 | Estados sobrios (croma baja en OKLCH), uno por modo, AA como texto. | Que sirvan para punto, chip y texto sin ser color de marca. |
+| Q7 | Los tokens de Yunque quedan como alias de los nuevos. | La app no se rompe. La tanda 2 los saca componente por componente. |
+| Q8 | `--radius` de 10 a 4 px. | El manual es de esquinas rectas y el punto es cuadrado. |
+| Q9 | El favicon es la Q cromada sobre un cuadrado negro. | Contraste en pestañas claras y oscuras. A 16 px se lee con su punto. |
+| Q10 | La recompensa conserva la forma de llamarla (`lanzarSalto({ desde, mensaje })`) y suma la "aprobación completa". | Cambio de una línea en cada lugar. La aprobación llega en la tanda 6. |
+| Q11 | El sello `DEMO` pierde la rotación y el redondeo. | La rotación era el carácter de Yunque. Quvant es preciso. El resto de los componentes base es de la tanda 2. |
+| Q12 | Las 3 propuestas de titular viven en `src/config/sitio.ts` (`TITULARES_PROPUESTOS`). | La tanda 2 guarda la elegida ahí y borra la lista. |
+
+## Para la tanda 2 (visto en la tanda 1)
+
+- **Conectar los archivos nuevos:** `src/app/icon.png`, `apple-icon.png`, `manifest.ts` y `opengraph-image.tsx` todavía apuntan a Yunque. Los de Quvant ya están en `public/marca/quvant-*` (favicon `.ico`, `apple-icon-180`, `icono-192`, `512`, `maskable-512` y `og`).
+- **Sacar los alias** (`--hierro`, `--temple`, `--chispa`, `.ficha`, `.num`, `.grilla-tecnica`…): pasar los componentes a los tokens y a las clases `.t-*`, y después borrar los alias de `globals.css`.
+- **El color de la empresa**, solo donde dice 2.2. Hoy también tiñe la barra de 3 px arriba del todo y el avatar (`src/components/app/shell.tsx`). Los gráficos todavía no lo toman: `--serie-1` se resuelve en `<html>` y no ve el `--marca` del AppShell, así que hay que definir `--serie-1` en el mismo elemento.
+- **Los estados en áreas grandes:** el aviso "Caja cerrada" del mostrador pinta un fondo entero con la alerta (`bg-chispa/10`). Tiene que quedar en un punto, un chip o un borde.
+- **El ancho de la mono:** el buscador del encabezado se parte en dos renglones y los nombres largos del tablero se cortan antes.
+- **`/marca`** sigue mostrando la identidad de Yunque: pasa a ser la de Quvant (la lámina ya está en `/marca/sistema`).
+
+---
+
+# Antes: Yunque (historial)
 
 ## Resumen · revisión final y Forja (10/10/2026)
 

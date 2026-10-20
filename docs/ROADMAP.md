@@ -12,6 +12,14 @@
 - **En demo** (se ve completo, con una parte emulada): cobro con Mercado Pago, avisos por WhatsApp, doble factor (autenticador emulado), copias y exportación (la exportación funciona; faltan copias de producción y restauración probada).
 - **Próximamente**: factura electrónica ARCA, Mercado Libre, app de depósito, migración asistida.
 
+## Quvant: el renombre y la identidad nueva (en curso, rama `quvant`)
+
+Yunque pasa a llamarse **Quvant** y se abre del kiosco a la empresa grande, con la identidad del manual (`referencias/Quvant-manual-de-identidad.pdf`). Son 10 tandas (`PROMPT-QUVANT.md`). No cambia ninguna funcionalidad: los estados de `src/showcase/features.ts` siguen iguales.
+
+- **Tanda 1 · La marca en el sistema — hecha (20/10/2026).** Logos y sus versiones, tokens de color con modo claro y estados, Michroma e IBM Plex Mono con estilos cerrados, la grilla, el salto (que reemplaza a la chispa como recompensa) y la lámina del sistema aplicado. Logotipo QUVANT provisorio hasta el archivo oficial.
+- Tanda 2 · El renombre y la app — siguiente.
+- Tandas 3 a 10: las cuatro empresas de la demo, el cambio de empresa, los recorridos por rubro, el sitio, las presentaciones y los videos, y Forja con la marca nueva.
+
 ## Etapas
 
 ### 1 · Arquitectura y seguridad auditadas — *siguiente*
