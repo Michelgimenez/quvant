@@ -40,3 +40,22 @@ const tipo = elegirPonderado(u01(semilla, "tipo", k), ritmo.tipos)
 ```
 
 Así, `eventosEntre(desde, hasta)` devuelve lo mismo si se lo pide en vivo, al volver a una empresa o en el cuadro 1.234 de un video. No hay estado escondido: el tablero es una función de (datos generados, momento, lo que hizo el visitante). El mismo truco sirve para el stock del grupo: `stockGrupo(producto, sucursal)` es un hash, así 25.000 productos × 40 sucursales no ocupan un millón de filas en memoria.
+
+## Tanda 4 · Flip: animar un cambio de layout que React ya hizo
+
+La técnica FLIP (First, Last, Invert, Play) anima algo que en realidad cambió de golpe:
+
+1. **First:** antes del cambio se guarda dónde estaba cada cosa: `Flip.getState(elementos)`.
+2. **Last:** React cambia el estado (con `flushSync`, para que el DOM nuevo exista ya).
+3. **Invert y Play:** a cada elemento nuevo con el mismo `data-flip-id` se le aplica una transformación que lo devuelve a su lugar viejo, y se la anima hasta cero.
+
+```ts
+const antes = Flip.getState(escena.querySelectorAll("[data-flip-id^='nav-']"))
+flushSync(() => elegirEmpresa(id))                       // React cambia la barra lateral
+Flip.from(antes, { targets: escena.querySelectorAll("[data-flip-id^='nav-']"), duration: 0.6,
+  onEnter: (nuevos) => gsap.fromTo(nuevos, { opacity: 0, x: -10 }, { opacity: 1, x: 0 }) })
+```
+
+El ojo ve que "Inventario" se movió de lugar, aunque React lo borró y lo volvió a dibujar. Lo que sale no tiene contra qué compararse: por eso se saca una foto del estado viejo (un clon del DOM) y se lo deja debajo, apagándose, mientras el barrido revela lo nuevo.
+
+Una trampa que apareció: los pasos que se agregan a una línea de tiempo *mientras corre* (en la caída del punto) se ubicaban al final de la línea, que ya estaba estirada por un paso de limpieza. Por eso, adentro de esos callbacks las posiciones van en tiempos absolutos (`t0 = tl.time()`).

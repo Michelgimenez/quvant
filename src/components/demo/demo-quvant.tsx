@@ -1,11 +1,13 @@
 "use client"
 
 import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react"
+import { flushSync } from "react-dom"
 import gsap from "gsap"
 import { Toaster } from "@/components/ui/sonner"
 import { CapaSaltos } from "@/components/marca/salto"
 import { EMPRESAS, EMPRESAS_ORDEN, type IdEmpresa, type ModuloDemo } from "@/demo/empresas"
 import { BarraDemo } from "./barra-demo"
+import { cambiarEmpresa } from "./coreografia"
 import { ProveedorDemo, useDemo, useTiendaDemo } from "./contexto"
 import { LateralEmpresa } from "./lateral-empresa"
 import { SelectorEmpresas } from "./selector-empresas"
@@ -21,6 +23,18 @@ import { VistaClientes, VistaModuloGenerica, VistaProductos } from "./vistas/vis
  * (/demo?empresa=kiosco) con history.replaceState, sin navegar.
  */
 export function DemoQuvant({ empresaInicial, filmando = false }: { empresaInicial: IdEmpresa | null; filmando?: boolean }) {
+  useEffect(() => {
+    if (!filmando) return
+    // Modo filmación (?film=1): el reloj global de GSAP se pausa y lo mueve quien filma, solo hacia adelante.
+    const w = window as unknown as { __gsap?: typeof gsap; __seek?: (t: number) => void; __ready?: boolean }
+    gsap.globalTimeline.pause()
+    w.__gsap = gsap
+    w.__seek = (t: number) => {
+      gsap.globalTimeline.pause()
+      gsap.globalTimeline.totalTime(t)
+    }
+    w.__ready = true
+  }, [filmando])
   return (
     <ProveedorDemo empresaInicial={empresaInicial} filmando={filmando}>
       <AppDemo />
@@ -53,31 +67,50 @@ function AppDemo() {
     }
   }, [empresa])
 
-  // El selector se abre y se cierra con GSAP (un solo reloj de animación).
+  // El selector se abre y se cierra con GSAP (un solo reloj de animación). El estado inicial se fija sin animar.
+  const primeraVez = useRef(true)
   useLayoutEffect(() => {
     const el = selectorRef.current?.querySelector<HTMLElement>("[data-selector]")
     if (!el) return
-    gsap.to(el, { autoAlpha: selector ? 1 : 0, yPercent: selector ? 0 : -6, duration: selector ? 0.32 : 0.22, ease: selector ? "power3.out" : "power2.in" })
+    // Arranca oculto por CSS (invisible, opacity-0): la primera vez no hay nada que animar.
+    if (primeraVez.current) {
+      primeraVez.current = false
+      if (!selector) return
+    }
+    gsap.to(el, { autoAlpha: selector ? 1 : 0, yPercent: selector ? 0 : -6, duration: selector ? 0.26 : 0.22, ease: selector ? "power3.out" : "power2.in", overwrite: "auto" })
   }, [selector])
 
-  /** Tanda 3: el cambio de empresa es un fundido simple. La tanda 4 lo reemplaza por la coreografía con el salto. */
+  const raiz = useRef<HTMLDivElement>(null)
+  const selectorAbierto = useRef(selector)
+  useEffect(() => {
+    selectorAbierto.current = selector
+  }, [selector])
+
+  /** El cambio de empresa: la coreografía del salto, los logos, el barrido, Flip y los números (coreografia.ts). */
   const cambiar = useCallback(
     (id: IdEmpresa) => {
       if (cambiando.current) return
-      if (id === tienda.getState().empresa) {
+      const desde = tienda.getState().empresa
+      if (id === desde) {
         setSelector(false)
         return
       }
+      if (!raiz.current || !escena.current) return
       cambiando.current = true
-      const el = escena.current
-      const tl = gsap.timeline({ onComplete: () => void (cambiando.current = false) })
-      tl.to(el, { opacity: 0, duration: 0.18, ease: "power1.in" })
-      tl.add(() => {
-        tienda.getState().elegirEmpresa(id)
-        setModulo("tablero")
-      })
-      tl.to(el, { opacity: 1, duration: 0.32, ease: "power2.out" }, "+=0.02")
-      tl.add(() => setSelector(false), 0.35)
+      void cambiarEmpresa({
+        raiz: raiz.current,
+        escena: escena.current,
+        desde,
+        hacia: id,
+        selectorAbierto: selectorAbierto.current,
+        abrirSelector: () => setSelector(true),
+        cerrarSelector: () => setSelector(false),
+        aplicarCambio: () =>
+          flushSync(() => {
+            tienda.getState().elegirEmpresa(id)
+            setModulo("tablero")
+          }),
+      }).finally(() => (cambiando.current = false))
     },
     [tienda],
   )
@@ -108,7 +141,7 @@ function AppDemo() {
   }
 
   return (
-    <div className="dark flex h-dvh flex-col overflow-hidden bg-background text-foreground" data-demo data-empresa={empresa}>
+    <div ref={raiz} className="dark flex h-dvh flex-col overflow-hidden bg-background text-foreground" data-demo data-empresa={empresa}>
       <BarraDemo empresa={empresa} selectorAbierto={selector} onSelector={() => setSelector((v) => !v)} onRecorrido={() => {}} onReiniciar={reiniciar} recorridoActivo={false} />
       <div className="relative flex min-h-0 flex-1">
         <div ref={selectorRef} className="pointer-events-none absolute inset-x-0 top-0 z-30 [&>[data-abierto]]:pointer-events-auto">
@@ -116,7 +149,7 @@ function AppDemo() {
         </div>
         <div
           ref={escena}
-          className="flex min-h-0 flex-1"
+          className="flex min-h-0 flex-1 bg-background"
           data-escena-empresa
           style={{ "--marca": EMPRESAS[empresa].color, "--serie-1": EMPRESAS[empresa].color, "--chart-1": EMPRESAS[empresa].color } as React.CSSProperties}
         >

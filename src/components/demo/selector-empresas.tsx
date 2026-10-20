@@ -19,7 +19,7 @@ export function SelectorEmpresas({ empresa, onElegir, abierto }: { empresa: IdEm
       aria-label="Elegir empresa de la demo"
       aria-hidden={!abierto}
       inert={!abierto}
-      className="dark absolute inset-x-0 top-0 z-30 overflow-hidden border-b border-gris-3 bg-negro text-blanco"
+      className="dark invisible absolute inset-x-0 top-0 z-30 overflow-hidden border-b border-gris-3 bg-negro text-blanco opacity-0"
       data-selector
       data-abierto={abierto || undefined}
     >

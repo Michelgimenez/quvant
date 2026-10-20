@@ -59,3 +59,20 @@ Se compone a 1600×1000 y se captura a 1,5× (2400×1500). Así los estilos de t
 - El kiosco, la distribuidora y el grupo se comparan con el viernes pasado a la misma hora. La ferretería, cuyo seed reparte el día completo, contra el día entero.
 - Las listas arrancan con lo que pasó hoy antes de las 17:30.
 - El grupo pasa a etiquetas cortas, a una tabla con anchos fijos (números sin cortes) y a cifras grandes del tipo "$ 11.012 M". En la ferretería, el taller pasa de una grilla 2×2 apretada a una lista.
+
+## Tanda 4 · El cambio de empresa (`docs/capturas/quvant/tanda-4/`: una hoja de contacto por vuelta y los cuadros de la tercera)
+
+**Vuelta 1**
+- El salto se veía, pero el arco entre la primera y la última tarjeta subía 450 px y se salía de la pantalla.
+- La escena no cambiaba a tiempo: el barrido arrancaba recién al final, porque los pasos agregados en la caída se ubicaban al final de la línea de tiempo.
+
+**Vuelta 2**
+- El arco tiene un tope de ~70 px de alto: es un salto entre tarjetas, no un vuelo.
+- Los pasos de la caída van en tiempos absolutos. El barrido, Flip, los logos y los números ya corren juntos.
+- Quedaban dos cosas. A mitad del barrido, las tarjetas semitransparentes dejaban ver la foto vieja por debajo y se superponían los textos. Y con el reloj pausado (modo filmación), el selector se veía abierto en el primer cuadro.
+
+**Vuelta 3**
+- La escena viva tiene fondo opaco: el barrido es limpio, y afuera del círculo queda solo el estado viejo.
+- El selector arranca oculto por CSS y GSAP solo lo anima al abrir y cerrar: no hay parpadeo en ningún modo.
+- Los tiempos se ajustan: apertura 0,27 s, salto 0,48 s y barrido 0,7 s. Son ~1,5 s con el selector cerrado y ~1,2 s si estaba abierto.
+- Resultado: el punto despega, cruza en arco y cae; los logos se cruzan; el barrido nace en la caída; la barra lateral se reacomoda y los números ruedan. Se siente una transformación, no una recarga.

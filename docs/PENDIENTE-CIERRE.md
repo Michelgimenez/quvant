@@ -35,3 +35,10 @@ Lo que el modo boceto deja para después: celular, respaldos, accesibilidad fina
 - **Accesibilidad (fase 3):** el selector de empresas es un diálogo sin trampa de foco. Las tablas del grupo se ordenan con botones, pero el orden no se anuncia. El mapa necesita una alternativa en tabla (la comparación cumple ese papel, pero falta enlazarlas).
 - **Rendimiento (fase 4):** el snapshot de la ferretería (129 kB) y los catálogos generados viajan en el paquete de `/demo`. Medir y, si hace falta, cargar cada empresa recién al elegirla.
 - **Movimiento reducido (fase 2):** el fundido y el simulador no miran `prefers-reduced-motion`.
+
+## De la tanda 4 · El cambio de empresa
+
+- **Movimiento reducido (fase 2):** con `prefers-reduced-motion` el cambio tiene que ser un corte limpio (o un fundido corto), sin salto ni barrido.
+- **Accesibilidad (fase 3):** anunciar el cambio a lectores de pantalla ("Estás viendo Grupo Cordal") con una región en vivo, y mover el foco al título del tablero nuevo.
+- **La foto del estado viejo** duplica por un instante los `id` de las máscaras SVG del clon. Hoy no se nota; en el cierre conviene limpiar los `id` del clon.
+- **Rendimiento (fase 4):** medir el cambio hacia el grupo en una máquina de 4 núcleos (es el que más DOM monta).

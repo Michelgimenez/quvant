@@ -19,7 +19,8 @@ El sistema que se llamaba Yunque pasa a llamarse **Quvant** y se abre del kiosco
 - **Tanda 1 · La marca en el sistema — hecha (20/10/2026).** Logos y sus versiones, tokens de color con modo claro y estados, Michroma e IBM Plex Mono con estilos cerrados, la grilla, el salto (que reemplaza a la chispa como recompensa) y la lámina del sistema aplicado. Logotipo QUVANT provisorio hasta el archivo oficial.
 - **Tanda 2 · El renombre y la app — hecha.** Quvant en todo lo visible, el titular A por defecto, los componentes base y la app con la identidad nueva; el material viejo de Forja, oculto.
 - **Tanda 3 · Las cuatro empresas y la demo — hecha.** `/demo` con el kiosco, la ferretería, la distribuidora y el grupo: datos con semilla, simulador del día, tableros por escala y el selector.
-- Tandas 4 a 10: el cambio de empresa, los recorridos por rubro, el sitio, las presentaciones y los videos, y Forja con la marca nueva.
+- **Tanda 4 · El cambio de empresa — hecha.** El salto entre tarjetas, los logos, el barrido circular, Flip en la barra lateral y los números que ruedan.
+- Tandas 5 a 10: los recorridos por rubro, el sitio, las presentaciones y los videos, y Forja con la marca nueva.
 
 ## Etapas
 

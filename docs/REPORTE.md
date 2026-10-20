@@ -2,6 +2,29 @@
 
 > Yunque pasa a ser Quvant (`PROMPT-QUVANT.md`), en 10 tandas, en la rama `quvant`. Arriba, lo último; abajo, el historial de Yunque.
 
+## Resumen · tanda 4 de 10 · El cambio de empresa (20/10/2026)
+
+**La coreografía** (`src/components/demo/coreografia.ts`) es una sola línea de tiempo de GSAP, con el plugin Flip, de ~1,5 s con el selector cerrado y ~1,2 s si ya estaba abierto:
+
+1. **El salto:** el punto cuadrado sale de la tarjeta de la empresa actual, traza su arco punteado (la misma geometría del salto de la marca) y cae en la tarjeta de la nueva. Si el selector está cerrado, el cambio primero lo abre.
+2. **Los logos:** el de la empresa actual vuelve a su tarjeta y el de la nueva sale de la suya y se instala en la barra lateral (`Flip.fit`).
+3. **El barrido:** un círculo (`clip-path`) que nace donde cayó el punto revela el estado nuevo sobre una foto del estado viejo. Lo que sale queda montado en esa foto y se apaga mientras pasa el barrido.
+4. **La barra lateral** se reorganiza con `Flip.from`: los módulos que siguen se reacomodan y los nuevos entran. Cada ítem tiene un `data-flip-id` estable.
+5. **Los números** ruedan del valor viejo al nuevo (los que no existían, desde cero).
+6. **Las tarjetas** que existen en las dos empresas viajan de su lugar viejo al nuevo. Las demás entran. Solo `transform` y `opacity`.
+
+**Con React:**
+- La foto y el estado viejo se toman antes del cambio.
+- El cambio se aplica con `flushSync` justo cuando cae el punto, y todo lo que se mueve después se agrega a la misma línea de tiempo en tiempos absolutos.
+- Sin cortes ni parpadeos: es la misma app que se transforma.
+
+**Para filmar (adelanto de la tanda 8):**
+- Con `?film=1`, `/demo` expone `window.__seek(t)` y `window.__ready`.
+- `__seek(t)` pausa el reloj global de GSAP y lo lleva a `t`.
+- `scripts/marca/capturar-cambio.mts` saca cuadros clave del cambio, y `scripts/marca/hoja-contacto.mjs` los junta en una hoja.
+
+**Verificación:** typecheck sin errores, lint de lo tocado limpio y `npm run build` sin errores (`/demo` compila como prerender parcial). Hubo tres vueltas con cuadros clave en `docs/capturas/quvant/tanda-4/`.
+
 ## Resumen · tanda 3 de 10 · Las cuatro empresas y la demo (20/10/2026)
 
 1. **Las cuatro empresas** (`src/demo/empresas.ts`), todas ficticias y con el sello DEMO:
