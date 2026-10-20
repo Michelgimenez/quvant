@@ -76,3 +76,15 @@ Se compone a 1600×1000 y se captura a 1,5× (2400×1500). Así los estilos de t
 - El selector arranca oculto por CSS y GSAP solo lo anima al abrir y cerrar: no hay parpadeo en ningún modo.
 - Los tiempos se ajustan: apertura 0,27 s, salto 0,48 s y barrido 0,7 s. Son ~1,5 s con el selector cerrado y ~1,2 s si estaba abierto.
 - Resultado: el punto despega, cruza en arco y cae; los logos se cruzan; el barrido nace en la caída; la barra lateral se reacomoda y los números ruedan. Se siente una transformación, no una recarga.
+
+## Tanda 5 · El kiosco y la ferretería por dentro (`docs/capturas/quvant/tanda-5/`)
+
+**Vuelta 1**
+- El mostrador del kiosco se lee de lejos: favoritos de 92 px de alto, el total grande y "Cobrar" de 64 px. Cortar la conexión pinta el interruptor de alerta y la venta avisa que quedó en el equipo. La sincronización salta desde el interruptor.
+- El cierre de caja con diferencia $ 0 lanza el salto con su mensaje.
+- Quedaba: debajo de los favoritos había un vacío grande, y la caja cerrada era una tarjeta sola. En presupuestos, los nombres de los clientes se cortaban demasiado. El fiado sumaba un número sospechosamente redondo.
+
+**Vuelta 2**
+- Debajo de los favoritos va "Lo último que vendiste": lo del visitante (en cola o sincronizado) y la simulación.
+- La caja cerrada suma "El día" (ventas, efectivo, otros medios y el fondo para mañana).
+- La lista de presupuestos gana ancho. El fiado pasa a $ 148.950.

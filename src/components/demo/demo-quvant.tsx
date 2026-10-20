@@ -16,6 +16,9 @@ import { TableroDistribuidora } from "./tableros/tablero-distribuidora"
 import { TableroGrupo } from "./tableros/tablero-grupo"
 import { TableroKiosco } from "./tableros/tablero-kiosco"
 import { VistaClientes, VistaModuloGenerica, VistaProductos } from "./vistas/vista-modulo"
+import { CajaKiosco, FiadoKiosco, MostradorKiosco, ProveedoresKiosco } from "./vistas/kiosco"
+import { PresupuestosFerreteria, ServicioFerreteria, TransferenciasFerreteria } from "./vistas/ferreteria"
+import { VistaPrecios } from "./vistas/precios"
 
 /**
  * La demo que cambia de empresa (/demo): pública, sin login y sin tocar la base. El mismo Quvant en un kiosco,
@@ -173,6 +176,18 @@ function Vista({ empresa, modulo, onModulo }: { empresa: IdEmpresa; modulo: Modu
     if (empresa === "distribuidora") return <TableroDistribuidora onModulo={onModulo} />
     return <TableroGrupo onModulo={onModulo} />
   }
+  if (empresa === "kiosco") {
+    if (modulo === "mostrador") return <MostradorKiosco />
+    if (modulo === "caja") return <CajaKiosco />
+    if (modulo === "fiado") return <FiadoKiosco />
+    if (modulo === "proveedores") return <ProveedoresKiosco />
+  }
+  if (empresa === "ferreteria") {
+    if (modulo === "presupuestos") return <PresupuestosFerreteria />
+    if (modulo === "transferencias") return <TransferenciasFerreteria />
+    if (modulo === "servicio") return <ServicioFerreteria />
+  }
+  if (modulo === "precios") return <VistaPrecios empresa={empresa} />
   if (modulo === "inventario") return <VistaProductos empresa={empresa} modulo={modulo} />
   if (modulo === "clientes" || modulo === "fiado" || modulo === "cobranzas") return <VistaClientes empresa={empresa} modulo={modulo} />
   return <VistaModuloGenerica empresa={empresa} modulo={modulo} />

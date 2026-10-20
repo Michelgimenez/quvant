@@ -2,6 +2,30 @@
 
 > Yunque pasa a ser Quvant (`PROMPT-QUVANT.md`), en 10 tandas, en la rama `quvant`. Arriba, lo último; abajo, el historial de Yunque.
 
+## Resumen · tanda 5 de 10 · El kiosco y la ferretería por dentro (20/10/2026)
+
+**El kiosco** (`src/components/demo/vistas/kiosco.tsx`):
+- **Vender:** un mostrador grande y táctil en su diseño.
+  - Lector simulado con el teclado: se escribe un código y Enter. El botón "Simular lector" tipea uno rápido.
+  - Doce favoritos, cantidades con botones grandes, el total en `.t-numero-xl`, los medios de pago y "Anotar como fiado".
+  - Mientras está abierto, las teclas 1 a 4 no cambian de empresa: el teclado es el lector.
+- **Cortar la conexión:** un interruptor. Se sigue vendiendo y las ventas quedan "en cola". Al volver, la cola se sincroniza sola con el salto ("Cola sincronizada · 2 ventas").
+- **Caja:** el arqueo contra lo que dice el sistema (fondo + efectivo).
+  - Se cuenta con un campo, con botones de billetes o con "Contar todo de una vez".
+  - Con diferencia $ 0, el cierre lanza el salto ("Caja cerrada · sin diferencias"). Con diferencia, solo un aviso.
+- **Fiado:** quién debe, cuánto y desde cuándo. Se puede anotar un fiado, registrar "Pagó" y "Avisar" (WhatsApp emulado, con aviso).
+- **Proveedores:** el pedido sugerido por proveedor y su día de visita.
+- **Precios:** el aumento masivo con la vista previa del impacto (sirve para las cuatro empresas: por proveedor en el kiosco, por categoría en las demás).
+
+**La ferretería** (`vistas/ferreteria.tsx`):
+- **Presupuestos:** la lista con su vencimiento y el detalle. "Pasar a venta" lanza el salto ("Presupuesto → venta") y suma la venta al tablero.
+- **Transferencias:** se arma desde una sucursal hacia otra con lo que falta en el destino. Se despacha y queda "en viaje"; después se recibe.
+- **Servicio técnico:** las órdenes en cuatro columnas por estado, una orden nueva y "Avanzar" hasta "Listo", con "Avisar" (emulado) y "Entregado".
+
+**Registro de funcionalidades:** se suman "Mostrador de kiosco", "Fiado de los vecinos" y "Pedido sugerido por proveedor", las tres en estado `demo`, con su nota honesta. El sello de cada pantalla muestra su estado real.
+
+**Verificación:** typecheck sin errores, lint limpio y cada flujo recorrido con capturas (`docs/capturas/quvant/tanda-5/`), sin errores de página. Un detalle que se corrigió: el fiado del kiosco sumaba justo $ 150.000 por casualidad del generador; un total tan redondo parece inventado, así que se movió apenas el rango ($ 148.950).
+
 ## Resumen · tanda 4 de 10 · El cambio de empresa (20/10/2026)
 
 **La coreografía** (`src/components/demo/coreografia.ts`) es una sola línea de tiempo de GSAP, con el plugin Flip, de ~1,5 s con el selector cerrado y ~1,2 s si ya estaba abierto:

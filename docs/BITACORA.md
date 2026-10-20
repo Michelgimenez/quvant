@@ -59,3 +59,17 @@ Flip.from(antes, { targets: escena.querySelectorAll("[data-flip-id^='nav-']"), d
 El ojo ve que "Inventario" se movió de lugar, aunque React lo borró y lo volvió a dibujar. Lo que sale no tiene contra qué compararse: por eso se saca una foto del estado viejo (un clon del DOM) y se lo deja debajo, apagándose, mientras el barrido revela lo nuevo.
 
 Una trampa que apareció: los pasos que se agregan a una línea de tiempo *mientras corre* (en la caída del punto) se ubicaban al final de la línea, que ya estaba estirada por un paso de limpieza. Por eso, adentro de esos callbacks las posiciones van en tiempos absolutos (`t0 = tl.time()`).
+
+## Tanda 5 · El teclado como lector de códigos
+
+Un lector de códigos de barras USB no es más que un teclado muy rápido: "escribe" los 13 dígitos y aprieta Enter. Por eso, en el mostrador del kiosco el campo de búsqueda sirve para las dos cosas:
+
+```ts
+const leer = (texto: string) => {
+  const porCodigo = datos.productos.find((p) => p.codigo === texto.trim())   // ¿es un código exacto?
+  const p = porCodigo ?? resultados[0]                                        // si no, el primer resultado por nombre
+  if (p) agregar(p)
+}
+```
+
+La consecuencia de diseño: mientras el mostrador está en pantalla, ninguna tecla puede tener otro significado. Por eso el mostrador marca `data-lector-activo` y el atajo de las teclas 1 a 4 (cambiar de empresa) lo respeta. Si no, escanear un producto cuyo código empieza con 2 cambiaría de empresa en medio de la venta.

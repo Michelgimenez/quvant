@@ -20,7 +20,8 @@ El sistema que se llamaba Yunque pasa a llamarse **Quvant** y se abre del kiosco
 - **Tanda 2 · El renombre y la app — hecha.** Quvant en todo lo visible, el titular A por defecto, los componentes base y la app con la identidad nueva; el material viejo de Forja, oculto.
 - **Tanda 3 · Las cuatro empresas y la demo — hecha.** `/demo` con el kiosco, la ferretería, la distribuidora y el grupo: datos con semilla, simulador del día, tableros por escala y el selector.
 - **Tanda 4 · El cambio de empresa — hecha.** El salto entre tarjetas, los logos, el barrido circular, Flip en la barra lateral y los números que ruedan.
-- Tandas 5 a 10: los recorridos por rubro, el sitio, las presentaciones y los videos, y Forja con la marca nueva.
+- **Tanda 5 · El kiosco y la ferretería por dentro — hecha.** Mostrador táctil con favoritos y lector, sin conexión, fiado, cierre de caja con el salto; presupuesto → venta, transferencias y servicio técnico.
+- Tandas 6 a 10: la distribuidora, el grupo y el recorrido guiado; el sitio; las presentaciones y los videos; Forja con la marca nueva.
 
 ## Etapas
 

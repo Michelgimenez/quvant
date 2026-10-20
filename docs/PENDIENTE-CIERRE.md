@@ -42,3 +42,9 @@ Lo que el modo boceto deja para después: celular, respaldos, accesibilidad fina
 - **Accesibilidad (fase 3):** anunciar el cambio a lectores de pantalla ("Estás viendo Grupo Cordal") con una región en vivo, y mover el foco al título del tablero nuevo.
 - **La foto del estado viejo** duplica por un instante los `id` de las máscaras SVG del clon. Hoy no se nota; en el cierre conviene limpiar los `id` del clon.
 - **Rendimiento (fase 4):** medir el cambio hacia el grupo en una máquina de 4 núcleos (es el que más DOM monta).
+
+## De la tanda 5 · El kiosco y la ferretería por dentro
+
+- **Celular y tablet (fase 1):** el mostrador del kiosco está diseñado para pantalla táctil pero probado en escritorio. Falta el lector con la cámara del celular, y que los favoritos y el carrito se reacomoden en una tablet vertical.
+- **Accesibilidad (fase 3):** el interruptor de conexión es un botón con `aria-pressed`; revisar que se anuncie como interruptor. Las columnas del servicio técnico necesitan títulos de región.
+- **La app real:** la pantalla de fiado y el mostrador con favoritos existen solo en la demo (estado `demo` en el registro). Para pasarlos a la app hay que conectarlos al motor de operaciones (`cuenta.pago`, `venta.crear`).

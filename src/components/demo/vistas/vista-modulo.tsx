@@ -34,8 +34,13 @@ const FEATURE_DE: Partial<Record<ModuloDemo, string>> = {
   forja: "forja",
 }
 
-export function SelloModulo({ modulo }: { modulo: ModuloDemo }) {
-  const id = FEATURE_DE[modulo]
+/** Lo que en una empresa en particular tiene su propia ficha en el registro. */
+const FEATURE_POR_EMPRESA: Partial<Record<IdEmpresa, Partial<Record<ModuloDemo, string>>>> = {
+  kiosco: { mostrador: "mostrador-kiosco", fiado: "fiado", proveedores: "pedido-sugerido" },
+}
+
+export function SelloModulo({ modulo, empresa }: { modulo: ModuloDemo; empresa?: IdEmpresa }) {
+  const id = (empresa && FEATURE_POR_EMPRESA[empresa]?.[modulo]) ?? FEATURE_DE[modulo]
   const f = id ? feature(id) : null
   const estado: EstadoFeature = f?.estado ?? "demo"
   return <EstadoFeatureBadge estado={estado} />
@@ -51,7 +56,7 @@ export function EncabezadoModulo({ empresa, modulo, detalle, acciones }: { empre
       <div className="space-y-1.5">
         <div className="flex items-center gap-2">
           <p className="t-etiqueta text-muted-foreground">{EMPRESAS[empresa].nombreCorto}</p>
-          <SelloModulo modulo={modulo} />
+          <SelloModulo modulo={modulo} empresa={empresa} />
         </div>
         <h1 className="t-titulo">{nombreModulo(empresa, modulo)}</h1>
         <p className="t-texto-sm max-w-2xl text-muted-foreground">{detalle}</p>

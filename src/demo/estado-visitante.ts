@@ -18,6 +18,8 @@ export type CierreCaja = { t: number; esperado: Centavos; contado: Centavos }
 export type CobranzaVisitante = { id: string; t: number; clienteId: string; monto: Centavos }
 export type AprobacionVisitante = { id: string; nivel1?: number; nivel2?: number; rechazada?: number }
 export type MovimientoVisitante = { id: string; t: number; tipo: "presupuesto-venta" | "transferencia" | "servicio" | "pedido"; detalle: string; monto: Centavos; ref?: string }
+export type TransferenciaVisitante = { id: string; numero: string; t: number; desde: number; hasta: number; items: { productoId: string; nombre: string; cantidad: number }[]; estado: "en-viaje" | "recibida" }
+export type OrdenVisitante = { id: string; numero: string; t: number; cliente: string; equipo: string; falla: string; estado: "ingresado" | "diagnostico" | "reparacion" | "listo" | "entregado" }
 
 export type AccionesEmpresa = {
   ventas: VentaVisitante[]
@@ -26,9 +28,13 @@ export type AccionesEmpresa = {
   cobranzas: CobranzaVisitante[]
   aprobaciones: AprobacionVisitante[]
   movimientos: MovimientoVisitante[]
+  transferencias: TransferenciaVisitante[]
+  ordenes: OrdenVisitante[]
+  /** Estados cambiados por el visitante en cosas que ya existían (órdenes de servicio, transferencias). */
+  estados: Record<string, string>
 }
 
-const vacias = (): AccionesEmpresa => ({ ventas: [], fiados: [], cierre: null, cobranzas: [], aprobaciones: [], movimientos: [] })
+const vacias = (): AccionesEmpresa => ({ ventas: [], fiados: [], cierre: null, cobranzas: [], aprobaciones: [], movimientos: [], transferencias: [], ordenes: [], estados: {} })
 const todasVacias = () => Object.fromEntries(EMPRESAS_ORDEN.map((id) => [id, vacias()])) as Record<IdEmpresa, AccionesEmpresa>
 
 export type EstadoDemo = {
@@ -43,7 +49,7 @@ export type EstadoDemo = {
   reiniciar: () => void
 }
 
-export const VERSION_ESTADO_DEMO = 1
+export const VERSION_ESTADO_DEMO = 2
 
 export function crearEstadoDemo(inicial: IdEmpresa) {
   return createStore<EstadoDemo>()(

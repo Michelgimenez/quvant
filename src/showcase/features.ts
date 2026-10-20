@@ -52,6 +52,9 @@ export const FEATURES: Feature[] = [
   { id: "clientes-cuentas", nombre: "Clientes y cuentas corrientes", frase: "Saldo, límite y movimientos de cada cliente.", estado: "disponible", escena: "ventas" },
   { id: "entregas", nombre: "Entregas", frase: "Hoja de ruta del día y estado de cada entrega.", estado: "disponible", escena: "ventas" },
   { id: "caja", nombre: "Caja diaria", frase: "Apertura, movimientos y cierre de caja por mostrador.", estado: "disponible", escena: "ventas" },
+  { id: "mostrador-kiosco", nombre: "Mostrador de kiosco", frase: "Caja rápida con favoritos y lector, pensada para pantalla táctil.", estado: "demo", escena: "ventas", nota: "Se usa en la demo (Kiosco La Esquina). En la app real está el mostrador general; la versión con botones de favoritos todavía no." },
+  { id: "fiado", nombre: "Fiado de los vecinos", frase: "Quién debe, cuánto y desde cuándo, sin cuaderno.", estado: "demo", escena: "ventas", nota: "En la app real funciona como la cuenta corriente del cliente; la pantalla de fiado del kiosco está en la demo." },
+  { id: "pedido-sugerido", nombre: "Pedido sugerido por proveedor", frase: "Lo que está por debajo del mínimo, armado para cuando pasa el proveedor.", estado: "demo", escena: "stock", nota: "Las órdenes de compra sugeridas por stock mínimo existen en la app; el armado por día de visita del proveedor está en la demo." },
   { id: "cobro-mercadopago", nombre: "Cobro con Mercado Pago", frase: "QR de cobro desde el mostrador.", estado: "demo", escena: "integraciones", nota: "Emulado: no se conecta con Mercado Pago." },
   { id: "factura-arca", nombre: "Factura electrónica ARCA", frase: "Facturas A y B autorizadas por ARCA.", estado: "próximamente", escena: "integraciones", nota: "La demo emula el CAE. La conexión real con ARCA está en la hoja de ruta." },
 

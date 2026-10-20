@@ -202,7 +202,7 @@ function generarKiosco(): DatosNegocio {
   const hoy = dias[dias.length - 1].porSucursal[0]
   const clientes: ClienteNegocio[] = VECINOS.map((nombre, i) => {
     const debe = i < 13
-    const saldo = debe ? c(redondearPrecio(entre(r, 1800, 18500))) : 0
+    const saldo = debe ? c(redondearPrecio(entre(r, 1750, 18400))) : 0
     return { id: `v-${i}`, nombre, zona: "Barrio", saldo, limite: c(30000), diasDeuda: debe ? entero(r, 1, 38) : 0, telefono: telefono(r), lista: "Mostrador" }
   })
   const pedidoSugerido = productos

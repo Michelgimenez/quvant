@@ -7,7 +7,7 @@ import { eventosEntre, acumuladoSimulado } from "@/demo/simulador"
 import { resumenDistribuidora, resumenGrupo, resumenKiosco } from "@/demo/resumen"
 import type { AccionesEmpresa } from "@/demo/estado-visitante"
 
-const sinAcciones = (): AccionesEmpresa => ({ ventas: [], fiados: [], cierre: null, cobranzas: [], aprobaciones: [], movimientos: [] })
+const sinAcciones = (): AccionesEmpresa => ({ ventas: [], fiados: [], cierre: null, cobranzas: [], aprobaciones: [], movimientos: [], transferencias: [], ordenes: [], estados: {} })
 
 describe("las cuatro empresas de la demo", () => {
   it("son ficticias, llevan su escala y sus módulos tienen la forma de Organizacion.modulos", () => {
