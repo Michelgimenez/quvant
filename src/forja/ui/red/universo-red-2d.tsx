@@ -205,7 +205,7 @@ export function UniversoRed2D({
   const buscarContenedor = useCallback(() => contenedor.current, [])
 
   return (
-    <div ref={contenedor} className="absolute inset-0 overflow-hidden bg-hierro" data-testid="forja-red" data-vista={vista} data-listo="true" data-modo="2d">
+    <div ref={contenedor} className="absolute inset-0 overflow-hidden bg-negro" data-testid="forja-red" data-vista={vista} data-listo="true" data-modo="2d">
       <div className="absolute inset-0 origin-top-left" style={{ transform: transformacion, transition: reducir ? undefined : "transform 0.9s cubic-bezier(0.65, 0, 0.35, 1)" }}>
         <svg className="absolute inset-0 size-full" aria-hidden data-entrada={entrada}>
           <defs>

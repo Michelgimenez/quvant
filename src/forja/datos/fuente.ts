@@ -6,7 +6,7 @@ export type DatosPieza = { tipo: "producto"; recorrido: RecorridoProducto } | { 
 
 /**
  * Lo que necesita el universo de Forja, venga de donde venga:
- * - app (estado de Yunque en el navegador, simulador si la empresa es demo),
+ * - app (estado de Quvant en el navegador, simulador si la empresa es demo),
  * - demo pública (snapshot + simulador en el navegador, sin base),
  * - Supabase (funciones forja_* y canales privados por sucursal; preparado).
  */
@@ -23,7 +23,7 @@ export type FuenteForja = {
   simulacion: boolean
   /** Sello PROPUESTA (demo comercial para un prospecto). */
   propuesta: boolean
-  /** Enlaces a los módulos de Yunque (solo dentro de la app). */
+  /** Enlaces a los módulos de Quvant (solo dentro de la app). */
   enlaces: EnlacesForja | null
   /** Demos públicas: milisegundos que se suman al reloj real (la demo vive en la hora de su snapshot). */
   desfase?: number

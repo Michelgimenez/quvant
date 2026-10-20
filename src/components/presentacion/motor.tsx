@@ -3,7 +3,7 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from "react"
 import { ChevronLeft, ChevronRight, EyeOff, Maximize, Pause, Play, RotateCcw } from "lucide-react"
 import { useReducedMotion } from "motion/react"
-import { Isotipo } from "@/components/marca/marca"
+import { Isotipo } from "@/components/marca/quvant"
 import { cn } from "@/lib/utils"
 
 /**
@@ -252,11 +252,11 @@ export function Presentacion({
   const montada = (i: number) => i === activa || i === saliente || i === activa + 1 || i === activa - 1
 
   return (
-    <div className={cn("presentacion dark text-niebla", oculto && "cursor-none")} aria-label={nombre}>
+    <div className={cn("presentacion dark text-blanco", oculto && "cursor-none")} aria-label={nombre}>
       <div aria-hidden style={{ height: `${totalVh}vh` }} />
-      <div className="fixed inset-0 overflow-hidden bg-hierro" style={{ height: alto }}>
+      <div className="fixed inset-0 overflow-hidden bg-negro" style={{ height: alto }}>
         <div
-          className="absolute left-1/2 top-1/2 overflow-hidden bg-hierro"
+          className="absolute left-1/2 top-1/2 overflow-hidden bg-negro"
           style={{ width: 1920, height: 1080, transform: `translate(-50%, -50%) scale(${escala})`, transformOrigin: "center" }}
           role="region"
           aria-roledescription="presentación"
@@ -316,9 +316,9 @@ export function Presentacion({
 function Precarga({ avance }: { avance: number }) {
   return (
     <div className="flex size-full flex-col items-center justify-center gap-8" role="status" aria-live="polite">
-      <Isotipo className="h-24 text-niebla" tono="negativo" />
+      <Isotipo className="h-24" version="principal" />
       <div className="h-1 w-96 overflow-hidden rounded-full bg-white/10">
-        <div className="h-full w-full origin-left bg-temple transition-transform duration-300" style={{ transform: `scaleX(${avance})` }} />
+        <div className="h-full w-full origin-left bg-foreground transition-transform duration-300" style={{ transform: `scaleX(${avance})` }} />
       </div>
       <p className="font-mono text-lg tracking-widest text-acero">PREPARANDO · {Math.round(avance * 100)} %</p>
     </div>
@@ -340,10 +340,10 @@ function Controles(p: {
   onOcultar: () => void
   onIr: (i: number) => void
 }) {
-  const boton = "inline-flex size-9 items-center justify-center rounded-lg text-niebla/80 hover:bg-white/10 hover:text-niebla"
+  const boton = "inline-flex size-9 items-center justify-center rounded-lg text-blanco/80 hover:bg-white/10 hover:text-blanco"
   return (
     <div className="pointer-events-none fixed inset-x-0 bottom-4 z-50 flex justify-center px-4">
-      <div className="pointer-events-auto flex max-w-full items-center gap-1 overflow-hidden rounded-xl border border-white/10 bg-hierro/90 px-2 py-1.5 shadow-2xl">
+      <div className="pointer-events-auto flex max-w-full items-center gap-1 overflow-hidden rounded-xl border border-white/10 bg-negro/90 px-2 py-1.5 shadow-2xl">
         <button type="button" className={boton} onClick={p.onAnterior} aria-label="Escena anterior">
           <ChevronLeft className="size-4" />
         </button>
@@ -354,7 +354,7 @@ function Controles(p: {
           <ChevronRight className="size-4" />
         </button>
         <span className="mx-2 hidden min-w-0 items-center gap-2 font-mono text-xs text-acero sm:flex" data-testid="presentacion-escena">
-          <span className="text-niebla">
+          <span className="text-blanco">
             {String(p.activa + 1).padStart(2, "0")} / {String(p.total).padStart(2, "0")}
           </span>
           <span className="max-w-48 truncate">{p.titulo}</span>
@@ -362,13 +362,13 @@ function Controles(p: {
         <div className="mx-1 hidden gap-1 md:flex" aria-label="Ir a escena">
           {Array.from({ length: p.total }, (_, i) => (
             <button key={i} type="button" onClick={() => p.onIr(i)} aria-label={`Escena ${i + 1}`} className="flex h-6 w-3 items-center justify-center">
-              <span className={cn("h-1.5 w-3 rounded-full transition-transform", i === p.activa ? "bg-chispa" : "scale-x-50 bg-white/25")} />
+              <span className={cn("h-1.5 w-3 rounded-full transition-transform", i === p.activa ? "bg-alerta" : "scale-x-50 bg-white/25")} />
             </button>
           ))}
         </div>
         <div className="mx-1 flex rounded-md border border-white/10 p-0.5" role="group" aria-label="Velocidad">
           {VELOCIDADES.map((v, i) => (
-            <button key={v} type="button" onClick={() => p.onVelocidad(v)} aria-pressed={p.velocidad === v} title={`Tecla ${i + 1}`} className={cn("rounded px-1.5 py-0.5 font-mono text-[11px]", p.velocidad === v ? "bg-white/15 text-niebla" : "text-acero hover:text-niebla")}>
+            <button key={v} type="button" onClick={() => p.onVelocidad(v)} aria-pressed={p.velocidad === v} title={`Tecla ${i + 1}`} className={cn("rounded px-1.5 py-0.5 font-mono text-[11px]", p.velocidad === v ? "bg-white/15 text-blanco" : "text-acero hover:text-blanco")}>
               {String(v).replace(".", ",")}×
             </button>
           ))}

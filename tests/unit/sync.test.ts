@@ -69,7 +69,7 @@ function eventoSync(eventos: EventoMotor[]) {
 describe("motor de sincronización", () => {
   it("una venta en línea se sincroniza y recibe número definitivo", async () => {
     const { crearMotor, usuario, cc, servidor } = escenario()
-    const m = await crearMotor(usuario("mostrador@demo.yunque.app"))
+    const m = await crearMotor(usuario("mostrador@demo.quvant.app"))
     const p = conStock(m.estado, cc.id)
     const antes = stockDe(m.estado, cc.id, p.id)
     const v = venta(m, cc.id, p)
@@ -87,7 +87,7 @@ describe("motor de sincronización", () => {
 
   it("una venta hecha mientras se sincroniza la anterior no queda esperando en la cola", async () => {
     const { crearMotor, usuario, cc, servidor } = escenario()
-    const m = await crearMotor(usuario("mostrador@demo.yunque.app"))
+    const m = await crearMotor(usuario("mostrador@demo.quvant.app"))
     const p = conStock(m.estado, cc.id, 2)
     // Servidor lento: la segunda venta entra con el primer ciclo en curso
     const enviar = servidor.enviar.bind(servidor)
@@ -109,7 +109,7 @@ describe("motor de sincronización", () => {
   it("sin conexión: se sigue vendiendo, la cola persiste y se sincroniza al volver", async () => {
     const { crearMotor, usuario, cc, cortar, reconectar } = escenario()
     const almacen = new AlmacenMemoria()
-    const m = await crearMotor(usuario("mostrador@demo.yunque.app"), almacen)
+    const m = await crearMotor(usuario("mostrador@demo.quvant.app"), almacen)
     cortar()
     const p = conStock(m.estado, cc.id, 3)
     const ids: string[] = []
@@ -124,7 +124,7 @@ describe("motor de sincronización", () => {
     expect(m.pendientes.every((o) => o.sinConexion)).toBe(true)
 
     // "Recarga" de la app sin conexión: la cola sigue ahí y el estado la incluye.
-    const recargado = await crearMotor(usuario("mostrador@demo.yunque.app"), almacen)
+    const recargado = await crearMotor(usuario("mostrador@demo.quvant.app"), almacen)
     expect(recargado.pendientes).toHaveLength(3)
     expect(stockDe(recargado.estado, cc.id, p.id)).toBe(stockDe(m.estado, cc.id, p.id))
 
@@ -142,7 +142,7 @@ describe("motor de sincronización", () => {
 
   it("reenviar una operación es seguro (idempotencia)", async () => {
     const { crearMotor, usuario, cc, servidor } = escenario()
-    const u = usuario("mostrador@demo.yunque.app")
+    const u = usuario("mostrador@demo.quvant.app")
     const m = await crearMotor(u)
     const p = conStock(m.estado, cc.id)
     const v = venta(m, cc.id, p)
@@ -167,8 +167,8 @@ describe("motor de sincronización", () => {
 
   it("conflicto: dos puestos convierten el mismo presupuesto; gana el primero y el segundo se informa", async () => {
     const { crearMotor, usuario, cc, cortar, reconectar, servidor } = escenario()
-    const uA = usuario("mostrador@demo.yunque.app")
-    const uB = usuario("admin@demo.yunque.app")
+    const uA = usuario("mostrador@demo.quvant.app")
+    const uB = usuario("admin@demo.quvant.app")
     const a = await crearMotor(uA)
     const pre = Object.values(a.estado.presupuestos).find((p) => p.sucursalId === cc.id && (p.estado === "enviado" || p.estado === "aceptado"))!
     expect(pre).toBeTruthy()
@@ -222,8 +222,8 @@ describe("motor de sincronización", () => {
 
   it("dos puestos venden la última unidad sin conexión: ambas se aceptan con advertencia de stock negativo", async () => {
     const { crearMotor, usuario, cc, cortar, reconectar } = escenario()
-    const a = await crearMotor(usuario("mostrador@demo.yunque.app"))
-    const b = await crearMotor(usuario("admin@demo.yunque.app"))
+    const a = await crearMotor(usuario("mostrador@demo.quvant.app"))
+    const b = await crearMotor(usuario("admin@demo.quvant.app"))
     const p = conStock(a.estado, cc.id)
     const unidades = stockDe(a.estado, cc.id, p.id)
     cortar()
@@ -242,12 +242,12 @@ describe("motor de sincronización", () => {
 
   it("venta sin conexión con precio viejo: se acepta y queda marcada", async () => {
     const { crearMotor, usuario, cc, cortar, reconectar, servidor } = escenario()
-    const m = await crearMotor(usuario("mostrador@demo.yunque.app"))
+    const m = await crearMotor(usuario("mostrador@demo.quvant.app"))
     const p = conStock(m.estado, cc.id)
     cortar()
     const v = venta(m, cc.id, p)
     await m.ejecutar("venta.crear", { venta: v }, { sucursalId: cc.id })
-    const compras = usuario("compras@demo.yunque.app")
+    const compras = usuario("compras@demo.quvant.app")
     await servidor.inyectar(
       {
         id: m.uuid(),
@@ -270,8 +270,8 @@ describe("motor de sincronización", () => {
 
   it("cerrar una caja ya cerrada desde otro puesto se rechaza", async () => {
     const { crearMotor, usuario, cc, cortar, reconectar } = escenario()
-    const a = await crearMotor(usuario("mostrador@demo.yunque.app"))
-    const b = await crearMotor(usuario("admin@demo.yunque.app"))
+    const a = await crearMotor(usuario("mostrador@demo.quvant.app"))
+    const b = await crearMotor(usuario("admin@demo.quvant.app"))
     const caja = Object.values(a.estado.cajas).find((c) => c.sucursalId === cc.id && c.estado === "abierta")!
     await b.ejecutar("caja.cerrar", { sesionId: caja.id, montoContado: 100 }, { sucursalId: cc.id })
     await b.sincronizar()
@@ -283,19 +283,19 @@ describe("motor de sincronización", () => {
     a.suscribir((e) => eventos.push(e))
     await a.sincronizar()
     expect(eventoSync(eventos).rechazadas[0].error).toMatch(/ya fue cerrada/)
-    expect(a.estado.cajas[caja.id].cerradaPor).toBe(usuario("admin@demo.yunque.app").id)
+    expect(a.estado.cajas[caja.id].cerradaPor).toBe(usuario("admin@demo.quvant.app").id)
   })
 
   it("las operaciones inválidas o sin permiso no entran a la cola", async () => {
     const { crearMotor, usuario, cc } = escenario()
-    const tecnico = await crearMotor(usuario("tecnico@demo.yunque.app"))
+    const tecnico = await crearMotor(usuario("tecnico@demo.quvant.app"))
     const p = conStock(tecnico.estado, cc.id)
     const r = await tecnico.ejecutar("venta.crear", { venta: venta(tecnico, cc.id, p) }, { sucursalId: cc.id })
     expect(r.ok).toBe(false)
     expect(tecnico.pendientes).toHaveLength(0)
 
     const norte = SEMILLA.sucursales.find((s) => s.codigo === "NO")!
-    const m = await crearMotor(usuario("mostrador@demo.yunque.app"))
+    const m = await crearMotor(usuario("mostrador@demo.quvant.app"))
     const fuera = await m.ejecutar("venta.crear", { venta: venta(m, norte.id, conStock(m.estado, norte.id)) }, { sucursalId: norte.id })
     expect(fuera).toMatchObject({ ok: false, codigo: "sucursal" })
 
@@ -307,8 +307,8 @@ describe("motor de sincronización", () => {
 
   it("tras sincronizar, la réplica local coincide con el servidor", async () => {
     const { crearMotor, usuario, cc, servidor, cortar, reconectar } = escenario()
-    const a = await crearMotor(usuario("mostrador@demo.yunque.app"))
-    const dep = await crearMotor(usuario("deposito@demo.yunque.app"))
+    const a = await crearMotor(usuario("mostrador@demo.quvant.app"))
+    const dep = await crearMotor(usuario("deposito@demo.quvant.app"))
     const p = conStock(a.estado, cc.id, 5)
     cortar()
     await a.ejecutar("venta.crear", { venta: venta(a, cc.id, p, 2) }, { sucursalId: cc.id })

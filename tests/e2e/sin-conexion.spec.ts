@@ -5,7 +5,7 @@ const contar = (ops: OpResumen[], id: string) => ops.filter((o) => o.id === id).
 
 test.describe("mostrador sin conexión", () => {
   test("corta la red, vende, reconecta: cada venta llega una sola vez y el stock baja una sola vez", async ({ page, context }) => {
-    await ingresar(page, "mostrador@demo.yunque.app", "/app/mostrador")
+    await ingresar(page, "mostrador@demo.quvant.app", "/app/mostrador")
     const estado = page.getByTestId("estado-conexion")
     await expect(estado).toHaveText("Sincronizado", { timeout: 15_000 })
     await page.evaluate(async () => {

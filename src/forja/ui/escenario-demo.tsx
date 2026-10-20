@@ -20,7 +20,7 @@ function Cargando() {
 
 /** Pantalla completa, sin barras de desplazamiento, siempre oscura (también dentro de un iframe). */
 function Marco({ children }: { children: React.ReactNode }) {
-  return <div className="dark fixed inset-0 overflow-hidden bg-hierro text-niebla [&_*]:[scrollbar-width:none]">{children}</div>
+  return <div className="dark fixed inset-0 overflow-hidden bg-negro text-blanco [&_*]:[scrollbar-width:none]">{children}</div>
 }
 
 /** /forja: la demo genérica (Ferretería Industrial Demo, sello DEMO). */

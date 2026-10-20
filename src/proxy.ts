@@ -24,7 +24,7 @@ export async function proxy(req: NextRequest) {
     return clienteDemo(forja[1])?.forja ? NextResponse.next() : NextResponse.rewrite(new URL("/_not-found", req.url), { status: 404 })
   }
 
-  const sesion = await verificar<Sesion>(req.cookies.get(COOKIE_SESION)?.value, "yunque-app")
+  const sesion = await verificar<Sesion>(req.cookies.get(COOKIE_SESION)?.value, "quvant-app")
 
   if (pathname.startsWith("/app")) {
     if (!sesion) {

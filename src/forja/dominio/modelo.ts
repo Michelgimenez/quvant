@@ -4,7 +4,7 @@ import type { EstadoEntrega, EstadoServicio, FechaISO, Id, Ilustracion } from "@
 import { calorRelativo } from "./calor"
 
 /**
- * Modelo de Forja: lo que se dibuja. Se arma desde el estado de Yunque (app y
+ * Modelo de Forja: lo que se dibuja. Se arma desde el estado de Quvant (app y
  * demo embebida) o se lee de un snapshot (demos públicas). No depende de React
  * ni de ningún motor gráfico; lo usan el mapa, la constelación, el taller 3D y
  * la versión 2D por igual.

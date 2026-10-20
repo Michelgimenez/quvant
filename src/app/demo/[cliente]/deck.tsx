@@ -13,7 +13,7 @@ export function DeckCliente({ cliente }: { cliente: ClienteDemo }) {
   const preparar = useCallback(async () => {
     setDemo(
       await crearDemoEmbebida({
-        email: "dueno@demo.yunque.app",
+        email: "dueno@demo.quvant.app",
         org: { nombre: cliente.nombre, slug: cliente.slug, colorAcento: cliente.color, logo: cliente.logo, logoNegativo: cliente.logoNegativo },
       }),
     )
@@ -22,7 +22,7 @@ export function DeckCliente({ cliente }: { cliente: ClienteDemo }) {
   return (
     <ProveedoresInterfaz>
       <ProveedorDemoCliente value={{ cliente, demo }}>
-        <Presentacion nombre={`Así se vería Yunque en ${cliente.nombre} · propuesta`} escenas={ESCENAS_CLIENTE} recursos={recursos} preparar={preparar} pie="Propuesta" />
+        <Presentacion nombre={`Así se vería Quvant en ${cliente.nombre} · propuesta`} escenas={ESCENAS_CLIENTE} recursos={recursos} preparar={preparar} pie="Propuesta" />
       </ProveedorDemoCliente>
     </ProveedoresInterfaz>
   )

@@ -93,7 +93,7 @@ export function TablaRapida<T>({
 
   return (
     <div className="overflow-hidden rounded-xl border border-linea bg-card">
-      <div role="table" aria-label={etiqueta} aria-rowcount={ordenadas.length} className="text-sm">
+      <div role="table" aria-label={etiqueta} aria-rowcount={ordenadas.length} className="t-texto-sm">
         <div role="rowgroup" className={cn("hidden border-b border-linea bg-superficie-2 md:block")}>
           <div role="row" className="grid items-center gap-3 px-4 py-2" style={{ gridTemplateColumns: plantilla }}>
             {columnas.map((c) => (
@@ -101,7 +101,7 @@ export function TablaRapida<T>({
                 key={c.id}
                 role="columnheader"
                 aria-sort={orden?.id === c.id ? (orden.asc ? "ascending" : "descending") : undefined}
-                className={cn("text-xs font-medium text-muted-foreground", c.alinear === "der" && "text-right", c.alinear === "centro" && "text-center")}
+                className={cn("t-texto-sm font-medium text-muted-foreground", c.alinear === "der" && "text-right", c.alinear === "centro" && "text-center")}
               >
                 {c.orden ? (
                   <button
@@ -162,7 +162,7 @@ export function TablaRapida<T>({
           </div>
         </div>
       </div>
-      <div className="flex items-center justify-between border-t border-linea px-4 py-2 text-xs text-muted-foreground">
+      <div className="flex items-center justify-between border-t border-linea px-4 py-2 t-texto-sm text-muted-foreground">
         <span>{ordenadas.length.toLocaleString("es-AR")} filas</span>
         <span className="hidden sm:inline">↑ ↓ para moverte · Enter para abrir</span>
       </div>

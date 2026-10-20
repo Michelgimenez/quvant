@@ -12,8 +12,8 @@ import { NAVEGACION, NAV_MOVIL, TODOS_LOS_ITEMS, itemActivo, itemVisible } from 
 import { borrar as borrarSesionLocal } from "@/cliente/sesion"
 import { LogoOrg } from "@/components/base/logo-org"
 import { Sello } from "@/components/base/sellos"
-import { ConYunqueDiscreto } from "@/components/marca/con-yunque-discreto"
-import { Isotipo } from "@/components/marca/marca"
+import { ConQuvantDiscreto } from "@/components/marca/con-quvant"
+import { Isotipo } from "@/components/marca/quvant"
 import { Button } from "@/components/ui/button"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 import { Kbd } from "@/components/ui/kbd"
@@ -48,9 +48,9 @@ export function ShellApp({ children }: { children: React.ReactNode }) {
 
 function Apertura({ mensaje }: { mensaje?: string }) {
   return (
-    <div className="grilla-tecnica flex min-h-dvh flex-col items-center justify-center gap-4 px-6 text-center" role="status" aria-live="polite">
-      <Isotipo className={cn("h-10 text-foreground", !mensaje && "animate-pulse")} />
-      <p className="text-sm text-muted-foreground">{mensaje ?? "Abriendo tu sistema…"}</p>
+    <div className="grilla-puntos flex min-h-dvh flex-col items-center justify-center gap-4 px-6 text-center" role="status" aria-live="polite">
+      <Isotipo className={cn("h-10", !mensaje && "animate-pulse")} />
+      <p className="t-texto-sm text-muted-foreground">{mensaje ?? "Abriendo tu sistema…"}</p>
       {mensaje && (
         <Button variant="outline" onClick={() => location.reload()}>
           Reintentar
@@ -76,7 +76,9 @@ function Marco({ children, renovada }: { children: React.ReactNode; renovada: bo
   return (
     <div
       className="min-h-dvh"
-      style={{ "--marca": org.colorAcento, "--marca-contraste": textoSobre(org.colorAcento) } as React.CSSProperties}
+      // El color de la empresa va solo en su logo, el indicador del módulo activo y la serie principal de sus gráficos.
+      // --serie-1 se redefine acá porque los tokens se resuelven en el elemento donde se declaran.
+      style={{ "--marca": org.colorAcento, "--marca-contraste": textoSobre(org.colorAcento), "--serie-1": org.colorAcento, "--chart-1": org.colorAcento } as React.CSSProperties}
     >
       <a href="#contenido" className="sr-only focus:not-sr-only focus:fixed focus:left-3 focus:top-3 focus:z-50 focus:rounded-md focus:bg-primary focus:px-3 focus:py-2 focus:text-primary-foreground">
         Saltar al contenido
@@ -93,7 +95,6 @@ function Marco({ children, renovada }: { children: React.ReactNode; renovada: bo
 
       <div className="lg:pl-60">
         <header className="sticky top-0 z-20 border-b border-linea bg-background/90 backdrop-blur supports-[backdrop-filter]:bg-background/75">
-          <div className="h-[3px] w-full" style={{ background: "var(--marca)" }} aria-hidden />
           <div className="flex h-14 items-center gap-2 px-3 sm:px-5">
             <Button variant="ghost" size="icon" className="lg:hidden" onClick={() => setMenu(true)} aria-label="Abrir menú">
               <Menu />
@@ -104,10 +105,10 @@ function Marco({ children, renovada }: { children: React.ReactNode; renovada: bo
             <button
               type="button"
               onClick={() => window.dispatchEvent(new CustomEvent(EVENTO_ABRIR_PALETA))}
-              className="hidden h-9 w-72 items-center gap-2 rounded-lg border border-linea bg-superficie-2 px-3 text-sm text-muted-foreground transition-colors hover:border-acero/40 md:flex"
+              className="hidden h-9 w-64 items-center gap-2 rounded-lg border border-linea bg-superficie-2 px-3 text-muted-foreground transition-colors hover:border-gris-5 md:flex"
             >
               <Search className="size-4" />
-              <span className="flex-1 text-left">Buscar productos, clientes…</span>
+              <span className="t-texto-sm flex-1 truncate whitespace-nowrap text-left">Buscar en Quvant</span>
               <Kbd>⌘K</Kbd>
             </button>
             <div className="ml-auto flex items-center gap-1.5 sm:gap-2">
@@ -156,7 +157,7 @@ function Lateral() {
           if (!items.length) return null
           return (
             <div key={g.grupo} className="space-y-0.5">
-              <p className="ficha px-2 pb-1">{g.grupo}</p>
+              <p className="t-etiqueta px-2.5 pb-1.5 text-muted-foreground">{g.grupo}</p>
               {items.map((i) => {
                 const activo = itemActivo(pathname, i.href)
                 return (
@@ -165,11 +166,11 @@ function Lateral() {
                     href={i.href}
                     aria-current={activo ? "page" : undefined}
                     className={cn(
-                      "relative flex h-9 items-center gap-2.5 rounded-md px-2.5 text-sm transition-colors",
+                      "relative flex h-9 items-center gap-2.5 rounded-md px-2.5 transition-colors t-texto-sm",
                       activo ? "bg-sidebar-accent font-medium text-foreground" : "text-muted-foreground hover:bg-sidebar-accent/60 hover:text-foreground",
                     )}
                   >
-                    {activo && <span className="absolute inset-y-1.5 left-0 w-[3px] rounded-full" style={{ background: "var(--marca)" }} aria-hidden />}
+                    {activo && <span className="absolute inset-y-2 left-0 w-[3px]" style={{ background: "var(--marca)" }} aria-hidden />}
                     <i.icono className="size-4" />
                     {i.nombre}
                   </Link>
@@ -181,10 +182,10 @@ function Lateral() {
       </nav>
       <div className="space-y-3 border-t border-sidebar-border px-4 py-3">
         <div className="min-w-0">
-          <p className="truncate text-sm font-medium">{usuario.nombre}</p>
-          <p className="truncate text-xs text-muted-foreground">{NOMBRE_ROL[usuario.rol]}</p>
+          <p className="t-texto-sm truncate font-medium">{usuario.nombre}</p>
+          <p className="t-etiqueta truncate text-muted-foreground">{NOMBRE_ROL[usuario.rol]}</p>
         </div>
-        <ConYunqueDiscreto />
+        <ConQuvantDiscreto />
       </div>
     </div>
   )
@@ -198,7 +199,7 @@ function SelectorSucursal() {
   }
   return (
     <Select value={sucursalId} onValueChange={setSucursalId}>
-      <SelectTrigger size="sm" className="h-8 w-auto max-w-44 gap-1.5 text-xs" aria-label="Sucursal activa">
+      <SelectTrigger size="sm" className="h-8 w-auto max-w-44 gap-1.5 t-texto-sm" aria-label="Sucursal activa">
         <SelectValue />
       </SelectTrigger>
       <SelectContent align="end">
@@ -233,17 +234,17 @@ function MenuUsuario() {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <button type="button" className="inline-flex size-8 items-center justify-center rounded-full text-xs font-bold" style={{ background: "var(--marca)", color: "var(--marca-contraste)" }} aria-label={`Cuenta de ${usuario.nombre}`}>
+        <button type="button" className="t-etiqueta inline-flex size-8 items-center justify-center rounded-md border border-linea bg-secondary text-foreground tracking-normal" aria-label={`Cuenta de ${usuario.nombre}`}>
           {iniciales}
         </button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="w-60">
         <DropdownMenuLabel className="space-y-0.5">
-          <p className="text-sm font-semibold">{usuario.nombre}</p>
-          <p className="text-xs font-normal text-muted-foreground">
+          <p className="t-texto-sm font-semibold">{usuario.nombre}</p>
+          <p className="t-texto-sm font-normal text-muted-foreground">
             {NOMBRE_ROL[usuario.rol]} · {usuario.email}
           </p>
-          {sesion.aal === "aal2" && <p className="text-[11px] font-normal text-ok-texto">Doble factor verificado</p>}
+          {sesion.aal === "aal2" && <p className="t-texto-sm font-normal text-ok">Doble factor verificado</p>}
         </DropdownMenuLabel>
         <DropdownMenuSeparator />
         <DropdownMenuItem onSelect={() => window.dispatchEvent(new CustomEvent(EVENTO_AYUDA_ATAJOS))}>
@@ -289,7 +290,7 @@ function NavegacionMovil({ onMas }: { onMas: () => void }) {
           const activo = itemActivo(pathname, i.href)
           return (
             <li key={i.href}>
-              <Link href={i.href} aria-current={activo ? "page" : undefined} className={cn("flex h-14 flex-col items-center justify-center gap-0.5 text-[10.5px]", activo ? "text-foreground" : "text-muted-foreground")}>
+              <Link href={i.href} aria-current={activo ? "page" : undefined} className={cn("flex h-14 flex-col items-center justify-center gap-0.5 t-texto-sm", activo ? "text-foreground" : "text-muted-foreground")}>
                 <i.icono className="size-5" style={activo ? { color: "var(--marca)" } : undefined} />
                 <span className="max-w-full truncate px-1">{i.nombre.split(" ")[0]}</span>
               </Link>
@@ -297,7 +298,7 @@ function NavegacionMovil({ onMas }: { onMas: () => void }) {
           )
         })}
         <li>
-          <button type="button" onClick={onMas} className="flex h-14 w-full flex-col items-center justify-center gap-0.5 text-[10.5px] text-muted-foreground">
+          <button type="button" onClick={onMas} className="flex h-14 w-full flex-col items-center justify-center gap-0.5 t-texto-sm text-muted-foreground">
             <MoreHorizontal className="size-5" />
             Más
           </button>

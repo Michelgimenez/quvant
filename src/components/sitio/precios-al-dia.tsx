@@ -15,7 +15,7 @@ export function PreciosAlDia() {
   if (!e) return null
   const torkan = e.marcas.find((m) => m.nombre === "Torkan")
   return (
-    <div className="dark rounded-2xl border border-white/10 bg-superficie/60 p-4 text-foreground sm:p-6" data-testid="precios-al-dia">
+    <div className="dark rounded-2xl border border-white/10 bg-superficie-1/60 p-4 text-foreground sm:p-6" data-testid="precios-al-dia">
       <AumentoMasivo e={e} verCostos inicial={{ marcaIds: torkan ? [torkan.id] : [], porcentaje: 8 }} />
       <p className="mt-3 text-xs text-acero">Catálogo de la empresa de demostración (marcas y precios ficticios). En la app, un clic aplica el aumento y queda en el historial para revertirlo.</p>
     </div>

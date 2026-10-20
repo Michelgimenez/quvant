@@ -201,9 +201,9 @@ function Pelicula({ demo, textos, bucle }: { demo: DemoEmbebida; textos: TextosP
       <div className="grid h-full grid-cols-[440px_1fr] items-center gap-16">
         <ol className="space-y-6">
           {pasos.map(([id, titulo, texto], i) => (
-            <li key={id} className={cn("rounded-2xl border p-6 transition-[opacity,transform] duration-500", paso === id ? "border-temple/60 bg-superficie opacity-100" : "translate-x-2 border-white/5 opacity-45")}>
+            <li key={id} className={cn("rounded-2xl border p-6 transition-[opacity,transform] duration-500", paso === id ? "border-foreground/60 bg-superficie-1 opacity-100" : "translate-x-2 border-white/5 opacity-45")}>
               <p className="font-mono text-[18px] tracking-widest text-acero">0{i + 1}</p>
-              <p className="mt-2 text-[32px] font-bold leading-tight text-niebla">{titulo}</p>
+              <p className="mt-2 text-[32px] font-bold leading-tight text-blanco">{titulo}</p>
               <p className="mt-2 text-[20px] text-acero">{texto}</p>
             </li>
           ))}
@@ -257,14 +257,14 @@ function Pelicula({ demo, textos, bucle }: { demo: DemoEmbebida; textos: TextosP
                     </button>
                     {venta && (
                       <motion.p initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} className="flex items-center gap-2 rounded-lg border border-ok/40 bg-ok/10 p-3 text-sm">
-                        <CheckCircle2 className="size-5 text-ok-texto" /> Venta {venta.numero ? `#${venta.numero}` : venta.numeroLocal}
+                        <CheckCircle2 className="size-5 text-ok" /> Venta {venta.numero ? `#${venta.numero}` : venta.numeroLocal}
                       </motion.p>
                     )}
                   </div>
                 </div>
               )}
               {cobrando && (
-                <div className="absolute inset-0 z-20 flex items-center justify-center bg-hierro/60">
+                <div className="absolute inset-0 z-20 flex items-center justify-center bg-negro/60">
                   <div className="w-[420px] space-y-4 rounded-xl border border-linea bg-popover p-6">
                     <p className="text-lg font-semibold">Cobrar</p>
                     <p className="text-4xl font-semibold tracking-tight">{formatoPesos(total)}</p>
@@ -336,7 +336,7 @@ function Pelicula({ demo, textos, bucle }: { demo: DemoEmbebida; textos: TextosP
       </motion.svg>
       <motion.span
         key={cursor.clic}
-        className="pointer-events-none absolute left-0 top-0 z-40 size-10 rounded-full border-2 border-chispa"
+        className="pointer-events-none absolute left-0 top-0 z-40 size-10 rounded-full border-2 border-alerta"
         initial={{ x: cursor.x - 14, y: cursor.y - 14, scale: 0.2, opacity: cursor.clic ? 0.9 : 0 }}
         animate={{ x: cursor.x - 14, y: cursor.y - 14, scale: 1.4, opacity: 0 }}
         transition={{ duration: 0.5 / velocidad }}
@@ -351,7 +351,7 @@ function TarjetaPresupuesto({ presupuesto, botonRef, venta }: { presupuesto: imp
     <div className="mx-auto max-w-[720px] space-y-4 rounded-xl border border-linea bg-card p-6">
       <div className="flex items-center gap-2">
         <span className="ficha">Presupuesto #{presupuesto.numero}</span>
-        <span className={cn("rounded-full px-2 py-0.5 text-[11px] font-medium", venta ? "bg-ok/15 text-ok-texto" : "bg-temple/15 text-enlace")}>{venta ? "Convertido en venta" : "Enviado"}</span>
+        <span className={cn("rounded-full px-2 py-0.5 text-[11px] font-medium", venta ? "bg-ok/15 text-ok" : "bg-foreground/15 text-foreground")}>{venta ? "Convertido en venta" : "Enviado"}</span>
       </div>
       <p className="text-2xl font-bold">{presupuesto.clienteNombre}</p>
       <ul className="divide-y divide-linea rounded-lg border border-linea">
@@ -369,7 +369,7 @@ function TarjetaPresupuesto({ presupuesto, botonRef, venta }: { presupuesto: imp
       </div>
       {venta ? (
         <p className="flex items-center gap-2 rounded-lg border border-ok/40 bg-ok/10 p-3 text-sm">
-          <CheckCircle2 className="size-5 text-ok-texto" /> Convertido en la venta {venta}
+          <CheckCircle2 className="size-5 text-ok" /> Convertido en la venta {venta}
         </p>
       ) : (
         <button ref={botonRef} type="button" className="flex h-12 items-center gap-2 rounded-lg bg-primary px-5 font-medium text-primary-foreground">

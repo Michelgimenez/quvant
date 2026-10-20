@@ -1,24 +1,22 @@
-import { Wordmark } from "@/components/marca/marca"
+import { Isotipo } from "@/components/marca/quvant"
 import { cn } from "@/lib/utils"
 
 /**
- * "yunque + forja": el wordmark de Yunque, y "forja" en Inter Display
- * ExtraBold, color sólido --niebla. La brasa es solo un punto de acento al lado
- * (nunca un degradé en las letras). Todo se mide en em a partir de `tamano`
- * (alto del wordmark en px) y usa tokens: se adapta cuando la identidad de
- * Yunque se renueve.
+ * La placa de Forja: "FORJA" en Michroma (una palabra, mayúsculas, espaciado amplio: manual, pág. 9) y la
+ * firma «by Quvant» (manual, pág. 4: los productos llevan «by Quvant»). Todo en em a partir de `tamano`
+ * (alto de las mayúsculas en px). Negro y blanco: la Q cromada es el único brillo.
  */
-export function MarcaForja({ className, tamano = 28, conBrasa = true }: { className?: string; tamano?: number; conBrasa?: boolean }) {
+export function MarcaForja({ className, tamano = 28 }: { className?: string; tamano?: number; conBrasa?: boolean }) {
   return (
-    <span className={cn("inline-flex items-baseline gap-[0.22em] text-niebla", className)} style={{ fontSize: tamano }} role="img" aria-label="yunque más forja">
-      <Wordmark className="h-[1em] w-auto translate-y-[0.2em] self-center" titulo={null} />
-      <span aria-hidden className="font-heading text-[0.86em] font-extrabold leading-none tracking-[-0.03em] opacity-80">
-        +
+    <span className={cn("inline-flex items-center gap-[0.55em] text-blanco", className)} style={{ fontSize: tamano }} role="img" aria-label="Forja, by Quvant">
+      <span aria-hidden className="font-marca text-[1em] uppercase leading-none tracking-[0.18em]">
+        Forja
       </span>
-      <span aria-hidden className="font-heading text-[0.86em] font-extrabold leading-none tracking-[-0.04em]" style={{ fontVariationSettings: '"opsz" 32' }}>
-        forja
+      <span aria-hidden className="inline-flex items-center gap-[0.3em] border-l border-gris-4 pl-[0.55em] font-sans text-[0.36em] font-medium uppercase leading-none tracking-[0.2em] text-acero">
+        by
+        <Isotipo lado={Math.max(16, tamano * 0.5)} version="principal" titulo={null} />
+        Quvant
       </span>
-      {conBrasa && <span aria-hidden className="ml-[0.02em] inline-block size-[0.2em] rounded-full bg-brasa shadow-[0_0_0.5em_0.08em_rgb(255_106_31/0.6)]" />}
     </span>
   )
 }

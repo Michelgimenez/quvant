@@ -23,17 +23,17 @@ const CASOS: Caso[] = [
   { id: "marca", ruta: "/marca", completa: true },
   { id: "ingresar-oscuro", ruta: "/ingresar" },
   { id: "ingresar-claro", ruta: "/ingresar", tema: "claro" },
-  { id: "inversores-02", ruta: "/inversores", clave: "yunque-demo", escena: 2 },
-  { id: "inversores-04", ruta: "/inversores", clave: "yunque-demo", escena: 4 },
-  { id: "inversores-08", ruta: "/inversores", clave: "yunque-demo", escena: 8 },
-  { id: "inversores-11", ruta: "/inversores", clave: "yunque-demo", escena: 11 },
+  { id: "inversores-02", ruta: "/inversores", clave: "quvant-demo", escena: 2 },
+  { id: "inversores-04", ruta: "/inversores", clave: "quvant-demo", escena: 4 },
+  { id: "inversores-08", ruta: "/inversores", clave: "quvant-demo", escena: 8 },
+  { id: "inversores-11", ruta: "/inversores", clave: "quvant-demo", escena: 11 },
   { id: "ferremix-02", ruta: "/demo/ferremix", escena: 2 },
   { id: "ferremix-07", ruta: "/demo/ferremix", escena: 7 },
   ...(["oscuro", "claro"] as const).flatMap((tema) => [
-    { id: `app-tablero-${tema}`, ruta: "/app", usuario: "dueno@demo.yunque.app", tema },
-    { id: `app-usuarios-${tema}`, ruta: "/app/usuarios", usuario: "dueno@demo.yunque.app", tema },
-    { id: `app-servicio-${tema}`, ruta: "/app/servicio", usuario: "tecnico@demo.yunque.app", tema },
-    { id: `app-reportes-${tema}`, ruta: "/app/reportes", usuario: "dueno@demo.yunque.app", tema, completa: true },
+    { id: `app-tablero-${tema}`, ruta: "/app", usuario: "dueno@demo.quvant.app", tema },
+    { id: `app-usuarios-${tema}`, ruta: "/app/usuarios", usuario: "dueno@demo.quvant.app", tema },
+    { id: `app-servicio-${tema}`, ruta: "/app/servicio", usuario: "tecnico@demo.quvant.app", tema },
+    { id: `app-reportes-${tema}`, ruta: "/app/reportes", usuario: "dueno@demo.quvant.app", tema, completa: true },
   ]),
 ]
 
@@ -53,7 +53,7 @@ async function ingresar(page: Page, email: string) {
 
 async function capturar(carpeta: string) {
   mkdirSync(carpeta, { recursive: true })
-  const proc = spawn("npx", ["next", "start", "-p", String(PUERTO)], { shell: true, stdio: "ignore", env: { ...process.env, INVERSORES_KEY: "yunque-demo" } })
+  const proc = spawn("npx", ["next", "start", "-p", String(PUERTO)], { shell: true, stdio: "ignore", env: { ...process.env, INVERSORES_KEY: "quvant-demo" } })
   for (let i = 0; i < 120 && !(await fetch(`${BASE}/api/salud`).then((r) => r.ok).catch(() => false)); i++) await new Promise((r) => setTimeout(r, 1000))
   const browser = await chromium.launch()
   try {

@@ -5,8 +5,8 @@ import { motion } from "motion/react"
 import { Boxes, Clock, FileWarning, Layers, MessageSquareWarning, Network, ServerCrash, ShoppingCart, Tags, Wrench } from "lucide-react"
 import type { DemoEmbebida } from "@/cliente/demo-embebida"
 import { EstadoFeatureBadge, TextoConfig } from "@/components/base/sellos"
-import { Wordmark } from "@/components/marca/marca"
-import { YunqueArmado } from "@/components/marca/yunque-armado"
+import { Logotipo } from "@/components/marca/quvant"
+import { IsotipoAnimado } from "@/components/marca/isotipo-animado"
 import { DemoConexion } from "@/components/sitio/demo-conexion"
 import { VideoForja } from "@/components/sitio/video-forja"
 import { ETAPAS } from "@/config/hoja-de-ruta"
@@ -43,9 +43,9 @@ function Apertura() {
   return (
     <Lienzo sinMarca>
       <div className="flex h-full flex-col items-center justify-center gap-10 pb-16">
-        <YunqueArmado key={`${activa}:${reinicio}`} activo={activa} velocidad={velocidad} className="h-[300px] w-auto" />
+        {activa && <IsotipoAnimado key={`${activa}:${reinicio}`} lado={300} duracion={1.6 / velocidad} />}
         <Aparecer demora={1.6} y={20}>
-          <Wordmark className="h-[120px] text-niebla" />
+          <Logotipo version="principal" className="h-[64px]" />
         </Aparecer>
         <Aparecer demora={2.2} y={10}>
           <p className="font-mono text-[22px] uppercase tracking-[0.3em] text-acero">Presentación para inversores · 2026</p>
@@ -65,8 +65,8 @@ function Problema() {
       </Aparecer>
       <div className="mt-12 grid grid-cols-3 gap-8">
         {MERCADO.datos.map((d, i) => (
-          <Aparecer key={i} demora={0.5 + i * 0.15} className="rounded-3xl border border-white/10 bg-superficie/80 p-7">
-            <p className="text-[28px] font-bold text-niebla">
+          <Aparecer key={i} demora={0.5 + i * 0.15} className="rounded-3xl border border-white/10 bg-superficie-1/80 p-7">
+            <p className="text-[28px] font-bold text-blanco">
               <TextoConfig texto={d.valor} />
             </p>
             <p className="mt-2 text-[22px] text-acero">{d.etiqueta}</p>
@@ -77,7 +77,7 @@ function Problema() {
         {MERCADO.dolores.map((d, i) => {
           const I = ICONOS_DOLOR[i % ICONOS_DOLOR.length]
           return (
-            <Aparecer key={d} demora={1.1 + i * 0.12} y={12} className="flex items-center gap-3 rounded-full border border-white/10 bg-hierro px-6 py-2.5 text-[22px] text-niebla">
+            <Aparecer key={d} demora={1.1 + i * 0.12} y={12} className="flex items-center gap-3 rounded-full border border-white/10 bg-negro px-6 py-2.5 text-[22px] text-blanco">
               <I className="size-6 text-error" /> {d}
             </Aparecer>
           )
@@ -91,23 +91,23 @@ function Terreno() {
   return (
     <Lienzo numero="03" etiqueta="Lo que vimos en el terreno">
       <Aparecer>
-        <p className="font-mono text-[24px] uppercase tracking-[0.2em] text-chispa">Caso real · anonimizado</p>
+        <p className="font-mono text-[24px] uppercase tracking-[0.2em] text-alerta">Caso real · anonimizado</p>
         <Titulo className="mt-4">{TERRENO.caso}</Titulo>
         <Bajada className="mt-4">{TERRENO.alcance}.</Bajada>
       </Aparecer>
       <ul className="mt-14 grid grid-cols-2 gap-x-10 gap-y-6">
         {TERRENO.hallazgos.map((h, i) => (
-          <Aparecer key={h.area} demora={0.5 + i * 0.15} x={-20} y={0} className="flex gap-6 border-l-4 border-temple pl-6">
+          <Aparecer key={h.area} demora={0.5 + i * 0.15} x={-20} y={0} className="flex gap-6 border-l-4 border-foreground pl-6">
             <div>
               <p className="text-[22px] uppercase tracking-widest text-acero">{h.area}</p>
-              <p className="mt-1 text-[28px] text-niebla">
+              <p className="mt-1 text-[28px] text-blanco">
                 <TextoConfig texto={h.hallazgo} />
               </p>
             </div>
           </Aparecer>
         ))}
       </ul>
-      <Aparecer demora={1.5} className="mt-12 text-[30px] text-niebla">
+      <Aparecer demora={1.5} className="mt-12 text-[30px] text-blanco">
         <TextoConfig texto={TERRENO.conclusion} />
       </Aparecer>
     </Lienzo>
@@ -120,16 +120,16 @@ function Solucion() {
   return (
     <Lienzo numero="04" etiqueta="La solución">
       <Aparecer>
-        <Titulo className="max-w-[1550px] text-[76px]">Yunque: el sistema de gestión en la nube para negocios con stock complejo, que sigue vendiendo aunque se corte internet.</Titulo>
+        <Titulo className="max-w-[1550px] text-[76px]">Quvant: el sistema de gestión en la nube para negocios con stock complejo, que sigue vendiendo aunque se corte internet.</Titulo>
       </Aparecer>
       <div className="mt-14 grid grid-cols-5 gap-6">
         {PILARES.map((p, i) => {
           const I = ICONO_PILAR[p.id]
           const disponibles = FEATURES.filter((f) => f.escena === p.id && f.estado === "disponible").length
           return (
-            <Aparecer key={p.id} demora={0.6 + i * 0.14} y={36} className="flex flex-col rounded-3xl border border-white/10 bg-superficie/80 p-8">
-              <I className="size-14 shrink-0 text-temple" />
-              <p className="mt-7 text-[34px] font-bold leading-tight text-niebla">{p.nombre}</p>
+            <Aparecer key={p.id} demora={0.6 + i * 0.14} y={36} className="flex flex-col rounded-3xl border border-white/10 bg-superficie-1/80 p-8">
+              <I className="size-14 shrink-0 text-foreground" />
+              <p className="mt-7 text-[34px] font-bold leading-tight text-blanco">{p.nombre}</p>
               <p className="mt-3 flex-1 text-[22px] leading-snug text-acero">{p.frase}</p>
               <p className="mt-6 font-mono text-[18px] text-ok">
                 {disponibles} {disponibles === 1 ? "función disponible" : "funciones disponibles"}
@@ -150,6 +150,9 @@ function DemoProducto() {
     </Lienzo>
   )
 }
+
+/** Hasta la tanda 10 (video nuevo de Forja), la escena queda oculta. */
+const MOSTRAR_FORJA = false
 
 /** Forja: la extensión visual, con la toma genérica (empresa de demostración, sin ningún prospecto). */
 function ForjaEnVivo() {
@@ -194,7 +197,7 @@ function Diferencial() {
             <Bajada className="mt-8 text-[28px]">Cada mostrador tiene su base local y su cola. Cuando vuelve la conexión, todo se sincroniza solo, con reglas claras para los conflictos.</Bajada>
           </Aparecer>
           <Aparecer demora={0.7}>
-            <p className="mt-10 font-mono text-[20px] uppercase tracking-widest text-chispa">En vivo · mismo motor que la app</p>
+            <p className="mt-10 font-mono text-[20px] uppercase tracking-widest text-alerta">En vivo · mismo motor que la app</p>
           </Aparecer>
         </div>
         <Aparecer demora={0.3} escala={0.97}>
@@ -223,15 +226,15 @@ function Modelo() {
           <Aparecer>
             <Titulo className="text-[64px]">Licencia mensual por negocio + implementación.</Titulo>
           </Aparecer>
-          <Aparecer demora={0.4} className="rounded-3xl border border-white/10 bg-superficie/80 p-7">
+          <Aparecer demora={0.4} className="rounded-3xl border border-white/10 bg-superficie-1/80 p-7">
             <p className="text-[20px] uppercase tracking-widest text-acero">Ingreso recurrente</p>
-            <p className="mt-2 text-[30px] text-niebla">
+            <p className="mt-2 text-[30px] text-blanco">
               negocios activos × <span className="font-bold">USD {PRECIOS.desdePorNegocio}</span> por mes
             </p>
           </Aparecer>
-          <Aparecer demora={0.55} className="rounded-3xl border border-white/10 bg-superficie/80 p-7">
+          <Aparecer demora={0.55} className="rounded-3xl border border-white/10 bg-superficie-1/80 p-7">
             <p className="text-[20px] uppercase tracking-widest text-acero">Ingreso por implementación</p>
-            <p className="mt-2 text-[30px] text-niebla">negocios nuevos × implementación (se cotiza por negocio)</p>
+            <p className="mt-2 text-[30px] text-blanco">negocios nuevos × implementación (se cotiza por negocio)</p>
           </Aparecer>
           <Aparecer demora={0.7}>
             <p className="text-[22px] leading-snug text-acero">Cada cliente nuevo suma la licencia todos los meses. La implementación cubre migración, configuración y capacitación.</p>
@@ -239,7 +242,7 @@ function Modelo() {
         </div>
         <div className="flex flex-col">
           <Aparecer demora={0.3}>
-            <p className="font-mono text-[20px] uppercase tracking-widest text-chispa">{SUPUESTOS.etiqueta}</p>
+            <p className="font-mono text-[20px] uppercase tracking-widest text-alerta">{SUPUESTOS.etiqueta}</p>
             <p className="mt-2 text-[22px] text-acero">Ingreso mensual recurrente al final de cada trimestre (USD) si se cumplieran estos supuestos. No es un pronóstico.</p>
           </Aparecer>
           <svg viewBox="0 0 1000 460" className="mt-6 min-h-0 w-full flex-1" role="img" aria-label="Proyección ilustrativa del ingreso mensual por trimestre">
@@ -273,7 +276,7 @@ function Modelo() {
                     T{t.trimestre}
                   </text>
                   {i === tri.length - 1 && (
-                    <text x={x + ancho / 2} y={390 - h} textAnchor="middle" className="fill-niebla font-mono text-[20px]">
+                    <text x={x + ancho / 2} y={390 - h} textAnchor="middle" className="fill-blanco font-mono text-[20px]">
                       {t.mrrUSD.toLocaleString("es-AR")}
                     </text>
                   )}
@@ -308,14 +311,14 @@ function EstadoActual() {
         {columnas.map((c, i) => {
           const lista = FEATURES.filter((f) => f.estado === c)
           return (
-            <Aparecer key={c} demora={0.5 + i * 0.2} className="rounded-3xl border border-white/10 bg-superficie/80 p-7">
+            <Aparecer key={c} demora={0.5 + i * 0.2} className="rounded-3xl border border-white/10 bg-superficie-1/80 p-7">
               <div className="flex items-center justify-between">
-                <EstadoFeatureBadge estado={c} className="h-9 border-white/10 bg-hierro px-4 text-[16px]" />
-                <span className="font-mono text-[40px] font-bold text-niebla">{lista.length}</span>
+                <EstadoFeatureBadge estado={c} className="h-9 border-white/10 bg-negro px-4 text-[16px]" />
+                <span className="font-mono text-[40px] font-bold text-blanco">{lista.length}</span>
               </div>
               <ul className="mt-5 space-y-2">
                 {lista.slice(0, 8).map((f) => (
-                  <li key={f.id} className="text-[21px] leading-snug text-niebla">
+                  <li key={f.id} className="text-[21px] leading-snug text-blanco">
                     {f.nombre}
                   </li>
                 ))}
@@ -344,14 +347,14 @@ function HojaDeRuta() {
           {ETAPAS.map((et, i) => (
             <li key={et.id}>
               <motion.span
-                className={cn("block size-[44px] rounded-full border-4", i === 0 ? "border-chispa bg-chispa/30" : "border-temple bg-hierro")}
+                className={cn("block size-[44px] rounded-full border-4", i === 0 ? "border-alerta bg-alerta/30" : "border-foreground bg-negro")}
                 initial={{ scale: 0 }}
                 animate={{ scale: activa ? 1 : 0 }}
                 transition={{ duration: reducir ? 0 : 0.4 / velocidad, delay: activa && !reducir ? (0.6 + i * 0.3) / velocidad : 0 }}
               />
               <Aparecer demora={0.8 + i * 0.3} y={16} className="mt-8 pr-4">
                 <p className="font-mono text-[18px] uppercase tracking-widest text-acero">Etapa {i + 1}{i === 0 && " · siguiente"}</p>
-                <p className="mt-2 text-[32px] font-bold leading-tight text-niebla">{et.nombre}</p>
+                <p className="mt-2 text-[32px] font-bold leading-tight text-blanco">{et.nombre}</p>
                 <p className="mt-3 text-[20px] leading-snug text-acero">{et.detalle}</p>
               </Aparecer>
             </li>
@@ -382,7 +385,7 @@ function Inversion() {
         <div>
           <Aparecer>
             <p className="text-[30px] text-acero">Buscamos</p>
-            <p className="mt-2 text-[96px] font-extrabold leading-none tracking-tight text-niebla">
+            <p className="mt-2 text-[96px] font-extrabold leading-none tracking-tight text-blanco">
               <TextoConfig texto={datos.inversion.montoTexto} />
             </p>
           </Aparecer>
@@ -391,7 +394,7 @@ function Inversion() {
               <Aparecer key={d.id} demora={0.6 + i * 0.15} x={-16} y={0} className="flex items-start gap-5">
                 <span className="mt-2 size-6 shrink-0 rounded-md" style={{ background: PARTES[i % PARTES.length] }} aria-hidden />
                 <div>
-                  <p className="text-[32px] font-bold text-niebla">
+                  <p className="text-[32px] font-bold text-blanco">
                     {d.nombre} <span className="font-mono text-acero">· {d.porcentaje} %</span>
                   </p>
                   <p className="text-[22px] text-acero">{d.detalle}</p>
@@ -416,7 +419,7 @@ function Inversion() {
               transition={{ duration: reducir ? 0 : 0.6 / velocidad, delay: activa && !reducir ? (0.5 + i * 0.3) / velocidad : 0, ease: "easeOut" }}
             />
           ))}
-          <text x="260" y="250" textAnchor="middle" className="fill-niebla text-[44px] font-bold">
+          <text x="260" y="250" textAnchor="middle" className="fill-blanco text-[44px] font-bold">
             100 %
           </text>
           <text x="260" y="292" textAnchor="middle" className="fill-acero font-mono text-[20px]">
@@ -437,19 +440,19 @@ function Equipo() {
       </Aparecer>
       <div className="mt-16 grid grid-cols-2 gap-10">
         {datos.equipo.map((p, i) => (
-          <Aparecer key={i} demora={0.4 + i * 0.2} className="flex gap-8 rounded-3xl border border-white/10 bg-superficie/80 p-10">
+          <Aparecer key={i} demora={0.4 + i * 0.2} className="flex gap-8 rounded-3xl border border-white/10 bg-superficie-1/80 p-10">
             {p.foto ? (
               // eslint-disable-next-line @next/next/no-img-element -- foto cargada en la configuración
               <img src={p.foto} alt={p.nombre} className="size-40 rounded-2xl object-cover" />
             ) : (
-              <div className="flex size-40 shrink-0 items-center justify-center rounded-2xl border-2 border-dashed border-chispa/60 text-center font-mono text-[16px] text-chispa">
+              <div className="flex size-40 shrink-0 items-center justify-center rounded-2xl border-2 border-dashed border-alerta/60 text-center font-mono text-[16px] text-alerta">
                 [COMPLETAR
                 <br />
                 foto]
               </div>
             )}
             <div className="space-y-3">
-              <p className="text-[40px] font-bold text-niebla">
+              <p className="text-[40px] font-bold text-blanco">
                 <TextoConfig texto={p.nombre} />
               </p>
               <p className="text-[26px] text-acero">
@@ -472,9 +475,9 @@ function Cierre() {
   return (
     <Lienzo sinMarca>
       <div className="flex h-full flex-col items-center justify-center gap-10 pb-16 text-center">
-        <YunqueArmado key={`${activa}:${reinicio}`} activo={activa} velocidad={velocidad} className="h-[240px] w-auto" />
+        {activa && <IsotipoAnimado key={`${activa}:${reinicio}`} lado={240} duracion={1.6 / velocidad} />}
         <Aparecer demora={1.5}>
-          <p className="text-[96px] font-extrabold tracking-[-0.035em] text-niebla">{SITIO.tagline}</p>
+          <p className="text-[96px] font-extrabold tracking-[-0.035em] text-blanco">{SITIO.tagline}</p>
         </Aparecer>
         <Aparecer demora={2.0} className="space-y-2 text-[28px] text-acero">
           <p>
@@ -495,7 +498,8 @@ export const ESCENAS_INVERSORES: DefinicionEscena[] = [
   { id: "terreno", titulo: "Lo que vimos en el terreno", largo: 120, duracion: 11, Componente: Terreno },
   { id: "solucion", titulo: "La solución", largo: 120, duracion: 11, Componente: Solucion },
   { id: "demo", titulo: "Demo del producto", largo: 150, duracion: 24, Componente: DemoProducto },
-  { id: "forja", titulo: "Forja: el negocio, en vivo", largo: 130, duracion: 46, Componente: ForjaEnVivo },
+  // La escena de Forja vuelve con la marca nueva en la tanda 10 (el video viejo muestra el yunque).
+  ...(MOSTRAR_FORJA ? [{ id: "forja", titulo: "Forja: el negocio, en vivo", largo: 130, duracion: 46, Componente: ForjaEnVivo }] : []),
   { id: "diferencial", titulo: "El diferencial", largo: 140, duracion: 15, Componente: Diferencial },
   { id: "modelo", titulo: "Modelo de negocio", largo: 120, duracion: 13, Componente: Modelo },
   { id: "estado", titulo: "Estado actual", largo: 120, duracion: 12, Componente: EstadoActual },

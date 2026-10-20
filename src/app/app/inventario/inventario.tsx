@@ -138,7 +138,7 @@ export function Inventario() {
             orden: (p: Producto) => margen(precioDe(e, lista.id, p.id), p.costo, p.iva) ?? 0,
             celda: (p: Producto) => {
               const m = margen(precioDe(e, lista.id, p.id), p.costo, p.iva)
-              return <span className={cn("num text-xs", m !== null && m < 20 ? "text-error-texto" : "text-muted-foreground")}>{m === null ? "—" : formatoPorcentaje(m, 0)}</span>
+              return <span className={cn("num t-texto-sm", m !== null && m < 20 ? "text-error" : "text-muted-foreground")}>{m === null ? "—" : formatoPorcentaje(m, 0)}</span>
             },
           },
         ]
@@ -233,7 +233,7 @@ export function Inventario() {
         </Select>
       </div>
 
-      <div className="mb-3 flex flex-wrap items-center gap-2 text-sm" role="group" aria-label="Filtrar por estado de stock">
+      <div className="mb-3 flex flex-wrap items-center gap-2 t-texto-sm" role="group" aria-label="Filtrar por estado de stock">
         {(
           [
             ["todos", "Todos", null],
@@ -247,23 +247,23 @@ export function Inventario() {
             aria-pressed={filtroStock === id}
             onClick={() => setFiltroStock(id)}
             className={cn(
-              "inline-flex h-8 items-center gap-1.5 rounded-full border px-3 text-xs transition-colors",
+              "inline-flex h-8 items-center gap-1.5 rounded-full border px-3 t-texto-sm transition-colors",
               filtroStock === id ? "border-foreground/30 bg-muted font-semibold text-foreground" : "border-linea text-muted-foreground hover:text-foreground",
             )}
           >
             {id === "sin" && <span className="size-1.5 rounded-full bg-error" />}
-            {id === "bajo" && <span className="size-1.5 rounded-full bg-chispa" />}
+            {id === "bajo" && <span className="size-1.5 rounded-full bg-alerta" />}
             {nombre}
             {n !== null && <span className="num">{n}</span>}
           </button>
         ))}
         {ubicacion && (
-          <button type="button" onClick={quitarUbicacion} className="inline-flex h-8 items-center gap-1.5 rounded-full border border-foreground/30 bg-muted px-3 text-xs font-semibold" data-testid="filtro-ubicacion">
+          <button type="button" onClick={quitarUbicacion} className="inline-flex h-8 items-center gap-1.5 rounded-full border border-foreground/30 bg-muted px-3 t-texto-sm font-semibold" data-testid="filtro-ubicacion">
             Ubicación {ubicacion}
             <X className="size-3.5" aria-label="Quitar filtro de ubicación" />
           </button>
         )}
-        {verCostos && <span className="ml-auto text-xs text-muted-foreground">Stock valorizado a costo: <span className="num font-semibold text-foreground">{formatoPesosCorto(resumen.valorizado)}</span></span>}
+        {verCostos && <span className="ml-auto t-texto-sm text-muted-foreground">Stock valorizado a costo: <span className="num font-semibold text-foreground">{formatoPesosCorto(resumen.valorizado)}</span></span>}
       </div>
 
       <TablaRapida
@@ -305,13 +305,13 @@ export function Inventario() {
 }
 
 export function CantidadStock({ cantidad, estado }: { cantidad: number | undefined; estado: ReturnType<typeof estadoStock> }) {
-  if (estado === "no_lleva" || cantidad === undefined) return <span className="text-xs text-muted-foreground/60">—</span>
+  if (estado === "no_lleva" || cantidad === undefined) return <span className="t-texto-sm text-muted-foreground/60">—</span>
   return (
     <span
       className={cn(
         "num inline-flex min-w-9 justify-end rounded px-1.5 py-0.5 text-[13px]",
-        estado === "sin" && "bg-error/15 font-semibold text-error-texto",
-        estado === "bajo" && "bg-chispa/15 font-semibold text-chispa-texto",
+        estado === "sin" && "bg-error/15 font-semibold text-error",
+        estado === "bajo" && "bg-alerta/15 font-semibold text-alerta",
       )}
       title={estado === "sin" ? "Sin stock" : estado === "bajo" ? "Bajo el mínimo" : undefined}
     >

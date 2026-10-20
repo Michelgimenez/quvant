@@ -54,8 +54,8 @@ export function Auditoria() {
 
   const nombre = (id: string) => e.usuarios.find((u) => u.id === id)?.nombre ?? "—"
   const columnas: Columna<RegistroAuditoria>[] = [
-    { id: "fecha", encabezado: "Cuándo", ancho: "150px", orden: (a) => a.fecha, celda: (a) => <span className="num text-xs text-muted-foreground">{new Date(a.fecha).toLocaleString("es-AR", { dateStyle: "short", timeStyle: "medium" })}</span> },
-    { id: "quien", encabezado: "Quién", ancho: "150px", orden: (a) => nombre(a.usuarioId), celda: (a) => <span className="truncate text-sm">{nombre(a.usuarioId)}</span> },
+    { id: "fecha", encabezado: "Cuándo", ancho: "150px", orden: (a) => a.fecha, celda: (a) => <span className="num t-texto-sm text-muted-foreground">{new Date(a.fecha).toLocaleString("es-AR", { dateStyle: "short", timeStyle: "medium" })}</span> },
+    { id: "quien", encabezado: "Quién", ancho: "150px", orden: (a) => nombre(a.usuarioId), celda: (a) => <span className="truncate t-texto-sm">{nombre(a.usuarioId)}</span> },
     { id: "area", encabezado: "Área", ancho: "140px", orden: (a) => a.accion, celda: (a) => <span className="ficha">{AREAS[a.accion.split(".")[0]] ?? a.accion}</span> },
     {
       id: "que",
@@ -63,7 +63,7 @@ export function Auditoria() {
       ancho: "minmax(240px,3fr)",
       celda: (a) => (
         <span className="flex min-w-0 items-center gap-2">
-          {a.origen === "sin_conexion" && <CloudOff className="size-3.5 shrink-0 text-chispa-texto" aria-label="Hecho sin conexión" />}
+          {a.origen === "sin_conexion" && <CloudOff className="size-3.5 shrink-0 text-alerta" aria-label="Hecho sin conexión" />}
           <span className="truncate">{a.resumen}</span>
         </span>
       ),
@@ -109,8 +109,8 @@ export function Auditoria() {
             ))}
           </SelectContent>
         </Select>
-        <label className="inline-flex items-center gap-2 text-xs text-muted-foreground">
-          <input type="checkbox" checked={soloSinConexion} onChange={(ev) => setSoloSinConexion(ev.target.checked)} className="accent-[var(--temple)]" />
+        <label className="inline-flex items-center gap-2 t-texto-sm text-muted-foreground">
+          <input type="checkbox" checked={soloSinConexion} onChange={(ev) => setSoloSinConexion(ev.target.checked)} className="accent-[var(--foreground)]" />
           Solo hechas sin conexión
         </label>
         <div className="relative ml-auto w-full sm:w-72">
@@ -126,7 +126,7 @@ export function Auditoria() {
         alto="calc(100dvh - 300px)"
         tarjeta={(a) => (
           <div className="min-w-0">
-            <p className="truncate text-sm">{a.resumen}</p>
+            <p className="truncate t-texto-sm">{a.resumen}</p>
             <p className="ficha">
               {nombre(a.usuarioId)} · {new Date(a.fecha).toLocaleString("es-AR", { dateStyle: "short", timeStyle: "short" })}
             </p>

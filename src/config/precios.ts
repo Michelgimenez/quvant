@@ -1,7 +1,7 @@
 import { ES_COMPLETAR } from "./sitio"
 
 /**
- * Precios públicos de Yunque. Editables: el sitio y la presentación leen de acá.
+ * Precios públicos de Quvant. Editables: el sitio y la presentación leen de acá.
  * Valores en USD por mes, por negocio (un negocio puede tener varias sucursales).
  */
 export const PRECIOS = {

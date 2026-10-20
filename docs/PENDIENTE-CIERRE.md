@@ -21,3 +21,10 @@ Lo que el modo boceto deja para después: celular, respaldos, accesibilidad fina
 **Rendimiento (fase 4)**
 - `quvant-firma.svg` pesa 280 kB porque lleva la Q incrustada a 1024 px. Para documentos sirve; en la web la firma se arma con dos `<img>` livianos. Evaluar WebP o AVIF para los PNG de la Q.
 - Las 8 variantes de Plex Mono (4 pesos × 2 estilos) se descargan todas. Medir cuánto se usan las itálicas y, si no se usan, sacarlas.
+
+## De la tanda 2 · El renombre y la app
+
+- **Tamaños sueltos en módulos secundarios:** los textos chicos ya usan `.t-texto-sm`, pero quedan tamaños de Tailwind en títulos y números de inventario, compras, reportes, configuración y presupuestos. Hay que pasarlos a las clases cerradas, revisando cada pantalla.
+- **Tests de punta a punta:** no se corrieron en esta tanda. Cambiaron los usuarios de prueba (`@demo.quvant.app`), el testid del salto y la cantidad de escenas de `/inversores` (12 mientras Forja esté oculta). Correr `npm run build && npm run test:e2e` y ajustar.
+- **Claves de almacenamiento:** pasaron de `yunque:` a `quvant:` sin migración. En producción habría que leer las viejas como respaldo.
+- **El manifiesto:** no hay ícono vectorial porque la Q es PNG.

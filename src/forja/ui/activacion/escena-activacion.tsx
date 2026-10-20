@@ -11,7 +11,7 @@ import { texturaBrillo } from "../taller/brillo"
 import { Chispas, type ControlChispas } from "../taller/chispas"
 
 /**
- * Activación (3D): el isotipo de Yunque extruido en acero cepillado cae y
+ * Activación (3D): el isotipo de Quvant extruido en acero cepillado cae y
  * apoya con peso; saltan chispas; alrededor se arma la forja (placas del
  * hogar, campana y chimenea en líneas de luz, núcleo de brasa) y los bordes
  * del yunque toman temperatura. Al final la cámara empuja hacia la brasa.
@@ -65,7 +65,7 @@ export default function EscenaActivacion({
       <directionalLight position={[6, 3, -5]} intensity={1.3} color="#9fb2c8" />
       {/* Sin piso visible: solo la sombra de contacto sobre el fondo hierro */}
       <ContactShadows position={[0, 0.002, 0]} scale={16} resolution={1024} blur={2.6} far={3.2} opacity={0.85} color="#000000" />
-      <Yunque reloj={reloj} />
+      <Quvant reloj={reloj} />
       <Polvo reloj={reloj} reducir={reducir} />
       <Hogar reloj={reloj} />
       <Campana reloj={reloj} />
@@ -90,7 +90,7 @@ function Entorno() {
   return <primitive object={entorno} attach="environment" />
 }
 
-function Yunque({ reloj }: { reloj: React.RefObject<number> }) {
+function Quvant({ reloj }: { reloj: React.RefObject<number> }) {
   const grupo = useRef<THREE.Group>(null)
   const bordes = useRef<THREE.LineBasicMaterial>(null)
   const { geometria, aristas } = useMemo(() => {
@@ -306,7 +306,7 @@ function ChispasDelGolpe({ reloj, reducir, onGolpe, onChispas }: { reloj: React.
         if (i === 0) onGolpe()
         if (i === 0) onChispas()
         const cantidad = i === 0 ? 40 : 22
-        // La cara del yunque: arriba, entre el cuerno y el talón
+        // La cara del quvant: arriba, entre el cuerno y el talón
         for (let k = 0; k < 3; k++) chispas.current?.lanzar(-0.35 + Math.random() * 1.3, 1.5, -0.35 + Math.random() * 0.7, Math.round(cantidad / 3))
       }
     })

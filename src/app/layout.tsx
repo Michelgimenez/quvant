@@ -25,12 +25,12 @@ const plexMono = IBM_Plex_Mono({
 export const metadata: Metadata = {
   metadataBase: new URL(SITIO.url),
   title: {
-    default: `Yunque · ${SITIO.tagline}`,
-    template: "%s · Yunque",
+    default: `Quvant · ${SITIO.tagline}`,
+    template: "%s · Quvant",
   },
   description: SITIO.descripcion,
-  applicationName: "Yunque",
-  authors: [{ name: "Yunque" }],
+  applicationName: "Quvant",
+  authors: [{ name: "Quvant" }],
   formatDetection: { telephone: false },
 }
 

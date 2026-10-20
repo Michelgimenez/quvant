@@ -8,7 +8,7 @@ import { SimuladorForja, mundoDesdeEstado } from "@/forja/dominio/simulador"
 import type { Id } from "@/dominio/tipos"
 
 /**
- * Forja dentro de la app: el modelo sale del estado de Yunque (la réplica
+ * Forja dentro de la app: el modelo sale del estado de Quvant (la réplica
  * local que mantiene el motor de sincronización). Dueño y administración ven
  * todas las sucursales; el resto, si tiene el permiso, solo las asignadas.
  */

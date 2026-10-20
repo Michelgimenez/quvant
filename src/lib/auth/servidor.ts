@@ -13,8 +13,8 @@ import {
   type Sesion,
 } from "./tipos"
 
-const AUD_SESION = "yunque-app"
-const AUD_PRE = "yunque-2fa"
+const AUD_SESION = "quvant-app"
+const AUD_PRE = "quvant-2fa"
 
 const opcionesCookie = (maxAge: number) => ({
   httpOnly: true,
@@ -81,10 +81,10 @@ class LimitadorSupabase implements LimitadorIngreso {
   }
 }
 
-const global = globalThis as unknown as { __limitadorYunque?: LimitadorMemoria }
+const global = globalThis as unknown as { __limitadorQuvant?: LimitadorMemoria }
 function limitadorMemoria() {
-  global.__limitadorYunque ??= new LimitadorMemoria()
-  return global.__limitadorYunque
+  global.__limitadorQuvant ??= new LimitadorMemoria()
+  return global.__limitadorQuvant
 }
 
 export function limitador(): LimitadorIngreso {

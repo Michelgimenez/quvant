@@ -58,7 +58,7 @@ export async function pedirDemo(_: EstadoSolicitud, form: FormData): Promise<Est
   try {
     await guardarSolicitud(fila)
   } catch (e) {
-    console.error(JSON.stringify({ nivel: "error", servicio: "yunque", evento: "solicitud_demo", mensaje: (e as Error).message }))
+    console.error(JSON.stringify({ nivel: "error", servicio: "quvant", evento: "solicitud_demo", mensaje: (e as Error).message }))
     return { error: "No pudimos guardar tu solicitud. Probá de nuevo en un rato." }
   }
   return { ok: true }

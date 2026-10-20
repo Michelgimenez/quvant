@@ -13,3 +13,18 @@ Un *token* es un nombre para una decisión de diseño ("el fondo", "el texto sec
 Un componente escribe `className="text-muted-foreground"` y nunca sabe si es acero o gris-6. Por eso Yunque pudo pasar a Quvant en esta tanda cambiando un solo archivo. Los tokens viejos quedaron como alias (`--temple: var(--blanco)` en oscuro) para que nada se rompa, y en la tanda 2 se reemplazan componente por componente.
 
 El mismo truco tiene una trampa, y vale la pena saberla. Si `--serie-1: var(--marca)` se define en `<html>`, el navegador lo resuelve ahí, con el `--marca` de `<html>`. Cuando el AppShell cambia `--marca` en un elemento de más abajo, `--serie-1` no se entera: ya llegó resuelto. Para que un token siga a otro, hay que definirlo en el mismo elemento donde cambia el de origen (queda para la tanda 2).
+
+## Tanda 2 · Un renombre que no rompe nada: textos, claves y lo que no se toca
+
+Cambiar el nombre de un producto tiene tres capas, y cada una pide un cuidado distinto:
+
+1. **Lo que ve la gente** (títulos, metadatos, mails): se cambia sin miedo.
+2. **Las claves internas** (`localStorage`, cookies, nombres de base local): si cambian, el navegador "olvida" lo guardado. En una demo es aceptable, así que pasaron a `quvant:`. En producción, lo prudente es leer la clave vieja como respaldo un tiempo, como se hizo con la variable de entorno:
+
+   ```ts
+   (process.env.QUVANT_PERMITIR_SECRETO_DEV ?? process.env.YUNQUE_PERMITIR_SECRETO_DEV) !== "1"
+   ```
+
+3. **Lo que ya está aplicado afuera** (las migraciones de la base): no se edita nunca. Una migración aplicada es historia; cambiarla hace que la base real y el repo dejen de coincidir.
+
+El reemplazo automático tuvo un efecto inesperado que vale recordar: `yunque-app` también transformó `yunque-app-icon` en `quvant-app-icon`, un archivo que no existe. Por eso, después de un reemplazo masivo, conviene comprobar que cada ruta a un archivo siga existiendo (eso se hizo y se corrigió).

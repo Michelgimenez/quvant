@@ -61,34 +61,34 @@ export function DetalleOrden({ id, onCerrar }: { id: Id | null; onCerrar: () => 
           </div>
         </SheetHeader>
         <div className="space-y-5 p-4">
-          <dl className="grid grid-cols-2 gap-3 text-sm">
+          <dl className="grid grid-cols-2 gap-3 t-texto-sm">
             <div>
-              <dt className="text-xs text-muted-foreground">Cliente</dt>
+              <dt className="t-texto-sm text-muted-foreground">Cliente</dt>
               <dd className="font-medium">{cliente?.nombre}</dd>
-              <dd className="num text-xs text-muted-foreground">{cliente?.whatsapp}</dd>
+              <dd className="num t-texto-sm text-muted-foreground">{cliente?.whatsapp}</dd>
             </div>
             <div>
-              <dt className="text-xs text-muted-foreground">Prometido para</dt>
+              <dt className="t-texto-sm text-muted-foreground">Prometido para</dt>
               <dd className="font-medium">{new Date(o.fechaPrometida).toLocaleDateString("es-AR")}</dd>
             </div>
             <div className="col-span-2">
-              <dt className="text-xs text-muted-foreground">Falla informada</dt>
+              <dt className="t-texto-sm text-muted-foreground">Falla informada</dt>
               <dd>{o.falla}</dd>
             </div>
             {o.diagnostico && (
               <div className="col-span-2">
-                <dt className="text-xs text-muted-foreground">Diagnóstico</dt>
+                <dt className="t-texto-sm text-muted-foreground">Diagnóstico</dt>
                 <dd>{o.diagnostico}</dd>
               </div>
             )}
             {o.presupuestoReparacion !== null && (
               <div>
-                <dt className="text-xs text-muted-foreground">Presupuesto de reparación</dt>
+                <dt className="t-texto-sm text-muted-foreground">Presupuesto de reparación</dt>
                 <dd className="num font-semibold">{formatoPesos(o.presupuestoReparacion)}</dd>
               </div>
             )}
             <div>
-              <dt className="text-xs text-muted-foreground">Técnico</dt>
+              <dt className="t-texto-sm text-muted-foreground">Técnico</dt>
               <dd>
                 {puede("servicio.editar") ? (
                   <Select
@@ -128,22 +128,22 @@ export function DetalleOrden({ id, onCerrar }: { id: Id | null; onCerrar: () => 
           )}
 
           <section>
-            <h3 className="mb-2 text-sm font-semibold">Historial</h3>
+            <h3 className="mb-2 t-texto-sm font-semibold">Historial</h3>
             <ol className="relative space-y-4 border-l border-linea pl-4">
               {[...o.eventos].reverse().map((ev, i) => (
                 <li key={i} className="relative">
                   <span className="absolute -left-[21px] top-1.5 size-2.5 rounded-full border-2 border-background bg-acero" aria-hidden />
-                  <p className="text-sm font-medium">{NOMBRE_ESTADO_SERVICIO[ev.estado]}</p>
-                  <p className="text-xs text-muted-foreground">
+                  <p className="t-texto-sm font-medium">{NOMBRE_ESTADO_SERVICIO[ev.estado]}</p>
+                  <p className="t-texto-sm text-muted-foreground">
                     {new Date(ev.fecha).toLocaleString("es-AR", { dateStyle: "short", timeStyle: "short" })} · {e.usuarios.find((u) => u.id === ev.usuarioId)?.nombre ?? "—"}
                   </p>
-                  {ev.nota && <p className="mt-1 text-sm">{ev.nota}</p>}
+                  {ev.nota && <p className="mt-1 t-texto-sm">{ev.nota}</p>}
                   {ev.aviso && (
-                    <div className="mt-2 rounded-lg bg-[#0b141a] p-2">
-                      <p className="mb-1 flex items-center gap-1 text-[10px] uppercase tracking-wider text-[#8696a0]">
+                    <div className="mt-2 rounded-md border border-linea bg-superficie-2 p-2">
+                      <p className="t-etiqueta mb-1.5 flex items-center gap-1.5 text-muted-foreground">
                         <MessageCircle className="size-3" /> WhatsApp · envío emulado
                       </p>
-                      <p className="rounded-md bg-[#005c4b] px-2.5 py-1.5 text-xs text-[#e9edef]">{ev.aviso.mensaje}</p>
+                      <p className="t-texto-sm rounded-md border border-linea bg-card px-2.5 py-1.5">{ev.aviso.mensaje}</p>
                     </div>
                   )}
                 </li>
@@ -215,7 +215,7 @@ function DialogoTransicion({ ordenId, hacia, onCerrar }: { ordenId: Id; hacia: E
             <Input id="nota" value={nota} onChange={(ev) => setNota(ev.target.value)} placeholder="Opcional" />
           </div>
           {conAviso && (
-            <label className="flex items-center gap-2 text-sm">
+            <label className="flex items-center gap-2 t-texto-sm">
               <Checkbox checked={avisar} onCheckedChange={(c) => setAvisar(Boolean(c))} />
               Avisar al cliente por WhatsApp
             </label>

@@ -69,8 +69,8 @@ export function Clientes() {
         </div>
       ),
     },
-    { id: "contacto", encabezado: "WhatsApp", ancho: "150px", celda: (c) => <span className="num text-xs text-muted-foreground">{c.whatsapp}</span> },
-    { id: "lista", encabezado: "Lista", ancho: "100px", orden: (c) => lista(c.listaId), celda: (c) => <span className="text-xs">{lista(c.listaId)}</span> },
+    { id: "contacto", encabezado: "WhatsApp", ancho: "150px", celda: (c) => <span className="num t-texto-sm text-muted-foreground">{c.whatsapp}</span> },
+    { id: "lista", encabezado: "Lista", ancho: "100px", orden: (c) => lista(c.listaId), celda: (c) => <span className="t-texto-sm">{lista(c.listaId)}</span> },
     {
       id: "saldo",
       encabezado: "Saldo",
@@ -79,11 +79,11 @@ export function Clientes() {
       orden: (c) => resumen.saldo[c.id] ?? 0,
       celda: (c) => {
         const s = resumen.saldo[c.id] ?? 0
-        return <span className={cn("num", s > c.limiteCredito && c.limiteCredito > 0 ? "font-semibold text-error-texto" : s > 0 ? "" : "text-muted-foreground")}>{s ? formatoPesos(s, { sinDecimales: true }) : "—"}</span>
+        return <span className={cn("num", s > c.limiteCredito && c.limiteCredito > 0 ? "font-semibold text-error" : s > 0 ? "" : "text-muted-foreground")}>{s ? formatoPesos(s, { sinDecimales: true }) : "—"}</span>
       },
     },
-    { id: "limite", encabezado: "Límite", ancho: "110px", alinear: "der", orden: (c) => c.limiteCredito, celda: (c) => <span className="num text-xs text-muted-foreground">{c.limiteCredito ? formatoPesosCorto(c.limiteCredito) : "—"}</span> },
-    { id: "ultima", encabezado: "Última compra", ancho: "110px", alinear: "der", orden: (c) => resumen.ultima[c.id] ?? "", celda: (c) => <span className="num text-xs text-muted-foreground">{resumen.ultima[c.id] ? new Date(resumen.ultima[c.id]).toLocaleDateString("es-AR") : "—"}</span> },
+    { id: "limite", encabezado: "Límite", ancho: "110px", alinear: "der", orden: (c) => c.limiteCredito, celda: (c) => <span className="num t-texto-sm text-muted-foreground">{c.limiteCredito ? formatoPesosCorto(c.limiteCredito) : "—"}</span> },
+    { id: "ultima", encabezado: "Última compra", ancho: "110px", alinear: "der", orden: (c) => resumen.ultima[c.id] ?? "", celda: (c) => <span className="num t-texto-sm text-muted-foreground">{resumen.ultima[c.id] ? new Date(resumen.ultima[c.id]).toLocaleDateString("es-AR") : "—"}</span> },
   ]
 
   return (
@@ -122,7 +122,7 @@ export function Clientes() {
             ["excedidos", "Sobre su límite"],
           ] as const
         ).map(([id, nombre]) => (
-          <button key={id} type="button" aria-pressed={filtro === id} onClick={() => setFiltro(id)} className={cn("h-8 rounded-full border px-3 text-xs", filtro === id ? "border-foreground/30 bg-muted font-semibold" : "border-linea text-muted-foreground hover:text-foreground")}>
+          <button key={id} type="button" aria-pressed={filtro === id} onClick={() => setFiltro(id)} className={cn("h-8 rounded-full border px-3 t-texto-sm", filtro === id ? "border-foreground/30 bg-muted font-semibold" : "border-linea text-muted-foreground hover:text-foreground")}>
             {nombre}
           </button>
         ))}
@@ -141,10 +141,10 @@ export function Clientes() {
         tarjeta={(c) => (
           <div className="flex w-full items-center gap-3">
             <div className="min-w-0 flex-1">
-              <p className="truncate text-sm font-medium">{c.nombre}</p>
+              <p className="truncate t-texto-sm font-medium">{c.nombre}</p>
               <p className="ficha truncate">{c.cuit || c.condicionIva}</p>
             </div>
-            <span className={cn("num text-sm", (resumen.saldo[c.id] ?? 0) > c.limiteCredito && c.limiteCredito > 0 && "text-error-texto")}>{resumen.saldo[c.id] ? formatoPesosCorto(resumen.saldo[c.id]) : "—"}</span>
+            <span className={cn("num t-texto-sm", (resumen.saldo[c.id] ?? 0) > c.limiteCredito && c.limiteCredito > 0 && "text-error")}>{resumen.saldo[c.id] ? formatoPesosCorto(resumen.saldo[c.id]) : "—"}</span>
           </div>
         )}
         vacio={<Vacio icono={Users} titulo="No hay clientes con ese filtro" />}

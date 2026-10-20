@@ -21,7 +21,7 @@ test.describe("pedir una demo → panel interno", () => {
     await page.getByLabel("Clave").fill("otra")
     await page.getByRole("button", { name: "Entrar" }).click()
     await expect(page.getByText("Clave incorrecta.")).toBeVisible()
-    await page.getByLabel("Clave").fill("yunque-panel")
+    await page.getByLabel("Clave").fill("quvant-panel")
     await page.getByRole("button", { name: "Entrar" }).click()
 
     await expect(page.getByTestId("aviso-solicitudes")).toContainText(/solicitud(es)? nueva/)

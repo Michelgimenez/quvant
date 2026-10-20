@@ -83,7 +83,7 @@ export function FichaCliente({ id, onCerrar }: { id: Id | null; onCerrar: () => 
                 ["Disponible", Math.max(0, c.limiteCredito - saldo), false],
               ].map(([nombre, valor, alerta]) => (
                 <div key={String(nombre)} className={cn("rounded-lg border p-3", alerta ? "border-error/50 bg-error/10" : "border-linea")}>
-                  <p className="text-xs text-muted-foreground">{nombre}</p>
+                  <p className="t-texto-sm text-muted-foreground">{nombre}</p>
                   <p className="text-lg font-semibold">{formatoPesos(Number(valor), { sinDecimales: true })}</p>
                 </div>
               ))}
@@ -97,23 +97,23 @@ export function FichaCliente({ id, onCerrar }: { id: Id | null; onCerrar: () => 
               <TabsTrigger value="servicio">Taller</TabsTrigger>
             </TabsList>
             <TabsContent value="cuenta">
-              <ul className="divide-y divide-linea rounded-lg border border-linea text-sm">
+              <ul className="divide-y divide-linea rounded-lg border border-linea t-texto-sm">
                 {datos.movimientos.slice(0, 40).map((m) => (
                   <li key={m.id} className="grid grid-cols-[80px_minmax(0,1fr)_auto_auto] items-center gap-3 px-3 py-2">
-                    <span className="num text-xs text-muted-foreground">{new Date(m.fecha).toLocaleDateString("es-AR")}</span>
+                    <span className="num t-texto-sm text-muted-foreground">{new Date(m.fecha).toLocaleDateString("es-AR")}</span>
                     <span className="truncate">{m.descripcion}</span>
-                    <span className={cn("num text-right", m.importe < 0 ? "text-ok-texto" : "")}>{formatoPesos(m.importe, { sinDecimales: true, signo: true })}</span>
-                    <span className="num w-24 text-right text-xs text-muted-foreground">{formatoPesos(m.saldo, { sinDecimales: true })}</span>
+                    <span className={cn("num text-right", m.importe < 0 ? "text-ok" : "")}>{formatoPesos(m.importe, { sinDecimales: true, signo: true })}</span>
+                    <span className="num w-24 text-right t-texto-sm text-muted-foreground">{formatoPesos(m.saldo, { sinDecimales: true })}</span>
                   </li>
                 ))}
                 {datos.movimientos.length === 0 && <li className="px-3 py-4 text-center text-muted-foreground">Sin movimientos.</li>}
               </ul>
             </TabsContent>
             <TabsContent value="compras">
-              <ul className="divide-y divide-linea rounded-lg border border-linea text-sm">
+              <ul className="divide-y divide-linea rounded-lg border border-linea t-texto-sm">
                 {datos.ventas.map((x) => (
                   <li key={x.id} className="flex items-center gap-3 px-3 py-2">
-                    <span className="num w-20 text-xs text-muted-foreground">{new Date(x.fecha).toLocaleDateString("es-AR")}</span>
+                    <span className="num w-20 t-texto-sm text-muted-foreground">{new Date(x.fecha).toLocaleDateString("es-AR")}</span>
                     <span className="ficha">{x.numero ? `#${x.numero}` : x.numeroLocal}</span>
                     <span className="flex-1 truncate text-muted-foreground">{x.items.map((it) => it.descripcion).join(", ")}</span>
                     <span className="num">{formatoPesos(x.total, { sinDecimales: true })}</span>
@@ -123,11 +123,11 @@ export function FichaCliente({ id, onCerrar }: { id: Id | null; onCerrar: () => 
               </ul>
             </TabsContent>
             <TabsContent value="presupuestos">
-              <ul className="divide-y divide-linea rounded-lg border border-linea text-sm">
+              <ul className="divide-y divide-linea rounded-lg border border-linea t-texto-sm">
                 {datos.presupuestos.map((p) => (
                   <li key={p.id} className="flex items-center gap-3 px-3 py-2">
                     <span className="ficha">{p.numero ? `#${p.numero}` : p.numeroLocal}</span>
-                    <span className="flex-1 text-xs text-muted-foreground">{NOMBRE_ESTADO_PRESUPUESTO[p.estado]}</span>
+                    <span className="flex-1 t-texto-sm text-muted-foreground">{NOMBRE_ESTADO_PRESUPUESTO[p.estado]}</span>
                     <span className="num">{formatoPesos(p.total, { sinDecimales: true })}</span>
                   </li>
                 ))}
@@ -135,21 +135,21 @@ export function FichaCliente({ id, onCerrar }: { id: Id | null; onCerrar: () => 
               </ul>
             </TabsContent>
             <TabsContent value="servicio">
-              <ul className="divide-y divide-linea rounded-lg border border-linea text-sm">
+              <ul className="divide-y divide-linea rounded-lg border border-linea t-texto-sm">
                 {datos.servicio.map((o) => (
                   <li key={o.id} className="flex items-center gap-3 px-3 py-2">
                     <span className="ficha">ST {o.numero ? `#${o.numero}` : o.numeroLocal}</span>
                     <span className="flex-1 truncate">
                       {o.equipo.marca} {o.equipo.modelo}
                     </span>
-                    <span className="text-xs text-muted-foreground">{NOMBRE_ESTADO_SERVICIO[o.estado]}</span>
+                    <span className="t-texto-sm text-muted-foreground">{NOMBRE_ESTADO_SERVICIO[o.estado]}</span>
                   </li>
                 ))}
                 {datos.servicio.length === 0 && <li className="px-3 py-4 text-center text-muted-foreground">Sin equipos en el taller.</li>}
               </ul>
             </TabsContent>
           </Tabs>
-          {c.notas && <p className="mt-4 rounded-lg bg-superficie-2 p-3 text-sm text-muted-foreground">{c.notas}</p>}
+          {c.notas && <p className="mt-4 rounded-lg bg-superficie-2 p-3 t-texto-sm text-muted-foreground">{c.notas}</p>}
         </div>
         {editar && <DialogoCliente cliente={c} onCerrar={() => setEditar(false)} />}
         {pago && <DialogoPago clienteId={c.id} onCerrar={() => setPago(false)} />}
@@ -274,7 +274,7 @@ export function DialogoCliente({ cliente, onCerrar, onGuardado }: { cliente?: Cl
           <div className="space-y-1">
             <Label htmlFor="cl-limite">Límite de cuenta corriente ($)</Label>
             <Input id="cl-limite" inputMode="decimal" value={f.limite} onChange={set("limite")} disabled={!puedeLimite} className="num" />
-            {!puedeLimite && <p className="text-[11px] text-muted-foreground">Solo administración otorga crédito.</p>}
+            {!puedeLimite && <p className="t-texto-sm text-muted-foreground">Solo administración otorga crédito.</p>}
           </div>
           <div className="space-y-1 sm:col-span-2">
             <Label htmlFor="cl-notas">Notas</Label>

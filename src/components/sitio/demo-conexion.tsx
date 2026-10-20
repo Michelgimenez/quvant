@@ -33,7 +33,7 @@ export function DemoConexion({ compacta = false, guion }: { compacta?: boolean; 
   }, [])
   if (!demo) {
     return (
-      <div className="flex h-[420px] items-center justify-center rounded-2xl border border-linea bg-superficie/60 text-sm text-acero" role="status">
+      <div className="flex h-[420px] items-center justify-center rounded-2xl border border-linea bg-superficie-1/60 text-sm text-acero" role="status">
         Preparando el mostrador de demostración…
       </div>
     )
@@ -146,13 +146,13 @@ function Mostrador({ demo, compacta, guion }: { demo: DemoEmbebida; compacta: bo
   return (
     // Consultas de contenedor (no de ventana): se ve igual en el sitio y dentro del escenario de las presentaciones
     <div className="@container">
-      <div className={cn("grid gap-4 rounded-2xl border border-linea bg-superficie/60 p-4 @xl:p-6", compacta ? "" : "@3xl:grid-cols-[minmax(0,1.25fr)_auto_minmax(0,1fr)]")} data-testid="demo-conexion">
+      <div className={cn("grid gap-4 rounded-2xl border border-linea bg-superficie-1/60 p-4 @xl:p-6", compacta ? "" : "@3xl:grid-cols-[minmax(0,1.25fr)_auto_minmax(0,1fr)]")} data-testid="demo-conexion">
         {/* Mostrador */}
-        <section className="space-y-3 rounded-xl border border-linea bg-hierro/70 p-4" aria-label="Mostrador de demostración">
+        <section className="space-y-3 rounded-xl border border-linea bg-negro/70 p-4" aria-label="Mostrador de demostración">
           <div className="flex items-center justify-between gap-2">
             <p className="ficha">Mostrador · CC · puesto 1</p>
-            <span className={cn("inline-flex h-7 items-center gap-2 rounded-full border px-3 text-xs", sinConexion ? "border-chispa/50 bg-chispa/10" : "border-linea bg-superficie")} data-testid="demo-estado">
-              <Punto tono={sinConexion ? "chispa" : pendientes ? "acero" : "ok"} pulso={sinConexion} />
+            <span className={cn("inline-flex h-7 items-center gap-2 rounded-full border px-3 text-xs", sinConexion ? "border-alerta/50 bg-alerta/10" : "border-linea bg-superficie-1")} data-testid="demo-estado">
+              <Punto tono={sinConexion ? "alerta" : pendientes ? "acero" : "ok"} pulso={sinConexion} />
               {sinConexion ? `Sin conexión${pendientes ? ` · ${pendientes} ${pendientes === 1 ? "venta" : "ventas"} en cola` : ""}` : pendientes ? "Sincronizando" : "Sincronizado"}
             </span>
           </div>
@@ -163,11 +163,11 @@ function Mostrador({ demo, compacta, guion }: { demo: DemoEmbebida; compacta: bo
                 key={p.id}
                 type="button"
                 onClick={() => vender(p)}
-                className="flex items-center gap-2 rounded-lg border border-linea bg-superficie px-2.5 py-2 text-left transition-colors hover:border-temple/60 active:translate-y-px"
+                className="flex items-center gap-2 rounded-lg border border-linea bg-superficie-1 px-2.5 py-2 text-left transition-colors hover:border-foreground/60 active:translate-y-px"
               >
                 <MiniaturaProducto tipo={p.ilustracion} className="size-8" />
                 <span className="min-w-0">
-                  <span className="block truncate text-xs text-niebla">{p.nombre.replace(/ (Abrasur|Corta|Escudo|Protek|Lumen|Conductel|Lubrimax|Arkon|Vulkor|Torkan|Brava)$/, "")}</span>
+                  <span className="block truncate text-xs text-blanco">{p.nombre.replace(/ (Abrasur|Corta|Escudo|Protek|Lumen|Conductel|Lubrimax|Arkon|Vulkor|Torkan|Brava)$/, "")}</span>
                   <span className="num block text-[11px] text-acero">{formatoPesos(precioDe(e, lista.id, p.id), { sinDecimales: true })}</span>
                 </span>
               </button>
@@ -179,11 +179,11 @@ function Mostrador({ demo, compacta, guion }: { demo: DemoEmbebida; compacta: bo
               if (!v) return null
               const enCola = v.numero === null
               return (
-                <li key={id} className="flex items-center gap-2 rounded-md bg-superficie px-2.5 py-1.5 text-xs">
-                  <span className={cn("num", enCola ? "text-chispa" : "text-ok")}>{enCola ? v.numeroLocal : `#${v.numero}`}</span>
+                <li key={id} className="flex items-center gap-2 rounded-md bg-superficie-1 px-2.5 py-1.5 text-xs">
+                  <span className={cn("num", enCola ? "text-alerta" : "text-ok")}>{enCola ? v.numeroLocal : `#${v.numero}`}</span>
                   <span className="min-w-0 flex-1 truncate text-acero">{v.items[0]?.descripcion}</span>
-                  <span className="num text-niebla">{formatoPesos(v.total, { sinDecimales: true })}</span>
-                  <span className={cn("rounded px-1.5 py-0.5 text-[10px]", enCola ? "bg-chispa/15 text-chispa" : "bg-ok/15 text-ok")}>{enCola ? "en cola" : "sincronizada"}</span>
+                  <span className="num text-blanco">{formatoPesos(v.total, { sinDecimales: true })}</span>
+                  <span className={cn("rounded px-1.5 py-0.5 text-[10px]", enCola ? "bg-alerta/15 text-alerta" : "bg-ok/15 text-ok")}>{enCola ? "en cola" : "sincronizada"}</span>
                 </li>
               )
             })}
@@ -196,16 +196,16 @@ function Mostrador({ demo, compacta, guion }: { demo: DemoEmbebida; compacta: bo
           <div className="relative h-1 w-24 overflow-hidden @3xl:h-24 @3xl:w-1" aria-hidden>
             {conectado ? (
               <>
-                <span className="absolute inset-0 bg-temple/30" />
-                <span className="flujo-red absolute size-1.5 rounded-full bg-temple @3xl:left-[-1px]" />
+                <span className="absolute inset-0 bg-foreground/30" />
+                <span className="flujo-red absolute size-1.5 rounded-full bg-foreground @3xl:left-[-1px]" />
               </>
             ) : (
               <span className="absolute inset-0 border-t-2 border-dashed border-error/70 @3xl:border-l-2 @3xl:border-t-0" />
             )}
           </div>
-          <label className={cn("flex cursor-pointer flex-col items-center gap-2 rounded-xl border px-4 py-3 text-center", conectado ? "border-linea bg-hierro/70" : "border-error/50 bg-error/10")}>
+          <label className={cn("flex cursor-pointer flex-col items-center gap-2 rounded-xl border px-4 py-3 text-center", conectado ? "border-linea bg-negro/70" : "border-error/50 bg-error/10")}>
             {conectado ? <Wifi className="size-5 text-ok" /> : <WifiOff className="size-5 text-error" />}
-            <span className="text-xs font-semibold text-niebla">{conectado ? "Internet: conectado" : "Internet: cortado"}</span>
+            <span className="text-xs font-semibold text-blanco">{conectado ? "Internet: conectado" : "Internet: cortado"}</span>
             <Switch
               checked={conectado}
               onCheckedChange={(v) => {
@@ -218,12 +218,12 @@ function Mostrador({ demo, compacta, guion }: { demo: DemoEmbebida; compacta: bo
             <span className="text-[11px] text-acero">{conectado ? "Cortá la conexión" : "Volvé a conectar"}</span>
           </label>
           <div className="relative h-1 w-24 overflow-hidden @3xl:h-24 @3xl:w-1" aria-hidden>
-            {conectado ? <span className="absolute inset-0 bg-temple/30" /> : <span className="absolute inset-0 border-t-2 border-dashed border-error/70 @3xl:border-l-2 @3xl:border-t-0" />}
+            {conectado ? <span className="absolute inset-0 bg-foreground/30" /> : <span className="absolute inset-0 border-t-2 border-dashed border-error/70 @3xl:border-l-2 @3xl:border-t-0" />}
           </div>
         </div>
 
         {/* Servidor */}
-        <section ref={panelServidor} className="space-y-3 rounded-xl border border-linea bg-hierro/70 p-4" aria-label="Servidor">
+        <section ref={panelServidor} className="space-y-3 rounded-xl border border-linea bg-negro/70 p-4" aria-label="Servidor">
           <div className="flex items-center justify-between">
             <p className="ficha">Servidor · la nube</p>
             {conectado ? <Cloud className="size-4 text-ok" /> : <CloudOff className="size-4 text-error" />}
@@ -231,10 +231,10 @@ function Mostrador({ demo, compacta, guion }: { demo: DemoEmbebida; compacta: bo
           <p className="text-sm text-acero">{conectado ? "Recibe cada venta y le pone su número definitivo." : "No le llega nada. El mostrador no se entera: sigue vendiendo."}</p>
           <ul className="space-y-1.5">
             {recibidas.map((r) => (
-              <li key={r.id} className="flex items-center gap-2 rounded-md bg-superficie px-2.5 py-1.5 text-xs">
+              <li key={r.id} className="flex items-center gap-2 rounded-md bg-superficie-1 px-2.5 py-1.5 text-xs">
                 <span className="num text-ok">#{r.numero}</span>
                 <span className="flex-1 text-acero">venta recibida</span>
-                <span className="num text-niebla">{formatoPesos(r.total, { sinDecimales: true })}</span>
+                <span className="num text-blanco">{formatoPesos(r.total, { sinDecimales: true })}</span>
               </li>
             ))}
             {recibidas.length === 0 && <li className="rounded-md border border-dashed border-linea px-3 py-3 text-center text-xs text-acero">Esperando ventas…</li>}

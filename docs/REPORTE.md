@@ -2,6 +2,42 @@
 
 > Yunque pasa a ser Quvant (`PROMPT-QUVANT.md`), en 10 tandas, en la rama `quvant`. Arriba, lo último; abajo, el historial de Yunque.
 
+## Resumen · tanda 2 de 10 · El renombre y la app (20/10/2026)
+
+**Pedido de Michel:** hacer todas las tandas restantes seguidas, con ejemplos dinámicos. Donde el prompt pedía esperar una elección, queda una por defecto que se cambia en la configuración.
+
+1. **Titular:** queda la propuesta A, «Del kiosco a la empresa.» (`TITULAR_ELEGIDO` en `src/config/sitio.ts`). B y C siguen en `TITULARES_ALTERNATIVOS`. La bajada de la marca es «Software a la vanguardia de cada nicho.».
+2. **El renombre:**
+   - Todo lo visible pasa de Yunque a Quvant: el sitio, la app, los metadatos, los datos estructurados, el manifiesto, los íconos, el favicon (`src/app/favicon.ico`, `icon.png`, `apple-icon.png`), la imagen para redes (`opengraph-image.png`, `twitter-image.png`), los usuarios de prueba (`@demo.quvant.app`), las presentaciones, el ticket y el panel.
+   - En el código: `<ConQuvant />` y `<ConQuvantDiscreto />`, y sellos estáticos en `public/marca/con-quvant-*.svg`.
+   - Las claves internas (localStorage, cookies, eventos, base local) pasan a `quvant`. Efecto: en la demo se pierde una vez la sesión guardada.
+   - La variable `QUVANT_PERMITIR_SECRETO_DEV` reemplaza a `YUNQUE_PERMITIR_SECRETO_DEV`, que se sigue leyendo como respaldo (documentado en `.env.example`).
+   - Docs: README, CLAUDE.md, ARQUITECTURA, SEGURIDAD, ROADMAP y FORJA.
+   - Los logos viejos ya no se publican: de `public/marca/` queda solo `antes-yunque-brand-board.png`, como "el antes".
+3. **Material viejo de Forja, oculto hasta la tanda 10:**
+   - la sección del sitio;
+   - la escena de `/inversores`, con su test e2e marcado como omitido;
+   - la frase «Lo firme y lo vivo, trabajando juntos»;
+   - la placa «yunque + forja», que pasa a «FORJA · by Quvant».
+
+   Los videos `public/demo/forja*.mp4` quedan en el repo, pero nada los muestra.
+4. **Componentes base:**
+   - el chip de estado y el punto, cuadrados;
+   - el sello DEMO, sin rotación;
+   - las cifras con `.t-numero-lg`, y los encabezados y paneles con las clases cerradas;
+   - los diálogos sin desenfoque de vidrio;
+   - los avisos con Plex Mono.
+5. **El marco de la app:** el color de la empresa va solo en su logo, en el indicador del módulo activo y en la serie principal de sus gráficos. La barra de color de arriba y el avatar teñido se fueron. Los alias de Yunque se borraron de `globals.css` después de pasar 454 usos a los tokens nuevos.
+6. **Tablero, mostrador y caja:** tres vueltas (ver `BITACORA-ESTETICA.md`), con todos los tamaños en clases cerradas. El resto de los módulos tuvo una pasada: sus textos chicos ya usan `.t-texto-sm`. Capturas en `docs/capturas/quvant/tanda-2/`.
+
+**Verificación:** typecheck sin errores. `next dev` sin errores de página ni de consola en tablero, mostrador, caja, inventario, presupuestos, clientes, reportes e ingreso.
+
+**Sin tocar a propósito:**
+- las migraciones de Supabase ya aplicadas (solo dicen "Yunque" en comentarios);
+- `src/forja/` por dentro (tandas 9 y 10);
+- `docs/PITCH.md` (el guion se reescribe con `/inversores` en la tanda 8);
+- las capturas de la app que usa el sitio (se regeneran en la tanda 7).
+
 ## Resumen · tanda 1 de 10 · La marca en el sistema (20/10/2026)
 
 **Estado real:** demo funcional / piloto. Todavía no hay clientes pagando. Sin deploy ni `git push`.

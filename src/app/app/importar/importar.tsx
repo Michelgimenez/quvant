@@ -75,12 +75,12 @@ function Asistente() {
         titulo="Traé tu catálogo"
         descripcion="Desde Excel o CSV, con el formato de tu sistema actual. Asignás las columnas, revisás los errores y recién ahí se importa."
         acciones={
-          <Button variant="outline" onClick={() => descargarArchivo("plantilla-yunque.csv", "﻿" + PLANTILLA_CSV)}>
+          <Button variant="outline" onClick={() => descargarArchivo("plantilla-quvant.csv", "﻿" + PLANTILLA_CSV)}>
             <Download /> Plantilla CSV
           </Button>
         }
       />
-      <ol className="mb-4 flex flex-wrap gap-2 text-xs" aria-label="Pasos">
+      <ol className="mb-4 flex flex-wrap gap-2 t-texto-sm" aria-label="Pasos">
         {["Subir archivo", "Asignar columnas y revisar", "Importar"].map((p, i) => (
           <li key={p} className={cn("rounded-full border px-3 py-1", paso >= i + 1 ? "border-primary/50 bg-primary/10 text-foreground" : "border-linea text-muted-foreground")}>
             {i + 1}. {p}
@@ -105,7 +105,7 @@ function Asistente() {
         >
           <FileSpreadsheet className="size-8 text-muted-foreground" />
           <span className="font-semibold">Arrastrá el archivo o hacé clic para elegirlo</span>
-          <span className="text-sm text-muted-foreground">Excel (.xlsx) o CSV, hasta 10 MB. No se modifica nada hasta que confirmes.</span>
+          <span className="t-texto-sm text-muted-foreground">Excel (.xlsx) o CSV, hasta 10 MB. No se modifica nada hasta que confirmes.</span>
           <input type="file" accept=".csv,.xlsx,text/csv" className="sr-only" onChange={(ev) => ev.target.files?.[0] && void cargar(ev.target.files[0])} data-testid="archivo-importacion" />
         </label>
       )}
@@ -116,9 +116,9 @@ function Asistente() {
             <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
               {CAMPOS.map((c) => (
                 <div key={c} className="space-y-1">
-                  <Label className="text-xs">
+                  <Label className="t-texto-sm">
                     {NOMBRE_CAMPO[c]}
-                    {OBLIGATORIOS.includes(c) && <span className="text-error-texto"> *</span>}
+                    {OBLIGATORIOS.includes(c) && <span className="text-error"> *</span>}
                   </Label>
                   <Select value={mapeo[c] === null ? "-" : String(mapeo[c])} onValueChange={(x) => setMapeo({ ...mapeo, [c]: x === "-" ? null : Number(x) })}>
                     <SelectTrigger size="sm" className="w-full" aria-label={NOMBRE_CAMPO[c]}>
@@ -140,7 +140,7 @@ function Asistente() {
 
           <div className="grid gap-3 sm:grid-cols-3">
             <Resumen icono={CheckCircle2} tono="ok" titulo="Listas para importar" valor={validacion.validas.length} pie={`${validacion.nuevos} nuevas · ${validacion.actualizados} actualizan productos existentes`} />
-            <Resumen icono={AlertTriangle} tono={validacion.errores.length ? "chispa" : "ok"} titulo="Con errores" valor={new Set(validacion.errores.map((x) => x.fila)).size} pie="no se importan; corregilas en el archivo y volvé a subirlo" />
+            <Resumen icono={AlertTriangle} tono={validacion.errores.length ? "alerta" : "ok"} titulo="Con errores" valor={new Set(validacion.errores.map((x) => x.fila)).size} pie="no se importan; corregilas en el archivo y volvé a subirlo" />
             <Panel titulo="Destino">
               <div className="space-y-2">
                 <Select value={listaId} onValueChange={setListaId}>
@@ -174,7 +174,7 @@ function Asistente() {
 
           {validacion.errores.length > 0 && (
             <Panel titulo="Errores encontrados">
-              <ul className="max-h-60 space-y-1 overflow-auto text-sm">
+              <ul className="max-h-60 space-y-1 overflow-auto t-texto-sm">
                 {validacion.errores.slice(0, 200).map((x, i) => (
                   <li key={i} className="flex gap-3">
                     <span className="num w-16 shrink-0 text-muted-foreground">Fila {x.fila}</span>
@@ -188,7 +188,7 @@ function Asistente() {
           {validacion.validas.length > 0 && (
             <Panel titulo="Vista previa" ficha="Primeras 8 filas válidas">
               <div className="overflow-auto">
-                <table className="w-full text-xs">
+                <table className="w-full t-texto-sm">
                   <thead className="text-muted-foreground">
                     <tr>
                       {["SKU", "Descripción", "Rubro", "Marca", "Costo", "Precio", "Stock"].map((h) => (
@@ -243,9 +243,9 @@ function Asistente() {
       {resultado && (
         <Panel>
           <div className="flex flex-col items-center gap-2 py-6 text-center">
-            <CheckCircle2 className="size-10 text-ok-texto" />
+            <CheckCircle2 className="size-10 text-ok" />
             <p className="text-lg font-semibold">Importación terminada</p>
-            <p className="text-sm text-muted-foreground">
+            <p className="t-texto-sm text-muted-foreground">
               {resultado.creados} productos nuevos y {resultado.actualizados} actualizados. Quedó registrado en la auditoría.
             </p>
             <Button
@@ -265,14 +265,14 @@ function Asistente() {
   )
 }
 
-function Resumen({ icono: Icono, tono, titulo, valor, pie }: { icono: React.ComponentType<{ className?: string }>; tono: "ok" | "chispa"; titulo: string; valor: number; pie: string }) {
+function Resumen({ icono: Icono, tono, titulo, valor, pie }: { icono: React.ComponentType<{ className?: string }>; tono: "ok" | "alerta"; titulo: string; valor: number; pie: string }) {
   return (
     <div className="rounded-xl border border-linea bg-card p-4">
-      <p className="flex items-center gap-2 text-sm text-muted-foreground">
-        <Icono className={cn("size-4", tono === "ok" ? "text-ok-texto" : "text-chispa-texto")} /> {titulo}
+      <p className="flex items-center gap-2 t-texto-sm text-muted-foreground">
+        <Icono className={cn("size-4", tono === "ok" ? "text-ok" : "text-alerta")} /> {titulo}
       </p>
       <p className="mt-1 text-3xl font-semibold">{valor.toLocaleString("es-AR")}</p>
-      <p className="text-xs text-muted-foreground">{pie}</p>
+      <p className="t-texto-sm text-muted-foreground">{pie}</p>
     </div>
   )
 }

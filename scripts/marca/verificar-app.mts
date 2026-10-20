@@ -19,9 +19,9 @@ async function ingresar(page: Page, usuario: string) {
   }
 }
 const tomas = [
-  { id: "app-tablero-oscuro", usuario: "dueno@demo.yunque.app", ruta: "/app", tema: "dark" },
-  { id: "app-mostrador-oscuro", usuario: "mostrador@demo.yunque.app", ruta: "/app/mostrador", tema: "dark" },
-  { id: "app-mostrador-claro", usuario: "mostrador@demo.yunque.app", ruta: "/app/mostrador", tema: "light" },
+  { id: "app-tablero-oscuro", usuario: "dueno@demo.quvant.app", ruta: "/app", tema: "dark" },
+  { id: "app-mostrador-oscuro", usuario: "mostrador@demo.quvant.app", ruta: "/app/mostrador", tema: "dark" },
+  { id: "app-mostrador-claro", usuario: "mostrador@demo.quvant.app", ruta: "/app/mostrador", tema: "light" },
   { id: "sitio-texto-largo", ruta: "/", tema: "dark", bajar: 2600 },
 ]
 const b = await chromium.launch()

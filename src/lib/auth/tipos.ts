@@ -24,7 +24,7 @@ export type PreSesion = {
   exp: number
 }
 
-export const COOKIE_SESION = "yunque_sesion"
-export const COOKIE_PRE_SESION = "yunque_pre"
+export const COOKIE_SESION = "quvant_sesion"
+export const COOKIE_PRE_SESION = "quvant_pre"
 export const DURACION_SESION_S = 12 * 60 * 60
 export const DURACION_PRE_SESION_S = 5 * 60

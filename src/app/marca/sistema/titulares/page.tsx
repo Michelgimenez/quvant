@@ -2,7 +2,7 @@ import type { Metadata } from "next"
 import { Button } from "@/components/ui/button"
 import { Firma } from "@/components/marca/quvant"
 import { Grilla } from "@/components/marca/grilla"
-import { TITULARES_PROPUESTOS } from "@/config/sitio"
+import { TITULARES_ALTERNATIVOS } from "@/config/sitio"
 
 export const metadata: Metadata = {
   title: "Titulares propuestos",
@@ -22,7 +22,7 @@ export default function PaginaTitulares() {
           </div>
           <p className="t-etiqueta text-gris-7">Michel elige uno · se guarda en src/config/sitio.ts</p>
         </header>
-        {TITULARES_PROPUESTOS.map((t) => (
+        {TITULARES_ALTERNATIVOS.map((t) => (
           <section key={t.id} className="relative grid flex-1 grid-cols-[1fr_380px] overflow-hidden border border-gris-3 bg-negro">
             <Grilla paso={28} />
             <div className="relative flex flex-col justify-center gap-4 px-10 py-7">

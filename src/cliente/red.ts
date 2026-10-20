@@ -5,7 +5,7 @@
  * El corte simulado sirve para mostrar el modo sin conexión en una demo sin
  * desenchufar nada; se recuerda durante la pestaña (sessionStorage).
  */
-const CLAVE = "yunque:corte-simulado"
+const CLAVE = "quvant:corte-simulado"
 const oyentes = new Set<() => void>()
 
 let corte = leer()

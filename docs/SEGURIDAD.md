@@ -1,4 +1,4 @@
-# Yunque — seguridad
+# Quvant — seguridad
 
 > Estado honesto: **demo funcional, sin auditoría externa.** Publicado en Vercel solo para revisión (https://yunque-rust.vercel.app), en modo demo: datos ficticios, sin Supabase ni datos de clientes. Este documento dice
 > qué existe hoy, qué falta y qué tiene que revisar una auditoría profesional antes del primer cliente real.

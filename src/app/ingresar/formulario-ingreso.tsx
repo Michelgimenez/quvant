@@ -32,7 +32,7 @@ export function FormularioIngreso() {
     <form action={accion} className="space-y-4" noValidate>
       <input type="hidden" name="siguiente" value={params.get("siguiente") ?? ""} />
       {params.get("vencida") && !estado.error && (
-        <p className="rounded-md border border-chispa/40 bg-chispa/10 px-3 py-2 text-sm">La verificación venció. Ingresá de nuevo.</p>
+        <p className="rounded-md border border-alerta/40 bg-alerta/10 px-3 py-2 t-texto-sm">La verificación venció. Ingresá de nuevo.</p>
       )}
       <div className="space-y-1.5">
         <Label htmlFor="email">Email</Label>
@@ -65,7 +65,7 @@ export function FormularioIngreso() {
         />
       </div>
       {estado.error && (
-        <p id="error-ingreso" role="alert" className="text-sm font-medium text-error-texto">
+        <p id="error-ingreso" role="alert" className="t-texto-sm font-medium text-error">
           {estado.error}
         </p>
       )}

@@ -163,15 +163,15 @@ export function generarEmpresaDemo(opciones: OpcionesDemo = {}): EstadoEmpresa {
   }))
   const U = (email: string) => usuarios.find((u) => u.email === email)!.id
   const vendedoresPor: Record<string, Id[]> = {
-    CC: [U("mostrador@demo.yunque.app"), U("admin@demo.yunque.app")],
-    NO: [U("mostrador.norte@demo.yunque.app")],
-    DM: [U("maquinaria@demo.yunque.app"), U("dueno@demo.yunque.app")],
+    CC: [U("mostrador@demo.quvant.app"), U("admin@demo.quvant.app")],
+    NO: [U("mostrador.norte@demo.quvant.app")],
+    DM: [U("maquinaria@demo.quvant.app"), U("dueno@demo.quvant.app")],
   }
   // Sucursales a medida: venden administración y el dueño (pueden en todas)
-  for (const s of sucursales) vendedoresPor[s.codigo] ??= [U("admin@demo.yunque.app"), U("dueno@demo.yunque.app")]
-  const tecnicos = [U("tecnico@demo.yunque.app"), U("tecnico2@demo.yunque.app")]
-  const deposito = U("deposito@demo.yunque.app")
-  const compras = U("compras@demo.yunque.app")
+  for (const s of sucursales) vendedoresPor[s.codigo] ??= [U("admin@demo.quvant.app"), U("dueno@demo.quvant.app")]
+  const tecnicos = [U("tecnico@demo.quvant.app"), U("tecnico2@demo.quvant.app")]
+  const deposito = U("deposito@demo.quvant.app")
+  const compras = U("compras@demo.quvant.app")
 
   const listas: ListaPrecio[] = LISTAS_DEMO.map((l, i) => ({
     id: uuidDe(`${semilla}:lista:${i}`),

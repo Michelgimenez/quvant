@@ -1,5 +1,5 @@
 /*
- * Service worker de Yunque: que la app abra sin internet.
+ * Service worker de Quvant: que la app abra sin internet.
  *
  * - Estáticos (/_next/static, íconos, marca): cache-first (son inmutables).
  * - Páginas de /app: network-first con respaldo en caché (si no hay red,
@@ -8,7 +8,7 @@
  *   mostrador abre sin conexión aunque no se haya visitado antes.
  * - Los datos NO pasan por acá: viven en IndexedDB (réplica + cola).
  */
-const VERSION = "yunque-v1"
+const VERSION = "quvant-v1"
 const ESTATICOS = `${VERSION}-estaticos`
 const PAGINAS = `${VERSION}-paginas`
 const RUTAS = [

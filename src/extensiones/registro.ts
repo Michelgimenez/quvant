@@ -3,7 +3,7 @@ import type { IdExtension } from "@/dominio/tipos"
 import type { EstadoFeature } from "@/showcase/features"
 
 /**
- * Registro de extensiones de Yunque. Una extensión suma pantallas sobre los
+ * Registro de extensiones de Quvant. Una extensión suma pantallas sobre los
  * mismos datos (y las mismas reglas de acceso) sin tocar el núcleo:
  *
  *  1. su id en EXTENSIONES (src/dominio/tipos.ts) y en el check de
@@ -28,7 +28,7 @@ export const REGISTRO_EXTENSIONES: DefinicionExtension[] = [
   {
     id: "forja",
     nombre: "Forja",
-    descripcion: "Las sucursales conectadas como un taller vivo: ventas, stock, transferencias y reparaciones en tiempo real, sobre los mismos datos de Yunque.",
+    descripcion: "Las sucursales conectadas como un taller vivo: ventas, stock, transferencias y reparaciones en tiempo real, sobre los mismos datos de Quvant.",
     puntos: ["Ver toda la red en el mapa", "Entrar a cada sucursal", "Reproducir el día"],
     ruta: "/app/forja",
     permisoVer: "forja.ver",

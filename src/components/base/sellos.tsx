@@ -16,7 +16,7 @@ export function Sello({
     <span
       title={titulo ?? (texto === "DEMO" ? "Datos ficticios de demostración" : undefined)}
       className={cn(
-        "inline-flex h-5 shrink-0 items-center border border-dashed border-alerta px-1.5 font-mono text-[10px] font-semibold leading-none tracking-[0.2em] text-alerta",
+        "t-etiqueta inline-flex h-5 shrink-0 items-center border border-dashed border-alerta px-1.5 leading-none text-alerta",
         className,
       )}
     >
@@ -37,8 +37,8 @@ export function partes(...p: (string | number | null | undefined | false)[]) {
 
 const COLOR_ESTADO: Record<EstadoFeature, string> = {
   disponible: "bg-ok",
-  demo: "bg-chispa",
-  "próximamente": "bg-acero",
+  demo: "bg-alerta",
+  "próximamente": "bg-gris-7",
 }
 
 /** Sello de estado del registro de funcionalidades. */
@@ -46,11 +46,11 @@ export function EstadoFeatureBadge({ estado, className }: { estado: EstadoFeatur
   return (
     <span
       className={cn(
-        "inline-flex h-6 items-center gap-1.5 rounded-full border border-linea bg-superficie-2 px-2.5 font-mono text-[10.5px] uppercase tracking-wider text-foreground/85",
+        "t-etiqueta inline-flex h-6 items-center gap-2 border border-linea bg-superficie-2 px-2 text-foreground/85",
         className,
       )}
     >
-      <span className={cn("size-1.5 rounded-full", COLOR_ESTADO[estado])} aria-hidden />
+      <span className={cn("size-[6px]", COLOR_ESTADO[estado])} aria-hidden />
       {ETIQUETA_ESTADO[estado]}
     </span>
   )
@@ -69,7 +69,7 @@ export function TextoConfig({ texto, className }: { texto: string; className?: s
         ES_COMPLETAR.test(t) ? (
           <mark
             key={i}
-            className="rounded-[3px] border border-dashed border-chispa/70 bg-chispa/10 px-1 font-mono text-[0.85em] text-chispa-texto"
+            className="border border-dashed border-alerta/70 bg-transparent px-1 font-mono text-[0.85em] text-alerta"
           >
             {t}
           </mark>
@@ -82,12 +82,12 @@ export function TextoConfig({ texto, className }: { texto: string; className?: s
 }
 
 /** Punto de estado (conexión, sincronización). */
-export function Punto({ tono, pulso, className }: { tono: "ok" | "chispa" | "error" | "acero"; pulso?: boolean; className?: string }) {
-  const color = { ok: "bg-ok", chispa: "bg-chispa", error: "bg-error", acero: "bg-acero" }[tono]
+export function Punto({ tono, pulso, className }: { tono: "ok" | "alerta" | "error" | "acero"; pulso?: boolean; className?: string }) {
+  const color = { ok: "bg-ok", alerta: "bg-alerta", error: "bg-error", acero: "bg-acero" }[tono]
   return (
     <span className={cn("relative inline-flex size-2", className)} aria-hidden>
-      {pulso && <span className={cn("absolute inset-0 animate-ping rounded-full opacity-60", color)} />}
-      <span className={cn("relative inline-flex size-2 rounded-full", color)} />
+      {pulso && <span className={cn("absolute inset-0 animate-ping opacity-60", color)} />}
+      <span className={cn("relative inline-flex size-2", color)} />
     </span>
   )
 }

@@ -12,7 +12,7 @@ export function SelectorArcos({ red, onElegir }: { red: RedForja; onElegir: (id:
   return (
     <div className="pointer-events-auto absolute bottom-[4.5rem] left-4 flex max-w-[60%] flex-wrap gap-2" aria-label="Transferencias en tránsito">
       {enTransito.map((t) => (
-        <button key={t.id} type="button" onClick={() => onElegir(t.id)} className="rounded-md border border-white/10 bg-hierro/85 px-2.5 py-1.5 font-mono text-[11px] text-niebla backdrop-blur hover:border-white/25 focus-visible:outline focus-visible:outline-1 focus-visible:outline-temple" data-testid="transferencia-en-transito">
+        <button key={t.id} type="button" onClick={() => onElegir(t.id)} className="rounded-md border border-white/10 bg-negro/85 px-2.5 py-1.5 font-mono text-[11px] text-blanco backdrop-blur hover:border-white/25 focus-visible:outline focus-visible:outline-1 focus-visible:outline-foreground" data-testid="transferencia-en-transito">
           <span className="mr-1.5 inline-block size-1.5 rounded-full bg-brasa align-middle" aria-hidden />
           {nombre(t.desdeId)} → {nombre(t.haciaId)} · llega {hora(t.llegadaEstimada)}
         </button>
@@ -27,7 +27,7 @@ export function DetalleTransferencia({ red, id, onCerrar }: { red: RedForja; id:
   const desde = red.nodos.find((n) => n.id === t.desdeId)
   const hacia = red.nodos.find((n) => n.id === t.haciaId)
   return (
-    <aside className="pointer-events-auto absolute right-4 top-4 w-80 rounded-xl border border-white/10 bg-hierro/92 p-4 shadow-2xl backdrop-blur" aria-label="Detalle de la transferencia" data-testid="detalle-transferencia">
+    <aside className="pointer-events-auto absolute right-4 top-4 w-80 rounded-xl border border-white/10 bg-negro/92 p-4 shadow-2xl backdrop-blur" aria-label="Detalle de la transferencia" data-testid="detalle-transferencia">
       <div className="flex items-start justify-between gap-2">
         <div>
           <p className="font-mono text-[11px] uppercase tracking-widest text-acero">Transferencia</p>
@@ -35,17 +35,17 @@ export function DetalleTransferencia({ red, id, onCerrar }: { red: RedForja; id:
             {desde?.nombre ?? "—"} → {hacia?.nombre ?? "—"}
           </p>
         </div>
-        <button type="button" onClick={onCerrar} className="rounded-md px-2 py-1 text-acero hover:text-niebla focus-visible:outline focus-visible:outline-1 focus-visible:outline-temple" aria-label="Cerrar">
+        <button type="button" onClick={onCerrar} className="rounded-md px-2 py-1 text-acero hover:text-blanco focus-visible:outline focus-visible:outline-1 focus-visible:outline-foreground" aria-label="Cerrar">
           ✕
         </button>
       </div>
-      <p className="mt-2 font-mono text-xs text-niebla">
+      <p className="mt-2 font-mono text-xs text-blanco">
         {t.estado === "en_transito" ? `En camino · salió ${hora(t.despachadaEn)} · llega ~${hora(t.llegadaEstimada)}` : `Recibida ${hora(t.recibidaEn ?? t.llegadaEstimada)}`}
       </p>
       <ul className="mt-3 space-y-1.5 text-sm">
         {t.items.map((i) => (
           <li key={i.productoId} className="grid grid-cols-[minmax(0,1fr)_auto] gap-3">
-            <span className="truncate text-niebla/90">{i.nombre}</span>
+            <span className="truncate text-blanco/90">{i.nombre}</span>
             <span className="whitespace-nowrap font-mono text-acero">× {i.cantidad}</span>
           </li>
         ))}

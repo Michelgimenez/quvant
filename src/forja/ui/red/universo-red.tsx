@@ -310,7 +310,7 @@ export function UniversoRed({
       <div className="absolute inset-0" aria-hidden>
         <div ref={divMapa} className="forja-mapa size-full" />
       </div>
-      {errorMapa && <p className="absolute left-4 top-4 rounded-md bg-superficie px-3 py-2 text-xs text-acero">El mapa no se pudo cargar ({errorMapa}). Los datos siguen visibles.</p>}
+      {errorMapa && <p className="absolute left-4 top-4 rounded-md bg-superficie-1 px-3 py-2 text-xs text-acero">El mapa no se pudo cargar ({errorMapa}). Los datos siguen visibles.</p>}
 
       {/* Constelación: enlaces con grosor por volumen de transferencias */}
       <svg ref={svgEnlaces} className="pointer-events-none absolute inset-0 size-full opacity-0" aria-hidden>

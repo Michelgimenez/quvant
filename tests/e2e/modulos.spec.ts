@@ -25,7 +25,7 @@ test.describe("módulos", () => {
     test.setTimeout(150_000)
     const errores: string[] = []
     page.on("pageerror", (e) => errores.push(e.message))
-    await ingresar(page, "dueno@demo.yunque.app")
+    await ingresar(page, "dueno@demo.quvant.app")
     for (const [ruta, titulo] of MODULOS) {
       await page.goto(ruta)
       await expect(page.getByRole("heading", { level: 1 }).first()).toHaveText(titulo, { timeout: 15_000 })
@@ -35,14 +35,14 @@ test.describe("módulos", () => {
   })
 
   test("el técnico no ve ventas ni configuración", async ({ page }) => {
-    await ingresar(page, "tecnico@demo.yunque.app")
+    await ingresar(page, "tecnico@demo.quvant.app")
     await expect(page.getByRole("navigation", { name: "Módulos" }).getByRole("link", { name: "Mostrador" })).toHaveCount(0)
     await page.goto("/app/configuracion")
     await expect(page.getByRole("heading", { name: "Sin acceso" })).toBeVisible()
   })
 
   test("co-branding: el color de la organización se aplica al encabezado", async ({ page }) => {
-    await ingresar(page, "dueno@demo.yunque.app", "/app/configuracion")
+    await ingresar(page, "dueno@demo.quvant.app", "/app/configuracion")
     await page.getByLabel("Usar #FF5A1F").click()
     await page.getByRole("button", { name: "Guardar" }).first().click()
     await expect(page.getByText("Marca actualizada en todo el sistema")).toBeVisible()
@@ -53,7 +53,7 @@ test.describe("módulos", () => {
   test("taller: el equipo pasa a listo y queda el aviso por WhatsApp (emulado)", async ({ page }) => {
     // La demo se genera según la fecha: con reloj fijo siempre hay equipos en reparación
     await page.clock.install({ time: new Date("2026-10-07T15:30:00-03:00") })
-    await ingresar(page, "tecnico@demo.yunque.app", "/app/servicio")
+    await ingresar(page, "tecnico@demo.quvant.app", "/app/servicio")
     await page.getByLabel("Solo mis órdenes").uncheck()
     const tarjeta = page.getByRole("region", { name: "En reparación" }).getByRole("button").first()
     await tarjeta.click()

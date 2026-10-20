@@ -42,8 +42,8 @@ export function FormularioCodigo() {
     <form action={accion} className="space-y-4">
       <input type="hidden" name="siguiente" value={params.get("siguiente") ?? "/app"} />
       {params.get("enrolar") && (
-        <p className="rounded-md border border-chispa/40 bg-chispa/10 px-3 py-2 text-sm">
-          Tu cuenta todavía no tiene un autenticador configurado. Pedile a quien administra Yunque en tu empresa que active el doble
+        <p className="rounded-md border border-alerta/40 bg-alerta/10 px-3 py-2 t-texto-sm">
+          Tu cuenta todavía no tiene un autenticador configurado. Pedile a quien administra Quvant en tu empresa que active el doble
           factor para tu usuario.
         </p>
       )}
@@ -64,7 +64,7 @@ export function FormularioCodigo() {
         />
       </div>
       {estado.error && (
-        <p id="error-codigo" role="alert" className="text-sm font-medium text-error-texto">
+        <p id="error-codigo" role="alert" className="t-texto-sm font-medium text-error">
           {estado.error}
         </p>
       )}
@@ -73,11 +73,11 @@ export function FormularioCodigo() {
         Verificar
       </Button>
       {ES_DEMO && (
-        <div className="rounded-lg border border-dashed border-chispa/60 bg-chispa/5 p-3 text-sm">
+        <div className="rounded-lg border border-dashed border-alerta/60 bg-alerta/5 p-3 t-texto-sm">
           <p className="ficha mb-1">Autenticador emulado · solo demo</p>
           {demo ? (
             <p>
-              Código actual: <span data-testid="codigo-demo" className="num text-lg font-bold text-chispa-texto">{demo.codigo.replace(/(\d{3})(\d{3})/, "$1 $2")}</span>
+              Código actual: <span data-testid="codigo-demo" className="num text-lg font-bold text-alerta">{demo.codigo.replace(/(\d{3})(\d{3})/, "$1 $2")}</span>
               <span className="text-muted-foreground"> · cambia en {demo.segundosRestantes} s</span>
             </p>
           ) : (
@@ -85,7 +85,7 @@ export function FormularioCodigo() {
           )}
         </div>
       )}
-      <Link href="/ingresar" className="block text-center text-sm text-muted-foreground underline-offset-4 hover:underline">
+      <Link href="/ingresar" className="block text-center t-texto-sm text-muted-foreground underline-offset-4 hover:underline">
         Volver
       </Link>
     </form>

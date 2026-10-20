@@ -72,7 +72,7 @@ describe("Forja · geometría", () => {
   })
 })
 
-describe("Forja · modelo desde el estado de Yunque", () => {
+describe("Forja · modelo desde el estado de Quvant", () => {
   it("la red tiene cada sucursal con ubicación, marca DEMO y sus números del día", () => {
     const red = redForja(e, AHORA)
     expect(red.nodos).toHaveLength(3)
@@ -139,7 +139,7 @@ describe("Forja · simulador", () => {
     expect(intencion?.tipo).toBe("recepcion")
   })
 
-  it("cada intención se vuelve una operación que las reglas de Yunque aceptan", () => {
+  it("cada intención se vuelve una operación que las reglas de Quvant aceptan", () => {
     const estado = structuredClone(e)
     const sim = new SimuladorForja("z")
     const tipos = new Set<string>()
@@ -197,7 +197,7 @@ describe("Forja · operaciones en el reductor", () => {
   })
 
   it("un permiso extra habilita ver Forja sin cambiar el rol", () => {
-    const lucia = e.usuarios.find((u) => u.email === "mostrador.norte@demo.yunque.app")!
+    const lucia = e.usuarios.find((u) => u.email === "mostrador.norte@demo.quvant.app")!
     expect(lucia.permisosExtra).toContain("forja.ver")
   })
 })

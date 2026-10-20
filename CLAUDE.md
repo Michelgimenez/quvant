@@ -1,8 +1,8 @@
 @AGENTS.md
 
-# Yunque — reglas del proyecto
+# Quvant — reglas del proyecto
 
-Yunque es un sistema de gestión en la nube para ferreterías industriales y distribuidores (Argentina).
+Quvant (antes Yunque) es el sistema de gestión en la nube que se adapta a cada negocio: del kiosco a la empresa con decenas de sucursales (Argentina). Identidad: el manual en `referencias/` y `docs/TIPOGRAFIA.md`.
 Estado real: **demo funcional / piloto**. Todavía no hay clientes pagando.
 
 ## Regla del registro de funcionalidades (obligatoria)

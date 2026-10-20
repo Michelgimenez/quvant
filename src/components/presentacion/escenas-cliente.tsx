@@ -9,8 +9,8 @@ import { NAVEGACION } from "@/cliente/navegacion"
 import { Tablero } from "@/components/app/tablero"
 import { LogoOrg } from "@/components/base/logo-org"
 import { Sello, TextoConfig } from "@/components/base/sellos"
-import { ConYunqueDiscreto } from "@/components/marca/con-yunque-discreto"
-import { Wordmark } from "@/components/marca/marca"
+import { ConQuvantDiscreto } from "@/components/marca/con-quvant"
+import { Logotipo } from "@/components/marca/quvant"
 import { DemoConexion } from "@/components/sitio/demo-conexion"
 import type { ClienteDemo } from "@/config/clientes"
 import { IMPLEMENTACION } from "@/config/hoja-de-ruta"
@@ -39,7 +39,7 @@ function orgDe(c: ClienteDemo) {
   return { nombre: c.nombre, logo: c.logo, logoNegativo: c.logoNegativo, colorAcento: c.color }
 }
 
-/** Arriba a la derecha en cada escena: su marca, "con yunque" y el sello PROPUESTA. */
+/** Arriba a la derecha en cada escena: su marca, "con Quvant" y el sello PROPUESTA. */
 function MarcaCliente() {
   const { cliente } = useCliente()
   return (
@@ -69,8 +69,8 @@ function Portada() {
           <LogoOrg org={orgDe(cliente)} alto="h-[120px]" />
         </Aparecer>
         <Aparecer demora={0.5}>
-          <p className="text-[88px] font-extrabold leading-[1.04] tracking-[-0.035em] text-niebla">
-            Así se vería <span className="font-display">Yunque</span> en {cliente.nombre}
+          <p className="text-[88px] font-extrabold leading-[1.04] tracking-[-0.035em] text-blanco">
+            Así se vería <span className="font-display">Quvant</span> en {cliente.nombre}
           </p>
         </Aparecer>
         <Aparecer demora={0.9} className="flex items-center gap-8">
@@ -80,7 +80,7 @@ function Portada() {
           </span>
         </Aparecer>
         <Aparecer demora={1.3} className="mt-6 flex items-center gap-4 text-[22px] text-acero">
-          funciona con <Wordmark className="h-[34px] text-niebla" />
+          funciona con <Logotipo version="principal" className="h-[20px]" />
         </Aparecer>
       </div>
     </Lienzo>
@@ -99,9 +99,9 @@ function SuProblema() {
       </Aparecer>
       <ul className="mt-14 grid grid-cols-2 gap-8">
         {cliente.problemas.map((p, i) => (
-          <Aparecer key={p.area} demora={0.5 + i * 0.18} className="rounded-3xl border border-white/10 bg-superficie/80 p-8" y={24}>
+          <Aparecer key={p.area} demora={0.5 + i * 0.18} className="rounded-3xl border border-white/10 bg-superficie-1/80 p-8" y={24}>
             <p className="font-mono text-[20px] uppercase tracking-widest text-acero">{p.area}</p>
-            <p className="mt-3 text-[30px] leading-snug text-niebla">
+            <p className="mt-3 text-[30px] leading-snug text-blanco">
               <TextoConfig texto={p.detalle} />
             </p>
           </Aparecer>
@@ -141,7 +141,7 @@ function AppConSuMarca({ demo }: { demo: DemoEmbebida }) {
               ))}
             </nav>
             <div className="absolute bottom-6 left-5">
-              <ConYunqueDiscreto />
+              <ConQuvantDiscreto />
             </div>
           </aside>
           <div className="min-w-0 flex-1 overflow-hidden">
@@ -170,7 +170,7 @@ function AppConSuMarca({ demo }: { demo: DemoEmbebida }) {
   )
 }
 
-/** Pantalla de ingreso en el celular: su marca adelante, Yunque discreto al pie. */
+/** Pantalla de ingreso en el celular: su marca adelante, Quvant discreto al pie. */
 function IngresoCelular() {
   const { cliente } = useCliente()
   return (
@@ -185,7 +185,7 @@ function IngresoCelular() {
         </div>
       </div>
       <div className="mt-auto flex justify-center">
-        <ConYunqueDiscreto />
+        <ConQuvantDiscreto />
       </div>
     </div>
   )
@@ -194,12 +194,12 @@ function IngresoCelular() {
 function SuMarca() {
   const { cliente, demo } = useCliente()
   return (
-    <LienzoCliente numero="03" etiqueta="Yunque con su marca">
+    <LienzoCliente numero="03" etiqueta="Quvant con su marca">
       <div className="grid h-full grid-cols-[1100px_1fr] gap-12">
         <div className="flex flex-col gap-6">
           <Aparecer>
             <Titulo className="text-[56px]">
-              Su logo y su color. <Acento>Yunque</Acento> queda discreto.
+              Su logo y su color. <Acento>Quvant</Acento> queda discreto.
             </Titulo>
           </Aparecer>
           <Aparecer demora={0.4} escala={0.98}>
@@ -214,7 +214,7 @@ function SuMarca() {
             <p className="font-mono text-[18px] uppercase tracking-widest text-acero">Sus categorías</p>
             <ul className="mt-3 flex flex-wrap gap-2">
               {cliente.categorias.map((c) => (
-                <li key={c} className="rounded-full border border-white/10 bg-superficie px-4 py-2 text-[18px] text-niebla">
+                <li key={c} className="rounded-full border border-white/10 bg-superficie-1 px-4 py-2 text-[18px] text-blanco">
                   <TextoConfig texto={c} />
                 </li>
               ))}
@@ -261,7 +261,7 @@ function Corte() {
             <Bajada className="mt-8 text-[28px]">Cada puesto guarda lo que vende y lo sincroniza solo cuando vuelve la conexión. Sin papelitos, sin cargar dos veces.</Bajada>
           </Aparecer>
           <Aparecer demora={0.7}>
-            <p className="mt-10 font-mono text-[20px] uppercase tracking-widest text-chispa">En vivo · mismo motor que la app</p>
+            <p className="mt-10 font-mono text-[20px] uppercase tracking-widest text-alerta">En vivo · mismo motor que la app</p>
           </Aparecer>
         </div>
         <Aparecer demora={0.3} escala={0.97}>
@@ -292,7 +292,7 @@ function ComoEmpezamos() {
           {IMPLEMENTACION.map((p, i) => (
             <li key={p.paso}>
               <motion.span
-                className="flex size-[44px] items-center justify-center rounded-full border-4 bg-hierro font-mono text-[18px] font-bold text-niebla"
+                className="flex size-[44px] items-center justify-center rounded-full border-4 bg-negro font-mono text-[18px] font-bold text-blanco"
                 style={{ borderColor: cliente.color }}
                 initial={{ scale: 0 }}
                 animate={{ scale: activa ? 1 : 0 }}
@@ -301,7 +301,7 @@ function ComoEmpezamos() {
                 {i + 1}
               </motion.span>
               <Aparecer demora={0.8 + i * 0.35} y={16} className="mt-8 pr-6">
-                <p className="text-[36px] font-bold leading-tight text-niebla">{p.paso}</p>
+                <p className="text-[36px] font-bold leading-tight text-blanco">{p.paso}</p>
                 <p className="mt-3 text-[24px] leading-snug text-acero">{p.detalle}</p>
               </Aparecer>
             </li>
@@ -334,12 +334,12 @@ function SocioFundador() {
               <Acento>{cliente.nombre}</Acento> como socio fundador.
             </Titulo>
             <Bajada className="mt-5 text-[28px]">
-              Programa para los primeros {socios.cupos} negocios que usen Yunque de verdad. {socios.estado}.
+              Programa para los primeros {socios.cupos} negocios que usen Quvant de verdad. {socios.estado}.
             </Bajada>
           </Aparecer>
           <ul className="mt-12 space-y-6">
             {socios.condiciones.map((c, i) => (
-              <Aparecer key={c} demora={0.5 + i * 0.2} x={-16} y={0} className="flex items-start gap-4 text-[30px] text-niebla">
+              <Aparecer key={c} demora={0.5 + i * 0.2} x={-16} y={0} className="flex items-start gap-4 text-[30px] text-blanco">
                 <CheckCircle2 className="mt-1 size-8 shrink-0 text-ok" /> {c}
               </Aparecer>
             ))}
@@ -348,12 +348,12 @@ function SocioFundador() {
             A cambio: {socios.aCambio.charAt(0).toLowerCase() + socios.aCambio.slice(1)}
           </Aparecer>
         </div>
-        <Aparecer demora={0.8} className="flex flex-col self-start rounded-3xl border border-white/10 bg-superficie/80 p-10">
+        <Aparecer demora={0.8} className="flex flex-col self-start rounded-3xl border border-white/10 bg-superficie-1/80 p-10">
           <p className="font-mono text-[20px] uppercase tracking-widest text-acero">Plan {plan.nombre}</p>
-          <p className="mt-4 text-[80px] font-extrabold leading-none tracking-tight text-niebla">USD {plan.precioMensual}</p>
+          <p className="mt-4 text-[80px] font-extrabold leading-none tracking-tight text-blanco">USD {plan.precioMensual}</p>
           <p className="mt-2 text-[26px] text-acero">{plan.unidad}</p>
           <p className="mt-4 text-[22px] text-acero">{plan.para}. Implementación: {PRECIOS.implementacion.toLowerCase()}</p>
-          <div className="mt-8 border-t border-white/10 pt-8 text-[22px] text-niebla">
+          <div className="mt-8 border-t border-white/10 pt-8 text-[22px] text-blanco">
             <p className="font-mono text-[16px] uppercase tracking-widest text-acero">Hablemos</p>
             <p className="mt-3">
               <TextoConfig texto={cliente.contacto.nombre} />
@@ -373,9 +373,9 @@ function SocioFundador() {
 
 /** Unos 6 minutos en reproducción automática (5 a 7 según la velocidad). */
 export const ESCENAS_CLIENTE: DefinicionEscena[] = [
-  { id: "portada", titulo: "Así se vería Yunque", largo: 100, duracion: 12, Componente: Portada },
+  { id: "portada", titulo: "Así se vería Quvant", largo: 100, duracion: 12, Componente: Portada },
   { id: "su-problema", titulo: "Lo que vimos", largo: 120, duracion: 45, Componente: SuProblema },
-  { id: "su-marca", titulo: "Yunque con su marca", largo: 140, duracion: 60, Componente: SuMarca },
+  { id: "su-marca", titulo: "Quvant con su marca", largo: 140, duracion: 60, Componente: SuMarca },
   { id: "un-dia", titulo: "Un día en su negocio", largo: 150, duracion: 80, Componente: UnDia },
   { id: "corte", titulo: "El corte de conexión", largo: 140, duracion: 60, Componente: Corte },
   { id: "como-empezamos", titulo: "Cómo empezamos", largo: 120, duracion: 45, Componente: ComoEmpezamos },

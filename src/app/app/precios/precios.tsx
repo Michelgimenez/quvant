@@ -42,7 +42,7 @@ export function Precios() {
             />
           </TabsContent>
         ) : (
-          <p className="flex items-center gap-2 text-sm text-muted-foreground">
+          <p className="flex items-center gap-2 t-texto-sm text-muted-foreground">
             <Lock className="size-4" /> Tu rol puede ver precios, pero no cambiarlos.
           </p>
         )}
@@ -55,8 +55,8 @@ export function Precios() {
               <li key={l.id} className="rounded-xl border border-linea bg-card p-4">
                 <Ficha>{l.esDefault ? "Lista principal" : "Lista"}</Ficha>
                 <p className="mt-1 text-lg font-semibold">{l.nombre}</p>
-                <p className="text-sm text-muted-foreground">Margen sugerido para productos nuevos: {l.margenSugerido} %</p>
-                <p className="mt-2 text-xs text-muted-foreground">{Object.values(e.clientes).filter((c) => c.listaId === l.id).length} clientes usan esta lista</p>
+                <p className="t-texto-sm text-muted-foreground">Margen sugerido para productos nuevos: {l.margenSugerido} %</p>
+                <p className="mt-2 t-texto-sm text-muted-foreground">{Object.values(e.clientes).filter((c) => c.listaId === l.id).length} clientes usan esta lista</p>
               </li>
             ))}
           </ul>
@@ -69,7 +69,7 @@ export function Precios() {
 function Historial() {
   const { e } = useDatos()
   const { ejecutar, puede } = useApp()
-  if (!e.aumentos.length) return <p className="text-sm text-muted-foreground">Todavía no hubo aumentos.</p>
+  if (!e.aumentos.length) return <p className="t-texto-sm text-muted-foreground">Todavía no hubo aumentos.</p>
   return (
     <ul className="space-y-2">
       {e.aumentos.map((a) => {
@@ -80,19 +80,19 @@ function Historial() {
             <History className="size-4 text-muted-foreground" />
             <div className="min-w-0 flex-1">
               <p className="font-medium">{a.descripcion}</p>
-              <p className="text-xs text-muted-foreground">
+              <p className="t-texto-sm text-muted-foreground">
                 {new Date(a.fecha).toLocaleString("es-AR", { dateStyle: "medium", timeStyle: "short" })} · {autor?.nombre ?? "—"} · {a.listaIds.map((l) => e.listas.find((x) => x.id === l)?.nombre).join(", ")}
               </p>
               {ejemplo && (
-                <p className="mt-1 text-xs text-muted-foreground">
+                <p className="mt-1 t-texto-sm text-muted-foreground">
                   Ej.: {e.productos[ejemplo.productoId]?.nombre} {formatoPesos(ejemplo.antes, { sinDecimales: true })} → {formatoPesos(ejemplo.despues, { sinDecimales: true })}
                 </p>
               )}
             </div>
-            <span className="num text-sm font-semibold">+{a.porcentaje} %</span>
-            <span className="num text-xs text-muted-foreground">{a.cambios.length} precios</span>
+            <span className="num t-texto-sm font-semibold">+{a.porcentaje} %</span>
+            <span className="num t-texto-sm text-muted-foreground">{a.cambios.length} precios</span>
             {a.revertido ? (
-              <span className="rounded-full bg-muted px-2 py-0.5 text-[11px] text-muted-foreground">Revertido</span>
+              <span className="rounded-full bg-muted px-2 py-0.5 t-texto-sm text-muted-foreground">Revertido</span>
             ) : (
               puede("precios.editar") && (
                 <Button

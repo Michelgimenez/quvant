@@ -22,16 +22,16 @@ const COLUMNAS: EstadoServicio[] = ["ingresado", "diagnostico", "esperando_aprob
 
 export const TONO_SERVICIO: Record<EstadoServicio, string> = {
   ingresado: "bg-muted text-muted-foreground",
-  diagnostico: "bg-temple/15 text-enlace",
-  esperando_aprobacion: "bg-chispa/15 text-chispa-texto",
-  en_reparacion: "bg-temple/15 text-enlace",
-  listo: "bg-ok/15 text-ok-texto",
+  diagnostico: "bg-foreground/15 text-foreground",
+  esperando_aprobacion: "bg-alerta/15 text-alerta",
+  en_reparacion: "bg-foreground/15 text-foreground",
+  listo: "bg-ok/15 text-ok",
   entregado: "bg-muted text-muted-foreground",
-  sin_reparacion: "bg-error/15 text-error-texto",
+  sin_reparacion: "bg-error/15 text-error",
 }
 
 export function ChipServicio({ estado }: { estado: EstadoServicio }) {
-  return <span className={cn("inline-flex whitespace-nowrap rounded-full px-2 py-0.5 text-[11px] font-medium", TONO_SERVICIO[estado])}>{NOMBRE_ESTADO_SERVICIO[estado]}</span>
+  return <span className={cn("inline-flex whitespace-nowrap rounded-full px-2 py-0.5 t-texto-sm font-medium", TONO_SERVICIO[estado])}>{NOMBRE_ESTADO_SERVICIO[estado]}</span>
 }
 
 export function Servicio() {
@@ -83,7 +83,7 @@ export function Servicio() {
     { id: "cliente", encabezado: "Cliente", ancho: "minmax(160px,1.4fr)", orden: (o) => e.clientes[o.clienteId]?.nombre ?? "", celda: (o) => <span className="truncate">{e.clientes[o.clienteId]?.nombre}</span> },
     { id: "falla", encabezado: "Falla", ancho: "minmax(160px,1.4fr)", celda: (o) => <span className="truncate text-muted-foreground">{o.falla}</span> },
     { id: "estado", encabezado: "Estado", ancho: "170px", orden: (o) => COLUMNAS.indexOf(o.estado), celda: (o) => <ChipServicio estado={o.estado} /> },
-    { id: "ingreso", encabezado: "Ingreso", ancho: "96px", orden: (o) => o.fechaIngreso, celda: (o) => <span className="num text-xs text-muted-foreground">{new Date(o.fechaIngreso).toLocaleDateString("es-AR")}</span> },
+    { id: "ingreso", encabezado: "Ingreso", ancho: "96px", orden: (o) => o.fechaIngreso, celda: (o) => <span className="num t-texto-sm text-muted-foreground">{new Date(o.fechaIngreso).toLocaleDateString("es-AR")}</span> },
   ]
 
   const filasLista = filtroEstado ? ordenes.filter((o) => o.estado === filtroEstado) : ordenes
@@ -111,12 +111,12 @@ export function Servicio() {
             <List /> Lista
           </Button>
         </div>
-        <label className="inline-flex items-center gap-2 text-xs text-muted-foreground">
-          <input type="checkbox" checked={soloMias} onChange={(ev) => setSoloMias(ev.target.checked)} className="accent-[var(--temple)]" />
+        <label className="inline-flex items-center gap-2 t-texto-sm text-muted-foreground">
+          <input type="checkbox" checked={soloMias} onChange={(ev) => setSoloMias(ev.target.checked)} className="accent-[var(--foreground)]" />
           Solo mis órdenes
         </label>
         {filtroEstado && (
-          <button type="button" onClick={() => router.replace("/app/servicio")} className="rounded-full border border-linea px-2.5 py-0.5 text-xs">
+          <button type="button" onClick={() => router.replace("/app/servicio")} className="rounded-full border border-linea px-2.5 py-0.5 t-texto-sm">
             {NOMBRE_ESTADO_SERVICIO[filtroEstado]} ✕
           </button>
         )}
@@ -134,8 +134,8 @@ export function Servicio() {
               return (
                 <section key={estado} className="flex min-h-64 flex-col rounded-xl border border-linea bg-superficie-2/60" aria-label={NOMBRE_ESTADO_SERVICIO[estado]}>
                   <header className="flex items-center justify-between border-b border-linea px-3 py-2">
-                    <h2 className="text-sm font-semibold">{NOMBRE_ESTADO_SERVICIO[estado]}</h2>
-                    <span className="num rounded bg-muted px-1.5 text-xs">{lista.length}</span>
+                    <h2 className="t-texto-sm font-semibold">{NOMBRE_ESTADO_SERVICIO[estado]}</h2>
+                    <span className="num rounded bg-muted px-1.5 t-texto-sm">{lista.length}</span>
                   </header>
                   <ul className="flex-1 space-y-2 p-2">
                     {lista.map((o) => (
@@ -143,7 +143,7 @@ export function Servicio() {
                         <TarjetaOrden o={o} hoy={hoy} onAbrir={() => abrir(o.id)} />
                       </li>
                     ))}
-                    {lista.length === 0 && <li className="px-2 py-6 text-center text-xs text-muted-foreground">Nada acá.</li>}
+                    {lista.length === 0 && <li className="px-2 py-6 text-center t-texto-sm text-muted-foreground">Nada acá.</li>}
                   </ul>
                 </section>
               )
@@ -162,7 +162,7 @@ export function Servicio() {
             <div className="flex w-full items-center gap-3">
               <IlustracionProducto tipo={o.equipo.tipo} className="size-7" />
               <div className="min-w-0 flex-1">
-                <p className="truncate text-sm font-medium">
+                <p className="truncate t-texto-sm font-medium">
                   {o.equipo.marca} {o.equipo.modelo} · {e.clientes[o.clienteId]?.nombre}
                 </p>
                 <p className="ficha">ST {o.numero ? `#${o.numero}` : o.numeroLocal}</p>
@@ -189,7 +189,7 @@ function TarjetaOrden({ o, hoy, onAbrir }: { o: OrdenServicio; hoy: string; onAb
       <div className="flex items-center justify-between gap-2">
         <Ficha>ST {o.numero ? `#${o.numero}` : o.numeroLocal}</Ficha>
         {o.prioridad === "urgente" && (
-          <span className="inline-flex items-center gap-1 text-[11px] font-medium text-chispa-texto">
+          <span className="inline-flex items-center gap-1 t-texto-sm font-medium text-alerta">
             <AlertTriangle className="size-3" /> Urgente
           </span>
         )}
@@ -197,16 +197,16 @@ function TarjetaOrden({ o, hoy, onAbrir }: { o: OrdenServicio; hoy: string; onAb
       <div className="flex items-start gap-2">
         <IlustracionProducto tipo={o.equipo.tipo} className="size-8 shrink-0" />
         <div className="min-w-0">
-          <p className="truncate text-sm font-medium">
+          <p className="truncate t-texto-sm font-medium">
             {o.equipo.marca} {o.equipo.modelo}
           </p>
-          <p className="truncate text-xs text-muted-foreground">{e.clientes[o.clienteId]?.nombre}</p>
+          <p className="truncate t-texto-sm text-muted-foreground">{e.clientes[o.clienteId]?.nombre}</p>
         </div>
       </div>
-      <p className="line-clamp-2 text-xs text-muted-foreground">{o.falla}</p>
-      <div className="flex items-center justify-between text-[11px] text-muted-foreground">
+      <p className="line-clamp-2 t-texto-sm text-muted-foreground">{o.falla}</p>
+      <div className="flex items-center justify-between t-texto-sm text-muted-foreground">
         <span>{tecnico?.nombre.split(" ")[0] ?? "Sin asignar"}</span>
-        <span className={cn(atrasada && "font-semibold text-error-texto")}>
+        <span className={cn(atrasada && "font-semibold text-error")}>
           {dias === 0 ? "hoy" : `${dias} día${dias === 1 ? "" : "s"}`}
           {atrasada && " · atrasada"}
         </span>

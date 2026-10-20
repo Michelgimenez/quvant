@@ -3,7 +3,7 @@ import { agregarProducto, cobrarEnEfectivo, ingresar } from "./utiles"
 
 test.describe("mostrador", () => {
   test("venta de mostrador de punta a punta", async ({ page }) => {
-    await ingresar(page, "mostrador@demo.yunque.app", "/app/mostrador")
+    await ingresar(page, "mostrador@demo.quvant.app", "/app/mostrador")
     await agregarProducto(page, "disco de corte")
     await agregarProducto(page, "guantes")
     const total = await page.getByTestId("total-venta").innerText()
@@ -17,7 +17,7 @@ test.describe("mostrador", () => {
   })
 
   test("presupuesto que pasa a venta (con el salto)", async ({ page }) => {
-    await ingresar(page, "mostrador@demo.yunque.app", "/app/presupuestos/nuevo")
+    await ingresar(page, "mostrador@demo.quvant.app", "/app/presupuestos/nuevo")
     await page.getByLabel("Nombre del cliente").fill("Obra Calle Falsa")
     const buscador = page.getByTestId("buscador-productos")
     await buscador.fill("taladro")
@@ -34,7 +34,7 @@ test.describe("mostrador", () => {
   })
 
   test("sin conexión: vende, recarga sin internet, y sincroniza al volver", async ({ page, context }) => {
-    await ingresar(page, "mostrador@demo.yunque.app", "/app/mostrador")
+    await ingresar(page, "mostrador@demo.quvant.app", "/app/mostrador")
     await expect(page.getByTestId("estado-conexion")).toHaveText("Sincronizado", { timeout: 15_000 })
     // Esperar a que el service worker esté activo (precarga de la app)
     await page.evaluate(async () => {

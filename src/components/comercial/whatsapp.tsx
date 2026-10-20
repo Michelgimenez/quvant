@@ -23,10 +23,10 @@ export function DialogoWhatsApp({ destinatario, telefono, mensaje, onEnviado, on
             {destinatario} · <span className="num">{telefono || "sin teléfono"}</span>
           </DialogDescription>
         </DialogHeader>
-        <div className="rounded-xl bg-[#0b141a] p-3">
-          <div className="ml-auto max-w-[90%] rounded-lg rounded-tr-none bg-[#005c4b] px-3 py-2 text-sm text-[#e9edef] shadow">{mensaje}</div>
+        <div className="rounded-lg border border-linea bg-superficie-2 p-3">
+          <div className="t-texto-sm ml-auto max-w-[90%] rounded-md rounded-tr-none border border-linea bg-card px-3 py-2">{mensaje}</div>
         </div>
-        <p className="rounded-md border border-dashed border-chispa/60 px-3 py-2 text-xs text-muted-foreground">
+        <p className="rounded-md border border-dashed border-alerta/60 px-3 py-2 t-texto-sm text-muted-foreground">
           <span className="ficha mr-1">Demo</span> Envío emulado: no sale ningún mensaje real. En producción se envía por la API de WhatsApp Business.
         </p>
         <DialogFooter>

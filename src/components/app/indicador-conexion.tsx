@@ -43,7 +43,7 @@ export function IndicadorConexion({ compacto = false }: { compacto?: boolean }) 
       : estado === "sincronizando" || pendientes
         ? "Sincronizando"
         : "Sincronizado"
-  const tono = estado === "sin_conexion" ? "chispa" : estado === "sincronizando" || pendientes ? "acero" : "ok"
+  const tono = estado === "sin_conexion" ? "alerta" : estado === "sincronizando" || pendientes ? "acero" : "ok"
 
   return (
     <Popover>
@@ -54,8 +54,8 @@ export function IndicadorConexion({ compacto = false }: { compacto?: boolean }) 
           type="button"
           aria-label={`Estado de conexión: ${texto}`}
           className={cn(
-            "inline-flex h-8 items-center gap-2 rounded-full border px-3 text-xs font-medium transition-colors",
-            estado === "sin_conexion" ? "border-chispa/50 bg-chispa/10" : "border-linea bg-superficie-2 hover:border-acero/40",
+            "inline-flex h-8 items-center gap-2 rounded-full border px-3 t-texto-sm font-medium transition-colors",
+            estado === "sin_conexion" ? "border-alerta/50 bg-alerta/10" : "border-linea bg-superficie-2 hover:border-acero/40",
           )}
         >
           {estado === "sincronizando" ? <Loader2 className="size-3.5 animate-spin text-muted-foreground" /> : <Punto tono={tono} pulso={estado === "sin_conexion"} />}
@@ -66,12 +66,12 @@ export function IndicadorConexion({ compacto = false }: { compacto?: boolean }) 
       </PopoverTrigger>
       <PopoverContent align="end" className="w-80 space-y-4">
         <div className="flex items-start gap-3">
-          <span className={cn("mt-0.5 rounded-md p-1.5", estado === "sin_conexion" ? "bg-chispa/15 text-chispa-texto" : "bg-ok/15 text-ok-texto")}>
+          <span className={cn("mt-0.5 rounded-md p-1.5", estado === "sin_conexion" ? "bg-alerta/15 text-alerta" : "bg-ok/15 text-ok")}>
             {estado === "sin_conexion" ? <CloudOff className="size-4" /> : <Wifi className="size-4" />}
           </span>
           <div className="space-y-0.5">
-            <p className="text-sm font-semibold">{estado === "sin_conexion" ? "Trabajando sin conexión" : "Conectado"}</p>
-            <p className="text-xs text-muted-foreground">
+            <p className="t-texto-sm font-semibold">{estado === "sin_conexion" ? "Trabajando sin conexión" : "Conectado"}</p>
+            <p className="t-texto-sm text-muted-foreground">
               {estado === "sin_conexion"
                 ? "Podés seguir vendiendo. Todo queda guardado en este equipo y se sincroniza solo cuando vuelve internet."
                 : ultimaSincronizacion
@@ -84,9 +84,9 @@ export function IndicadorConexion({ compacto = false }: { compacto?: boolean }) 
         <div>
           <p className="ficha mb-1.5">Cola · {pendientes} pendiente{pendientes === 1 ? "" : "s"}</p>
           {pendientes === 0 ? (
-            <p className="text-xs text-muted-foreground">Nada pendiente.</p>
+            <p className="t-texto-sm text-muted-foreground">Nada pendiente.</p>
           ) : (
-            <ul className="max-h-40 space-y-1 overflow-auto text-xs">
+            <ul className="max-h-40 space-y-1 overflow-auto t-texto-sm">
               {motor.pendientes.map((op) => (
                 <li key={op.id} className="flex justify-between gap-2 rounded bg-superficie-2 px-2 py-1">
                   <span>{NOMBRE_OP[op.tipo] ?? op.tipo}</span>
@@ -98,7 +98,7 @@ export function IndicadorConexion({ compacto = false }: { compacto?: boolean }) 
         </div>
 
         <div className="flex items-center justify-between gap-3 rounded-md border border-dashed border-linea p-2.5">
-          <label htmlFor="corte-simulado" className="flex items-center gap-2 text-xs">
+          <label htmlFor="corte-simulado" className="flex items-center gap-2 t-texto-sm">
             <Unplug className="size-3.5 text-muted-foreground" />
             Simular corte de conexión
           </label>

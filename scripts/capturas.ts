@@ -42,8 +42,8 @@ async function levantarServidor(): Promise<ChildProcess | null> {
     stdio: "ignore",
     env: {
       ...process.env,
-      INVERSORES_KEY: process.env.INVERSORES_KEY ?? "yunque-demo",
-      PANEL_KEY: process.env.PANEL_KEY ?? "yunque-panel",
+      INVERSORES_KEY: process.env.INVERSORES_KEY ?? "quvant-demo",
+      PANEL_KEY: process.env.PANEL_KEY ?? "quvant-panel",
       SESION_SECRETO: process.env.SESION_SECRETO ?? "secreto-de-capturas-no-usar-en-produccion-000000",
     },
   })

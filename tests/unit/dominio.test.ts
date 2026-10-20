@@ -55,7 +55,7 @@ describe("precios", () => {
 
   it("aplicar y revertir un aumento deja los precios como estaban", () => {
     const e = copia()
-    const ctx = ctxDe(e, "compras@demo.yunque.app")
+    const ctx = ctxDe(e, "compras@demo.quvant.app")
     const cat = e.categorias[0]
     const listas = e.listas.map((l) => l.id)
     const antes = Object.fromEntries(Object.entries(e.precios).map(([k, v]) => [k, v.precio]))
@@ -69,7 +69,7 @@ describe("precios", () => {
 
   it("el mostrador no puede aplicar aumentos", () => {
     const e = copia()
-    const ctx = ctxDe(e, "mostrador@demo.yunque.app")
+    const ctx = ctxDe(e, "mostrador@demo.quvant.app")
     const r = aplicarOperacion(e, op(e, ctx, "precios.aumento", { aumentoId: "a2", descripcion: "", parametros: { filtro: {}, porcentaje: 5, listaIds: [e.listas[0].id], redondeo: "10" } }), ctx)
     expect(r).toMatchObject({ ok: false, codigo: "permiso" })
   })
@@ -103,7 +103,7 @@ describe("ventas", () => {
 
   it("anular una venta devuelve el stock", () => {
     const e = copia()
-    const ctx = ctxDe(e, "admin@demo.yunque.app")
+    const ctx = ctxDe(e, "admin@demo.quvant.app")
     const v = Object.values(e.ventas).find((x) => x.estado === "confirmada")!
     const antes = v.items.map((it) => stockDe(e, v.sucursalId, it.productoId))
     expect(aplicarOperacion(e, op(e, ctx, "venta.anular", { ventaId: v.id, motivo: "Error de carga" }), ctx).ok).toBe(true)
@@ -117,14 +117,14 @@ describe("caja y conteos", () => {
     const e = copia()
     const caja = Object.values(e.cajas).find((c) => c.estado === "abierta")!
     const base = efectivoEsperado(e, caja, "2026-10-07T23:00:00.000Z")
-    const ctx = ctxDe(e, "admin@demo.yunque.app")
+    const ctx = ctxDe(e, "admin@demo.quvant.app")
     aplicarOperacion(e, op(e, ctx, "caja.movimiento", { movimientoId: "m1", sesionId: caja.id, tipo: "retiro", importe: 1000, motivo: "Retiro a caja fuerte" }), ctx)
     expect(efectivoEsperado(e, caja, "2026-10-07T23:00:00.000Z")).toBe(base - 1000)
   })
 
   it("cerrar un conteo sin diferencias informa 0; con diferencias ajusta el stock", () => {
     const e = copia()
-    const ctx = ctxDe(e, "deposito@demo.yunque.app")
+    const ctx = ctxDe(e, "deposito@demo.quvant.app")
     const cc = e.sucursales.find((s) => s.codigo === "CC")!
     const productos = Object.values(e.productos).filter((p) => e.stock[claveStock(cc.id, p.id)]).slice(0, 3)
     aplicarOperacion(e, op(e, ctx, "conteo.crear", { conteoId: "c1", sucursalId: cc.id, nombre: "Prueba", productoIds: productos.map((p) => p.id) }), ctx)
@@ -141,7 +141,7 @@ describe("caja y conteos", () => {
 
   it("una operación rechazada no modifica el estado", () => {
     const e = copia()
-    const ctx = ctxDe(e, "mostrador@demo.yunque.app")
+    const ctx = ctxDe(e, "mostrador@demo.quvant.app")
     const antes = JSON.stringify(e)
     const r = aplicarOperacion(e, op(e, ctx, "stock.ajustar", { sucursalId: e.sucursales[0].id, productoId: Object.keys(e.productos)[0], cantidad: 5, motivo: "x" }), ctx)
     expect(r.ok).toBe(false)

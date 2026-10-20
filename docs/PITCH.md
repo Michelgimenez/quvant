@@ -1,4 +1,4 @@
-# Yunque — guion de la presentación para inversores
+# Quvant — guion de la presentación para inversores
 
 > Para quien presenta. Acompaña a `/inversores` (12 escenas). Todo lo que dice `[COMPLETAR]` también aparece
 > así, resaltado, en la presentación: completarlo en `src/config/` antes de mostrarla.
@@ -13,7 +13,7 @@ dura unos **10 minutos**; conviene pausar (P) en las escenas 5 y 6, que son demo
 
 ## 1 · Apertura (6 s)
 **En pantalla:** el yunque se arma, salta la chispa, "yunque", "Presentación para inversores · 2026".
-**Decir:** "Yunque es el sistema de gestión para negocios con stock complejo que no se cae. Firme, aunque todo se mueva."
+**Decir:** "Quvant es el sistema de gestión para negocios con stock complejo que no se cae. Firme, aunque todo se mueva."
 
 ## 2 · El problema (11 s)
 **En pantalla:** "Miles de negocios en Argentina gestionan millones en stock con sistemas antiguos." Tres datos de mercado y cinco dolores.
@@ -29,7 +29,7 @@ dura unos **10 minutos**; conviene pausar (P) en las escenas 5 y 6, que son demo
 **Completar:** `TERRENO.hallazgos` (sistema de gestión, precios y listas, stock y sucursales, presupuestos y clientes, sitio web) y `TERRENO.conclusion`. Sin nombre del negocio.
 
 ## 4 · La solución (11 s)
-**En pantalla:** "Yunque: el sistema de gestión en la nube para negocios con stock complejo, que sigue vendiendo aunque se corte internet." Cinco pilares —stock, ventas, precios, servicio técnico, multinegocio— con la cantidad de funciones **disponibles** de cada uno (sale del registro `src/showcase/features.ts`).
+**En pantalla:** "Quvant: el sistema de gestión en la nube para negocios con stock complejo, que sigue vendiendo aunque se corte internet." Cinco pilares —stock, ventas, precios, servicio técnico, multinegocio— con la cantidad de funciones **disponibles** de cada uno (sale del registro `src/showcase/features.ts`).
 **Decir:** "Todo lo que hoy está en cinco lugares distintos, en uno. En la nube, pero el mostrador no depende de internet."
 
 ## 5 · Demo del producto (24 s, pausar)
@@ -80,5 +80,5 @@ dura unos **10 minutos**; conviene pausar (P) en las escenas 5 y 6, que son demo
 
 `/demo/<cliente>` (hoy `/demo/ferremix`): 7 escenas, unos 6 minutos a 1×, con la marca del prospecto y el sello
 `PROPUESTA`. Guion: su problema (del relevamiento) → su marca en la app → un día en su negocio → el corte de
-conexión → cómo empezamos → socio fundador. Siempre "así se vería Yunque en …", nunca como cliente.
+conexión → cómo empezamos → socio fundador. Siempre "así se vería Quvant en …", nunca como cliente.
 Para sumar un prospecto: `src/config/clientes/_plantilla.ts`.

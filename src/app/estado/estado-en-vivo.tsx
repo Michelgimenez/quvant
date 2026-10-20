@@ -10,7 +10,7 @@ type Componente = { id: string; nombre: string; estado: "operativo" | "degradado
 type Salud = { ok: boolean; version: string; modo: string; momento: string; erroresUltimaHora: number; componentes: Componente[] }
 
 const TEXTO: Record<Componente["estado"], string> = { operativo: "Operativo", degradado: "Lento", caido: "Sin servicio", emulado: "Emulado (demo)" }
-const TONO: Record<Componente["estado"], "ok" | "chispa" | "error" | "acero"> = { operativo: "ok", degradado: "chispa", caido: "error", emulado: "acero" }
+const TONO: Record<Componente["estado"], "ok" | "alerta" | "error" | "acero"> = { operativo: "ok", degradado: "alerta", caido: "error", emulado: "acero" }
 
 /** Consulta /api/salud cada 30 s y revisa este equipo (red, base local, modo sin conexión). */
 export function EstadoEnVivo() {
@@ -46,7 +46,7 @@ export function EstadoEnVivo() {
         <div className="flex-1">
           <h1 className="text-xl font-bold">{error ? "No pudimos consultar el servidor" : !salud ? "Consultando…" : salud.ok ? "Todo funcionando" : "Hay componentes con problemas"}</h1>
           {salud && (
-            <p className="text-xs text-muted-foreground">
+            <p className="t-texto-sm text-muted-foreground">
               Versión {salud.version} · modo {salud.modo} · actualizado {new Date(salud.momento).toLocaleTimeString("es-AR")} · {salud.erroresUltimaHora} errores registrados en la última hora
             </p>
           )}
@@ -61,10 +61,10 @@ export function EstadoEnVivo() {
             <li key={c.id} className="flex items-center gap-3 px-5 py-3.5">
               <Punto tono={TONO[c.estado]} />
               <div className="min-w-0 flex-1">
-                <p className="text-sm font-medium">{c.nombre}</p>
-                <p className="text-xs text-muted-foreground">{c.detalle}</p>
+                <p className="t-texto-sm font-medium">{c.nombre}</p>
+                <p className="t-texto-sm text-muted-foreground">{c.detalle}</p>
               </div>
-              <span className="text-xs text-muted-foreground">{TEXTO[c.estado]}</span>
+              <span className="t-texto-sm text-muted-foreground">{TEXTO[c.estado]}</span>
             </li>
           ))}
         </ul>
@@ -78,12 +78,12 @@ export function EstadoEnVivo() {
               ["Base local (IndexedDB)", local.indexeddb],
               ["Modo sin conexión instalado", local.sw],
             ].map(([n, ok]) => (
-              <li key={String(n)} className="flex items-center gap-2 rounded-lg border border-linea bg-card px-3 py-2 text-sm">
+              <li key={String(n)} className="flex items-center gap-2 rounded-lg border border-linea bg-card px-3 py-2 t-texto-sm">
                 <Punto tono={ok ? "ok" : "acero"} /> {n}
               </li>
             ))}
           </ul>
-          {!local.sw && <p className="text-xs text-muted-foreground">El modo sin conexión se instala solo la primera vez que entrás a la app.</p>}
+          {!local.sw && <p className="t-texto-sm text-muted-foreground">El modo sin conexión se instala solo la primera vez que entrás a la app.</p>}
         </section>
       )}
     </div>

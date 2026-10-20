@@ -1,7 +1,7 @@
 import type { Permiso } from "./permisos"
 
 /**
- * Modelo de dominio de Yunque.
+ * Modelo de dominio de Quvant.
  *
  * Convenciones:
  * - Importes en CENTAVOS (enteros). `precio: 1284500` = $ 12.845,00.
@@ -46,7 +46,7 @@ export type Organizacion = {
   extensiones: Partial<Record<IdExtension, EstadoExtension>>
 }
 
-/** Extensiones de Yunque. Cada una se registra en src/extensiones/registro.ts. */
+/** Extensiones de Quvant. Cada una se registra en src/extensiones/registro.ts. */
 export const EXTENSIONES = ["forja"] as const
 export type IdExtension = (typeof EXTENSIONES)[number]
 export type EstadoExtension = { activa: boolean; activadaEn: FechaISO | null; activadaPor: Id | null }

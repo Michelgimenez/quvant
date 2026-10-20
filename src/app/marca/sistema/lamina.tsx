@@ -313,7 +313,7 @@ export function Lamina() {
             <figure className="mt-auto flex flex-col gap-1.5">
               <figcaption className="t-etiqueta text-gris-7">Antes · Yunque</figcaption>
               {/* eslint-disable-next-line @next/next/no-img-element -- el "antes", tal cual */}
-              <img src="/marca/yunque-brand-board.png" alt="La identidad anterior (Yunque)" className="block w-[232px] border border-gris-3 opacity-80" />
+              <img src="/marca/antes-yunque-brand-board.png" alt="La identidad anterior (Yunque)" className="block w-[232px] border border-gris-3 opacity-80" />
             </figure>
           </Seccion>
         </div>

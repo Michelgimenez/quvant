@@ -36,8 +36,8 @@ export function Carrito({
     return (
       <div className="@container flex min-h-56 flex-col items-center justify-center gap-3 rounded-xl border border-dashed border-linea p-8 text-center">
         <ShoppingCart className="size-7 text-muted-foreground" />
-        <p className="text-sm text-muted-foreground">{vacio}</p>
-        <p className="hidden items-center gap-3 text-xs text-muted-foreground @md:flex">
+        <p className="t-texto-sm text-muted-foreground">{vacio}</p>
+        <p className="hidden items-center gap-3 t-texto-sm text-muted-foreground @md:flex">
           <span><Kbd>F2</Kbd> buscar</span>
           <span><Kbd>F4</Kbd> cliente</span>
           <span><Kbd>F8</Kbd> cobrar</span>
@@ -58,12 +58,12 @@ export function Carrito({
           <li key={`${it.productoId}-${i}`} className="grid grid-cols-[auto_minmax(0,1fr)] items-center gap-x-3 gap-y-2 px-3 py-2.5 @lg:grid-cols-[auto_minmax(0,1fr)_auto_auto_auto_auto]">
             <MiniaturaProducto tipo={p?.ilustracion ?? "tornillo"} className="size-10" />
             <div className="min-w-0">
-              <p className="truncate text-sm font-medium">{it.descripcion}</p>
+              <p className="truncate t-texto-sm font-medium">{it.descripcion}</p>
               <p className="ficha truncate">
                 {p?.sku} · {formatoPesos(it.precioUnitario)} {p?.unidad !== "u" ? `/${p?.unidad}` : ""}
-                {lista !== it.precioUnitario && lista > 0 && <span className="text-chispa-texto"> · lista {formatoPesos(lista, { sinDecimales: true })}</span>}
+                {lista !== it.precioUnitario && lista > 0 && <span className="text-alerta"> · lista {formatoPesos(lista, { sinDecimales: true })}</span>}
               </p>
-              {sinStock && <p className="text-[11px] font-medium text-chispa-texto">Hay {formatoCantidad(disponible)} en esta sucursal</p>}
+              {sinStock && <p className="t-texto-sm font-medium text-alerta">Hay {formatoCantidad(disponible)} en esta sucursal</p>}
             </div>
             <div className="col-span-2 flex items-center gap-1 @lg:col-span-1">
               <Button size="icon-sm" variant="outline" onClick={() => (it.cantidad - paso <= 0 ? quitar(i) : cambiar(i, { cantidad: Math.round((it.cantidad - paso) * 1000) / 1000 }))} aria-label={`Restar ${it.descripcion}`}>
@@ -82,13 +82,13 @@ export function Carrito({
                 <Plus />
               </Button>
               <div className="ml-auto flex items-center gap-1 @lg:hidden">
-                <span className="num text-sm font-semibold">{formatoPesos(subtotalItem(it))}</span>
+                <span className="t-dato font-semibold">{formatoPesos(subtotalItem(it))}</span>
                 <Button size="icon-sm" variant="ghost" onClick={() => quitar(i)} aria-label={`Quitar ${it.descripcion}`}>
                   <Trash2 />
                 </Button>
               </div>
             </div>
-            <label className="hidden items-center gap-1 text-xs text-muted-foreground @lg:flex">
+            <label className="hidden items-center gap-1 t-texto-sm text-muted-foreground @lg:flex">
               Desc.
               <Input
                 type="number"
@@ -96,12 +96,12 @@ export function Carrito({
                 max={100}
                 value={it.descuentoPct}
                 onChange={(ev) => cambiar(i, { descuentoPct: Math.min(100, Math.max(0, Number(ev.target.value))) })}
-                className={cn("num h-8 w-14 text-right", it.descuentoPct > 0 && "border-chispa/60")}
+                className={cn("num h-8 w-14 text-right", it.descuentoPct > 0 && "border-alerta/60")}
                 aria-label={`Descuento de ${it.descripcion}`}
               />
               %
             </label>
-            <span className="num hidden w-28 text-right text-sm font-semibold @lg:block">{formatoPesos(subtotalItem(it))}</span>
+            <span className="num hidden w-28 text-right t-texto-sm font-semibold @lg:block">{formatoPesos(subtotalItem(it))}</span>
             <Button size="icon-sm" variant="ghost" className="hidden @lg:inline-flex" onClick={() => quitar(i)} aria-label={`Quitar ${it.descripcion}`}>
               <Trash2 />
             </Button>

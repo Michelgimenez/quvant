@@ -27,3 +27,20 @@ Se compone a 1600×1000 y se captura a 1,5× (2400×1500). Así los estilos de t
 - Resultado: la jerarquía se lee de arriba abajo (encabezado → seis secciones numeradas → pie con la bajada), nada se corta y lo único con brillo es la Q cromada.
 
 **Decisión de estilo de la tanda:** `--radius` baja de 10 px (Yunque) a 4 px. El manual no tiene esquinas redondeadas (las placas, las muestras y el recuadro de la firma son rectos) y el punto es un cuadrado: los bordes casi rectos se sienten más precisos.
+
+## Tanda 2 · Tablero, mostrador y caja (`docs/capturas/quvant/tanda-2/vuelta-N/`)
+
+**Vuelta 1**
+- Ya en negro y blanco con Plex Mono. El color de la empresa (verde de la demo) queda en su logo, en el indicador activo y en la serie principal del gráfico.
+- Las etiquetas mezclaban estilos: "Ventas de hoy · todos los negocios" iba en texto común y "POR NEGOCIO", en etiqueta.
+- La barra "Caja abierta" del mostrador se partía en tres renglones (la mono ocupa más ancho).
+- Los avisos (toasts) salían con otra letra.
+- El diálogo de cierre tenía un desenfoque fuerte, tipo vidrio.
+
+**Vuelta 2**
+- Las etiquetas pasan a `.t-etiqueta`; el total del día, a `.t-numero-xl`; las cifras, a `.t-numero-lg`. Los diálogos pasan a negro al 70 % sin desenfoque, y los avisos, a Plex Mono.
+- El mapa automático de tamaños agrandó el sello DEMO y la hora de la barra de caja se metía debajo de "Retiro / gasto".
+
+**Vuelta 3**
+- El sello vuelve a `.t-etiqueta`. El botón de retiro queda solo con su ícono (con su nombre accesible) y el estado de la caja se recorta con puntos suspensivos si no entra.
+- En oscuro y en claro: los totales se leen primero, nada se parte y el claro queda plano y prolijo, sin grilla.

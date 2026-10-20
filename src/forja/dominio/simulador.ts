@@ -10,7 +10,7 @@ import { distanciaKm, minutosDeViaje } from "./geo"
  * que ya llegó y avances del servicio técnico.
  *
  * Trabaja sobre una interfaz chica (`MundoSimulable`) para servir igual a la
- * app (estado de Yunque → operaciones reales) y a las demos públicas (snapshot).
+ * app (estado de Quvant → operaciones reales) y a las demos públicas (snapshot).
  */
 export type IntencionSimulada =
   | { tipo: "venta"; sucursalId: Id; puesto: number; items: { productoId: Id; cantidad: number }[] }
@@ -117,7 +117,7 @@ export class SimuladorForja {
   }
 }
 
-/** El estado de Yunque visto por el simulador. */
+/** El estado de Quvant visto por el simulador. */
 export function mundoDesdeEstado(e: EstadoEmpresa, ahora: Date): MundoSimulable {
   const hace28 = ahora.getTime() - 28 * 86_400_000
   const ritmo = new Map<Id, number>()

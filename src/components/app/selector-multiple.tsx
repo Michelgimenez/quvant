@@ -46,7 +46,7 @@ export function SelectorMultiple({
                         {sel && <Check className="size-3" />}
                       </span>
                       <span className="flex-1 truncate">{o.nombre}</span>
-                      {o.detalle && <span className="text-xs text-muted-foreground">{o.detalle}</span>}
+                      {o.detalle && <span className="t-texto-sm text-muted-foreground">{o.detalle}</span>}
                     </CommandItem>
                   )
                 })}
@@ -58,7 +58,7 @@ export function SelectorMultiple({
       {elegidas.length > 0 && (
         <div className="flex flex-wrap gap-1">
           {elegidas.map((o) => (
-            <button key={o.id} type="button" onClick={() => onCambio(valor.filter((x) => x !== o.id))} className="inline-flex items-center gap-1 rounded-full border border-linea bg-superficie-2 px-2 py-0.5 text-[11px] hover:border-acero/50" aria-label={`Quitar ${o.nombre}`}>
+            <button key={o.id} type="button" onClick={() => onCambio(valor.filter((x) => x !== o.id))} className="inline-flex items-center gap-1 rounded-full border border-linea bg-superficie-2 px-2 py-0.5 t-texto-sm hover:border-acero/50" aria-label={`Quitar ${o.nombre}`}>
               {o.nombre}
               <X className="size-3" />
             </button>

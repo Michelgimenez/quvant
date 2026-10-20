@@ -211,8 +211,8 @@ export function Reportes() {
 function TablaSimple({ columnas, filas }: { columnas: string[]; filas: (string | number)[][] }) {
   return (
     <div className="max-h-[420px] overflow-auto rounded-lg border border-linea">
-      <table className="w-full text-sm">
-        <thead className="sticky top-0 bg-superficie-2 text-xs text-muted-foreground">
+      <table className="w-full t-texto-sm">
+        <thead className="sticky top-0 bg-superficie-2 t-texto-sm text-muted-foreground">
           <tr>
             {columnas.map((c, i) => (
               <th key={c} className={`px-3 py-2 font-medium ${i ? "text-right" : "text-left"}`}>
@@ -274,7 +274,7 @@ function ReporteStock() {
     return { porSucursal, porCategoria: Object.entries(porCategoria).sort((a, b) => b[1] - a[1]), quietos }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [v, ahora])
-  if (!puede("costos.ver")) return <p className="text-sm text-muted-foreground">El stock valorizado necesita permiso para ver costos.</p>
+  if (!puede("costos.ver")) return <p className="t-texto-sm text-muted-foreground">El stock valorizado necesita permiso para ver costos.</p>
   return (
     <div className="space-y-4">
       <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
@@ -386,18 +386,18 @@ function ReporteRevisar() {
       accion={<BotonCSV onClick={() => descargarCSV("ventas-para-revisar", [["Venta", "Fecha", "Sucursal", "Total", "Origen", "Advertencias"], ...filas.map((x) => [x.numero ?? x.numeroLocal, new Date(x.fecha).toLocaleString("es-AR"), e.sucursales.find((s) => s.id === x.sucursalId)?.codigo, pesos(x.total), x.origen, x.advertencias.join(" | ")])])} />}
     >
       {filas.length === 0 ? (
-        <p className="text-sm text-muted-foreground">No hay ventas con advertencias. Aparecen acá, por ejemplo, las ventas hechas sin conexión que dejaron stock negativo o se cobraron a un precio viejo.</p>
+        <p className="t-texto-sm text-muted-foreground">No hay ventas con advertencias. Aparecen acá, por ejemplo, las ventas hechas sin conexión que dejaron stock negativo o se cobraron a un precio viejo.</p>
       ) : (
         <ul className="divide-y divide-linea">
           {filas.map((x) => (
             <li key={x.id} className="space-y-1 py-2.5">
-              <p className="flex flex-wrap items-center gap-2 text-sm">
+              <p className="flex flex-wrap items-center gap-2 t-texto-sm">
                 <span className="ficha text-foreground">{x.numero ? `#${x.numero}` : x.numeroLocal}</span>
                 <span className="text-muted-foreground">{new Date(x.fecha).toLocaleString("es-AR", { dateStyle: "short", timeStyle: "short" })}</span>
-                {x.origen === "sin_conexion" && <span className="rounded bg-chispa/15 px-1.5 text-[11px] text-chispa-texto">sin conexión</span>}
+                {x.origen === "sin_conexion" && <span className="rounded bg-alerta/15 px-1.5 t-texto-sm text-alerta">sin conexión</span>}
                 <span className="num ml-auto">{formatoPesos(x.total, { sinDecimales: true })}</span>
               </p>
-              <ul className="text-xs text-muted-foreground">
+              <ul className="t-texto-sm text-muted-foreground">
                 {x.advertencias.map((a, i) => (
                   <li key={i}>• {a.split(": ").slice(1).join(": ") || a}</li>
                 ))}

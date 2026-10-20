@@ -10,7 +10,7 @@ export function generateStaticParams() {
 export async function generateMetadata({ params }: PageProps<"/demo/[cliente]">): Promise<Metadata> {
   const c = clienteDemo((await params).cliente)
   return {
-    title: c ? `Así se vería Yunque en ${c.nombre}` : "Demo",
+    title: c ? `Así se vería Quvant en ${c.nombre}` : "Demo",
     robots: { index: false, follow: false },
   }
 }

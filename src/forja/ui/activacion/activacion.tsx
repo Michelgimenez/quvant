@@ -2,7 +2,6 @@
 
 import { Component, Suspense, lazy, useCallback, useEffect, useRef, useState } from "react"
 import { Volume2, VolumeX } from "lucide-react"
-import { Isotipo } from "@/components/marca/marca"
 import { CRONOGRAMA, DURACION_ACTIVACION, tramo } from "@/forja/dominio/activacion"
 import { cn } from "@/lib/utils"
 import { MarcaForja } from "../marca-forja"
@@ -151,8 +150,8 @@ export function Activacion({ onFin, quietaDeEntrada = false, arranqueManual = fa
   }
 
   return (
-    <div ref={capa} className="fixed inset-0 z-50 overflow-hidden text-niebla" role="dialog" aria-modal="true" aria-label="Activación de Forja" data-testid="activacion" data-modo={quieta ? "quieta" : "3d"} data-listo={listo3d || quieta}>
-      <div ref={fondo} className="absolute inset-0 bg-hierro" aria-hidden />
+    <div ref={capa} className="fixed inset-0 z-50 overflow-hidden text-blanco" role="dialog" aria-modal="true" aria-label="Activación de Forja" data-testid="activacion" data-modo={quieta ? "quieta" : "3d"} data-listo={listo3d || quieta}>
+      <div ref={fondo} className="absolute inset-0 bg-negro" aria-hidden />
       {!quieta && (
         <div ref={lienzo} className="absolute inset-0">
           <FalloEscena onFallo={() => setQuieta(true)}>
@@ -183,15 +182,12 @@ export function Activacion({ onFin, quietaDeEntrada = false, arranqueManual = fa
       />
       <div ref={texto} className={cn("pointer-events-none absolute inset-x-0 flex flex-col items-center gap-3 px-6 text-center opacity-0", quieta ? "inset-y-0 justify-center" : "bottom-[16%]")}>
         <div className="flex items-center gap-4">
-          {/* La única estrella de 4 puntas: la del isotipo, al final, junto al nombre */}
-          <Isotipo tono="negativo" className="h-7 text-niebla sm:h-9" titulo={null} />
           <MarcaForja tamano={28} className="sm:hidden" />
           <MarcaForja tamano={40} className="max-sm:hidden" />
         </div>
-        <p className="font-heading text-lg text-niebla/85 sm:text-xl">Lo firme y lo vivo, trabajando juntos.</p>
       </div>
       <p className="sr-only" role="status">
-        Forja activada: yunque más forja. Lo firme y lo vivo, trabajando juntos.
+        Forja activada.
       </p>
       <div className="absolute inset-x-0 bottom-0 flex items-center justify-between gap-3 p-4 sm:p-6">
         {quieta ? (
@@ -201,7 +197,7 @@ export function Activacion({ onFin, quietaDeEntrada = false, arranqueManual = fa
             type="button"
             onClick={alternarSonido}
             aria-pressed={sonido}
-            className="inline-flex items-center gap-1.5 rounded-md border border-white/15 bg-hierro/60 px-3 py-1.5 text-xs text-acero backdrop-blur hover:text-niebla focus-visible:outline focus-visible:outline-1 focus-visible:outline-temple"
+            className="inline-flex items-center gap-1.5 rounded-md border border-white/15 bg-negro/60 px-3 py-1.5 text-xs text-acero backdrop-blur hover:text-blanco focus-visible:outline focus-visible:outline-1 focus-visible:outline-foreground"
             data-testid="sonido-activacion"
           >
             {sonido ? <Volume2 className="size-3.5" aria-hidden /> : <VolumeX className="size-3.5" aria-hidden />}
@@ -212,7 +208,7 @@ export function Activacion({ onFin, quietaDeEntrada = false, arranqueManual = fa
           ref={saltar}
           type="button"
           onClick={alSaltar}
-          className="rounded-md border border-white/15 bg-hierro/60 px-3 py-1.5 text-xs text-niebla backdrop-blur hover:border-white/30 focus-visible:outline focus-visible:outline-1 focus-visible:outline-temple"
+          className="rounded-md border border-white/15 bg-negro/60 px-3 py-1.5 text-xs text-blanco backdrop-blur hover:border-white/30 focus-visible:outline focus-visible:outline-1 focus-visible:outline-foreground"
           data-testid="saltar-activacion"
         >
           Saltar

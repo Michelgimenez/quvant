@@ -2,7 +2,7 @@
 
 import type { Sesion } from "@/lib/auth/tipos"
 
-const CLAVE = "yunque:sesion"
+const CLAVE = "quvant:sesion"
 
 /**
  * Obtiene la sesión del servidor. Sin conexión usa la última copia guardada

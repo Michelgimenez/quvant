@@ -15,17 +15,17 @@ import { PGlite } from "@electric-sql/pglite"
  * escribible: es temporal y cada instancia tiene la suya.
  */
 export const BASE_LOCAL_TEMPORAL = Boolean(process.env.VERCEL)
-const CARPETA = BASE_LOCAL_TEMPORAL ? "/tmp/yunque-base-local" : path.join(process.cwd(), ".data", "base-local")
+const CARPETA = BASE_LOCAL_TEMPORAL ? "/tmp/quvant-base-local" : path.join(process.cwd(), ".data", "base-local")
 
-type ConBase = typeof globalThis & { __yunqueBaseLocal?: Promise<PGlite> }
+type ConBase = typeof globalThis & { __quvantBaseLocal?: Promise<PGlite> }
 
 export function baseLocal(): Promise<PGlite> {
   const g = globalThis as ConBase
-  g.__yunqueBaseLocal ??= abrir().catch((e) => {
-    g.__yunqueBaseLocal = undefined
+  g.__quvantBaseLocal ??= abrir().catch((e) => {
+    g.__quvantBaseLocal = undefined
     throw e
   })
-  return g.__yunqueBaseLocal
+  return g.__quvantBaseLocal
 }
 
 async function abrir() {

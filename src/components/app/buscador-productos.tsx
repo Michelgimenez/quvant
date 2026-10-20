@@ -89,7 +89,7 @@ export const BuscadorProductos = forwardRef<
               }
             }}
             placeholder={placeholder}
-            className="h-11 pl-9 text-[15px]"
+            className="h-11 pl-9 t-texto"
             role="combobox"
             aria-expanded={abierto && resultados.length > 0}
             aria-controls="resultados-productos"
@@ -120,13 +120,13 @@ export const BuscadorProductos = forwardRef<
               >
                 <MiniaturaProducto tipo={p.ilustracion} className="size-8" />
                 <span className="min-w-0 flex-1">
-                  <span className="block truncate text-sm">{p.nombre}</span>
+                  <span className="block truncate t-texto-sm">{p.nombre}</span>
                   <span className="ficha block truncate">{p.sku}</span>
                 </span>
                 {st !== undefined && (
-                  <span className={cn("num text-xs", st <= 0 ? "text-error-texto" : "text-muted-foreground")}>{st <= 0 ? "sin stock" : `${formatoCantidad(st)} u.`}</span>
+                  <span className={cn("num t-texto-sm", st <= 0 ? "text-error" : "text-muted-foreground")}>{st <= 0 ? "sin stock" : `${formatoCantidad(st)} u.`}</span>
                 )}
-                {listaId && <span className="num text-sm font-semibold">{formatoPesos(precioDe(e, listaId, p.id), { sinDecimales: true })}</span>}
+                {listaId && <span className="t-dato font-semibold">{formatoPesos(precioDe(e, listaId, p.id), { sinDecimales: true })}</span>}
               </li>
             )
           })}

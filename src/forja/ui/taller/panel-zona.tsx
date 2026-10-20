@@ -24,13 +24,13 @@ type Props = {
   onPieza?: (p: Pieza) => void
 }
 
-/** Panel lateral del taller: los datos de Yunque de la zona y enlaces directos al módulo. */
+/** Panel lateral del taller: los datos de Quvant de la zona y enlaces directos al módulo. */
 export function PanelZona(props: Props) {
   const elegirZona = useEscenaForja((s) => s.elegirZona)
   const { zona, nodo } = props
   return (
     <aside
-      className="pointer-events-auto absolute inset-x-0 bottom-0 z-20 flex max-h-[58%] flex-col rounded-t-2xl border border-white/10 bg-hierro/95 text-niebla shadow-2xl backdrop-blur md:inset-x-auto md:bottom-4 md:right-4 md:top-4 md:max-h-none md:w-[360px] md:rounded-2xl"
+      className="pointer-events-auto absolute inset-x-0 bottom-0 z-20 flex max-h-[58%] flex-col rounded-t-2xl border border-white/10 bg-negro/95 text-blanco shadow-2xl backdrop-blur md:inset-x-auto md:bottom-4 md:right-4 md:top-4 md:max-h-none md:w-[360px] md:rounded-2xl"
       aria-label={`${NOMBRE_ZONA[zona.tipo]} de ${nodo.nombre}`}
       data-testid="panel-zona"
       data-zona={zona.tipo}
@@ -40,7 +40,7 @@ export function PanelZona(props: Props) {
           <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-acero">{nodo.nombre}</p>
           <h2 className="mt-0.5 font-heading text-lg font-extrabold leading-tight">{NOMBRE_ZONA[zona.tipo]}</h2>
         </div>
-        <button type="button" onClick={() => elegirZona(null)} className="rounded-md p-1.5 text-acero hover:text-niebla focus-visible:outline focus-visible:outline-1 focus-visible:outline-temple" aria-label="Cerrar panel">
+        <button type="button" onClick={() => elegirZona(null)} className="rounded-md p-1.5 text-acero hover:text-blanco focus-visible:outline focus-visible:outline-1 focus-visible:outline-foreground" aria-label="Cerrar panel">
           <X className="size-4" />
         </button>
       </header>
@@ -56,7 +56,7 @@ export function PanelZona(props: Props) {
 
 function Enlace({ href, children }: { href: string; children: React.ReactNode }) {
   return (
-    <Link href={href} className="inline-flex items-center gap-1 rounded-md border border-white/15 px-2.5 py-1.5 text-xs font-medium text-niebla hover:border-white/30 focus-visible:outline focus-visible:outline-1 focus-visible:outline-temple" data-testid="enlace-modulo">
+    <Link href={href} className="inline-flex items-center gap-1 rounded-md border border-white/15 px-2.5 py-1.5 text-xs font-medium text-blanco hover:border-white/30 focus-visible:outline focus-visible:outline-1 focus-visible:outline-foreground" data-testid="enlace-modulo">
       {children}
       <ArrowUpRight className="size-3.5 text-acero" aria-hidden />
     </Link>
@@ -67,7 +67,7 @@ function Dato({ etiqueta, valor, alerta }: { etiqueta: string; valor: React.Reac
   return (
     <div>
       <dt className="font-mono text-[10px] uppercase tracking-wider text-acero">{etiqueta}</dt>
-      <dd className={cn("mt-0.5 font-mono text-[15px]", alerta ? "text-chispa" : "text-niebla")}>{valor}</dd>
+      <dd className={cn("mt-0.5 font-mono text-[15px]", alerta ? "text-alerta" : "text-blanco")}>{valor}</dd>
     </div>
   )
 }
@@ -79,7 +79,7 @@ function Titulo({ children }: { children: React.ReactNode }) {
 function Volver({ zona, texto }: { zona: TipoZona; texto: string }) {
   const elegirZona = useEscenaForja((s) => s.elegirZona)
   return (
-    <button type="button" onClick={() => elegirZona({ tipo: zona, id: null })} className="mb-3 inline-flex items-center gap-1 text-xs text-acero hover:text-niebla focus-visible:outline focus-visible:outline-1 focus-visible:outline-temple">
+    <button type="button" onClick={() => elegirZona({ tipo: zona, id: null })} className="mb-3 inline-flex items-center gap-1 text-xs text-acero hover:text-blanco focus-visible:outline focus-visible:outline-1 focus-visible:outline-foreground">
       <ArrowLeft className="size-3.5" aria-hidden /> {texto}
     </button>
   )
@@ -96,17 +96,17 @@ function PanelMostrador({ taller, nodo, enlaces }: Props) {
         <Dato etiqueta="Facturado" valor={formatoPesosCorto(importe)} />
         <Dato etiqueta="Presup. abiertos" valor={nodo.presupuestosAbiertos} />
       </dl>
-      {cola > 0 && <p className="mt-3 rounded-md border border-chispa/40 px-2.5 py-2 text-xs text-chispa">{cola} ventas hechas sin conexión esperan sincronizar. Ya están registradas en el puesto y se envían solas al volver la red.</p>}
+      {cola > 0 && <p className="mt-3 rounded-md border border-alerta/40 px-2.5 py-2 text-xs text-alerta">{cola} ventas hechas sin conexión esperan sincronizar. Ya están registradas en el puesto y se envían solas al volver la red.</p>}
       <Titulo>Puestos</Titulo>
       <ul className="divide-y divide-white/8">
         {taller.puestos.map((p) => (
           <li key={p.puesto} className="flex items-baseline gap-3 py-2">
             <span className="w-16 shrink-0 font-heading font-bold">Puesto {p.puesto}</span>
-            <span className={cn("shrink-0 font-mono text-[11px]", p.cajaAbierta ? "text-niebla" : "text-acero")}>{p.cajaAbierta ? "caja abierta" : "caja cerrada"}</span>
+            <span className={cn("shrink-0 font-mono text-[11px]", p.cajaAbierta ? "text-blanco" : "text-acero")}>{p.cajaAbierta ? "caja abierta" : "caja cerrada"}</span>
             <span className="ml-auto text-right font-mono text-[11px] text-acero">
               {p.ventasHoy} ventas · {formatoPesosCorto(p.importeHoy)}
               {p.ultimaVenta && <span className="block">última {hora(p.ultimaVenta)}</span>}
-              {p.sinConexion > 0 && <span className="block text-chispa">{p.sinConexion} sin sincronizar</span>}
+              {p.sinConexion > 0 && <span className="block text-alerta">{p.sinConexion} sin sincronizar</span>}
             </span>
           </li>
         ))}
@@ -150,12 +150,12 @@ function PanelDeposito({ taller, nodo, enlaces }: Props) {
                 onMouseLeave={() => resaltarRack(null)}
                 onFocus={() => resaltarRack(p.rackId)}
                 onBlur={() => resaltarRack(null)}
-                className="flex w-full items-baseline gap-2 rounded-md px-1.5 py-1 text-left hover:bg-white/5 focus-visible:outline focus-visible:outline-1 focus-visible:outline-temple"
+                className="flex w-full items-baseline gap-2 rounded-md px-1.5 py-1 text-left hover:bg-white/5 focus-visible:outline focus-visible:outline-1 focus-visible:outline-foreground"
                 data-testid="faltante"
               >
                 <span className="w-11 shrink-0 font-mono text-[10px] text-acero">{p.rackId}</span>
                 <span className="min-w-0 flex-1 truncate text-[13px]">{p.nombre}</span>
-                <span className={cn("font-mono text-[11px]", p.estado === "sin_stock" ? "text-brasa" : "text-chispa")}>{p.estado === "sin_stock" ? "sin stock" : `${formatoCantidad(p.cantidad)} / ${p.minimo}`}</span>
+                <span className={cn("font-mono text-[11px]", p.estado === "sin_stock" ? "text-brasa" : "text-alerta")}>{p.estado === "sin_stock" ? "sin stock" : `${formatoCantidad(p.cantidad)} / ${p.minimo}`}</span>
               </button>
             </li>
           ))}
@@ -195,7 +195,7 @@ function PanelRack({ taller, nodo, enlaces, rackId, onPieza }: Props & { rackId:
                 <span className="block truncate text-[13px]">{p.nombre}</span>
                 <span className="block font-mono text-[10px] text-acero">{p.sku}</span>
               </span>
-              <span className={cn("text-right font-mono text-[12px]", estado === "sin_stock" ? "text-brasa" : estado === "critico" ? "text-chispa" : "text-niebla")}>
+              <span className={cn("text-right font-mono text-[12px]", estado === "sin_stock" ? "text-brasa" : estado === "critico" ? "text-alerta" : "text-blanco")}>
                 {formatoCantidad(p.cantidad)}
                 {p.minimo > 0 && <span className="block text-[10px] text-acero">mín. {p.minimo}</span>}
               </span>
@@ -204,7 +204,7 @@ function PanelRack({ taller, nodo, enlaces, rackId, onPieza }: Props & { rackId:
           return (
             <li key={p.productoId} className="flex items-center gap-1">
               {enlaces ? (
-                <Link href={enlaces.inventario(nodo.id, { producto: p.productoId })} className="flex min-w-0 flex-1 items-center gap-2 rounded-md px-1 py-1.5 hover:bg-white/5 focus-visible:outline focus-visible:outline-1 focus-visible:outline-temple">
+                <Link href={enlaces.inventario(nodo.id, { producto: p.productoId })} className="flex min-w-0 flex-1 items-center gap-2 rounded-md px-1 py-1.5 hover:bg-white/5 focus-visible:outline focus-visible:outline-1 focus-visible:outline-foreground">
                   {fila}
                 </Link>
               ) : (
@@ -214,7 +214,7 @@ function PanelRack({ taller, nodo, enlaces, rackId, onPieza }: Props & { rackId:
                 <button
                   type="button"
                   onClick={() => onPieza({ tipo: "producto", id: p.productoId })}
-                  className="shrink-0 rounded-md p-1.5 text-acero hover:bg-white/5 hover:text-niebla focus-visible:outline focus-visible:outline-1 focus-visible:outline-temple"
+                  className="shrink-0 rounded-md p-1.5 text-acero hover:bg-white/5 hover:text-blanco focus-visible:outline focus-visible:outline-1 focus-visible:outline-foreground"
                   aria-label={`Recorrido de ${p.nombre} por las sucursales`}
                   title="Recorrido por las sucursales"
                   data-testid="ver-recorrido"
@@ -239,11 +239,11 @@ function FilaOrden({ o }: { o: BancoForja }) {
   const elegirZona = useEscenaForja((s) => s.elegirZona)
   return (
     <li>
-      <button type="button" onClick={() => elegirZona({ tipo: "servicio", id: o.id })} className="flex w-full items-center gap-2 rounded-md px-1.5 py-1.5 text-left hover:bg-white/5 focus-visible:outline focus-visible:outline-1 focus-visible:outline-temple" data-testid="fila-orden">
+      <button type="button" onClick={() => elegirZona({ tipo: "servicio", id: o.id })} className="flex w-full items-center gap-2 rounded-md px-1.5 py-1.5 text-left hover:bg-white/5 focus-visible:outline focus-visible:outline-1 focus-visible:outline-foreground" data-testid="fila-orden">
         <span className="size-1.5 shrink-0 rounded-full" style={{ background: LUZ_SERVICIO[o.estado].color }} aria-hidden />
         <span className="w-14 shrink-0 font-mono text-[11px]">{o.numero}</span>
         <span className="min-w-0 flex-1 truncate text-[13px]">{o.descripcion}</span>
-        <span className={cn("shrink-0 font-mono text-[10px]", o.atrasada ? "text-chispa" : "text-acero")}>{duracionHoras(o.horasEnBanco)}</span>
+        <span className={cn("shrink-0 font-mono text-[10px]", o.atrasada ? "text-alerta" : "text-acero")}>{duracionHoras(o.horasEnBanco)}</span>
       </button>
     </li>
   )
@@ -297,9 +297,9 @@ function PanelOrden({ taller, enlaces, ordenId, onPieza }: Props & { ordenId: st
       <Volver zona="servicio" texto="Todo el servicio técnico" />
       <p className="flex items-center gap-2 font-heading text-base font-bold">
         Orden {o.numero}
-        {o.prioridad === "urgente" && <span className="rounded-[3px] border border-chispa/60 px-1 font-mono text-[10px] font-semibold text-chispa">URGENTE</span>}
+        {o.prioridad === "urgente" && <span className="rounded-[3px] border border-alerta/60 px-1 font-mono text-[10px] font-semibold text-alerta">URGENTE</span>}
       </p>
-      <p className="text-[13px] text-niebla/90">{o.descripcion}</p>
+      <p className="text-[13px] text-blanco/90">{o.descripcion}</p>
       <dl className="mt-3 grid grid-cols-2 gap-3">
         <Dato
           etiqueta="Estado"
@@ -312,7 +312,7 @@ function PanelOrden({ taller, enlaces, ordenId, onPieza }: Props & { ordenId: st
         />
         <Dato etiqueta="En el taller" valor={duracionHoras(o.horasEnBanco)} alerta={o.atrasada} />
       </dl>
-      {o.atrasada && <p className="mt-3 text-xs text-chispa">Pasó la fecha prometida al cliente.</p>}
+      {o.atrasada && <p className="mt-3 text-xs text-alerta">Pasó la fecha prometida al cliente.</p>}
       {o.estado === "esperando_aprobacion" && <p className="mt-3 text-xs text-acero">El presupuesto de reparación espera la aprobación del cliente.</p>}
       <div className="mt-4 flex flex-wrap gap-2">
         {enlaces && <Enlace href={enlaces.servicio(o.id)}>Abrir la orden</Enlace>}
@@ -320,7 +320,7 @@ function PanelOrden({ taller, enlaces, ordenId, onPieza }: Props & { ordenId: st
           <button
             type="button"
             onClick={() => onPieza({ tipo: "maquina", id: o.serie })}
-            className="inline-flex items-center gap-1 rounded-md border border-white/15 px-2.5 py-1.5 text-xs font-medium text-niebla hover:border-white/30 focus-visible:outline focus-visible:outline-1 focus-visible:outline-temple"
+            className="inline-flex items-center gap-1 rounded-md border border-white/15 px-2.5 py-1.5 text-xs font-medium text-blanco hover:border-white/30 focus-visible:outline focus-visible:outline-1 focus-visible:outline-foreground"
             data-testid="ver-historia-maquina"
           >
             <History className="size-3.5 text-acero" aria-hidden /> Historia de la máquina
@@ -393,7 +393,7 @@ export function Leyenda({ className }: { className?: string }) {
         <span className="h-2.5 w-2 rounded-[1px] bg-[#6b7684]" aria-hidden /> stock normal
       </li>
       <li className="flex items-center gap-1.5">
-        <span className="h-2.5 w-2 rounded-[1px] bg-chispa" aria-hidden /> en el mínimo
+        <span className="h-2.5 w-2 rounded-[1px] bg-alerta" aria-hidden /> en el mínimo
       </li>
       <li className="flex items-center gap-1.5">
         <span className="h-0.5 w-2.5 bg-ascua" aria-hidden /> hueco: sin stock

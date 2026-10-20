@@ -9,20 +9,20 @@ import { VideoForja } from "./video-forja"
 
 const PUNTOS = [
   { icono: Map, titulo: "Ver toda la red", texto: "Cada sucursal en el mapa con el calor de sus ventas, el stock crítico y las transferencias viajando entre ellas." },
-  { icono: Warehouse, titulo: "Entrar a cada sucursal", texto: "El mostrador, el depósito rack por rack, los bancos de servicio técnico y el muelle, con los datos de Yunque." },
+  { icono: Warehouse, titulo: "Entrar a cada sucursal", texto: "El mostrador, el depósito rack por rack, los bancos de servicio técnico y el muelle, con los datos de Quvant." },
   { icono: PlayCircle, titulo: "Reproducir el día", texto: "La jornada completa en 30 segundos, para ver cómo fue el día de un vistazo." },
 ]
 
-/** "Yunque + Forja": la extensión visual, con la toma genérica (empresa de demostración). */
+/** Forja (oculta hasta la tanda 10): la extensión visual, con la toma genérica (empresa de demostración). */
 export function SeccionForja() {
   const f = feature("forja")
   return (
     <section id="forja" className="diferida mx-auto max-w-6xl scroll-mt-24 px-4 py-20" aria-labelledby="titulo-forja">
       <Encabezado
         id="titulo-forja"
-        ficha="Extensión · Yunque + Forja"
+        ficha="Extensión · Forja, by Quvant"
         titulo="Todo el negocio, en vivo."
-        bajada="Forja convierte los datos de Yunque en un taller que se ve: la red de sucursales, cada una por dentro y el día entero en un recorrido."
+        bajada="Forja convierte los datos de Quvant en un taller que se ve: la red de sucursales, cada una por dentro y el día entero en un recorrido."
       />
       <div className="grid gap-10 lg:grid-cols-[1.35fr_1fr] lg:items-center">
         <figure className="space-y-2">
@@ -39,7 +39,7 @@ export function SeccionForja() {
               <li key={p.titulo} className="flex gap-3">
                 <p.icono className="mt-0.5 size-5 shrink-0 text-brasa" aria-hidden />
                 <div>
-                  <p className="font-semibold text-niebla">{p.titulo}</p>
+                  <p className="font-semibold text-blanco">{p.titulo}</p>
                   <p className="text-sm text-acero">{p.texto}</p>
                 </div>
               </li>
@@ -50,7 +50,7 @@ export function SeccionForja() {
               Ver la demo <ArrowRight className="size-4" aria-hidden />
             </Link>
             <p className="text-sm text-acero">
-              Extensión de Yunque · <span className="font-semibold text-niebla">{textoPrecioExtension("forja")}</span>
+              Extensión de Quvant · <span className="font-semibold text-blanco">{textoPrecioExtension("forja")}</span>
             </p>
           </div>
           {f.nota && <p className="text-xs text-acero">{f.nota}</p>}

@@ -7,8 +7,8 @@ import { cn } from "@/lib/utils"
 import type { MarcaNodo } from "../pieza/vista"
 
 const TONO_MARCA: Record<MarcaNodo["tono"], string> = {
-  normal: "border-white/25 text-niebla",
-  critico: "border-chispa/70 text-chispa",
+  normal: "border-white/25 text-blanco",
+  critico: "border-alerta/70 text-alerta",
   sin_stock: "border-brasa/70 text-brasa",
   activo: "border-blanco-caliente/60 text-blanco-caliente",
 }
@@ -68,7 +68,7 @@ export function NodoRed({
     <li ref={refElemento} className={cn("absolute left-0 top-0 will-change-transform transition-opacity", marca === null && "opacity-35")} style={{ transform: "translate3d(-200px, -200px, 0)", ["--i" as string]: indice }} data-testid="nodo-forja" data-nodo={nodo.codigo}>
       <button
         type="button"
-        className={cn("pointer-events-auto absolute -translate-x-1/2 -translate-y-1/2 rounded-full outline-none", resaltado && "ring-1 ring-temple ring-offset-2 ring-offset-transparent")}
+        className={cn("pointer-events-auto absolute -translate-x-1/2 -translate-y-1/2 rounded-full outline-none", resaltado && "ring-1 ring-foreground ring-offset-2 ring-offset-transparent")}
         style={{ width: anillo * 2 + 6, height: anillo * 2 + 6 }}
         aria-label={descripcion}
         onMouseEnter={() => onResaltar(true)}
@@ -85,7 +85,7 @@ export function NodoRed({
               cy={anillo + 3}
               r={anillo}
               fill="none"
-              stroke="var(--chispa)"
+              stroke="var(--alerta)"
               strokeWidth={2}
               strokeLinecap="butt"
               strokeDasharray={`${Math.max(2, porcion * circ)} ${circ}`}
@@ -99,14 +99,14 @@ export function NodoRed({
       </button>
       <span className="pointer-events-none absolute left-0 top-0 flex -translate-x-1/2 flex-col items-center whitespace-nowrap" style={{ transform: `translate(-50%, ${anillo + 10}px)` }} aria-hidden>
         {/* Nombres largos en dos renglones: que no se corten contra el borde */}
-        <span className="w-max max-w-[9rem] whitespace-normal text-balance text-center font-heading text-[13px] font-bold leading-tight tracking-tight text-niebla [text-shadow:0_1px_8px_rgb(0_0_0/0.9)]">{nodo.nombre}</span>
+        <span className="w-max max-w-[9rem] whitespace-normal text-balance text-center font-heading text-[13px] font-bold leading-tight tracking-tight text-blanco [text-shadow:0_1px_8px_rgb(0_0_0/0.9)]">{nodo.nombre}</span>
         <span className="mt-0.5 flex items-center gap-1.5 font-mono text-[10px] uppercase tracking-widest text-acero">
           {nodo.codigo}
           {nodo.tipo === "deposito" && <span>· depósito</span>}
-          {nodo.demo && <span className="rounded-[3px] border border-dashed border-chispa/80 px-1 text-[9px] font-bold text-chispa">DEMO</span>}
+          {nodo.demo && <span className="rounded-[3px] border border-dashed border-alerta/80 px-1 text-[9px] font-bold text-alerta">DEMO</span>}
         </span>
         {marca && (
-          <span className={cn("mt-1 rounded-[4px] border bg-hierro/80 px-1.5 py-0.5 font-mono text-[11px] font-semibold", TONO_MARCA[marca.tono])} data-testid="marca-pieza">
+          <span className={cn("mt-1 rounded-[4px] border bg-negro/80 px-1.5 py-0.5 font-mono text-[11px] font-semibold", TONO_MARCA[marca.tono])} data-testid="marca-pieza">
             {marca.texto}
           </span>
         )}

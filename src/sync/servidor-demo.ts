@@ -38,7 +38,7 @@ export class ServidorDemo implements Servidor {
   /** Serializa el acceso entre pestañas (Web Locks) cuando está disponible. */
   private async conBloqueo<T>(fn: () => Promise<T>): Promise<T> {
     const locks = typeof navigator !== "undefined" ? (navigator as Navigator & { locks?: LockManager }).locks : undefined
-    if (locks) return locks.request("yunque-servidor-demo", fn) as Promise<T>
+    if (locks) return locks.request("quvant-servidor-demo", fn) as Promise<T>
     return fn()
   }
 

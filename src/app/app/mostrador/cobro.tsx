@@ -67,7 +67,7 @@ export function DialogoCobro({
     integraciones()
       .cobrador.crearCobroQR(montoMp, `mostrador-${Date.now()}`)
       .then(async (c) => {
-        const url = await QRCode.toDataURL(c.qrTexto, { margin: 1, width: 180, color: { dark: "#0e1116", light: "#ffffff" } })
+        const url = await QRCode.toDataURL(c.qrTexto, { margin: 1, width: 180, color: { dark: "#0d0d0f", light: "#ffffff" } })
         if (vivo) {
           setCobroId(c.id)
           setQr(url)
@@ -97,7 +97,7 @@ export function DialogoCobro({
           <DialogTitle>Cobrar</DialogTitle>
           <DialogDescription>{cliente ? cliente.nombre : "Consumidor final"}</DialogDescription>
         </DialogHeader>
-        <p className="text-4xl font-semibold tracking-tight" data-testid="total-cobro">
+        <p className="t-numero-lg" data-testid="total-cobro">
           {formatoPesos(total)}
         </p>
         <div className="grid grid-cols-3 gap-2" role="group" aria-label="Medio de pago">
@@ -110,7 +110,7 @@ export function DialogoCobro({
                 type="button"
                 onClick={() => elegir(m)}
                 aria-pressed={activo}
-                className={cn("flex flex-col items-center gap-1 rounded-lg border px-2 py-3 text-xs transition-colors", activo ? "border-primary bg-primary/15 font-semibold" : "border-linea hover:border-acero/50")}
+                className={cn("flex flex-col items-center gap-1 rounded-lg border px-2 py-3 t-texto-sm transition-colors", activo ? "border-primary bg-primary/15 font-semibold" : "border-linea hover:border-acero/50")}
               >
                 <I className="size-5" />
                 {NOMBRE_MEDIO[m]}
@@ -118,7 +118,7 @@ export function DialogoCobro({
             )
           })}
         </div>
-        <button type="button" className="inline-flex items-center gap-1.5 self-start text-xs text-enlace hover:underline" onClick={() => setDividido((d) => !d)}>
+        <button type="button" className="inline-flex items-center gap-1.5 self-start t-texto-sm text-foreground hover:underline" onClick={() => setDividido((d) => !d)}>
           <SplitSquareHorizontal className="size-3.5" /> {dividido ? "Un solo medio" : "Dividir el pago"}
         </button>
 
@@ -126,7 +126,7 @@ export function DialogoCobro({
           <ul className="space-y-2">
             {pagos.map((p, i) => (
               <li key={i} className="flex items-center gap-2">
-                <span className="w-32 text-sm">{NOMBRE_MEDIO[p.medio]}</span>
+                <span className="w-32 t-texto-sm">{NOMBRE_MEDIO[p.medio]}</span>
                 <Input
                   inputMode="decimal"
                   value={p.importe / 100}
@@ -139,7 +139,7 @@ export function DialogoCobro({
                 </Button>
               </li>
             ))}
-            <p className={cn("text-xs", falta === 0 ? "text-ok-texto" : "text-chispa-texto")}>{falta === 0 ? "Pagos completos." : falta > 0 ? `Falta asignar ${formatoPesos(falta)}` : `Sobra ${formatoPesos(-falta)}`}</p>
+            <p className={cn("t-texto-sm", falta === 0 ? "text-ok" : "text-alerta")}>{falta === 0 ? "Pagos completos." : falta > 0 ? `Falta asignar ${formatoPesos(falta)}` : `Sobra ${formatoPesos(-falta)}`}</p>
           </ul>
         )}
 
@@ -150,21 +150,21 @@ export function DialogoCobro({
               <Input id="recibido" inputMode="decimal" value={recibido} onChange={(ev) => setRecibido(ev.target.value)} placeholder={String(efectivo / 100)} className="num" />
             </div>
             <div className="pb-1 text-right">
-              <p className="text-xs text-muted-foreground">Vuelto</p>
-              <p className="num text-lg font-semibold">{vueltoTxt ?? "—"}</p>
+              <p className="t-texto-sm text-muted-foreground">Vuelto</p>
+              <p className="t-numero">{vueltoTxt ?? "—"}</p>
             </div>
           </div>
         )}
 
         {usaMp && (
-          <div className="flex items-center gap-4 rounded-lg border border-dashed border-chispa/60 p-3">
+          <div className="flex items-center gap-4 rounded-lg border border-dashed border-alerta/60 p-3">
             {/* eslint-disable-next-line @next/next/no-img-element -- QR generado en el navegador (data URL) */}
             {qr ? <img src={qr} alt="Código QR de cobro (emulado)" className="size-28 rounded bg-white p-1" /> : <div className="size-28 rounded bg-muted" />}
-            <div className="space-y-2 text-sm">
+            <div className="space-y-2 t-texto-sm">
               <p className="ficha">Cobro emulado · demo</p>
               <p className="text-muted-foreground">En producción el QR lo genera Mercado Pago y la acreditación llega sola.</p>
               {mpAprobado ? (
-                <p className="inline-flex items-center gap-1 font-medium text-ok-texto">
+                <p className="inline-flex items-center gap-1 font-medium text-ok">
                   <CheckCircle2 className="size-4" /> Pago acreditado (simulado)
                 </p>
               ) : (
@@ -187,7 +187,7 @@ export function DialogoCobro({
         )}
 
         {enCuenta > 0 && cliente && (
-          <p className={cn("rounded-lg border px-3 py-2 text-sm", enCuenta > disponible ? "border-error/50 bg-error/10" : "border-linea")}>
+          <p className={cn("rounded-lg border px-3 py-2 t-texto-sm", enCuenta > disponible ? "border-error/50 bg-error/10" : "border-linea")}>
             Cuenta corriente: disponible {formatoPesos(Math.max(0, disponible))}.
             {enCuenta > disponible && " Supera el límite: la venta queda marcada para revisar."}
           </p>

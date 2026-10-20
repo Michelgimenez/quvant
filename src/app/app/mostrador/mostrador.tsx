@@ -66,14 +66,14 @@ function PantallaMostrador() {
   const sucursal = e.sucursales.find((s) => s.id === sucursalId)!
   const [puesto, setPuesto] = useState(() => {
     try {
-      return Math.min(sucursal.puestos, Number(localStorage.getItem(`yunque:puesto:${sucursalId}`)) || 1)
+      return Math.min(sucursal.puestos, Number(localStorage.getItem(`quvant:puesto:${sucursalId}`)) || 1)
     } catch {
       return 1
     }
   })
   const caja = useCaja(sucursalId, puesto)
   const vacio: Borrador = { items: [], clienteId: null, listaId: listaDefault(e).id, entrega: null }
-  const [b, setB] = useBorrador(`yunque:mostrador:${sucursalId}:${puesto}`, vacio)
+  const [b, setB] = useBorrador(`quvant:mostrador:${sucursalId}:${puesto}`, vacio)
   const [cobrando, setCobrando] = useState(false)
   const [procesando, setProcesando] = useState(false)
   const [abrirCaja, setAbrirCaja] = useState(false)
@@ -179,7 +179,7 @@ function PantallaMostrador() {
             </Ficha>
             {e.org.esDemo && <Sello className="scale-90" />}
           </div>
-          <h1 className="text-2xl font-extrabold">Nueva venta</h1>
+          <h1 className="t-titulo">Nueva venta</h1>
         </div>
         {sucursal.puestos > 1 && (
           <Select
@@ -187,7 +187,7 @@ function PantallaMostrador() {
             onValueChange={(v) => {
               setPuesto(Number(v))
               try {
-                localStorage.setItem(`yunque:puesto:${sucursalId}`, v)
+                localStorage.setItem(`quvant:puesto:${sucursalId}`, v)
               } catch {
                 /* nada */
               }
@@ -211,8 +211,8 @@ function PantallaMostrador() {
       </div>
 
       {estado === "sin_conexion" && (
-        <div className="flex items-center gap-2 rounded-lg border border-chispa/50 bg-chispa/10 px-3 py-2 text-sm" role="status">
-          <CloudOff className="size-4 text-chispa-texto" />
+        <div className="flex items-center gap-2 rounded-lg border border-alerta/50 bg-alerta/10 px-3 py-2 t-texto-sm" role="status">
+          <CloudOff className="size-4 text-alerta" />
           Sin conexión. Seguís vendiendo normalmente: las ventas quedan en cola y se sincronizan solas.
         </div>
       )}
@@ -236,10 +236,10 @@ function PantallaMostrador() {
               <Kbd>F4</Kbd>
             </div>
             <SelectorCliente ref={selectorCliente} valor={b.clienteId} onCambio={cambiarCliente} />
-            <div className="flex items-center justify-between text-xs text-muted-foreground">
+            <div className="flex items-center justify-between t-texto-sm text-muted-foreground">
               <span>Lista de precios</span>
               <Select value={b.listaId} onValueChange={(listaId) => setB({ ...b, listaId, items: b.items.map((it) => ({ ...it, precioUnitario: e.precios[`${listaId}:${it.productoId}`]?.precio ?? it.precioUnitario })) })}>
-                <SelectTrigger size="sm" className="h-7 w-32 text-xs" aria-label="Lista de precios">
+                <SelectTrigger size="sm" className="h-7 w-32 t-texto-sm" aria-label="Lista de precios">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
@@ -254,7 +254,7 @@ function PantallaMostrador() {
           </div>
 
           <div className="space-y-3 rounded-xl border border-linea bg-card p-4">
-            <label className="flex items-center justify-between gap-2 text-sm">
+            <label className="flex items-center justify-between gap-2 t-texto-sm">
               <span className="inline-flex items-center gap-2">
                 <Truck className="size-4 text-muted-foreground" /> Entrega a domicilio
               </span>
@@ -287,7 +287,7 @@ function PantallaMostrador() {
           </div>
 
           <div className="space-y-3 rounded-xl border border-linea bg-card p-4">
-            <dl className="space-y-1 text-sm">
+            <dl className="space-y-1 t-texto-sm">
               <div className="flex justify-between text-muted-foreground">
                 <dt>{b.items.length} ítem(s)</dt>
                 <dd className="num">{formatoPesos(b.items.reduce((t, it) => t + Math.round(it.cantidad * it.precioUnitario), 0))}</dd>
@@ -300,11 +300,11 @@ function PantallaMostrador() {
               )}
               <div className="flex items-end justify-between pt-1">
                 <dt className="font-semibold">Total</dt>
-                <dd className="text-3xl font-semibold tracking-tight" data-testid="total-venta">
+                <dd className="t-numero-lg" data-testid="total-venta">
                   {formatoPesos(total)}
                 </dd>
               </div>
-              <div className="flex justify-between text-xs text-muted-foreground">
+              <div className="flex justify-between t-texto-sm text-muted-foreground">
                 <dt>IVA contenido</dt>
                 <dd className="num">{formatoPesos(ivaContenido(total))}</dd>
               </div>
@@ -324,7 +324,7 @@ function PantallaMostrador() {
               </Button>
             )}
           </div>
-          <p className="px-1 text-[11px] text-muted-foreground">Vendedor: {usuario.nombre} · la venta se guarda en este equipo y se sincroniza sola.</p>
+          <p className="px-1 t-texto-sm text-muted-foreground">Vendedor: {usuario.nombre} · la venta se guarda en este equipo y se sincroniza sola.</p>
         </aside>
       </div>
 
@@ -332,8 +332,8 @@ function PantallaMostrador() {
       {b.items.length > 0 && (
         <div className="fixed inset-x-0 bottom-14 z-20 flex items-center gap-3 border-t border-linea bg-background/95 px-3 py-2 backdrop-blur lg:hidden">
           <div className="min-w-0 flex-1">
-            <p className="text-[11px] text-muted-foreground">{b.items.length} ítem(s)</p>
-            <p className="truncate text-lg font-semibold">{formatoPesos(total)}</p>
+            <p className="t-texto-sm text-muted-foreground">{b.items.length} ítem(s)</p>
+            <p className="truncate t-numero">{formatoPesos(total)}</p>
           </div>
           {caja ? (
             <Button size="lg" onClick={() => setCobrando(true)}>
@@ -353,14 +353,14 @@ function PantallaMostrador() {
       <Dialog open={Boolean(hecha)} onOpenChange={(o) => !o && setHecha(null)}>
         <DialogContent className="max-w-sm text-center" onOpenAutoFocus={(ev) => ev.preventDefault()}>
           <DialogHeader className="items-center">
-            <CheckCircle2 className="size-10 text-ok-texto" />
-            <DialogTitle className="text-xl">Venta registrada</DialogTitle>
+            <CheckCircle2 className="size-10 text-ok" />
+            <DialogTitle className="t-titulo-sm">Venta registrada</DialogTitle>
             <DialogDescription>
               {venta?.numero ? `Venta #${venta.numero}` : `Número provisorio ${venta?.numeroLocal ?? ""}`} · {venta && formatoPesos(venta.total)}
             </DialogDescription>
           </DialogHeader>
           {hecha?.sinConexion && (
-            <p className="rounded-md border border-chispa/50 bg-chispa/10 px-3 py-2 text-sm" data-testid="venta-en-cola">
+            <p className="rounded-md border border-alerta/50 bg-alerta/10 px-3 py-2 t-texto-sm" data-testid="venta-en-cola">
               Guardada sin conexión. Se sincroniza sola cuando vuelva internet y ahí recibe su número definitivo.
             </p>
           )}

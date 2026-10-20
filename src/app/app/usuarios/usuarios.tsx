@@ -62,8 +62,8 @@ export function Usuarios() {
         </TabsList>
         <TabsContent value="usuarios">
           <div className="overflow-hidden rounded-xl border border-linea bg-card">
-            <table className="w-full text-sm">
-              <thead className="bg-superficie-2 text-xs text-muted-foreground">
+            <table className="w-full t-texto-sm">
+              <thead className="bg-superficie-2 t-texto-sm text-muted-foreground">
                 <tr>
                   <th className="px-4 py-2 text-left font-medium">Persona</th>
                   <th className="hidden px-4 py-2 text-left font-medium sm:table-cell">Rol</th>
@@ -78,25 +78,25 @@ export function Usuarios() {
                   <tr key={u.id} className={cn("border-t border-linea", !u.activo && "opacity-55")}>
                     <td className="px-4 py-2.5">
                       <p className="font-medium">{u.nombre}</p>
-                      <p className="text-xs text-muted-foreground">{u.email}</p>
-                      <p className="text-xs text-muted-foreground sm:hidden">{NOMBRE_ROL[u.rol]}</p>
+                      <p className="t-texto-sm text-muted-foreground">{u.email}</p>
+                      <p className="t-texto-sm text-muted-foreground sm:hidden">{NOMBRE_ROL[u.rol]}</p>
                     </td>
                     <td className="hidden px-4 py-2.5 sm:table-cell">{NOMBRE_ROL[u.rol]}</td>
-                    <td className="hidden px-4 py-2.5 text-xs md:table-cell">{u.sucursalIds === null ? "Todas" : u.sucursalIds.map((s) => e.sucursales.find((x) => x.id === s)?.codigo).join(", ")}</td>
+                    <td className="hidden px-4 py-2.5 t-texto-sm md:table-cell">{u.sucursalIds === null ? "Todas" : u.sucursalIds.map((s) => e.sucursales.find((x) => x.id === s)?.codigo).join(", ")}</td>
                     <td className="hidden px-4 py-2.5 md:table-cell">
                       {u.dosFactor ? (
-                        <span className="inline-flex items-center gap-1 text-xs text-ok-texto">
+                        <span className="inline-flex items-center gap-1 t-texto-sm text-ok">
                           <ShieldCheck className="size-3.5" /> Activado
                         </span>
                       ) : exige2FA(u.rol) ? (
-                        <span className="inline-flex items-center gap-1 text-xs text-error-texto">
+                        <span className="inline-flex items-center gap-1 t-texto-sm text-error">
                           <ShieldAlert className="size-3.5" /> Pendiente (obligatorio)
                         </span>
                       ) : (
-                        <span className="text-xs text-muted-foreground">Opcional</span>
+                        <span className="t-texto-sm text-muted-foreground">Opcional</span>
                       )}
                     </td>
-                    <td className="num hidden px-4 py-2.5 text-xs text-muted-foreground lg:table-cell">{u.ultimoIngreso ? new Date(u.ultimoIngreso).toLocaleString("es-AR", { dateStyle: "short", timeStyle: "short" }) : "—"}</td>
+                    <td className="num hidden px-4 py-2.5 t-texto-sm text-muted-foreground lg:table-cell">{u.ultimoIngreso ? new Date(u.ultimoIngreso).toLocaleString("es-AR", { dateStyle: "short", timeStyle: "short" }) : "—"}</td>
                     <td className="px-4 py-2.5 text-right">
                       <Button size="sm" variant="ghost" onClick={() => setEditar(u)}>
                         Editar
@@ -111,7 +111,7 @@ export function Usuarios() {
         <TabsContent value="matriz">
           <Panel>
             <div className="overflow-auto">
-              <table className="w-full text-xs">
+              <table className="w-full t-texto-sm">
                 <thead>
                   <tr className="text-muted-foreground">
                     <th className="sticky left-0 bg-card px-2 py-2 text-left font-medium">Permiso</th>
@@ -132,7 +132,7 @@ export function Usuarios() {
                         </td>
                         {ROLES.map((r) => (
                           <td key={r} className="px-2 py-1.5 text-center">
-                            {PERMISOS_POR_ROL[r].includes(p) ? <Check className="mx-auto size-4 text-ok-texto" aria-label="Sí" /> : <Minus className="mx-auto size-3 text-muted-foreground/50" aria-label="No" />}
+                            {PERMISOS_POR_ROL[r].includes(p) ? <Check className="mx-auto size-4 text-ok" aria-label="Sí" /> : <Minus className="mx-auto size-3 text-muted-foreground/50" aria-label="No" />}
                           </td>
                         ))}
                       </tr>
@@ -141,7 +141,7 @@ export function Usuarios() {
                 </tbody>
               </table>
             </div>
-            <p className="mt-3 text-xs text-muted-foreground">La misma matriz vive en la base de datos y la aplican las políticas de seguridad (RLS): no depende solo de la pantalla.</p>
+            <p className="mt-3 t-texto-sm text-muted-foreground">La misma matriz vive en la base de datos y la aplican las políticas de seguridad (RLS): no depende solo de la pantalla.</p>
           </Panel>
         </TabsContent>
       </Tabs>
@@ -206,24 +206,24 @@ function DialogoUsuario({ usuario, onCerrar }: { usuario: Usuario | null; onCerr
                 ))}
               </SelectContent>
             </Select>
-            <p className="text-xs text-muted-foreground">{DESCRIPCION_ROL[rol]}</p>
-            {esYo && <p className="text-xs text-muted-foreground">No podés cambiar tu propio rol.</p>}
+            <p className="t-texto-sm text-muted-foreground">{DESCRIPCION_ROL[rol]}</p>
+            {esYo && <p className="t-texto-sm text-muted-foreground">No podés cambiar tu propio rol.</p>}
           </div>
           <fieldset className="space-y-1.5">
-            <legend className="text-sm font-medium">Sucursales</legend>
-            <label className="flex items-center gap-2 text-sm">
+            <legend className="t-texto-sm font-medium">Sucursales</legend>
+            <label className="flex items-center gap-2 t-texto-sm">
               <Checkbox checked={todas} onCheckedChange={(c) => setTodas(Boolean(c))} /> Todas
             </label>
             {!todas &&
               e.sucursales.map((s) => (
-                <label key={s.id} className="flex items-center gap-2 text-sm">
+                <label key={s.id} className="flex items-center gap-2 t-texto-sm">
                   <Checkbox checked={sucursales.includes(s.id)} onCheckedChange={(c) => setSucursales((xs) => (c ? [...xs, s.id] : xs.filter((x) => x !== s.id)))} />
                   {s.codigo} · {s.nombre}
                 </label>
               ))}
           </fieldset>
           {usuario && !esYo && (
-            <label className="flex items-center justify-between text-sm">
+            <label className="flex items-center justify-between t-texto-sm">
               Usuario activo
               <Switch checked={activo} onCheckedChange={setActivo} />
             </label>

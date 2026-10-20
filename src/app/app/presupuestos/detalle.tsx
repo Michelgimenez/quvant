@@ -94,21 +94,21 @@ export function DetallePresupuesto({ id, onCerrar }: { id: Id | null; onCerrar: 
           <div className="space-y-5 p-4">
             <ul className="divide-y divide-linea rounded-lg border border-linea">
               {p.items.map((it, i) => (
-                <li key={i} className="flex items-center gap-3 px-3 py-2 text-sm">
+                <li key={i} className="flex items-center gap-3 px-3 py-2 t-texto-sm">
                   <span className="num w-12 shrink-0 text-muted-foreground">{formatoCantidad(it.cantidad)} ×</span>
                   <span className="min-w-0 flex-1 truncate">{it.descripcion}</span>
-                  {it.descuentoPct > 0 && <span className="text-xs text-chispa-texto">−{it.descuentoPct}%</span>}
+                  {it.descuentoPct > 0 && <span className="t-texto-sm text-alerta">−{it.descuentoPct}%</span>}
                   <span className="num font-medium">{formatoPesos(subtotalItem(it))}</span>
                 </li>
               ))}
             </ul>
             <div className="flex items-end justify-between">
-              <span className="text-sm text-muted-foreground">Total</span>
+              <span className="t-texto-sm text-muted-foreground">Total</span>
               <span className="text-3xl font-semibold tracking-tight">{formatoPesos(p.total)}</span>
             </div>
-            {p.notas && <p className="rounded-lg bg-superficie-2 p-3 text-sm text-muted-foreground">{p.notas}</p>}
+            {p.notas && <p className="rounded-lg bg-superficie-2 p-3 t-texto-sm text-muted-foreground">{p.notas}</p>}
             {venta && (
-              <p className="rounded-lg border border-ok/40 bg-ok/10 p-3 text-sm">
+              <p className="rounded-lg border border-ok/40 bg-ok/10 p-3 t-texto-sm">
                 Convertido en la venta <span className="num font-semibold">{venta.numero ? `#${venta.numero}` : venta.numeroLocal}</span> el {new Date(venta.fecha).toLocaleString("es-AR", { dateStyle: "short", timeStyle: "short" })}.
               </p>
             )}
@@ -136,8 +136,8 @@ export function DetallePresupuesto({ id, onCerrar }: { id: Id | null; onCerrar: 
               </Button>
             </div>
             {abierto && puede("presupuestos.editar") && estado !== "aceptado" && (
-              <div className="flex flex-wrap gap-2 border-t border-linea pt-4 text-sm">
-                <span className="w-full text-xs text-muted-foreground">¿Qué respondió el cliente?</span>
+              <div className="flex flex-wrap gap-2 border-t border-linea pt-4 t-texto-sm">
+                <span className="w-full t-texto-sm text-muted-foreground">¿Qué respondió el cliente?</span>
                 <Button size="sm" variant="ghost" onClick={async () => {
                   const r = await ejecutar("presupuesto.estado", { presupuestoId: p.id, estado: "aceptado" }, p.sucursalId)
                   if (!r.ok) toast.error(r.error)

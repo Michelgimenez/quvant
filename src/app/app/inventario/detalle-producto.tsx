@@ -69,17 +69,17 @@ export function DetalleProducto({ productoId, onCerrar }: { productoId: Id | nul
 
             <div className="space-y-6 p-4">
               <section className="space-y-2">
-                <h3 className="text-sm font-semibold">Stock por sucursal</h3>
+                <h3 className="t-texto-sm font-semibold">Stock por sucursal</h3>
                 <ul className="divide-y divide-linea rounded-lg border border-linea">
                   {sucursales.map((s) => {
                     const st = e.stock[claveStock(s.id, p.id)]
                     return (
                       <li key={s.id} className="flex flex-wrap items-center gap-x-3 gap-y-1 px-3 py-2.5">
                         <span className="min-w-0 flex-1">
-                          <span className="block text-sm font-medium">
+                          <span className="block t-texto-sm font-medium">
                             <span className="num text-muted-foreground">{s.codigo}</span> {s.nombre}
                           </span>
-                          <span className="block text-xs text-muted-foreground">
+                          <span className="block t-texto-sm text-muted-foreground">
                             {st ? `Mínimo ${formatoCantidad(st.minimo)}${st.ubicacion ? ` · ubicación ${st.ubicacion}` : ""}` : "No se trabaja en esta sucursal"}
                           </span>
                         </span>
@@ -96,15 +96,15 @@ export function DetalleProducto({ productoId, onCerrar }: { productoId: Id | nul
               </section>
 
               <section className="space-y-2">
-                <h3 className="text-sm font-semibold">Precios</h3>
+                <h3 className="t-texto-sm font-semibold">Precios</h3>
                 <ul className="divide-y divide-linea rounded-lg border border-linea">
                   {e.listas.map((l) => {
                     const pr = precioDe(e, l.id, p.id)
                     const m = margen(pr, p.costo, p.iva)
                     return (
-                      <li key={l.id} className="flex items-center gap-3 px-3 py-2.5 text-sm">
+                      <li key={l.id} className="flex items-center gap-3 px-3 py-2.5 t-texto-sm">
                         <span className="flex-1">{l.nombre}</span>
-                        {puede("costos.ver") && <span className="text-xs text-muted-foreground">margen {m === null ? "—" : formatoPorcentaje(m, 0)}</span>}
+                        {puede("costos.ver") && <span className="t-texto-sm text-muted-foreground">margen {m === null ? "—" : formatoPorcentaje(m, 0)}</span>}
                         <span className="num font-semibold">{formatoPesos(pr)}</span>
                         {puede("precios.editar") && (
                           <Button size="icon-sm" variant="ghost" aria-label={`Editar precio ${l.nombre}`} onClick={() => setPrecio({ listaId: l.id })}>
@@ -115,26 +115,26 @@ export function DetalleProducto({ productoId, onCerrar }: { productoId: Id | nul
                     )
                   })}
                 </ul>
-                {puede("costos.ver") && <p className="text-xs text-muted-foreground">Costo de reposición sin IVA: <span className="num">{formatoPesos(p.costo)}</span></p>}
+                {puede("costos.ver") && <p className="t-texto-sm text-muted-foreground">Costo de reposición sin IVA: <span className="num">{formatoPesos(p.costo)}</span></p>}
               </section>
 
               <section className="space-y-2">
-                <h3 className="text-sm font-semibold">Últimos movimientos</h3>
+                <h3 className="t-texto-sm font-semibold">Últimos movimientos</h3>
                 <ol className="space-y-1.5">
                   {movimientos.map((m) => (
-                    <li key={m.id} className="flex items-center gap-3 text-xs">
+                    <li key={m.id} className="flex items-center gap-3 t-texto-sm">
                       <span className="num w-20 shrink-0 text-muted-foreground">{new Date(m.fecha).toLocaleDateString("es-AR", { day: "2-digit", month: "2-digit" })} {new Date(m.fecha).toLocaleTimeString("es-AR", { hour: "2-digit", minute: "2-digit" })}</span>
                       <span className="num w-8 shrink-0 text-muted-foreground">{e.sucursales.find((s) => s.id === m.sucursalId)?.codigo}</span>
                       <span className="min-w-0 flex-1 truncate">
                         {NOMBRE_MOV[m.tipo]} · {m.motivo}
                       </span>
-                      <span className={`num shrink-0 font-semibold ${m.cantidad < 0 ? "text-error-texto" : "text-ok-texto"}`}>
+                      <span className={`num shrink-0 font-semibold ${m.cantidad < 0 ? "text-error" : "text-ok"}`}>
                         {m.cantidad > 0 ? "+" : ""}
                         {formatoCantidad(m.cantidad)}
                       </span>
                     </li>
                   ))}
-                  {movimientos.length === 0 && <li className="text-xs text-muted-foreground">Sin movimientos.</li>}
+                  {movimientos.length === 0 && <li className="t-texto-sm text-muted-foreground">Sin movimientos.</li>}
                 </ol>
               </section>
             </div>
@@ -193,13 +193,13 @@ function DialogoAjuste({ productoId, sucursalId, onCerrar }: { productoId: Id; s
             <Input id="aj-motivo" value={motivo} onChange={(ev) => setMotivo(ev.target.value)} placeholder="Ej.: rotura en depósito" required minLength={3} />
             <div className="flex flex-wrap gap-1">
               {MOTIVOS.map((m) => (
-                <button key={m} type="button" className="rounded-full border border-linea px-2 py-0.5 text-[11px] text-muted-foreground hover:text-foreground" onClick={() => setMotivo(m)}>
+                <button key={m} type="button" className="rounded-full border border-linea px-2 py-0.5 t-texto-sm text-muted-foreground hover:text-foreground" onClick={() => setMotivo(m)}>
                   {m}
                 </button>
               ))}
             </div>
           </div>
-          <p className="text-xs text-muted-foreground">
+          <p className="t-texto-sm text-muted-foreground">
             Queda en <span className="num font-semibold text-foreground">{formatoCantidad(actual + signo * cantidad)}</span>. El ajuste se registra en la auditoría.
           </p>
           <DialogFooter>
@@ -246,7 +246,7 @@ function DialogoPrecio({ productoId, listaId, onCerrar }: { productoId: Id; list
           <div className="space-y-1.5">
             <Label htmlFor="precio-nuevo">Precio final con IVA</Label>
             <Input id="precio-nuevo" inputMode="decimal" value={valor} onChange={(ev) => setValor(ev.target.value)} className="num text-lg" />
-            <p className="text-xs text-muted-foreground">
+            <p className="t-texto-sm text-muted-foreground">
               Antes: <span className="num">{formatoPesos(actual)}</span>
               {puede("costos.ver") && m !== null && <> · margen {formatoPorcentaje(m, 1)}</>}
             </p>

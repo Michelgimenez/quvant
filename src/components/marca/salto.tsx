@@ -5,7 +5,7 @@ import gsap from "gsap"
 import { arcoDeSalto, fasesDelSalto, largoRecorrido, puntoEnArco, trazoDeArco } from "./salto-geometria"
 
 /**
- * El salto como recompensa (EXTENSIÓN DEL PROMPT, reemplaza a la chispa de Yunque).
+ * El salto como recompensa (EXTENSIÓN DEL PROMPT, reemplaza a la chispa de Quvant).
  * Un salto breve del punto cuadrado cuando algo cierra justo: caja sin diferencias, conteo que coincide,
  * cola sin conexión sincronizada, presupuesto que pasa a venta, aprobación completa. Nunca como decoración.
  *

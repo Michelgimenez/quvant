@@ -11,7 +11,7 @@ import { Command, CommandDialog, CommandEmpty, CommandGroup, CommandInput, Comma
 import { buscarMaquinas } from "@/forja/dominio/pieza"
 import { normalizar } from "@/lib/texto"
 
-export const EVENTO_ABRIR_PALETA = "yunque:abrir-paleta"
+export const EVENTO_ABRIR_PALETA = "quvant:abrir-paleta"
 
 /** Buscador ⌘K: ir a un módulo, buscar productos y clientes, acciones rápidas. */
 export function PaletaComandos() {
@@ -72,7 +72,7 @@ export function PaletaComandos() {
   const items = TODOS_LOS_ITEMS.filter((i) => itemVisible(i, puede, moduloActivo, extensionActiva))
 
   return (
-    <CommandDialog open={abierta} onOpenChange={setAbierta} title="Buscar en Yunque" description="Módulos, productos, clientes y acciones">
+    <CommandDialog open={abierta} onOpenChange={setAbierta} title="Buscar en Quvant" description="Módulos, productos, clientes y acciones">
       {/* El diálogo de esta versión de shadcn no trae el <Command>: sin él, cmdk falla al abrir */}
       <Command>
         <CommandInput placeholder="Buscar productos, clientes o ir a…" value={texto} onValueChange={setTexto} />

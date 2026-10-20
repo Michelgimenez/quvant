@@ -16,7 +16,7 @@ export function DeckInversores({ datos }: { datos: DatosInversores }) {
   return (
     <ProveedoresInterfaz>
       <ProveedorDatosInversores value={{ datos, demo }}>
-        <Presentacion nombre="Yunque · presentación para inversores" escenas={ESCENAS_INVERSORES} recursos={RECURSOS} preparar={preparar} pie="Confidencial" />
+        <Presentacion nombre="Quvant · presentación para inversores" escenas={ESCENAS_INVERSORES} recursos={RECURSOS} preparar={preparar} pie="Confidencial" />
       </ProveedorDatosInversores>
     </ProveedoresInterfaz>
   )

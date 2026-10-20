@@ -1,7 +1,7 @@
 "use client"
 
 import { motion } from "motion/react"
-import { Logo } from "@/components/marca/marca"
+import { Firma } from "@/components/marca/quvant"
 import { cn } from "@/lib/utils"
 import { useEscena } from "./motor"
 
@@ -21,11 +21,11 @@ export function Lienzo({
   children: React.ReactNode
   className?: string
   sinMarca?: boolean
-  /** Reemplaza el logo de Yunque arriba a la derecha (p. ej. marca del cliente + sello). */
+  /** Reemplaza el logo de Quvant arriba a la derecha (p. ej. marca del cliente + sello). */
   marca?: React.ReactNode
 }) {
   return (
-    <div className={cn("absolute inset-0 overflow-hidden bg-hierro", className)}>
+    <div className={cn("absolute inset-0 overflow-hidden bg-negro", className)}>
       <div
         className="pointer-events-none absolute inset-0 opacity-60"
         style={{
@@ -36,14 +36,14 @@ export function Lienzo({
       />
       {(numero || etiqueta) && (
         <div className="absolute left-[140px] top-[80px] font-mono text-[22px] uppercase tracking-[0.2em] text-acero">
-          {numero && <span className="text-niebla">{numero}</span>}
+          {numero && <span className="text-blanco">{numero}</span>}
           {numero && etiqueta && " · "}
           {etiqueta}
         </div>
       )}
       {!sinMarca && (
-        <div className="absolute right-[140px] top-[78px] text-niebla/70">
-          {marca ?? <Logo className="h-[34px]" tono="negativo" />}
+        <div className="absolute right-[140px] top-[78px] text-blanco/70">
+          {marca ?? <Firma className="h-[30px]" version="principal" />}
         </div>
       )}
       <div className="absolute inset-0 px-[140px] pb-[110px] pt-[170px]">{children}</div>
@@ -100,7 +100,7 @@ export function TrazoAnimado({ d, demora = 0, duracion = 1.2, className, ...rest
 
 export function Titulo({ children, className }: { children: React.ReactNode; className?: string }) {
   // El interlineado va al final: un tamaño de texto en className no lo pisa.
-  return <h2 className={cn("text-balance text-[88px] font-extrabold tracking-[-0.035em] text-niebla", className, "leading-[1.04]")}>{children}</h2>
+  return <h2 className={cn("text-balance text-[88px] font-extrabold tracking-[-0.035em] text-blanco", className, "leading-[1.04]")}>{children}</h2>
 }
 
 export function Bajada({ children, className }: { children: React.ReactNode; className?: string }) {
@@ -108,9 +108,9 @@ export function Bajada({ children, className }: { children: React.ReactNode; cla
 }
 
 /** Marco de navegador para mostrar pantallas de la app dentro del escenario. */
-export function Pantalla({ children, className, url = "app.yunque" }: { children: React.ReactNode; className?: string; url?: string }) {
+export function Pantalla({ children, className, url = "app.quvant" }: { children: React.ReactNode; className?: string; url?: string }) {
   return (
-    <div className={cn("overflow-hidden rounded-[18px] border border-white/10 bg-superficie shadow-[0_40px_120px_-20px_rgba(0,0,0,0.7)]", className)}>
+    <div className={cn("overflow-hidden rounded-[18px] border border-white/10 bg-superficie-1 shadow-[0_40px_120px_-20px_rgba(0,0,0,0.7)]", className)}>
       <div className="flex items-center gap-2 border-b border-white/10 px-4 py-3" aria-hidden>
         <span className="size-3 rounded-full bg-white/15" />
         <span className="size-3 rounded-full bg-white/15" />

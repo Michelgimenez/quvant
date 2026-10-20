@@ -34,7 +34,7 @@ export type Pantalla = {
 }
 
 /** Entra a una presentación con clave (si hace falta) y va a la escena n. */
-export function escena(n: number, clave = process.env.INVERSORES_KEY ?? "yunque-demo") {
+export function escena(n: number, clave = process.env.INVERSORES_KEY ?? "quvant-demo") {
   return async (p: Page) => {
     if (await p.locator("#clave").count()) {
       await p.locator("#clave").fill(clave)
@@ -122,12 +122,12 @@ export const PANTALLAS: Pantalla[] = [
     },
   },
   { id: "ingresar", ruta: "/ingresar" },
-  { id: "app-tablero", ruta: "/app", usuario: "dueno@demo.yunque.app", esperar: "[data-testid=ventas-hoy]", publica: true },
-  { id: "app-tablero-mostrador", ruta: "/app", usuario: "mostrador@demo.yunque.app", esperar: "#contenido h1" },
+  { id: "app-tablero", ruta: "/app", usuario: "dueno@demo.quvant.app", esperar: "[data-testid=ventas-hoy]", publica: true },
+  { id: "app-tablero-mostrador", ruta: "/app", usuario: "mostrador@demo.quvant.app", esperar: "#contenido h1" },
   {
     id: "app-mostrador",
     ruta: "/app/mostrador",
-    usuario: "mostrador@demo.yunque.app",
+    usuario: "mostrador@demo.quvant.app",
     esperar: "[data-testid=buscador-productos]",
     publica: true,
     antes: async (p) => {
@@ -142,7 +142,7 @@ export const PANTALLAS: Pantalla[] = [
   {
     id: "app-mostrador-cobro",
     ruta: "/app/mostrador",
-    usuario: "mostrador@demo.yunque.app",
+    usuario: "mostrador@demo.quvant.app",
     esperar: "[data-testid=buscador-productos]",
     soloEscritorio: true,
     antes: async (p) => {
@@ -153,24 +153,24 @@ export const PANTALLAS: Pantalla[] = [
       await p.getByRole("button", { name: "Mercado Pago" }).click()
     },
   },
-  { id: "app-inventario", ruta: "/app/inventario", usuario: "deposito@demo.yunque.app", esperar: "[role=table]", publica: true },
+  { id: "app-inventario", ruta: "/app/inventario", usuario: "deposito@demo.quvant.app", esperar: "[role=table]", publica: true },
   {
     id: "app-inventario-producto",
     ruta: "/app/inventario",
-    usuario: "dueno@demo.yunque.app",
+    usuario: "dueno@demo.quvant.app",
     esperar: "[role=table]",
     antes: async (p) => {
       await p.getByRole("row").nth(3).click()
       await p.getByTestId("detalle-producto").waitFor()
     },
   },
-  { id: "app-conteos", ruta: "/app/inventario/conteos", usuario: "deposito@demo.yunque.app", esperar: "#contenido h1" },
-  { id: "app-precios", ruta: "/app/precios", usuario: "compras@demo.yunque.app", esperar: "[role=table]", publica: true },
-  { id: "app-presupuestos", ruta: "/app/presupuestos", usuario: "mostrador@demo.yunque.app", esperar: "[role=table]", publica: true },
+  { id: "app-conteos", ruta: "/app/inventario/conteos", usuario: "deposito@demo.quvant.app", esperar: "#contenido h1" },
+  { id: "app-precios", ruta: "/app/precios", usuario: "compras@demo.quvant.app", esperar: "[role=table]", publica: true },
+  { id: "app-presupuestos", ruta: "/app/presupuestos", usuario: "mostrador@demo.quvant.app", esperar: "[role=table]", publica: true },
   {
     id: "app-presupuesto-detalle",
     ruta: "/app/presupuestos",
-    usuario: "mostrador@demo.yunque.app",
+    usuario: "mostrador@demo.quvant.app",
     esperar: "[role=table]",
     antes: async (p) => {
       await p.getByRole("row").nth(1).click()
@@ -181,52 +181,52 @@ export const PANTALLAS: Pantalla[] = [
     id: "ingresar-2fa",
     ruta: "/ingresar",
     antes: async (p) => {
-      await p.getByLabel("Email").fill("dueno@demo.yunque.app")
+      await p.getByLabel("Email").fill("dueno@demo.quvant.app")
       await p.getByLabel("Contraseña").fill("demo1234")
       await p.getByRole("button", { name: "Ingresar" }).click()
       await p.waitForURL(/verificar/)
       await p.getByTestId("codigo-demo").waitFor()
     },
   },
-  { id: "app-servicio", ruta: "/app/servicio", usuario: "tecnico@demo.yunque.app", esperar: "#contenido h1", publica: true, antes: async (p) => p.getByLabel("Solo mis órdenes").uncheck() },
+  { id: "app-servicio", ruta: "/app/servicio", usuario: "tecnico@demo.quvant.app", esperar: "#contenido h1", publica: true, antes: async (p) => p.getByLabel("Solo mis órdenes").uncheck() },
   {
     id: "app-servicio-orden",
     ruta: "/app/servicio",
-    usuario: "admin@demo.yunque.app",
+    usuario: "admin@demo.quvant.app",
     esperar: "#contenido h1",
     antes: async (p) => {
       await p.getByRole("region", { name: "Listo para retirar" }).getByRole("button").first().click()
       await p.getByTestId("detalle-orden").waitFor()
     },
   },
-  { id: "app-clientes", ruta: "/app/clientes", usuario: "admin@demo.yunque.app", esperar: "[role=table]", publica: true },
+  { id: "app-clientes", ruta: "/app/clientes", usuario: "admin@demo.quvant.app", esperar: "[role=table]", publica: true },
   {
     id: "app-cliente-cuenta",
     ruta: "/app/clientes?filtro=deudores",
-    usuario: "admin@demo.yunque.app",
+    usuario: "admin@demo.quvant.app",
     esperar: "[role=table]",
     antes: async (p) => {
       await p.getByRole("row").nth(1).click()
       await p.getByTestId("ficha-cliente").waitFor()
     },
   },
-  { id: "app-compras", ruta: "/app/compras", usuario: "compras@demo.yunque.app", esperar: "[role=table]" },
-  { id: "app-compras-sugerencias", ruta: "/app/compras", usuario: "compras@demo.yunque.app", esperar: "[role=table]", antes: async (p) => p.getByRole("tab", { name: /Sugerencias/ }).click() },
-  { id: "app-entregas", ruta: "/app/entregas", usuario: "deposito@demo.yunque.app", esperar: "#contenido h1" },
-  { id: "app-reportes", ruta: "/app/reportes", usuario: "dueno@demo.yunque.app", esperar: "#contenido h1", publica: true, paginaCompleta: true },
-  { id: "app-usuarios", ruta: "/app/usuarios", usuario: "dueno@demo.yunque.app", esperar: "#contenido h1" },
-  { id: "app-permisos", ruta: "/app/usuarios", usuario: "dueno@demo.yunque.app", esperar: "#contenido h1", soloEscritorio: true, antes: async (p) => p.getByRole("tab", { name: "Matriz de permisos" }).click() },
-  { id: "app-configuracion", ruta: "/app/configuracion", usuario: "dueno@demo.yunque.app", esperar: "#contenido h1", publica: true },
-  { id: "app-importar", ruta: "/app/importar", usuario: "compras@demo.yunque.app", esperar: "#contenido h1" },
-  { id: "app-auditoria", ruta: "/app/auditoria", usuario: "dueno@demo.yunque.app", esperar: "[role=table]" },
+  { id: "app-compras", ruta: "/app/compras", usuario: "compras@demo.quvant.app", esperar: "[role=table]" },
+  { id: "app-compras-sugerencias", ruta: "/app/compras", usuario: "compras@demo.quvant.app", esperar: "[role=table]", antes: async (p) => p.getByRole("tab", { name: /Sugerencias/ }).click() },
+  { id: "app-entregas", ruta: "/app/entregas", usuario: "deposito@demo.quvant.app", esperar: "#contenido h1" },
+  { id: "app-reportes", ruta: "/app/reportes", usuario: "dueno@demo.quvant.app", esperar: "#contenido h1", publica: true, paginaCompleta: true },
+  { id: "app-usuarios", ruta: "/app/usuarios", usuario: "dueno@demo.quvant.app", esperar: "#contenido h1" },
+  { id: "app-permisos", ruta: "/app/usuarios", usuario: "dueno@demo.quvant.app", esperar: "#contenido h1", soloEscritorio: true, antes: async (p) => p.getByRole("tab", { name: "Matriz de permisos" }).click() },
+  { id: "app-configuracion", ruta: "/app/configuracion", usuario: "dueno@demo.quvant.app", esperar: "#contenido h1", publica: true },
+  { id: "app-importar", ruta: "/app/importar", usuario: "compras@demo.quvant.app", esperar: "#contenido h1" },
+  { id: "app-auditoria", ruta: "/app/auditoria", usuario: "dueno@demo.quvant.app", esperar: "[role=table]" },
   { id: "estado", ruta: "/estado", esperar: "h1" },
   { id: "inversores-clave", ruta: "/inversores", esperar: "#clave" },
-  { id: "forja-extensiones", ruta: "/app/extensiones", usuario: "dueno@demo.yunque.app", esperar: "[data-testid=extension-forja]", carpeta: "forja" },
-  { id: "forja-red-mapa", ruta: "/app", usuario: "dueno@demo.yunque.app", esperar: "#contenido h1", carpeta: "forja", antes: activarForja },
+  { id: "forja-extensiones", ruta: "/app/extensiones", usuario: "dueno@demo.quvant.app", esperar: "[data-testid=extension-forja]", carpeta: "forja" },
+  { id: "forja-red-mapa", ruta: "/app", usuario: "dueno@demo.quvant.app", esperar: "#contenido h1", carpeta: "forja", antes: activarForja },
   {
     id: "forja-red-tarjeta",
     ruta: "/app",
-    usuario: "dueno@demo.yunque.app",
+    usuario: "dueno@demo.quvant.app",
     esperar: "#contenido h1",
     carpeta: "forja",
     soloEscritorio: true,
@@ -239,7 +239,7 @@ export const PANTALLAS: Pantalla[] = [
   {
     id: "forja-red-transferencia",
     ruta: "/app",
-    usuario: "dueno@demo.yunque.app",
+    usuario: "dueno@demo.quvant.app",
     esperar: "#contenido h1",
     carpeta: "forja",
     antes: async (p) => {
@@ -251,7 +251,7 @@ export const PANTALLAS: Pantalla[] = [
   {
     id: "forja-red-constelacion",
     ruta: "/app",
-    usuario: "dueno@demo.yunque.app",
+    usuario: "dueno@demo.quvant.app",
     esperar: "#contenido h1",
     carpeta: "forja",
     antes: async (p) => {
@@ -260,14 +260,14 @@ export const PANTALLAS: Pantalla[] = [
       await p.waitForTimeout(1600)
     },
   },
-  { id: "forja-activacion-golpe", ruta: "/app", usuario: "dueno@demo.yunque.app", esperar: "#contenido h1", carpeta: "forja", soloEscritorio: true, conMovimiento: true, antes: activacionEn(0.9) },
-  { id: "forja-activacion", ruta: "/app", usuario: "dueno@demo.yunque.app", esperar: "#contenido h1", carpeta: "forja", conMovimiento: true, antes: activacionEn(3.0) },
+  { id: "forja-activacion-golpe", ruta: "/app", usuario: "dueno@demo.quvant.app", esperar: "#contenido h1", carpeta: "forja", soloEscritorio: true, conMovimiento: true, antes: activacionEn(0.9) },
+  { id: "forja-activacion", ruta: "/app", usuario: "dueno@demo.quvant.app", esperar: "#contenido h1", carpeta: "forja", conMovimiento: true, antes: activacionEn(3.0) },
   // Con movimiento reducido: la composición quieta, sin 3D
-  { id: "forja-activacion-quieta", ruta: "/app", usuario: "dueno@demo.yunque.app", esperar: "#contenido h1", carpeta: "forja", soloEscritorio: true, antes: activacionEn(1) },
+  { id: "forja-activacion-quieta", ruta: "/app", usuario: "dueno@demo.quvant.app", esperar: "#contenido h1", carpeta: "forja", soloEscritorio: true, antes: activacionEn(1) },
   {
     id: "forja-transicion",
     ruta: "/app",
-    usuario: "dueno@demo.yunque.app",
+    usuario: "dueno@demo.quvant.app",
     esperar: "#contenido h1",
     carpeta: "forja",
     soloEscritorio: true,
@@ -286,11 +286,11 @@ export const PANTALLAS: Pantalla[] = [
       await p.waitForTimeout(500)
     },
   },
-  { id: "forja-taller", ruta: "/app", usuario: "dueno@demo.yunque.app", esperar: "#contenido h1", carpeta: "forja", antes: entrarAlTaller() },
+  { id: "forja-taller", ruta: "/app", usuario: "dueno@demo.quvant.app", esperar: "#contenido h1", carpeta: "forja", antes: entrarAlTaller() },
   {
     id: "forja-taller-zona",
     ruta: "/app",
-    usuario: "dueno@demo.yunque.app",
+    usuario: "dueno@demo.quvant.app",
     esperar: "#contenido h1",
     carpeta: "forja",
     antes: entrarAlTaller(async (p) => {
@@ -302,7 +302,7 @@ export const PANTALLAS: Pantalla[] = [
   {
     id: "forja-taller-rack",
     ruta: "/app",
-    usuario: "dueno@demo.yunque.app",
+    usuario: "dueno@demo.quvant.app",
     esperar: "#contenido h1",
     carpeta: "forja",
     soloEscritorio: true,
@@ -314,12 +314,12 @@ export const PANTALLAS: Pantalla[] = [
       await p.waitForTimeout(400)
     }),
   },
-  { id: "forja-2d-mapa", ruta: "/app", usuario: "dueno@demo.yunque.app", esperar: "#contenido h1", carpeta: "forja", vista: "2d", antes: activarForja },
-  { id: "forja-2d-taller", ruta: "/app", usuario: "dueno@demo.yunque.app", esperar: "#contenido h1", carpeta: "forja", vista: "2d", antes: entrarAlTaller() },
+  { id: "forja-2d-mapa", ruta: "/app", usuario: "dueno@demo.quvant.app", esperar: "#contenido h1", carpeta: "forja", vista: "2d", antes: activarForja },
+  { id: "forja-2d-taller", ruta: "/app", usuario: "dueno@demo.quvant.app", esperar: "#contenido h1", carpeta: "forja", vista: "2d", antes: entrarAlTaller() },
   {
     id: "forja-2d-rack",
     ruta: "/app",
-    usuario: "dueno@demo.yunque.app",
+    usuario: "dueno@demo.quvant.app",
     esperar: "#contenido h1",
     carpeta: "forja",
     vista: "2d",
@@ -345,7 +345,7 @@ export const PANTALLAS: Pantalla[] = [
   {
     id: "forja-pieza-producto",
     ruta: "/app",
-    usuario: "dueno@demo.yunque.app",
+    usuario: "dueno@demo.quvant.app",
     esperar: "#contenido h1",
     carpeta: "forja",
     antes: async (p) => {
@@ -360,7 +360,7 @@ export const PANTALLAS: Pantalla[] = [
   {
     id: "forja-pieza-maquina",
     ruta: "/app",
-    usuario: "dueno@demo.yunque.app",
+    usuario: "dueno@demo.quvant.app",
     esperar: "#contenido h1",
     carpeta: "forja",
     soloEscritorio: true,
@@ -375,7 +375,7 @@ export const PANTALLAS: Pantalla[] = [
   {
     id: "forja-repeticion",
     ruta: "/app",
-    usuario: "dueno@demo.yunque.app",
+    usuario: "dueno@demo.quvant.app",
     esperar: "#contenido h1",
     carpeta: "forja",
     antes: async (p) => {
@@ -391,7 +391,7 @@ export const PANTALLAS: Pantalla[] = [
   {
     id: "forja-sala",
     ruta: "/app",
-    usuario: "dueno@demo.yunque.app",
+    usuario: "dueno@demo.quvant.app",
     esperar: "#contenido h1",
     carpeta: "forja",
     soloEscritorio: true,

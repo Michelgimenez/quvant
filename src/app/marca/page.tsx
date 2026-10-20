@@ -1,110 +1,144 @@
 import type { Metadata } from "next"
-import { ConYunque } from "@/components/marca/con-yunque"
-import { Chispa, Isotipo, Logo, Wordmark } from "@/components/marca/marca"
+import Link from "next/link"
+import { ArrowRight } from "lucide-react"
+import { ConQuvant } from "@/components/marca/con-quvant"
+import { Firma, Isotipo } from "@/components/marca/quvant"
+import { Grilla } from "@/components/marca/grilla"
 import { EstadoFeatureBadge, Ficha, Sello, TextoConfig } from "@/components/base/sellos"
 import { Button } from "@/components/ui/button"
-import { SITIO } from "@/config/sitio"
 import { Kbd } from "@/components/ui/kbd"
+import { SITIO } from "@/config/sitio"
 import { DemoAnimaciones } from "./demo-animaciones"
 
 export const metadata: Metadata = {
-  title: "Sistema de marca",
-  description: "Identidad, tokens y componentes base de Yunque.",
+  title: "Marca",
+  description: "La identidad de Quvant aplicada a la web y a la app: logo, color, tipografía y componentes base.",
   robots: { index: false },
 }
 
 const PALETA = [
-  { token: "--hierro", hex: "#0E1116", uso: "Fondo principal" },
-  { token: "--superficie", hex: "#1A1F27", uso: "Superficies" },
-  { token: "--acero", hex: "#9AA3AE", uso: "Texto secundario" },
-  { token: "--niebla", hex: "#EEF1F4", uso: "Texto sobre oscuro" },
-  { token: "--temple", hex: "#3B6EF5", uso: "Acción, enlaces, foco" },
-  { token: "--chispa", hex: "#FFB224", uso: "Destacados y logros" },
-  { token: "--ok", hex: "#2FB36E", uso: "Correcto, sincronizado" },
-  { token: "--error", hex: "#E5484D", uso: "Errores, sin stock" },
+  { token: "--negro", hex: "#0D0D0F", uso: "Fondo principal", clase: "bg-negro border border-gris-3" },
+  { token: "--blanco", hex: "#ECECEE", uso: "Logo, títulos y textos sobre negro", clase: "bg-blanco" },
+  { token: "--acero", hex: "#9C9CA3", uso: "Secundarios y bajadas, sobre negro", clase: "bg-acero" },
+  { token: "--profundo", hex: "#26262B", uso: "Apoyo, bordes y grilla", clase: "bg-profundo" },
+]
+
+const ESTADOS = [
+  { token: "--ok", uso: "Correcto, sincronizado", clase: "bg-ok" },
+  { token: "--alerta", uso: "Pendiente, sin conexión", clase: "bg-alerta" },
+  { token: "--error", uso: "Error, sin stock", clase: "bg-error" },
+  { token: "--info", uso: "Aviso informativo", clase: "bg-info" },
 ]
 
 export default function PaginaMarca() {
   return (
-    <main className="grilla-tecnica min-h-dvh">
-      <div className="mx-auto max-w-6xl space-y-16 px-4 py-12 sm:px-8">
-        <header className="flex items-center justify-between border-b border-linea pb-4">
-          <Ficha>Yunque — identidad de producto</Ficha>
-          <Ficha>v1 · 2026</Ficha>
-        </header>
+    <main className="min-h-dvh bg-background">
+      <section className="dark relative overflow-hidden border-b border-gris-3 bg-negro text-blanco">
+        <Grilla />
+        <div className="relative mx-auto flex max-w-6xl flex-col gap-8 px-4 py-20 sm:px-8">
+          <Firma alto={56} version="principal" bajada />
+          <div className="flex flex-wrap items-center gap-3">
+            <Button asChild>
+              <Link href="/marca/sistema">
+                La lámina del sistema aplicado <ArrowRight />
+              </Link>
+            </Button>
+            <Button asChild variant="outline">
+              <Link href="/marca/sistema/titulares">Los titulares</Link>
+            </Button>
+          </div>
+        </div>
+      </section>
 
-        <section className="grid gap-4 md:grid-cols-[2fr_1fr]">
-          <div className="flex min-h-72 flex-col items-center justify-center gap-8 rounded-xl bg-superficie p-10 text-niebla">
-            <Logo className="h-16 sm:h-20" tono="negativo" />
-            <p className="font-display text-2xl font-semibold">Firme, aunque todo se mueva.</p>
-          </div>
-          <div className="grid gap-4">
-            <div className="flex items-center justify-center rounded-xl bg-niebla p-8 text-hierro">
-              <Logo className="h-10" tono="positivo" />
+      <div className="mx-auto max-w-6xl space-y-16 px-4 py-14 sm:px-8">
+        <section className="space-y-4">
+          <h2 className="t-etiqueta text-muted-foreground">La firma · manual, págs. 5 a 7</h2>
+          <div className="grid gap-3 sm:grid-cols-3">
+            <div className="dark flex h-40 items-center justify-center border border-gris-3 bg-negro">
+              <Firma alto={40} version="principal" />
             </div>
-            <div className="flex items-center gap-6 rounded-xl bg-superficie p-6 text-niebla">
-              <Isotipo className="h-12" tono="negativo" />
-              <Wordmark className="h-8" />
+            <div className="flex h-40 items-center justify-center border border-gris-11 bg-blanco">
+              <Firma alto={40} version="negativa" />
+            </div>
+            <div className="flex h-40 items-center justify-center gap-6 border border-border bg-card">
+              <Isotipo lado={56} />
+              <Isotipo lado={32} />
+              <Isotipo lado={16} />
             </div>
           </div>
+          <p className="t-texto-sm text-muted-foreground">
+            Principal sobre negro, negativa sobre claro. Nunca rotar, estirar ni pegar el punto a la cola. El logotipo QUVANT es provisorio hasta tener el archivo oficial.
+          </p>
         </section>
 
         <section className="space-y-4">
-          <h2 className="text-2xl font-extrabold">Paleta</h2>
-          <div className="grid grid-cols-2 gap-3 sm:grid-cols-4 lg:grid-cols-8">
+          <h2 className="t-etiqueta text-muted-foreground">Funciona con Quvant · para las webs de los clientes</h2>
+          <div className="grid gap-3 sm:grid-cols-2">
+            <div className="flex flex-wrap items-center gap-3 border border-gris-11 bg-blanco p-6">
+              <ConQuvant tema="claro" tamano="sm" />
+              <ConQuvant tema="claro" />
+              <ConQuvant tema="claro" tamano="lg" />
+            </div>
+            <div className="dark flex flex-wrap items-center gap-3 border border-gris-3 bg-negro p-6">
+              <ConQuvant tema="oscuro" tamano="sm" />
+              <ConQuvant tema="oscuro" />
+              <ConQuvant tema="oscuro" tamano="lg" />
+            </div>
+          </div>
+          <p className="t-dato text-muted-foreground">Versiones estáticas: /marca/con-quvant-claro.svg y /marca/con-quvant-oscuro.svg</p>
+        </section>
+
+        <section className="space-y-4">
+          <h2 className="t-etiqueta text-muted-foreground">Color · manual, pág. 8</h2>
+          <div className="grid gap-3 sm:grid-cols-4">
             {PALETA.map((c) => (
               <div key={c.token} className="space-y-2">
-                <div className="h-20 rounded-lg border border-linea" style={{ background: c.hex }} />
-                <div className="text-sm font-semibold">{c.token}</div>
-                <Ficha as="div">{c.hex}</Ficha>
-                <div className="text-xs text-muted-foreground">{c.uso}</div>
+                <div className={`h-24 ${c.clase}`} />
+                <p className="t-dato">
+                  {c.token} · {c.hex}
+                </p>
+                <p className="t-texto-sm text-muted-foreground">{c.uso}</p>
               </div>
+            ))}
+          </div>
+          <div className="grid gap-3 sm:grid-cols-4">
+            {ESTADOS.map((e) => (
+              <p key={e.token} className="t-dato flex items-center gap-2">
+                <span className={`size-2 ${e.clase}`} aria-hidden />
+                {e.token} · <span className="text-muted-foreground">{e.uso}</span>
+              </p>
             ))}
           </div>
         </section>
 
-        <section className="space-y-3">
-          <h2 className="text-2xl font-extrabold">Tipografía</h2>
-          <p className="font-display text-5xl font-extrabold tracking-tight sm:text-6xl">Tu negocio, en un solo lugar.</p>
-          <p className="max-w-2xl text-muted-foreground">
-            Titulares en Inter Display (eje óptico 32). Texto en Inter. Datos, códigos y montos en JetBrains Mono.
-          </p>
-          <p className="num text-lg">VENTA #10482 · MOSTRADOR 2 · $ 1.284.500</p>
+        <section className="space-y-4">
+          <h2 className="t-etiqueta text-muted-foreground">Tipografía · Michroma e IBM Plex Mono</h2>
+          <div className="space-y-3 border border-border bg-card p-6">
+            <p className="t-marca">Forja</p>
+            <p className="t-hero">{SITIO.titular}</p>
+            <p className="t-titulo">Cerrar la caja</p>
+            <p className="t-texto max-w-2xl text-muted-foreground">{SITIO.descripcion}</p>
+            <p className="t-numero-lg">$ 1.284.350</p>
+          </div>
         </section>
 
         <section className="space-y-4">
-          <h2 className="text-2xl font-extrabold">Componentes base</h2>
+          <h2 className="t-etiqueta text-muted-foreground">Componentes base</h2>
           <div className="flex flex-wrap items-center gap-3">
-            <Button size="lg">Nueva venta</Button>
-            <Button size="lg" variant="outline">
-              Ver stock <Kbd>⌘K</Kbd>
-            </Button>
+            <Button>Cerrar caja</Button>
+            <Button variant="outline">Ver movimientos</Button>
+            <Button variant="ghost">Cancelar</Button>
             <Sello />
             <Sello texto="PROPUESTA" />
             <EstadoFeatureBadge estado="disponible" />
             <EstadoFeatureBadge estado="demo" />
             <EstadoFeatureBadge estado="próximamente" />
-            <Chispa className="size-5" titulo="Chispa" />
+            <Ficha>Venta #10482 · Mostrador 2</Ficha>
+            <Kbd>⌘K</Kbd>
           </div>
-          <p>
-            <TextoConfig texto={`Contacto: ${SITIO.contacto.email}`} />
+          <p className="t-texto-sm text-muted-foreground">
+            Donde falta un dato real: <TextoConfig texto="[COMPLETAR: dato con fuente]" />
           </p>
-        </section>
-
-        <section className="space-y-4">
-          <h2 className="text-2xl font-extrabold">Sello “funciona con yunque”</h2>
-          <div className="grid gap-4 sm:grid-cols-2">
-            <div className="flex flex-wrap items-center gap-3 rounded-xl bg-white p-8">
-              <ConYunque tema="claro" tamano="sm" />
-              <ConYunque tema="claro" />
-              <ConYunque tema="claro" tamano="lg" />
-            </div>
-            <div className="flex flex-wrap items-center gap-3 rounded-xl bg-[#15171a] p-8">
-              <ConYunque tema="oscuro" tamano="sm" />
-              <ConYunque tema="oscuro" />
-              <ConYunque tema="oscuro" tamano="lg" />
-            </div>
-          </div>
         </section>
 
         <DemoAnimaciones />

@@ -64,8 +64,8 @@ export type OpResumen = { id: string; tipo: string; venta: string | null; ok: bo
 /** Lee de IndexedDB la cola local, lo confirmado en el dispositivo y el log del servidor demo. */
 export async function leerBaseLocal(page: Page) {
   return page.evaluate(async () => {
-    const nombre = (await indexedDB.databases()).map((d) => d.name ?? "").find((n) => n.startsWith("yunque-"))
-    if (!nombre) throw new Error("No hay base local de Yunque")
+    const nombre = (await indexedDB.databases()).map((d) => d.name ?? "").find((n) => n.startsWith("quvant-"))
+    if (!nombre) throw new Error("No hay base local de Quvant")
     const db = await new Promise<IDBDatabase>((ok, mal) => {
       const r = indexedDB.open(nombre)
       r.onsuccess = () => ok(r.result)

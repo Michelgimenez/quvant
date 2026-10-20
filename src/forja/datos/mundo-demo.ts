@@ -8,7 +8,7 @@ import { aplicarOperacion } from "@/sync/reductores"
  * Mundo de una demo pública de Forja: un snapshot del seed en memoria, sin
  * base ni sesión. El reloj de la demo arranca en el momento del snapshot y
  * avanza en tiempo real; el simulador propone eventos y los aplica con el
- * mismo reductor que Yunque (las mismas reglas que una operación a mano).
+ * mismo reductor que Quvant (las mismas reglas que una operación a mano).
  */
 export type SnapshotForja = { ahora: string; estado: EstadoEmpresa }
 

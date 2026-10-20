@@ -1,29 +1,12 @@
 /**
- * Datos públicos de Yunque. Donde todavía no hay dato real va un [COMPLETAR]
+ * Datos públicos de Quvant. Donde todavía no hay dato real va un [COMPLETAR]
  * visible: la regla de honestidad del proyecto prohíbe inventarlos.
  */
-export const SITIO = {
-  nombre: "Yunque",
-  url: process.env.NEXT_PUBLIC_SITIO_URL ?? "http://localhost:3000",
-  tagline: "Firme, aunque todo se mueva.",
-  descripcion:
-    "El sistema de gestión para ferreterías industriales y distribuidores que no se cae, no se traba y se entiende.",
-  estado: "Demo funcional · primer piloto en negociación",
-  contacto: {
-    email: "[COMPLETAR: email de contacto]",
-    whatsapp: "[COMPLETAR: WhatsApp comercial]",
-    ciudad: "Buenos Aires, Argentina",
-  },
-  redes: {
-    linkedin: "[COMPLETAR: URL de LinkedIn]",
-  },
-} as const
-
 /**
- * Quvant · las 3 propuestas de titular para el hero (tanda 1). Michel elige una y en la tanda 2
- * queda como el titular del sitio; esta lista se borra entonces. Se ven compuestas en /marca/sistema/titulares.
+ * Las 3 propuestas de titular para el hero (tanda 1). La elegida se marca en SITIO.titularElegido;
+ * se ven compuestas en /marca/sistema/titulares.
  */
-export const TITULARES_PROPUESTOS = [
+export const TITULARES_ALTERNATIVOS = [
   {
     id: "A",
     titular: "Del kiosco a la empresa.",
@@ -47,8 +30,39 @@ export const TITULARES_PROPUESTOS = [
   },
 ] as const
 
-/** Rubros del formulario "Pedir una demo". */
-export const RUBROS = ["Ferretería industrial", "Distribuidora de maquinaria", "Corralón", "Casa de repuestos", "Ferretería", "Otro"] as const
+/** El titular elegido para el hero: "A", "B" o "C". */
+const TITULAR_ELEGIDO: "A" | "B" | "C" = "A"
+
+export const SITIO = {
+  nombre: "Quvant",
+  url: process.env.NEXT_PUBLIC_SITIO_URL ?? "http://localhost:3000",
+  /** La bajada de la marca (manual, pág. 2): mayúscula al inicio y punto final, nunca abreviada ni traducida. */
+  tagline: "Software a la vanguardia de cada nicho.",
+  /**
+   * El titular del sitio (tanda 2). Michel no eligió todavía: queda la propuesta A por defecto y las otras dos
+   * en TITULARES_ALTERNATIVOS. Para cambiarlo, cambiá TITULAR_ELEGIDO.
+   */
+  titularElegido: TITULAR_ELEGIDO,
+  titular: TITULARES_ALTERNATIVOS.find((t) => t.id === TITULAR_ELEGIDO)!.titular as string,
+  descripcion:
+    "El sistema de gestión que se adapta a cada negocio: ventas, caja, stock, precios, compras, clientes y sucursales en un solo lugar. Del kiosco de barrio a la empresa con decenas de sucursales.",
+  estado: "Demo funcional · primer piloto en negociación",
+  contacto: {
+    email: "[COMPLETAR: email de contacto]",
+    whatsapp: "[COMPLETAR: WhatsApp comercial]",
+    ciudad: "Buenos Aires, Argentina",
+  },
+  redes: {
+    linkedin: "[COMPLETAR: URL de LinkedIn]",
+  },
+}
+
+
+/** Rubros del formulario "Pedir una demo": del kiosco a la empresa. */
+export const RUBROS = ["Kiosco o almacén", "Comercio", "Ferretería", "Distribuidora o mayorista", "Empresa con sucursales", "Otro"] as const
+
+/** Tamaño del negocio, para el formulario. */
+export const TAMANOS = ["1 caja", "2 a 5 cajas", "Varias sucursales", "Más de 10 sucursales"] as const
 
 export const ES_COMPLETAR = /\[COMPLETAR[^\]]*\]/
 

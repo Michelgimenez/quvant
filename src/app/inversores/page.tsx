@@ -13,7 +13,7 @@ export const metadata: Metadata = {
 
 export default function PaginaInversores() {
   return (
-    <Suspense fallback={<main className="min-h-dvh bg-hierro" />}>
+    <Suspense fallback={<main className="min-h-dvh bg-negro" />}>
       <Contenido />
     </Suspense>
   )

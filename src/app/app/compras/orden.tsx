@@ -40,11 +40,11 @@ export function DetalleCompra({ id, onCerrar }: { id: Id | null; onCerrar: () =>
           </SheetDescription>
         </SheetHeader>
         <div className="space-y-4 p-4">
-          <ul className="divide-y divide-linea rounded-lg border border-linea text-sm">
+          <ul className="divide-y divide-linea rounded-lg border border-linea t-texto-sm">
             {o.items.map((it) => (
               <li key={it.productoId} className="grid grid-cols-[minmax(0,1fr)_auto_auto] items-center gap-3 px-3 py-2">
                 <span className="truncate">{e.productos[it.productoId]?.nombre}</span>
-                <span className="num text-xs text-muted-foreground">
+                <span className="num t-texto-sm text-muted-foreground">
                   {o.estado !== "borrador" && `${formatoCantidad(it.recibido)}/`}
                   {formatoCantidad(it.cantidad)} × {formatoPesos(it.costoUnitario, { sinDecimales: true })}
                 </span>
@@ -52,11 +52,11 @@ export function DetalleCompra({ id, onCerrar }: { id: Id | null; onCerrar: () =>
               </li>
             ))}
           </ul>
-          <div className="flex justify-between text-sm">
+          <div className="flex justify-between t-texto-sm">
             <span className="text-muted-foreground">Total (sin IVA)</span>
             <span className="text-xl font-semibold">{formatoPesos(o.total)}</span>
           </div>
-          {o.notas && <p className="rounded-lg bg-superficie-2 p-3 text-sm text-muted-foreground">{o.notas}</p>}
+          {o.notas && <p className="rounded-lg bg-superficie-2 p-3 t-texto-sm text-muted-foreground">{o.notas}</p>}
           <div className="flex flex-wrap gap-2">
             {o.estado === "borrador" && puede("compras.editar") && (
               <Button
@@ -95,9 +95,9 @@ function DialogoRecepcion({ orden, onCerrar }: { orden: OrdenCompra; onCerrar: (
         </DialogHeader>
         <ul className="max-h-80 space-y-2 overflow-auto">
           {orden.items.map((i) => (
-            <li key={i.productoId} className="flex items-center gap-3 text-sm">
+            <li key={i.productoId} className="flex items-center gap-3 t-texto-sm">
               <span className="min-w-0 flex-1 truncate">{e.productos[i.productoId]?.nombre}</span>
-              <span className="num text-xs text-muted-foreground">pedido {formatoCantidad(i.cantidad - i.recibido)}</span>
+              <span className="num t-texto-sm text-muted-foreground">pedido {formatoCantidad(i.cantidad - i.recibido)}</span>
               <Input value={cant[i.productoId]} onChange={(ev) => setCant({ ...cant, [i.productoId]: ev.target.value })} inputMode="decimal" className="num h-8 w-20 text-right" aria-label={`Recibido de ${e.productos[i.productoId]?.nombre}`} />
             </li>
           ))}
@@ -155,16 +155,16 @@ export function EditorCompra({ onCerrar, onCreada }: { onCerrar: () => void; onC
         <BuscadorProductos sucursalId={sucursalId} onElegir={(p) => setItems((xs) => (xs.some((x) => x.productoId === p.id) ? xs : [...xs, { productoId: p.id, cantidad: 1, costoUnitario: p.costo }]))} placeholder="Agregar producto…" />
         <ul className="max-h-64 divide-y divide-linea overflow-auto rounded-lg border border-linea">
           {items.map((it) => (
-            <li key={it.productoId} className="flex items-center gap-2 px-3 py-2 text-sm">
+            <li key={it.productoId} className="flex items-center gap-2 px-3 py-2 t-texto-sm">
               <span className="min-w-0 flex-1 truncate">{e.productos[it.productoId].nombre}</span>
               <Input type="number" min={1} value={it.cantidad} onChange={(ev) => setItems((xs) => xs.map((x) => (x.productoId === it.productoId ? { ...x, cantidad: Number(ev.target.value) } : x)))} className="num h-8 w-20" aria-label="Cantidad" />
-              <span className="num w-24 text-right text-xs text-muted-foreground">{formatoPesos(it.costoUnitario, { sinDecimales: true })}</span>
+              <span className="num w-24 text-right t-texto-sm text-muted-foreground">{formatoPesos(it.costoUnitario, { sinDecimales: true })}</span>
               <Button size="icon-sm" variant="ghost" onClick={() => setItems((xs) => xs.filter((x) => x.productoId !== it.productoId))} aria-label="Quitar">
                 <Trash2 />
               </Button>
             </li>
           ))}
-          {items.length === 0 && <li className="px-3 py-6 text-center text-sm text-muted-foreground">Sin productos todavía.</li>}
+          {items.length === 0 && <li className="px-3 py-6 text-center t-texto-sm text-muted-foreground">Sin productos todavía.</li>}
         </ul>
         <DialogFooter>
           <Button variant="outline" onClick={onCerrar}>

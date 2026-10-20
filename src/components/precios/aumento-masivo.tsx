@@ -83,7 +83,7 @@ export function AumentoMasivo({
       ancho: "70px",
       alinear: "der",
       orden: (c) => c.despues / c.antes,
-      celda: (c) => <span className="num text-xs text-ok-texto">+{formatoPorcentaje(((c.despues - c.antes) / c.antes) * 100, 1)}</span>,
+      celda: (c) => <span className="num t-texto-sm text-ok">+{formatoPorcentaje(((c.despues - c.antes) / c.antes) * 100, 1)}</span>,
     },
     ...(verCostos
       ? [
@@ -94,7 +94,7 @@ export function AumentoMasivo({
             alinear: "der" as const,
             orden: (c: CambioPrecio) => c.margenDespues ?? 0,
             celda: (c: CambioPrecio) => (
-              <span className={cn("num text-xs", c.margenDespues !== null && c.margenDespues < UMBRAL_MARGEN_BAJO ? "text-error-texto" : "text-muted-foreground")}>
+              <span className={cn("num t-texto-sm", c.margenDespues !== null && c.margenDespues < UMBRAL_MARGEN_BAJO ? "text-error" : "text-muted-foreground")}>
                 {c.margenAntes === null ? "—" : formatoPorcentaje(c.margenAntes, 0)} → {c.margenDespues === null ? "—" : formatoPorcentaje(c.margenDespues, 0)}
               </span>
             ),
@@ -107,7 +107,7 @@ export function AumentoMasivo({
     <div className={cn("grid gap-4", !compacto && "lg:grid-cols-[340px_minmax(0,1fr)]")}>
       <div className="space-y-4 rounded-xl border border-linea bg-card p-4">
         <div className="space-y-2">
-          <p className="text-sm font-semibold">¿Qué productos?</p>
+          <p className="t-texto-sm font-semibold">¿Qué productos?</p>
           <SelectorMultiple etiqueta="Marcas" opciones={[...e.marcas].sort((a, b) => a.nombre.localeCompare(b.nombre))} valor={marcaIds} onCambio={setMarcas} />
           {!compacto && (
             <>
@@ -117,7 +117,7 @@ export function AumentoMasivo({
           )}
         </div>
         <div className="space-y-2">
-          <Label htmlFor="aumento-pct" className="text-sm font-semibold">
+          <Label htmlFor="aumento-pct" className="t-texto-sm font-semibold">
             ¿Cuánto?
           </Label>
           <div className="flex items-center gap-2">
@@ -127,7 +127,7 @@ export function AumentoMasivo({
             </div>
             <div className="flex flex-wrap gap-1">
               {[5, 8, 10, 15].map((n) => (
-                <button key={n} type="button" onClick={() => setPorcentaje(String(n))} className={cn("rounded-md border px-2 py-1 text-xs", pct === n ? "border-primary bg-primary/15" : "border-linea hover:border-acero/50")}>
+                <button key={n} type="button" onClick={() => setPorcentaje(String(n))} className={cn("rounded-md border px-2 py-1 t-texto-sm", pct === n ? "border-primary bg-primary/15" : "border-linea hover:border-acero/50")}>
                   {n} %
                 </button>
               ))}
@@ -137,16 +137,16 @@ export function AumentoMasivo({
         {!compacto && (
           <>
             <fieldset className="space-y-1.5">
-              <legend className="mb-1 text-sm font-semibold">¿En qué listas?</legend>
+              <legend className="mb-1 t-texto-sm font-semibold">¿En qué listas?</legend>
               {e.listas.map((l) => (
-                <label key={l.id} className="flex items-center gap-2 text-sm">
+                <label key={l.id} className="flex items-center gap-2 t-texto-sm">
                   <Checkbox checked={listaIds.includes(l.id)} onCheckedChange={(c) => setListas((xs) => (c ? [...xs, l.id] : xs.filter((x) => x !== l.id)))} />
                   {l.nombre}
                 </label>
               ))}
             </fieldset>
             <div className="space-y-1.5">
-              <Label className="text-sm font-semibold">Redondeo</Label>
+              <Label className="t-texto-sm font-semibold">Redondeo</Label>
               <Select value={redondeo} onValueChange={(v) => setRedondeo(v as Redondeo)}>
                 <SelectTrigger className="w-full" aria-label="Redondeo">
                   <SelectValue />
@@ -174,16 +174,16 @@ export function AumentoMasivo({
         {vista && vista.cambios.length > 0 ? (
           <TablaRapida etiqueta="Vista previa de precios" filas={vista.cambios} columnas={columnas} clave={(c) => `${c.listaId}:${c.productoId}`} alto={compacto ? 300 : 440} altoFila={50}
             tarjeta={(c) => (
-              <div className="flex w-full items-center gap-2 text-sm">
+              <div className="flex w-full items-center gap-2 t-texto-sm">
                 <span className="min-w-0 flex-1 truncate">{e.productos[c.productoId].nombre}</span>
-                <span className="num text-xs text-muted-foreground">{formatoPesos(c.antes, { sinDecimales: true })}</span>
+                <span className="num t-texto-sm text-muted-foreground">{formatoPesos(c.antes, { sinDecimales: true })}</span>
                 <ArrowRight className="size-3 text-muted-foreground" />
                 <span className="num font-semibold">{formatoPesos(c.despues, { sinDecimales: true })}</span>
               </div>
             )}
           />
         ) : (
-          <div className="rounded-xl border border-dashed border-linea p-8 text-center text-sm text-muted-foreground">Elegí productos y un porcentaje para ver la vista previa.</div>
+          <div className="rounded-xl border border-dashed border-linea p-8 text-center t-texto-sm text-muted-foreground">Elegí productos y un porcentaje para ver la vista previa.</div>
         )}
         {onAplicar && vista && vista.cambios.length > 0 && (
           <div className="flex flex-wrap items-center gap-2 rounded-xl border border-linea bg-card p-3">
@@ -208,10 +208,10 @@ export function AumentoMasivo({
 
 function Resumen({ etiqueta, valor, pie, alerta }: { etiqueta: string; valor: string; pie?: string; alerta?: boolean }) {
   return (
-    <div className={cn("rounded-xl border bg-card p-3", alerta ? "border-chispa/50" : "border-linea")}>
-      <p className="text-xs text-muted-foreground">{etiqueta}</p>
+    <div className={cn("rounded-xl border bg-card p-3", alerta ? "border-alerta/50" : "border-linea")}>
+      <p className="t-texto-sm text-muted-foreground">{etiqueta}</p>
       <p className="mt-0.5 text-xl font-semibold tracking-tight">{valor}</p>
-      {pie && <p className="text-[11px] text-muted-foreground">{pie}</p>}
+      {pie && <p className="t-texto-sm text-muted-foreground">{pie}</p>}
     </div>
   )
 }

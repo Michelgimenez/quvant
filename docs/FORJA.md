@@ -1,6 +1,6 @@
-# Forja — la extensión visual de Yunque
+# Forja — la extensión visual de Quvant
 
-Forja convierte los datos de Yunque en un universo que se puede recorrer: la red de sucursales en un mapa, cada sucursal por dentro y la historia de una pieza. Es una **extensión**: se activa por empresa en `/app/extensiones` y lee lo mismo que la app, con los mismos permisos.
+Forja convierte los datos de Quvant en un universo que se puede recorrer: la red de sucursales en un mapa, cada sucursal por dentro y la historia de una pieza. Es una **extensión**: se activa por empresa en `/app/extensiones` y lee lo mismo que la app, con los mismos permisos.
 
 Estado: **demo**. Funciona completa con la empresa de demostración (en la app y en `/forja`) y con la propuesta para un prospecto (`/demo/ferremix/forja`). Las lecturas y el tiempo real en Supabase están escritos y probados con RLS, pero la app todavía corre en modo demo (ver "Qué falta").
 
@@ -25,7 +25,7 @@ Las transiciones: el mapa vuela al nodo, el brillo del nodo cubre la escena y se
 src/forja/
   dominio/            Puro (sin React ni IO), con tests en tests/unit/forja.test.ts
     calor.ts          Escala de calor (OKLab) y calor relativo de una sucursal
-    modelo.ts         Red, taller y eventos del día desde el estado de Yunque (a cualquier hora)
+    modelo.ts         Red, taller y eventos del día desde el estado de Quvant (a cualquier hora)
     plano.ts          Plano de planta de una sucursal (lo usan el 3D y el 2D)
     pieza.ts          Recorrido de un SKU e historia de una máquina
     repeticion.ts     Tramo del día, velocidades, titulares de la sala de control
@@ -44,7 +44,7 @@ src/forja/
     linea-tiempo.tsx, sala-control.tsx, modo-2d.ts, store.ts (zustand)
 ```
 
-**Una sola interfaz, varias fuentes.** `FuenteForja` trae la red, la red a otra hora (repetición), los eventos del día, el taller de una sucursal, la pieza, los sellos y los enlaces. La app la arma desde la réplica local de Yunque (`universo-app.tsx`); las demos públicas, desde un snapshot (`demo-publica.tsx`). La escena no sabe de dónde vienen los datos.
+**Una sola interfaz, varias fuentes.** `FuenteForja` trae la red, la red a otra hora (repetición), los eventos del día, el taller de una sucursal, la pieza, los sellos y los enlaces. La app la arma desde la réplica local de Quvant (`universo-app.tsx`); las demos públicas, desde un snapshot (`demo-publica.tsx`). La escena no sabe de dónde vienen los datos.
 
 **Los mismos datos en 3D y en 2D.** El modelo (`modelo.ts`), el plano (`plano.ts`) y la pieza (`pieza.ts`) son puros; la versión 3D y la 2D los dibujan igual y comparten nodos, tarjetas, paneles y barra de zonas.
 
@@ -60,7 +60,7 @@ src/forja/
 
 ## Demos públicas
 
-- `/forja` (empresa de demostración, sello DEMO) y `/demo/<prospecto>/forja` (sello PROPUESTA): sin sesión ni base. Un **snapshot del seed** (`npm run snapshot-forja` → `src/demo/*.json`) en memoria, un **reloj de demo** que arranca en el momento del snapshot y el **simulador en el navegador** aplicando operaciones con el reductor de Yunque.
+- `/forja` (empresa de demostración, sello DEMO) y `/demo/<prospecto>/forja` (sello PROPUESTA): sin sesión ni base. Un **snapshot del seed** (`npm run snapshot-forja` → `src/demo/*.json`) en memoria, un **reloj de demo** que arranca en el momento del snapshot y el **simulador en el navegador** aplicando operaciones con el reductor de Quvant.
 - Los snapshots de prospectos no guardan nombres: los pone su configuración (`src/config/clientes/<prospecto>.ts` → `forja`), que también define sus sucursales (reales o DEMO), lo que falta (`[COMPLETAR]`) y desde qué orígenes se puede embeber.
 - **Embebible solo esa ruta**: `frame-ancestors 'self'` + los orígenes de la configuración, sin `X-Frame-Options`. El resto del sitio, `frame-ancestors 'none'`.
 - **Sumar un prospecto**: agregar `forja` a su configuración, correr `npm run snapshot-forja` y `npm run grabar-forja -- <slug>`.

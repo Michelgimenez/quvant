@@ -10,7 +10,7 @@ import type { OpConfirmada, Operacion, Resultado } from "./tipos"
  *  - meta: cursor de sincronización, id del dispositivo, sesión en caché, contadores
  *  - servidor_log / servidor_rechazadas: SOLO en modo demo (servidor emulado)
  */
-class BaseYunque extends Dexie {
+class BaseQuvant extends Dexie {
   pendientes!: Table<Operacion & { orden: number }, Id>
   confirmadas!: Table<OpConfirmada, number>
   meta!: Table<{ clave: string; valor: unknown }, string>
@@ -29,19 +29,19 @@ class BaseYunque extends Dexie {
   }
 }
 
-const bases = new Map<string, BaseYunque>()
+const bases = new Map<string, BaseQuvant>()
 export function baseLocal(orgId: Id) {
-  const nombre = `yunque-${orgId}`
+  const nombre = `quvant-${orgId}`
   let b = bases.get(nombre)
   if (!b) {
-    b = new BaseYunque(nombre)
+    b = new BaseQuvant(nombre)
     bases.set(nombre, b)
   }
   return b
 }
 
 export class AlmacenIndexedDB implements AlmacenLocal {
-  constructor(private db: BaseYunque) {}
+  constructor(private db: BaseQuvant) {}
 
   async pendientes() {
     const filas = await this.db.pendientes.orderBy("orden").toArray()
@@ -77,7 +77,7 @@ export class AlmacenIndexedDB implements AlmacenLocal {
 }
 
 export class AlmacenServidorIndexedDB implements AlmacenServidor {
-  constructor(private db: BaseYunque) {}
+  constructor(private db: BaseQuvant) {}
 
   async log(desdeSeq: number) {
     return this.db.servidor_log.where("seq").above(desdeSeq).sortBy("seq")

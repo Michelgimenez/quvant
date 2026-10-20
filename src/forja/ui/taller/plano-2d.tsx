@@ -250,7 +250,7 @@ function Banco({ b, elegido, onElegir }: { b: PlanoTaller["bancos"][number]; ele
 function TooltipRack2D({ r, x, y }: { r: RackPlano; x: number; y: number }) {
   const productos = [...r.rack.productos].sort((a, b) => a.estante - b.estante)
   return (
-    <div className="pointer-events-none absolute z-10 w-64 rounded-lg border border-white/10 bg-hierro/95 p-3 text-niebla shadow-2xl" style={{ left: x + 14, top: y + 14 }} data-testid="tooltip-rack" role="tooltip">
+    <div className="pointer-events-none absolute z-10 w-64 rounded-lg border border-white/10 bg-negro/95 p-3 text-blanco shadow-2xl" style={{ left: x + 14, top: y + 14 }} data-testid="tooltip-rack" role="tooltip">
       <p className="flex items-baseline justify-between gap-2">
         <span className="font-heading text-sm font-bold">Rack {r.rack.id}</span>
         <span className="truncate font-mono text-[10px] text-acero">{r.rack.categoriaNombre}</span>
@@ -260,7 +260,7 @@ function TooltipRack2D({ r, x, y }: { r: RackPlano; x: number; y: number }) {
           <li key={p.productoId} className="flex items-baseline gap-2 text-[11px]">
             <span className="w-6 shrink-0 font-mono text-[10px] text-acero">E{p.estante}</span>
             <span className="min-w-0 flex-1 truncate">{p.nombre}</span>
-            <span className={cn("font-mono", p.cantidad <= 0 ? "text-brasa" : p.minimo > 0 && p.cantidad <= p.minimo ? "text-chispa" : "text-niebla")}>{p.cantidad <= 0 ? "sin stock" : formatoCantidad(p.cantidad)}</span>
+            <span className={cn("font-mono", p.cantidad <= 0 ? "text-brasa" : p.minimo > 0 && p.cantidad <= p.minimo ? "text-alerta" : "text-blanco")}>{p.cantidad <= 0 ? "sin stock" : formatoCantidad(p.cantidad)}</span>
           </li>
         ))}
       </ul>

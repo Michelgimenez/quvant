@@ -19,9 +19,9 @@ import { cn } from "@/lib/utils"
 const NOMBRE: Record<EstadoEntrega, string> = { pendiente: "Pendiente", en_camino: "En camino", entregada: "Entregada", fallida: "No se pudo" }
 const TONO: Record<EstadoEntrega, string> = {
   pendiente: "bg-muted text-muted-foreground",
-  en_camino: "bg-temple/15 text-enlace",
-  entregada: "bg-ok/15 text-ok-texto",
-  fallida: "bg-error/15 text-error-texto",
+  en_camino: "bg-foreground/15 text-foreground",
+  entregada: "bg-ok/15 text-ok",
+  fallida: "bg-error/15 text-error",
 }
 
 export function Entregas() {
@@ -93,15 +93,15 @@ function ListaRuta({ entregas, ordenable, soloLectura, etiquetaFecha }: { entreg
         return (
           <li key={x.id} className="rounded-xl border border-linea bg-card p-4" data-testid="entrega">
             <div className="flex items-start gap-3">
-              {!soloLectura && <span className="num flex size-8 shrink-0 items-center justify-center rounded-full bg-muted text-sm font-semibold">{i + 1}</span>}
+              {!soloLectura && <span className="num flex size-8 shrink-0 items-center justify-center rounded-full bg-muted t-texto-sm font-semibold">{i + 1}</span>}
               <div className="min-w-0 flex-1 space-y-1">
                 <div className="flex flex-wrap items-center gap-2">
                   <p className="font-semibold">{x.destinatario}</p>
-                  <span className={cn("rounded-full px-2 py-0.5 text-[11px] font-medium", TONO[x.estado])}>{NOMBRE[x.estado]}</span>
+                  <span className={cn("rounded-full px-2 py-0.5 t-texto-sm font-medium", TONO[x.estado])}>{NOMBRE[x.estado]}</span>
                   {etiquetaFecha && <Ficha className="capitalize">{etiquetaFecha(x)}</Ficha>}
                   <Ficha>{x.franja}</Ficha>
                 </div>
-                <p className="flex items-center gap-1.5 text-sm">
+                <p className="flex items-center gap-1.5 t-texto-sm">
                   <MapPin className="size-3.5 shrink-0 text-muted-foreground" /> {x.direccion}
                   <button
                     type="button"
@@ -120,17 +120,17 @@ function ListaRuta({ entregas, ordenable, soloLectura, etiquetaFecha }: { entreg
                   </button>
                 </p>
                 {x.telefono && (
-                  <p className="flex items-center gap-1.5 text-sm text-muted-foreground">
+                  <p className="flex items-center gap-1.5 t-texto-sm text-muted-foreground">
                     <Phone className="size-3.5" /> <span className="num">{x.telefono}</span>
                   </p>
                 )}
                 {venta && (
-                  <p className="text-xs text-muted-foreground">
+                  <p className="t-texto-sm text-muted-foreground">
                     Venta {venta.numero ? `#${venta.numero}` : venta.numeroLocal} · {venta.items.map((it) => `${formatoCantidad(it.cantidad)} × ${it.descripcion}`).join(", ")} · {formatoPesos(venta.total, { sinDecimales: true })}
                   </p>
                 )}
-                {x.notas && <p className="text-xs text-chispa-texto">{x.notas}</p>}
-                {x.chofer && <p className="text-xs text-muted-foreground">{x.chofer}</p>}
+                {x.notas && <p className="t-texto-sm text-alerta">{x.notas}</p>}
+                {x.chofer && <p className="t-texto-sm text-muted-foreground">{x.chofer}</p>}
               </div>
               {ordenable && puede("entregas.editar") && (
                 <div className="flex flex-col gap-1">
@@ -177,7 +177,7 @@ function DialogoFallida({ onCerrar, onConfirmar }: { onCerrar: () => void; onCon
         <Input value={nota} onChange={(ev) => setNota(ev.target.value)} placeholder="Motivo" aria-label="Motivo" />
         <div className="flex flex-wrap gap-1">
           {MOTIVOS.map((m) => (
-            <button key={m} type="button" onClick={() => setNota(m)} className="rounded-full border border-linea px-2 py-0.5 text-[11px] text-muted-foreground hover:text-foreground">
+            <button key={m} type="button" onClick={() => setNota(m)} className="rounded-full border border-linea px-2 py-0.5 t-texto-sm text-muted-foreground hover:text-foreground">
               {m}
             </button>
           ))}

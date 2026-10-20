@@ -9,7 +9,7 @@ import { redForja, tallerForja } from "@/forja/dominio/modelo"
 import { historiaMaquina, piezaDesdeTexto, recorridoProducto } from "@/forja/dominio/pieza"
 import { Universo, type ActivacionUniverso } from "./universo"
 
-/** Forja dentro de la app: datos de Yunque, simulador si la empresa es demo y enlaces a los módulos. */
+/** Forja dentro de la app: datos de Quvant, simulador si la empresa es demo y enlaces a los módulos. */
 export function UniversoForjaApp({ activacion, simulacion, pieza }: { activacion: boolean; simulacion: boolean; pieza: string | null }) {
   const { motor, usuario, ejecutar } = useApp()
   // La primera vez que la persona entra (o cuando la pide desde Extensiones)

@@ -20,9 +20,9 @@ export function Comprobante({ venta, presupuesto }: { venta?: Venta; presupuesto
   const cliente = doc.clienteId ? e.clientes[doc.clienteId] : null
   const numero = doc.numero ? `#${doc.numero}` : `${doc.numeroLocal} (provisorio)`
   return (
-    <div className="mx-auto max-w-[80mm] space-y-3 bg-white p-4 font-mono text-[11px] leading-snug text-black">
+    <div className="mx-auto max-w-[80mm] space-y-3 bg-white p-4 font-mono t-texto-sm leading-snug text-black">
       <div className="text-center">
-        <p className="text-sm font-bold">{n?.nombre ?? e.org.nombre}</p>
+        <p className="t-texto-sm font-bold">{n?.nombre ?? e.org.nombre}</p>
         <p>CUIT {n?.cuit}</p>
         <p>{s?.nombre} · {s?.direccion}</p>
         {e.org.esDemo && <p className="mt-1 border border-dashed border-black px-1 font-bold">DEMO · empresa ficticia</p>}
@@ -50,7 +50,7 @@ export function Comprobante({ venta, presupuesto }: { venta?: Venta; presupuesto
         </tbody>
       </table>
       <div className="border-t border-dashed border-black pt-1.5">
-        <p className="flex justify-between text-sm font-bold">
+        <p className="flex justify-between t-texto-sm font-bold">
           <span>TOTAL</span>
           <span>{formatoPesos(doc.total)}</span>
         </p>
@@ -66,12 +66,12 @@ export function Comprobante({ venta, presupuesto }: { venta?: Venta; presupuesto
         ))}
       </div>
       {venta && (
-        <p className="text-center text-[10px]">
+        <p className="text-center t-texto-sm">
           {venta.comprobante.emulado ? "CAE emulado · comprobante sin validez fiscal (facturación ARCA en la hoja de ruta)" : `CAE ${venta.comprobante.cae}`}
         </p>
       )}
-      {presupuesto?.notas && <p className="text-[10px]">{presupuesto.notas}</p>}
-      <p className="text-center text-[10px]">Gracias por su compra · funciona con yunque</p>
+      {presupuesto?.notas && <p className="t-texto-sm">{presupuesto.notas}</p>}
+      <p className="text-center t-texto-sm">Gracias por su compra · funciona con Quvant</p>
     </div>
   )
 }

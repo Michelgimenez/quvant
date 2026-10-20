@@ -347,16 +347,16 @@ export const NEGOCIOS_DEMO = [
 ]
 
 export const USUARIOS_DEMO: { nombre: string; email: string; rol: Rol; sucursales: string[] | null; permisosExtra?: Permiso[] }[] = [
-  { nombre: "Martín Olivera", email: "dueno@demo.yunque.app", rol: "dueno", sucursales: null },
-  { nombre: "Carla Benítez", email: "admin@demo.yunque.app", rol: "administracion", sucursales: null },
-  { nombre: "Diego Sosa", email: "mostrador@demo.yunque.app", rol: "mostrador", sucursales: ["CC"] },
+  { nombre: "Martín Olivera", email: "dueno@demo.quvant.app", rol: "dueno", sucursales: null },
+  { nombre: "Carla Benítez", email: "admin@demo.quvant.app", rol: "administracion", sucursales: null },
+  { nombre: "Diego Sosa", email: "mostrador@demo.quvant.app", rol: "mostrador", sucursales: ["CC"] },
   // A Lucía se le dio permiso para ver Forja: solo ve su sucursal
-  { nombre: "Lucía Romero", email: "mostrador.norte@demo.yunque.app", rol: "mostrador", sucursales: ["NO"], permisosExtra: ["forja.ver"] },
-  { nombre: "Pablo Medina", email: "maquinaria@demo.yunque.app", rol: "mostrador", sucursales: ["DM"] },
-  { nombre: "Ramón Acosta", email: "deposito@demo.yunque.app", rol: "deposito", sucursales: null },
-  { nombre: "Sergio Paz", email: "tecnico@demo.yunque.app", rol: "tecnico", sucursales: ["CC"] },
-  { nombre: "Nahuel Ríos", email: "tecnico2@demo.yunque.app", rol: "tecnico", sucursales: ["CC"] },
-  { nombre: "Valeria Luna", email: "compras@demo.yunque.app", rol: "compras", sucursales: null },
+  { nombre: "Lucía Romero", email: "mostrador.norte@demo.quvant.app", rol: "mostrador", sucursales: ["NO"], permisosExtra: ["forja.ver"] },
+  { nombre: "Pablo Medina", email: "maquinaria@demo.quvant.app", rol: "mostrador", sucursales: ["DM"] },
+  { nombre: "Ramón Acosta", email: "deposito@demo.quvant.app", rol: "deposito", sucursales: null },
+  { nombre: "Sergio Paz", email: "tecnico@demo.quvant.app", rol: "tecnico", sucursales: ["CC"] },
+  { nombre: "Nahuel Ríos", email: "tecnico2@demo.quvant.app", rol: "tecnico", sucursales: ["CC"] },
+  { nombre: "Valeria Luna", email: "compras@demo.quvant.app", rol: "compras", sucursales: null },
 ]
 
 export const LISTAS_DEMO = [

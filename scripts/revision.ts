@@ -22,7 +22,7 @@ const PUERTO = Number(process.env.PUERTO_REVISION ?? 3410)
 const EXTERNA = process.env.REVISION_URL?.replace(/\/$/, "")
 const BASE = EXTERNA ?? `http://localhost:${PUERTO}`
 const SALIDA = process.env.REVISION_SALIDA ? path.resolve(process.env.REVISION_SALIDA) : path.join(process.cwd(), "docs", "capturas", "revision")
-const CLAVE_INVERSORES = process.env.INVERSORES_KEY ?? "yunque-demo"
+const CLAVE_INVERSORES = process.env.INVERSORES_KEY ?? "quvant-demo"
 const VISTAS = [
   { nombre: "escritorio", width: 1440, height: 900, movil: false },
   { nombre: "celular", width: 390, height: 844, movil: true },
@@ -60,8 +60,8 @@ async function levantarServidor(): Promise<ChildProcess> {
     stdio: "ignore",
     env: {
       ...process.env,
-      INVERSORES_KEY: process.env.INVERSORES_KEY ?? "yunque-demo",
-      PANEL_KEY: process.env.PANEL_KEY ?? "yunque-panel",
+      INVERSORES_KEY: process.env.INVERSORES_KEY ?? "quvant-demo",
+      PANEL_KEY: process.env.PANEL_KEY ?? "quvant-panel",
       SESION_SECRETO: process.env.SESION_SECRETO ?? "secreto-de-revision-no-usar-en-produccion-0000000",
     },
   })

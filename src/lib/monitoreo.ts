@@ -32,7 +32,7 @@ const recientes: number[] = []
 export async function registrarEnServidor(r: ReporteError) {
   recientes.push(Date.now())
   while (recientes.length && recientes[0] < Date.now() - 3_600_000) recientes.shift()
-  console.error(JSON.stringify({ nivel: "error", servicio: "yunque", ...r }))
+  console.error(JSON.stringify({ nivel: "error", servicio: "quvant", ...r }))
   const webhook = process.env.MONITOREO_WEBHOOK
   if (webhook) {
     try {

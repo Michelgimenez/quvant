@@ -79,7 +79,7 @@ export function LineaTiempo({ eventos, tramo }: { eventos: EventoForja[]; tramo:
 
   return (
     <div
-      className="pointer-events-auto absolute inset-x-0 bottom-0 z-10 flex items-center gap-2 border-t border-white/10 bg-hierro/85 px-3 py-2 backdrop-blur sm:gap-3"
+      className="pointer-events-auto absolute inset-x-0 bottom-0 z-10 flex items-center gap-2 border-t border-white/10 bg-negro/85 px-3 py-2 backdrop-blur sm:gap-3"
       role="group"
       aria-label="Línea de tiempo del día"
       data-testid="linea-tiempo"
@@ -88,7 +88,7 @@ export function LineaTiempo({ eventos, tramo }: { eventos: EventoForja[]; tramo:
       <button
         type="button"
         onClick={alternar}
-        className="grid size-8 shrink-0 place-items-center rounded-md border border-white/15 text-niebla hover:border-white/30 focus-visible:outline focus-visible:outline-1 focus-visible:outline-temple"
+        className="grid size-8 shrink-0 place-items-center rounded-md border border-white/15 text-blanco hover:border-white/30 focus-visible:outline focus-visible:outline-1 focus-visible:outline-foreground"
         aria-label={etiquetaBoton}
         title={etiquetaBoton}
         data-testid="repetir"
@@ -102,14 +102,14 @@ export function LineaTiempo({ eventos, tramo }: { eventos: EventoForja[]; tramo:
             type="button"
             aria-pressed={rep.velocidad === v}
             onClick={() => setRepeticion({ velocidad: v })}
-            className={cn("rounded px-1.5 py-0.5 font-mono text-[10px] sm:px-2 sm:text-[11px]", rep.velocidad === v ? "bg-white/12 text-niebla" : "text-acero hover:text-niebla")}
+            className={cn("rounded px-1.5 py-0.5 font-mono text-[10px] sm:px-2 sm:text-[11px]", rep.velocidad === v ? "bg-white/12 text-blanco" : "text-acero hover:text-blanco")}
             data-testid={`velocidad-${v}`}
           >
             {v}×
           </button>
         ))}
       </div>
-      <div className="relative h-9 min-w-0 flex-1 overflow-hidden rounded-md has-[:focus-visible]:outline has-[:focus-visible]:outline-1 has-[:focus-visible]:outline-temple">
+      <div className="relative h-9 min-w-0 flex-1 overflow-hidden rounded-md has-[:focus-visible]:outline has-[:focus-visible]:outline-1 has-[:focus-visible]:outline-foreground">
         {/* El pulso del día: ventas por franja; lo ya reproducido, en brasa */}
         <svg viewBox={`0 0 ${densidad.length} 1`} preserveAspectRatio="none" className="absolute inset-x-0 top-0 h-6 w-full" aria-hidden>
           {densidad.map((d, i) => (
@@ -139,11 +139,11 @@ export function LineaTiempo({ eventos, tramo }: { eventos: EventoForja[]; tramo:
           data-testid="cursor-dia"
         />
       </div>
-      <span className="min-w-12 shrink-0 whitespace-nowrap text-right font-mono text-xs text-niebla" data-testid="hora-repeticion" aria-live="off">
+      <span className="min-w-12 shrink-0 whitespace-nowrap text-right font-mono text-xs text-blanco" data-testid="hora-repeticion" aria-live="off">
         {rep.activa ? hora(new Date(cursor).toISOString()) : "En vivo"}
       </span>
       {rep.activa && (
-        <button type="button" onClick={salir} className="inline-flex shrink-0 items-center gap-1 rounded-md border border-white/15 px-2 py-1 text-[11px] text-niebla hover:border-white/30 focus-visible:outline focus-visible:outline-1 focus-visible:outline-temple" data-testid="volver-en-vivo">
+        <button type="button" onClick={salir} className="inline-flex shrink-0 items-center gap-1 rounded-md border border-white/15 px-2 py-1 text-[11px] text-blanco hover:border-white/30 focus-visible:outline focus-visible:outline-1 focus-visible:outline-foreground" data-testid="volver-en-vivo">
           <X className="size-3.5" aria-hidden />
           <span className="max-sm:sr-only">En vivo</span>
         </button>

@@ -133,14 +133,14 @@ function TableroDireccion() {
       <div className="grid gap-4 lg:grid-cols-[minmax(0,1.3fr)_minmax(0,2fr)]">
         <section className="flex flex-col justify-between gap-4 rounded-xl border border-linea bg-card p-5">
           <div>
-            <p className="text-sm text-muted-foreground">Ventas de hoy · todos los negocios</p>
-            <p className="mt-1 text-5xl font-semibold tracking-tight sm:text-6xl" data-testid="ventas-hoy">
+            <p className="t-etiqueta text-muted-foreground">Ventas de hoy · todos los negocios</p>
+            <p className="t-numero-xl mt-3" data-testid="ventas-hoy">
               {formatoPesosCorto(datos.hoy.total)}
             </p>
             <div className="mt-2 flex flex-wrap items-center gap-x-3 gap-y-1">
               <Delta valor={variacion(datos.hoy.total, datos.semanaPasada.total)} periodo="el mismo día de la semana pasada" />
             </div>
-            <p className="mt-1 text-xs text-muted-foreground">
+            <p className="t-texto-sm mt-1 text-muted-foreground">
               {datos.hoy.cantidad
                 ? `${datos.hoy.cantidad} ventas · ${formatoPesos(datos.hoy.total)}`
                 : `Todavía no hay ventas hoy. Ayer: ${formatoPesos(datos.ayer.total, { sinDecimales: true })} en ${datos.ayer.cantidad} ventas.`}
@@ -149,14 +149,14 @@ function TableroDireccion() {
           <div className="grid gap-2 sm:grid-cols-2">
             {datos.porNegocio.map(({ negocio, hoy, sucursales }, i) => (
               <div key={negocio.id} className="rounded-lg border border-linea bg-superficie-2 p-3">
-                <p className="flex items-center gap-1.5 text-xs text-muted-foreground">
+                <p className="t-etiqueta flex items-center gap-1.5 text-muted-foreground">
                   <span className="size-2.5 rounded-[2px]" style={{ background: SERIES[i] }} aria-hidden />
                   {negocio.nombre}
                 </p>
-                <p className="mt-1 text-lg font-semibold">{formatoPesosCorto(hoy.total)}</p>
+                <p className="t-numero mt-1.5">{formatoPesosCorto(hoy.total)}</p>
                 <ul className="mt-1 space-y-0.5">
                   {sucursales.map(({ s, hoy: h }) => (
-                    <li key={s.id} className="flex justify-between gap-2 text-[11px] text-muted-foreground">
+                    <li key={s.id} className="t-dato flex justify-between gap-2 text-muted-foreground">
                       <span className="min-w-0 truncate">
                         <span className="num">{s.codigo}</span> {s.nombre}
                       </span>
@@ -222,7 +222,7 @@ function TableroDireccion() {
 
 function DeltaPuntos({ valor }: { valor: number }) {
   return (
-    <span className={cn("text-xs font-semibold", valor >= 0 ? "text-ok-texto" : "text-error-texto")}>
+    <span className={cn("t-dato font-semibold", valor >= 0 ? "text-ok" : "text-error")}>
       {valor >= 0 ? "+" : "−"}
       {Math.abs(valor).toLocaleString("es-AR", { maximumFractionDigits: 1 })} pts <span className="font-normal text-muted-foreground">vs 30 días anteriores</span>
     </span>
@@ -237,8 +237,8 @@ function ListaAlertas({ alertas: lista, className }: { alertas: Alerta[]; classN
       <ul className="divide-y divide-linea">
         {estado === "sin_conexion" && pendientes > 0 && (
           <li className="flex items-center gap-3 py-2.5">
-            <CloudOff className="size-4 text-chispa-texto" />
-            <span className="flex-1 text-sm">
+            <CloudOff className="size-4 text-alerta" />
+            <span className="t-texto-sm flex-1">
               {pendientes} cambio{pendientes === 1 ? "" : "s"} en cola en este equipo
             </span>
           </li>
@@ -248,21 +248,21 @@ function ListaAlertas({ alertas: lista, className }: { alertas: Alerta[]; classN
             <Link href={a.href} className="group flex items-center gap-3 py-2.5">
               <Punto tono={a.tono} />
               <span className="min-w-0 flex-1">
-                <span className="block text-sm font-medium">{a.titulo}</span>
-                <span className="block truncate text-xs text-muted-foreground">{a.detalle}</span>
+                <span className="t-texto-sm block font-medium">{a.titulo}</span>
+                <span className="t-texto-sm block truncate text-muted-foreground">{a.detalle}</span>
               </span>
-              <span className="num rounded-md bg-muted px-2 py-0.5 text-sm font-semibold">{a.cantidad}</span>
+              <span className="t-numero rounded-md bg-muted px-2 py-0.5">{a.cantidad}</span>
               <ArrowRight className="size-4 text-muted-foreground opacity-0 transition-opacity group-hover:opacity-100" />
             </Link>
           </li>
         ))}
         {lista.length === 0 && (
-          <li className="flex items-center gap-2 py-3 text-sm text-muted-foreground">
-            <CircleCheck className="size-4 text-ok-texto" /> Todo en orden.
+          <li className="t-texto-sm flex items-center gap-2 py-3 text-muted-foreground">
+            <CircleCheck className="size-4 text-ok" /> Todo en orden.
           </li>
         )}
       </ul>
-      {motor.estado.org.esDemo && <p className="mt-3 text-[11px] text-muted-foreground">Datos de la empresa demo.</p>}
+      {motor.estado.org.esDemo && <p className="t-etiqueta mt-3 text-muted-foreground">Datos de la empresa demo</p>}
     </Panel>
   )
 }
@@ -273,16 +273,16 @@ function ActividadReciente({ className }: { className?: string }) {
   const items = useMemo(() => e.auditoria.slice(0, 8), [e, v]) // eslint-disable-line react-hooks/exhaustive-deps
   const nombre = (id: string) => e.usuarios.find((u) => u.id === id)?.nombre.split(" ")[0] ?? "—"
   return (
-    <Panel titulo="Actividad reciente" accion={puede("auditoria.ver") ? <Link href="/app/auditoria" className="text-xs text-enlace hover:underline">Ver todo</Link> : undefined} className={className}>
+    <Panel titulo="Actividad reciente" accion={puede("auditoria.ver") ? <Link href="/app/auditoria" className="t-etiqueta text-foreground hover:underline">Ver todo</Link> : undefined} className={className}>
       <ol className="space-y-2.5">
         {items.map((a) => (
-          <li key={a.id} className="flex gap-3 text-sm">
-            <span className="num mt-0.5 w-11 shrink-0 text-[11px] text-muted-foreground">
+          <li key={a.id} className="t-texto-sm flex gap-3">
+            <span className="t-dato mt-0.5 w-12 shrink-0 text-muted-foreground">
               {new Date(a.fecha).toLocaleTimeString("es-AR", { hour: "2-digit", minute: "2-digit" })}
             </span>
             <span className="min-w-0">
               <span className="block truncate">{a.resumen}</span>
-              <span className="text-xs text-muted-foreground">
+              <span className="t-dato text-muted-foreground">
                 {nombre(a.usuarioId)}
                 {a.origen === "sin_conexion" && " · hecha sin conexión"}
               </span>
@@ -336,12 +336,12 @@ function TableroOperativo() {
       <div className="grid gap-4 lg:grid-cols-3">
         {puede("ventas.ver") && (
           <Panel titulo={`Hoy en ${sucursal.nombre}`} ficha={sucursal.codigo}>
-            <p className="text-4xl font-semibold tracking-tight">{formatoPesosCorto(datos.hoy.total)}</p>
+            <p className="t-numero-xl">{formatoPesosCorto(datos.hoy.total)}</p>
             <Delta valor={variacion(datos.hoy.total, datos.semanaPasada.total)} periodo="el mismo día de la semana pasada" />
-            <p className="mt-1 text-xs text-muted-foreground">{datos.hoy.cantidad} ventas</p>
+            <p className="t-texto-sm mt-1 text-muted-foreground">{datos.hoy.cantidad} ventas</p>
             <ul className="mt-4 divide-y divide-linea">
               {datos.ultimas.map((x) => (
-                <li key={x.id} className="flex items-center justify-between gap-2 py-2 text-sm">
+                <li key={x.id} className="t-texto-sm flex items-center justify-between gap-2 py-2">
                   <span className="ficha">{x.numero ? `#${x.numero}` : x.numeroLocal}</span>
                   <span className="num">{formatoPesos(x.total)}</span>
                 </li>
@@ -367,25 +367,25 @@ function TableroTaller() {
       <div className="grid grid-cols-2 gap-3 sm:grid-cols-5">
         {activos.map((s) => (
           <Link key={s} href={`/app/servicio?estado=${s}`} className="rounded-xl border border-linea bg-card p-4 hover:border-acero/40">
-            <p className="text-xs text-muted-foreground">{NOMBRE_ESTADO_SERVICIO[s]}</p>
-            <p className="text-2xl font-semibold">{ordenes.filter((o) => o.estado === s).length}</p>
+            <p className="t-etiqueta text-muted-foreground">{NOMBRE_ESTADO_SERVICIO[s]}</p>
+            <p className="t-numero-lg mt-1">{ordenes.filter((o) => o.estado === s).length}</p>
           </Link>
         ))}
       </div>
       <Panel titulo="Mis órdenes en curso" accion={<Button asChild size="sm" variant="outline"><Link href="/app/servicio"><Wrench /> Ir al taller</Link></Button>}>
         {mias.length === 0 ? (
-          <p className="text-sm text-muted-foreground">No tenés órdenes asignadas en curso.</p>
+          <p className="t-texto-sm text-muted-foreground">No tenés órdenes asignadas en curso.</p>
         ) : (
           <ul className="divide-y divide-linea">
             {mias.map((o) => (
-              <li key={o.id} className="flex flex-wrap items-center gap-x-3 gap-y-1 py-2.5 text-sm">
+              <li key={o.id} className="t-texto-sm flex flex-wrap items-center gap-x-3 gap-y-1 py-2.5">
                 <Ficha>ST #{o.numero ?? o.numeroLocal}</Ficha>
                 <span className="font-medium">
                   {o.equipo.marca} {o.equipo.modelo}
                 </span>
                 <span className="text-muted-foreground">{o.falla}</span>
-                <span className="ml-auto inline-flex items-center gap-1 text-xs">
-                  {o.prioridad === "urgente" && <AlertTriangle className="size-3.5 text-chispa-texto" />}
+                <span className="t-dato ml-auto inline-flex items-center gap-1">
+                  {o.prioridad === "urgente" && <AlertTriangle className="size-3.5 text-alerta" />}
                   {NOMBRE_ESTADO_SERVICIO[o.estado]}
                 </span>
               </li>

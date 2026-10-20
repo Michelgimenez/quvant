@@ -2,7 +2,7 @@
 
 import { useActionState } from "react"
 import { Loader2, LockKeyhole } from "lucide-react"
-import { Isotipo } from "@/components/marca/marca"
+import { Isotipo } from "@/components/marca/quvant"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -23,9 +23,9 @@ export function PuertaClave({
 }) {
   const [estado, enviar, pendiente] = useActionState<Estado, FormData>(accion, {})
   return (
-    <main className="dark grilla-tecnica flex min-h-dvh items-center justify-center bg-hierro px-4 py-10 text-niebla">
-      <div className="w-full max-w-sm rounded-2xl border border-white/10 bg-superficie/90 p-8 shadow-2xl">
-        <Isotipo className="h-12 text-niebla" tono="negativo" />
+    <main className="dark grilla-puntos flex min-h-dvh items-center justify-center bg-negro px-4 py-10 text-blanco">
+      <div className="w-full max-w-sm rounded-2xl border border-white/10 bg-superficie-1/90 p-8 shadow-2xl">
+        <Isotipo className="h-12" version="principal" />
         <h1 className="mt-6 text-2xl font-bold tracking-tight">{titulo}</h1>
         <p className="mt-2 text-sm text-acero">{bajada}</p>
         {habilitada ? (
@@ -45,7 +45,7 @@ export function PuertaClave({
               />
             </div>
             {estado.error && (
-              <p id="error-clave" role="alert" className="text-sm font-medium text-error-texto">
+              <p id="error-clave" role="alert" className="text-sm font-medium text-error">
                 {estado.error}
               </p>
             )}
@@ -55,7 +55,7 @@ export function PuertaClave({
             </Button>
           </form>
         ) : (
-          <p role="alert" className="mt-8 rounded-md border border-chispa/40 bg-chispa/10 px-3 py-2 text-sm">
+          <p role="alert" className="mt-8 rounded-md border border-alerta/40 bg-alerta/10 px-3 py-2 text-sm">
             La presentación no está habilitada en este entorno (falta configurar la clave).
           </p>
         )}

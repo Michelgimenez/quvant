@@ -7,7 +7,7 @@ import { PREFIJO_DISPOSITIVO_SIMULADO, type Operacion, type UsuarioContexto } fr
 import type { IntencionSimulada } from "./simulador"
 
 /**
- * Convierte una intención del simulador en una operación real de Yunque, con
+ * Convierte una intención del simulador en una operación real de Quvant, con
  * un autor verosímil (quien la haría en esa sucursal). Pasa por el mismo motor
  * y las mismas reglas que una operación hecha a mano: si una regla la rechaza,
  * se descarta.
@@ -81,7 +81,7 @@ export function operacionSimulada(e: EstadoEmpresa, intencion: IntencionSimulada
       if (!o) return null
       const u = autorPara(e, "servicio.editar", o.sucursalId, ["tecnico", "mostrador", "administracion", "dueno"])
       if (!u) return null
-      // Para pedir aprobación hace falta el presupuesto de reparación (regla de Yunque)
+      // Para pedir aprobación hace falta el presupuesto de reparación (regla de Quvant)
       const presupuesto = intencion.estado === "esperando_aprobacion" && !o.presupuestoReparacion ? { presupuestoReparacion: 4_500_000 + (n % 7) * 850_000, diagnostico: "Diagnóstico simulado" } : {}
       const op = { ...base(u, o.sucursalId), tipo: "servicio.estado" as const, datos: { ordenId: o.id, estado: intencion.estado, nota: "Actualización simulada", avisar: false, ...presupuesto } }
       return { op: op as Operacion, autor: contexto(u) }

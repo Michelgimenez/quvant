@@ -56,7 +56,7 @@ export function DialogoTransferencia({ onCerrar }: { onCerrar: () => void }) {
         <BuscadorProductos sucursalId={desde} onElegir={(p) => setItems((xs) => (xs.some((x) => x.productoId === p.id) ? xs : [...xs, { productoId: p.id, cantidad: 1 }]))} placeholder="Agregar producto a transferir…" />
         <ul className="max-h-64 divide-y divide-linea overflow-auto rounded-lg border border-linea">
           {items.map((it) => (
-            <li key={it.productoId} className="flex items-center gap-3 px-3 py-2 text-sm">
+            <li key={it.productoId} className="flex items-center gap-3 px-3 py-2 t-texto-sm">
               <span className="min-w-0 flex-1 truncate">{e.productos[it.productoId].nombre}</span>
               <span className="ficha">hay {formatoCantidad(e.stock[claveStock(desde, it.productoId)]?.cantidad ?? 0)}</span>
               <Input type="number" min={0.001} step="any" value={it.cantidad} onChange={(ev) => setItems((xs) => xs.map((x) => (x.productoId === it.productoId ? { ...x, cantidad: Number(ev.target.value) } : x)))} className="num h-8 w-20" aria-label="Cantidad" />
@@ -65,7 +65,7 @@ export function DialogoTransferencia({ onCerrar }: { onCerrar: () => void }) {
               </Button>
             </li>
           ))}
-          {items.length === 0 && <li className="px-3 py-6 text-center text-sm text-muted-foreground">Buscá productos para agregarlos.</li>}
+          {items.length === 0 && <li className="px-3 py-6 text-center t-texto-sm text-muted-foreground">Buscá productos para agregarlos.</li>}
         </ul>
         <DialogFooter>
           <Button variant="outline" onClick={onCerrar}>
@@ -194,7 +194,7 @@ export function DialogoNuevoProducto({ onCerrar, onCreado }: { onCerrar: () => v
             </Select>
           </div>
           {costo > 0 && puede("precios.editar") && (
-            <ul className="space-y-1 rounded-lg border border-linea p-3 text-sm sm:col-span-2">
+            <ul className="space-y-1 rounded-lg border border-linea p-3 t-texto-sm sm:col-span-2">
               {precios.map((p) => (
                 <li key={p.listaId} className="flex justify-between">
                   <span className="text-muted-foreground">

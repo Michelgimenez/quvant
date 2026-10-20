@@ -3,7 +3,7 @@ import { ShellApp } from "@/components/app/shell"
 import { ProveedoresInterfaz } from "@/components/base/proveedores-interfaz"
 
 export const metadata: Metadata = {
-  title: { default: "App", template: "%s · Yunque" },
+  title: { default: "App", template: "%s · Quvant" },
   robots: { index: false, follow: false },
   manifest: "/manifest.webmanifest",
 }

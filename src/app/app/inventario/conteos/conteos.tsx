@@ -76,13 +76,13 @@ function TarjetaConteo({ c, onAbrir }: { c: Conteo; onAbrir: () => void }) {
           <Ficha>
             {s?.codigo} · {new Date(c.fecha).toLocaleDateString("es-AR")}
           </Ficha>
-          <span className={cn("rounded-full px-2 py-0.5 text-[11px] font-medium", c.estado === "en_curso" ? "bg-chispa/15 text-chispa-texto" : "bg-muted text-muted-foreground")}>
+          <span className={cn("rounded-full px-2 py-0.5 t-texto-sm font-medium", c.estado === "en_curso" ? "bg-alerta/15 text-alerta" : "bg-muted text-muted-foreground")}>
             {c.estado === "en_curso" ? "En curso" : "Cerrado"}
           </span>
         </div>
         <p className="font-semibold">{c.nombre}</p>
         <Progress value={(contados / Math.max(1, c.items.length)) * 100} aria-label="Avance del conteo" />
-        <p className="text-xs text-muted-foreground">
+        <p className="t-texto-sm text-muted-foreground">
           {contados} de {c.items.length} contados
           {c.estado === "cerrado" && ` · ${diferencias === 0 ? "sin diferencias" : `${diferencias} diferencia(s)`}`}
         </p>
@@ -134,7 +134,7 @@ function DialogoNuevoConteo({ onCerrar, onCreado }: { onCerrar: () => void; onCr
                 ))}
               </SelectContent>
             </Select>
-            <p className="text-xs text-muted-foreground">{productos.length} productos para contar.</p>
+            <p className="t-texto-sm text-muted-foreground">{productos.length} productos para contar.</p>
           </div>
         </div>
         <DialogFooter>
@@ -168,7 +168,7 @@ function DetalleConteo({ id }: { id: Id }) {
   const refs = useRef<Record<Id, HTMLInputElement | null>>({})
   const botonCerrar = useRef<HTMLButtonElement>(null)
 
-  if (!c) return <Vacio icono={ClipboardList} titulo="El conteo no existe" accion={<Link className="text-sm text-enlace" href="/app/inventario/conteos">Volver</Link>} />
+  if (!c) return <Vacio icono={ClipboardList} titulo="El conteo no existe" accion={<Link className="t-texto-sm text-foreground" href="/app/inventario/conteos">Volver</Link>} />
   const s = e.sucursales.find((x) => x.id === c.sucursalId)!
   const contados = c.items.filter((x) => x.contado !== null).length
   const abierto = c.estado === "en_curso"
@@ -231,16 +231,16 @@ function DetalleConteo({ id }: { id: Id }) {
               const actual = abierto ? (e.stock[claveStock(c.sucursalId, it.productoId)]?.cantidad ?? 0) : it.esperado
               const dif = it.contado === null ? null : it.contado - actual
               return (
-                <li key={it.productoId} className={cn("flex flex-wrap items-center gap-3 px-3 py-2.5", foco === it.productoId && "bg-temple/10")}>
+                <li key={it.productoId} className={cn("flex flex-wrap items-center gap-3 px-3 py-2.5", foco === it.productoId && "bg-foreground/10")}>
                   <MiniaturaProducto tipo={p.ilustracion} className="size-9" />
                   <span className="min-w-0 flex-1">
-                    <span className="block truncate text-sm">{p.nombre}</span>
+                    <span className="block truncate t-texto-sm">{p.nombre}</span>
                     <span className="ficha">
                       {p.sku} · sistema {formatoCantidad(actual)}
                     </span>
                   </span>
-                  {dif !== null && dif !== 0 && <span className={cn("num text-xs font-semibold", dif < 0 ? "text-error-texto" : "text-ok-texto")}>{dif > 0 ? "+" : ""}{formatoCantidad(dif)}</span>}
-                  {dif === 0 && <Check className="size-4 text-ok-texto" aria-label="Coincide" />}
+                  {dif !== null && dif !== 0 && <span className={cn("num t-texto-sm font-semibold", dif < 0 ? "text-error" : "text-ok")}>{dif > 0 ? "+" : ""}{formatoCantidad(dif)}</span>}
+                  {dif === 0 && <Check className="size-4 text-ok" aria-label="Coincide" />}
                   {abierto ? (
                     <Input
                       ref={(el) => {
@@ -261,7 +261,7 @@ function DetalleConteo({ id }: { id: Id }) {
                       onKeyDown={(ev) => ev.key === "Enter" && (ev.target as HTMLInputElement).blur()}
                     />
                   ) : (
-                    <span className="num w-16 text-right text-sm">{it.contado === null ? "—" : formatoCantidad(it.contado)}</span>
+                    <span className="num w-16 text-right t-texto-sm">{it.contado === null ? "—" : formatoCantidad(it.contado)}</span>
                   )}
                 </li>
               )
@@ -270,7 +270,7 @@ function DetalleConteo({ id }: { id: Id }) {
         </div>
         <Panel titulo="Resumen" className="h-fit lg:sticky lg:top-20">
           <Progress value={(contados / Math.max(1, c.items.length)) * 100} aria-label="Avance" />
-          <dl className="mt-3 space-y-1.5 text-sm">
+          <dl className="mt-3 space-y-1.5 t-texto-sm">
             <div className="flex justify-between">
               <dt className="text-muted-foreground">Contados</dt>
               <dd className="num">
@@ -279,10 +279,10 @@ function DetalleConteo({ id }: { id: Id }) {
             </div>
             <div className="flex justify-between">
               <dt className="text-muted-foreground">Con diferencias</dt>
-              <dd className={cn("num", diferencias.length && "font-semibold text-chispa-texto")}>{diferencias.length}</dd>
+              <dd className={cn("num", diferencias.length && "font-semibold text-alerta")}>{diferencias.length}</dd>
             </div>
           </dl>
-          {abierto && <p className="mt-3 text-xs text-muted-foreground">Al cerrar, el stock de los productos contados queda igual a lo contado y cada diferencia se registra como movimiento de conteo.</p>}
+          {abierto && <p className="mt-3 t-texto-sm text-muted-foreground">Al cerrar, el stock de los productos contados queda igual a lo contado y cada diferencia se registra como movimiento de conteo.</p>}
         </Panel>
       </div>
     </>

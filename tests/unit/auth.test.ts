@@ -36,17 +36,17 @@ describe("límite de intentos de ingreso", () => {
 
 describe("firma de sesión", () => {
   it("verifica un token propio y rechaza uno alterado o de otra audiencia", async () => {
-    const token = await firmar({ sub: "u1", rol: "dueno" }, 60, "yunque-app")
-    expect(await verificar<{ sub: string }>(token, "yunque-app")).toMatchObject({ sub: "u1" })
-    expect(await verificar(token, "yunque-2fa")).toBeNull()
+    const token = await firmar({ sub: "u1", rol: "dueno" }, 60, "quvant-app")
+    expect(await verificar<{ sub: string }>(token, "quvant-app")).toMatchObject({ sub: "u1" })
+    expect(await verificar(token, "quvant-2fa")).toBeNull()
     const [h, p, f] = token.split(".")
     const alterado = [h, Buffer.from(JSON.stringify({ sub: "u1", rol: "dueno", aal: "aal2" })).toString("base64url"), f].join(".")
-    expect(await verificar(alterado, "yunque-app")).toBeNull()
+    expect(await verificar(alterado, "quvant-app")).toBeNull()
     expect(p).toBeTruthy()
   })
 
   it("rechaza tokens vencidos", async () => {
-    const token = await firmar({ sub: "u1" }, -10, "yunque-app")
-    expect(await verificar(token, "yunque-app")).toBeNull()
+    const token = await firmar({ sub: "u1" }, -10, "quvant-app")
+    expect(await verificar(token, "quvant-app")).toBeNull()
   })
 })

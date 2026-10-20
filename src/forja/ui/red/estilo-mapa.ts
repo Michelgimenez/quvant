@@ -4,7 +4,7 @@ import type { Map as MapaLibre } from "maplibre-gl"
 export const ESTILO_CARTO = "https://basemaps.cartocdn.com/gl/dark-matter-gl-style/style.json"
 
 /**
- * Tiñe el estilo a la paleta de Yunque: hormigón y grafito, sin colores
+ * Tiñe el estilo a la paleta de Quvant: hormigón y grafito, sin colores
  * saturados en superficies. Las calles quedan como líneas finas; los nombres,
  * apagados; los puntos de interés, ocultos (ruido).
  */

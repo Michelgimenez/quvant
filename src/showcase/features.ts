@@ -1,5 +1,5 @@
 /**
- * Registro de funcionalidades de Yunque: la única fuente de verdad sobre qué
+ * Registro de funcionalidades de Quvant: la única fuente de verdad sobre qué
  * existe. Lo usan el sitio, la presentación para inversores y la demo comercial.
  *
  * Estados (definición honesta, ver docs/ROADMAP.md):

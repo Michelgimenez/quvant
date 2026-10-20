@@ -7,7 +7,7 @@ import { TODOS_LOS_ITEMS, itemVisible } from "@/cliente/navegacion"
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import { Kbd } from "@/components/ui/kbd"
 
-export const EVENTO_AYUDA_ATAJOS = "yunque:ayuda-atajos"
+export const EVENTO_AYUDA_ATAJOS = "quvant:ayuda-atajos"
 
 function escribiendo(ev: KeyboardEvent) {
   const t = ev.target as HTMLElement | null
@@ -39,7 +39,7 @@ export function AtajosGlobales() {
       }
       if (ev.key === "/") {
         ev.preventDefault()
-        window.dispatchEvent(new CustomEvent("yunque:abrir-paleta"))
+        window.dispatchEvent(new CustomEvent("quvant:abrir-paleta"))
         return
       }
       if (prefijo) {
@@ -99,7 +99,7 @@ export function AtajosGlobales() {
 
 function Fila({ teclas, texto }: { teclas: string[]; texto: string }) {
   return (
-    <div className="flex items-center justify-between gap-3 text-sm">
+    <div className="flex items-center justify-between gap-3 t-texto-sm">
       <span className="text-muted-foreground">{texto}</span>
       <span className="flex gap-1">
         {teclas.map((k) => (

@@ -109,7 +109,7 @@ export function ProveedorApp({ motor, servidor, sesion, children }: { motor: Mot
 
   const [sucursalId, setSucursalIdEstado] = useState<Id>(() => {
     try {
-      const guardada = localStorage.getItem(`yunque:sucursal:${sesion.sub}`)
+      const guardada = localStorage.getItem(`quvant:sucursal:${sesion.sub}`)
       if (guardada && sucursalesPermitidas.some((s) => s.id === guardada)) return guardada
     } catch {
       /* nada */
@@ -120,7 +120,7 @@ export function ProveedorApp({ motor, servidor, sesion, children }: { motor: Mot
     (id: Id) => {
       setSucursalIdEstado(id)
       try {
-        localStorage.setItem(`yunque:sucursal:${sesion.sub}`, id)
+        localStorage.setItem(`quvant:sucursal:${sesion.sub}`, id)
       } catch {
         /* nada */
       }

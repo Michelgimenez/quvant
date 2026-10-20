@@ -72,7 +72,7 @@ export function NivelTaller({
   const enTransito = taller.muelle.filter((b) => b.tipo === "transferencia" && b.estado === "en_transito").length
 
   return (
-    <div ref={caja} className="absolute inset-0 z-10 overflow-clip bg-hierro" data-testid="forja-taller" data-sucursal={nodo.codigo} data-listo={listo} data-modo={en2D ? "2d" : "3d"}>
+    <div ref={caja} className="absolute inset-0 z-10 overflow-clip bg-negro" data-testid="forja-taller" data-sucursal={nodo.codigo} data-listo={listo} data-modo={en2D ? "2d" : "3d"}>
       {en2D ? (
         <Plano2D plano={plano} sucursalId={nodo.id} eventos={fuente.eventos} enTransito={enTransito} margenDerecho={margenDerecho} margenAbajo={margenAbajo} onListo={avisar} />
       ) : (
@@ -97,7 +97,7 @@ export function NivelTaller({
       )}
       {listo && !en2D && <CapaEtiquetas anclas={anclas} plano={plano} elementos={elementos} />}
       {perdido && (
-        <p className="absolute left-3 top-3 z-10 rounded-md border border-white/10 bg-hierro/90 px-2.5 py-1.5 text-xs text-acero" role="status" data-testid="aviso-contexto">
+        <p className="absolute left-3 top-3 z-10 rounded-md border border-white/10 bg-negro/90 px-2.5 py-1.5 text-xs text-acero" role="status" data-testid="aviso-contexto">
           Se perdió la aceleración gráfica: seguimos en el plano 2D.
         </p>
       )}
@@ -152,12 +152,12 @@ function BarraZonas({ plano, taller }: { plano: PlanoTaller; taller: TallerForja
             onFocus={() => resaltarZona(t)}
             onBlur={() => resaltarZona(null)}
             className={cn(
-              "shrink-0 rounded-lg border bg-hierro/85 px-3 py-1.5 text-left backdrop-blur transition-colors focus-visible:outline focus-visible:outline-1 focus-visible:outline-temple",
-              activa || resaltada === t ? "border-temple" : "border-white/10 hover:border-white/25",
+              "shrink-0 rounded-lg border bg-negro/85 px-3 py-1.5 text-left backdrop-blur transition-colors focus-visible:outline focus-visible:outline-1 focus-visible:outline-foreground",
+              activa || resaltada === t ? "border-foreground" : "border-white/10 hover:border-white/25",
             )}
             data-testid={`zona-${t}`}
           >
-            <span className="block text-xs font-semibold text-niebla">{NOMBRE_ZONA[t]}</span>
+            <span className="block text-xs font-semibold text-blanco">{NOMBRE_ZONA[t]}</span>
             <span className="block font-mono text-[10px] text-acero">{resumenZona(t, taller)}</span>
           </button>
         )

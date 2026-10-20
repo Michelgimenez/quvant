@@ -25,15 +25,15 @@ const FILTROS = [
 
 export const TONO_ESTADO: Record<EstadoPresupuesto, string> = {
   borrador: "bg-muted text-muted-foreground",
-  enviado: "bg-temple/15 text-enlace",
-  aceptado: "bg-ok/15 text-ok-texto",
-  convertido: "bg-ok/15 text-ok-texto",
-  vencido: "bg-chispa/15 text-chispa-texto",
-  rechazado: "bg-error/15 text-error-texto",
+  enviado: "bg-foreground/15 text-foreground",
+  aceptado: "bg-ok/15 text-ok",
+  convertido: "bg-ok/15 text-ok",
+  vencido: "bg-alerta/15 text-alerta",
+  rechazado: "bg-error/15 text-error",
 }
 
 export function EstadoChip({ estado }: { estado: EstadoPresupuesto }) {
-  return <span className={cn("inline-flex rounded-full px-2 py-0.5 text-[11px] font-medium", TONO_ESTADO[estado])}>{NOMBRE_ESTADO_PRESUPUESTO[estado]}</span>
+  return <span className={cn("inline-flex rounded-full px-2 py-0.5 t-texto-sm font-medium", TONO_ESTADO[estado])}>{NOMBRE_ESTADO_PRESUPUESTO[estado]}</span>
 }
 
 export function Presupuestos() {
@@ -67,8 +67,8 @@ export function Presupuestos() {
   const columnas: Columna<Presupuesto>[] = [
     { id: "numero", encabezado: "Número", ancho: "110px", orden: (p) => p.numero ?? 0, celda: (p) => <span className="ficha text-foreground">{p.numero ? `#${p.numero}` : p.numeroLocal}</span> },
     { id: "cliente", encabezado: "Cliente", ancho: "minmax(200px,2fr)", orden: (p) => p.clienteNombre, celda: (p) => <span className="truncate font-medium">{p.clienteNombre}</span> },
-    { id: "fecha", encabezado: "Fecha", ancho: "100px", orden: (p) => p.fecha, celda: (p) => <span className="num text-xs text-muted-foreground">{new Date(p.fecha).toLocaleDateString("es-AR")}</span> },
-    { id: "vence", encabezado: "Vence", ancho: "100px", orden: (p) => p.vencimiento, celda: (p) => <span className="num text-xs text-muted-foreground">{new Date(p.vencimiento).toLocaleDateString("es-AR")}</span> },
+    { id: "fecha", encabezado: "Fecha", ancho: "100px", orden: (p) => p.fecha, celda: (p) => <span className="num t-texto-sm text-muted-foreground">{new Date(p.fecha).toLocaleDateString("es-AR")}</span> },
+    { id: "vence", encabezado: "Vence", ancho: "100px", orden: (p) => p.vencimiento, celda: (p) => <span className="num t-texto-sm text-muted-foreground">{new Date(p.vencimiento).toLocaleDateString("es-AR")}</span> },
     { id: "estado", encabezado: "Estado", ancho: "150px", orden: (p) => estadoVisible(p, ahora), celda: (p) => <EstadoChip estado={estadoVisible(p, ahora)} /> },
     { id: "total", encabezado: "Total", ancho: "130px", alinear: "der", orden: (p) => p.total, celda: (p) => <span className="num font-semibold">{formatoPesos(p.total, { sinDecimales: true })}</span> },
   ]
@@ -97,7 +97,7 @@ export function Presupuestos() {
               type="button"
               aria-pressed={filtro === f.id}
               onClick={() => setFiltro(f.id)}
-              className={cn("h-8 rounded-full border px-3 text-xs", filtro === f.id ? "border-foreground/30 bg-muted font-semibold" : "border-linea text-muted-foreground hover:text-foreground")}
+              className={cn("h-8 rounded-full border px-3 t-texto-sm", filtro === f.id ? "border-foreground/30 bg-muted font-semibold" : "border-linea text-muted-foreground hover:text-foreground")}
             >
               {f.nombre}
             </button>
@@ -118,13 +118,13 @@ export function Presupuestos() {
         tarjeta={(p) => (
           <div className="flex w-full items-center gap-3">
             <div className="min-w-0 flex-1">
-              <p className="truncate text-sm font-medium">{p.clienteNombre}</p>
+              <p className="truncate t-texto-sm font-medium">{p.clienteNombre}</p>
               <p className="ficha">
                 {p.numero ? `#${p.numero}` : p.numeroLocal} · {new Date(p.fecha).toLocaleDateString("es-AR")}
               </p>
             </div>
             <div className="text-right">
-              <p className="num text-sm font-semibold">{formatoPesosCorto(p.total)}</p>
+              <p className="num t-texto-sm font-semibold">{formatoPesosCorto(p.total)}</p>
               <EstadoChip estado={estadoVisible(p, ahora)} />
             </div>
           </div>

@@ -27,7 +27,7 @@ export function LogoOrg({ org, className, alto = "h-8" }: { org: OrgMarca; class
   return (
     <span className={cn("inline-flex items-center gap-2", className)}>
       <span
-        className={cn(alto, "inline-flex aspect-square items-center justify-center rounded-md font-display text-sm font-extrabold")}
+        className={cn(alto, "inline-flex aspect-square items-center justify-center rounded-md font-display t-texto-sm font-bold")}
         style={{ background: org.colorAcento, color: textoSobre(org.colorAcento) }}
         aria-hidden
       >

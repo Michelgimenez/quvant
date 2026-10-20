@@ -275,8 +275,8 @@ function Escena({
   })
 
   return (
-    <div ref={raiz} className="relative flex h-full flex-col bg-hierro text-niebla" data-nivel={nivel} data-sala={sala || undefined}>
-      <header className="relative z-30 flex flex-wrap items-center gap-3 border-b border-white/10 bg-hierro/80 px-4 py-2.5 backdrop-blur">
+    <div ref={raiz} className="relative flex h-full flex-col bg-negro text-blanco" data-nivel={nivel} data-sala={sala || undefined}>
+      <header className="relative z-30 flex flex-wrap items-center gap-3 border-b border-white/10 bg-negro/80 px-4 py-2.5 backdrop-blur">
         {marca && (
           <>
             {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -296,14 +296,14 @@ function Escena({
             <span className="font-mono text-xs uppercase tracking-[0.2em] text-acero">Sala de control</span>
             <div className="ml-auto flex items-center gap-4">
               <Reloj desfase={desfase} />
-              <button type="button" onClick={() => setSala(false)} className="inline-flex items-center gap-1 rounded-md border border-white/10 px-2 py-1 text-xs text-acero hover:border-white/25 hover:text-niebla focus-visible:outline focus-visible:outline-1 focus-visible:outline-temple" data-testid="salir-sala">
+              <button type="button" onClick={() => setSala(false)} className="inline-flex items-center gap-1 rounded-md border border-white/10 px-2 py-1 text-xs text-acero hover:border-white/25 hover:text-blanco focus-visible:outline focus-visible:outline-1 focus-visible:outline-foreground" data-testid="salir-sala">
                 <X className="size-3.5" aria-hidden /> Salir
               </button>
             </div>
           </>
         ) : nivel === "pieza" && pieza ? (
           <nav className="flex min-w-0 items-center gap-2 text-sm" aria-label="Ubicación en Forja">
-            <button type="button" onClick={() => verPieza(null)} className="inline-flex items-center gap-1 rounded-md border border-white/10 px-2 py-1 text-xs text-acero hover:border-white/25 hover:text-niebla focus-visible:outline focus-visible:outline-1 focus-visible:outline-temple" aria-label="Volver a la red">
+            <button type="button" onClick={() => verPieza(null)} className="inline-flex items-center gap-1 rounded-md border border-white/10 px-2 py-1 text-xs text-acero hover:border-white/25 hover:text-blanco focus-visible:outline focus-visible:outline-1 focus-visible:outline-foreground" aria-label="Volver a la red">
               <ArrowLeft className="size-3.5" aria-hidden /> Red
             </button>
             <span className="text-acero" aria-hidden>
@@ -315,7 +315,7 @@ function Escena({
           </nav>
         ) : nodoActual ? (
           <nav className="flex min-w-0 items-center gap-2 text-sm" aria-label="Ubicación en Forja">
-            <button type="button" onClick={() => void volver()} disabled={transicion !== null} className="inline-flex items-center gap-1 rounded-md border border-white/10 px-2 py-1 text-xs text-acero hover:border-white/25 hover:text-niebla focus-visible:outline focus-visible:outline-1 focus-visible:outline-temple disabled:opacity-50" aria-label="Volver a la red">
+            <button type="button" onClick={() => void volver()} disabled={transicion !== null} className="inline-flex items-center gap-1 rounded-md border border-white/10 px-2 py-1 text-xs text-acero hover:border-white/25 hover:text-blanco focus-visible:outline focus-visible:outline-1 focus-visible:outline-foreground disabled:opacity-50" aria-label="Volver a la red">
               <ArrowLeft className="size-3.5" aria-hidden /> Red
             </button>
             <span className="text-acero" aria-hidden>
@@ -324,7 +324,7 @@ function Escena({
             <span className="truncate font-heading font-bold" aria-current="page">
               {nodoActual.nombre}
             </span>
-            {nodoActual.demo && <span className="rounded-[3px] border border-dashed border-chispa/80 px-1 font-mono text-[9px] font-bold text-chispa">DEMO</span>}
+            {nodoActual.demo && <span className="rounded-[3px] border border-dashed border-alerta/80 px-1 font-mono text-[9px] font-bold text-alerta">DEMO</span>}
           </nav>
         ) : (
           <span className="hidden font-mono text-[11px] text-acero md:inline">
@@ -343,7 +343,7 @@ function Escena({
                   onClick={modo2D.alternar}
                   aria-pressed={es2D}
                   title={modo2D.motivo && !modo2D.elegido ? `Versión 2D automática: ${modo2D.motivo}` : es2D ? "Pasar a la versión 3D" : "Pasar a la versión 2D (más liviana)"}
-                  className="inline-flex items-center gap-1.5 rounded-lg border border-white/10 px-2.5 py-1 text-xs text-acero hover:border-white/25 hover:text-niebla focus-visible:outline focus-visible:outline-1 focus-visible:outline-temple"
+                  className="inline-flex items-center gap-1.5 rounded-lg border border-white/10 px-2.5 py-1 text-xs text-acero hover:border-white/25 hover:text-blanco focus-visible:outline focus-visible:outline-1 focus-visible:outline-foreground"
                   data-testid="alternar-2d"
                 >
                   {es2D ? <Square className="size-3.5" aria-hidden /> : <Box className="size-3.5" aria-hidden />}
@@ -352,7 +352,7 @@ function Escena({
                 <button
                   type="button"
                   onClick={() => setSala(true)}
-                  className="hidden items-center gap-1.5 rounded-lg border border-white/10 px-2.5 py-1 text-xs text-acero hover:border-white/25 hover:text-niebla focus-visible:outline focus-visible:outline-1 focus-visible:outline-temple md:inline-flex"
+                  className="hidden items-center gap-1.5 rounded-lg border border-white/10 px-2.5 py-1 text-xs text-acero hover:border-white/25 hover:text-blanco focus-visible:outline focus-visible:outline-1 focus-visible:outline-foreground md:inline-flex"
                   data-testid="abrir-sala"
                 >
                   <MonitorPlay className="size-3.5" aria-hidden /> Sala de control
@@ -375,12 +375,12 @@ function Escena({
           )}
         </div>
         {sinWebGL && nivel === "red" && (
-          <p className="absolute bottom-[4.5rem] right-3 z-10 rounded-md border border-white/10 bg-hierro/90 px-2.5 py-1.5 text-xs text-acero" role="status" data-testid="aviso-contexto">
+          <p className="absolute bottom-[4.5rem] right-3 z-10 rounded-md border border-white/10 bg-negro/90 px-2.5 py-1.5 text-xs text-acero" role="status" data-testid="aviso-contexto">
             Se perdió la aceleración gráfica: seguimos en la versión 2D.
           </p>
         )}
         {aviso && nivel === "red" && !sala && (
-          <div className="absolute right-3 top-3 z-10 max-w-sm rounded-md border border-white/10 bg-hierro/80 px-2.5 py-1.5 text-[11px] text-acero backdrop-blur" data-testid="aviso-demo">
+          <div className="absolute right-3 top-3 z-10 max-w-sm rounded-md border border-white/10 bg-negro/80 px-2.5 py-1.5 text-[11px] text-acero backdrop-blur" data-testid="aviso-demo">
             {aviso}
           </div>
         )}
@@ -394,9 +394,9 @@ function Escena({
         {nodoActual && <NivelTaller fuente={fuente} nodo={nodoActual} modo={camara} modo2D={es2D} onListo={() => avisarListo.current?.()} onPieza={(p) => void irAPieza(p)} />}
         {nivel === "pieza" && datosPieza && <PanelPieza datos={datosPieza} red={red} enlaces={fuente.enlaces} onCerrar={() => verPieza(null)} />}
         {nivel === "pieza" && !datosPieza && (
-          <div className="absolute right-4 top-4 z-20 max-w-sm rounded-xl border border-white/10 bg-hierro/95 p-4 text-sm text-acero" role="status" data-testid="panel-pieza-vacio">
+          <div className="absolute right-4 top-4 z-20 max-w-sm rounded-xl border border-white/10 bg-negro/95 p-4 text-sm text-acero" role="status" data-testid="panel-pieza-vacio">
             No hay datos de esa pieza en las sucursales que podés ver.
-            <button type="button" onClick={() => verPieza(null)} className="ml-2 text-niebla underline-offset-4 hover:underline">
+            <button type="button" onClick={() => verPieza(null)} className="ml-2 text-blanco underline-offset-4 hover:underline">
               Volver a la red
             </button>
           </div>
@@ -425,7 +425,7 @@ function Reloj({ desfase }: { desfase: number }) {
     const id = window.setInterval(() => setAhora(new Date(Date.now() + desfase).toISOString()), 15_000)
     return () => window.clearInterval(id)
   }, [desfase])
-  return <span className="font-mono text-2xl text-niebla">{hora(ahora)}</span>
+  return <span className="font-mono text-2xl text-blanco">{hora(ahora)}</span>
 }
 
 function SelectorVista() {
@@ -443,7 +443,7 @@ function SelectorVista() {
           type="button"
           aria-pressed={vista === v}
           onClick={() => setVista(v)}
-          className={cn("rounded-md px-3 py-1 text-xs font-medium transition-colors focus-visible:outline focus-visible:outline-1 focus-visible:outline-temple", vista === v ? "bg-white/12 text-niebla" : "text-acero hover:text-niebla")}
+          className={cn("rounded-md px-3 py-1 text-xs font-medium transition-colors focus-visible:outline focus-visible:outline-1 focus-visible:outline-foreground", vista === v ? "bg-white/12 text-blanco" : "text-acero hover:text-blanco")}
           data-testid={`vista-${v}`}
         >
           {nombre}
@@ -459,7 +459,7 @@ function LeyendaCalor() {
   const max = PARADAS_CALOR[PARADAS_CALOR.length - 1].calor
   const degradado = Array.from({ length: pasos + 1 }, (_, i) => colorCalor((i / pasos) * max)).join(", ")
   return (
-    <div className="pointer-events-none absolute left-3 top-3 z-10 hidden items-center gap-2 rounded-md bg-hierro/70 px-2 py-1 backdrop-blur md:flex" aria-label="Escala de calor: de frío a blanco caliente">
+    <div className="pointer-events-none absolute left-3 top-3 z-10 hidden items-center gap-2 rounded-md bg-negro/70 px-2 py-1 backdrop-blur md:flex" aria-label="Escala de calor: de frío a blanco caliente">
       <span className="font-mono text-[10px] uppercase tracking-widest text-acero">frío</span>
       <span className="h-1.5 w-28 rounded-full" style={{ background: `linear-gradient(90deg, ${degradado})` }} aria-hidden />
       <span className="font-mono text-[10px] uppercase tracking-widest text-acero">pico</span>

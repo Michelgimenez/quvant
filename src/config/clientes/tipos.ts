@@ -28,7 +28,7 @@ export type ClienteDemo = {
   sucursales: string[]
   /** Plazo estimado de implementación (escena "Cómo empezamos"). */
   plazo: string
-  /** Quién presenta la demo (vendedor de Yunque). */
+  /** Quién presenta la demo (vendedor de Quvant). */
   contacto: { nombre: string; email: string; telefono: string }
   /** Demo pública de Forja (`/demo/<slug>/forja`), si la tiene. */
   forja?: ForjaCliente

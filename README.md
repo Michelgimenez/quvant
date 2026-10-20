@@ -1,7 +1,11 @@
-# Yunque
+# Quvant
 
-Sistema de gestión en la nube para ferreterías industriales, distribuidores de maquinaria y negocios con stock
-complejo en Argentina. El mostrador sigue vendiendo aunque se corte internet. *Firme, aunque todo se mueva.*
+El sistema de gestión que se adapta a cada negocio: ventas, caja, stock, precios, compras, clientes y cuentas
+corrientes, sucursales, equipo y reportes, en un solo lugar. Del kiosco de barrio a la empresa con decenas de
+sucursales (Argentina). El mostrador sigue vendiendo aunque se corte internet. *Software a la vanguardia de cada nicho.*
+
+Antes se llamaba **Yunque** (para ferreterías industriales). La identidad sale del manual de Quvant
+(`referencias/Quvant-manual-de-identidad.pdf`); cómo quedó aplicada, en `docs/TIPOGRAFIA.md`.
 
 **Estado:** demo funcional / piloto. Primer piloto en negociación. Todavía no hay clientes pagando.
 Pagos, facturación y mensajería están **emulados**.
@@ -42,10 +46,10 @@ La primera vez que se corren los e2e o las capturas: `npx playwright install chr
 | `/` | sitio del producto |
 | `/ingresar` → `/app` | la app (usuarios de prueba abajo) |
 | `/inversores` | presentación para inversores (con clave) |
-| `/demo/ferremix` | demo comercial "Así se vería Yunque en Ferremix" (sello PROPUESTA) |
+| `/demo/ferremix` | demo comercial "Así se vería Quvant en Ferremix" (sello PROPUESTA) |
 | `/panel` | panel interno del equipo: solicitudes de "Pedir una demo" (con clave) |
 | `/estado` | página de estado |
-| `/marca` | identidad: logo, colores, sello "con yunque" |
+| `/marca` | identidad de Quvant: logo, colores, sello "Funciona con Quvant" · lámina en `/marca/sistema` |
 
 ## Usuarios de prueba (modo demo)
 
@@ -54,21 +58,21 @@ se muestra en la pantalla de verificación (el autenticador está emulado).
 
 | Email | Rol | Sucursales |
 |---|---|---|
-| `dueno@demo.yunque.app` | Dueño (2FA) | todas |
-| `admin@demo.yunque.app` | Administración (2FA) | todas |
-| `mostrador@demo.yunque.app` | Mostrador | Casa Central |
-| `mostrador.norte@demo.yunque.app` | Mostrador | Sucursal Norte |
-| `maquinaria@demo.yunque.app` | Mostrador | Salón y depósito de maquinaria |
-| `deposito@demo.yunque.app` | Depósito | todas |
-| `tecnico@demo.yunque.app` | Técnico | Casa Central |
-| `tecnico2@demo.yunque.app` | Técnico | Casa Central |
-| `compras@demo.yunque.app` | Compras | todas |
+| `dueno@demo.quvant.app` | Dueño (2FA) | todas |
+| `admin@demo.quvant.app` | Administración (2FA) | todas |
+| `mostrador@demo.quvant.app` | Mostrador | Casa Central |
+| `mostrador.norte@demo.quvant.app` | Mostrador | Sucursal Norte |
+| `maquinaria@demo.quvant.app` | Mostrador | Salón y depósito de maquinaria |
+| `deposito@demo.quvant.app` | Depósito | todas |
+| `tecnico@demo.quvant.app` | Técnico | Casa Central |
+| `tecnico2@demo.quvant.app` | Técnico | Casa Central |
+| `compras@demo.quvant.app` | Compras | todas |
 
 La pantalla de ingreso tiene un panel para elegir cualquiera de estos usuarios con un clic.
 
 ## Presentaciones
 
-**Clave de `/inversores`:** la variable `INVERSORES_KEY`. En desarrollo, si no está definida, es `yunque-demo`.
+**Clave de `/inversores`:** la variable `INVERSORES_KEY`. En desarrollo, si no está definida, es `quvant-demo`.
 En producción, sin `INVERSORES_KEY` la presentación queda cerrada.
 
 | Tecla | Acción |
@@ -83,7 +87,7 @@ En producción, sin `INVERSORES_KEY` la presentación queda cerrada.
 | **F** | pantalla completa |
 | `#N` en la URL | ir a la escena N (por ejemplo `/inversores#5`) |
 
-**Clave de `/panel`:** la variable `PANEL_KEY` (en desarrollo, si falta, `yunque-panel`; en producción sin
+**Clave de `/panel`:** la variable `PANEL_KEY` (en desarrollo, si falta, `quvant-panel`; en producción sin
 `PANEL_KEY` queda cerrado). Muestra cada solicitud de "Pedir una demo" con su WhatsApp, avisa cuántas hay
 nuevas y permite marcarlas como contactadas. Sin Supabase, las solicitudes se guardan en una base PostgreSQL
 local (`.data/base-local`, mismo esquema que producción).

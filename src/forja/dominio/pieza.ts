@@ -121,7 +121,7 @@ export type HistoriaMaquina = {
   ordenes: OrdenMaquina[]
   /**
    * Ventas que **coinciden** por cliente, marca y tipo de equipo, anteriores al
-   * primer ingreso. Yunque todavía no registra números de serie en compras y
+   * primer ingreso. Quvant todavía no registra números de serie en compras y
    * ventas: esto es una referencia, no un vínculo comprobado.
    */
   ventasCoincidentes: { ventaId: Id; fecha: FechaISO; sucursalId: Id; numero: string; producto: string }[]

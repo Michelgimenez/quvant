@@ -1,4 +1,4 @@
-# Yunque — arquitectura
+# Quvant — arquitectura
 
 > Para un equipo que llega al código por primera vez. Estado: **demo funcional / piloto**.
 > Las decisiones con su porqué están numeradas (D1–D40) en [`REPORTE.md`](REPORTE.md).

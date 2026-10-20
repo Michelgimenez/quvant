@@ -81,7 +81,7 @@ export function CapaEtiquetas({ anclas, plano, elementos }: { anclas: Ancla[]; p
 function Etiqueta({ a, activa }: { a: Ancla; activa: boolean }) {
   switch (a.tipo) {
     case "zona":
-      return <span className={cn("block -translate-y-1/2 whitespace-nowrap font-mono text-[10px] uppercase tracking-[0.18em]", activa ? "text-niebla" : "text-acero/75")}>{a.texto}</span>
+      return <span className={cn("block -translate-y-1/2 whitespace-nowrap font-mono text-[10px] uppercase tracking-[0.18em]", activa ? "text-blanco" : "text-acero/75")}>{a.texto}</span>
     case "seccion":
       return (
         <span className="block -translate-y-1/2 whitespace-nowrap font-mono text-[9px] tracking-[0.14em] text-acero/60" title={a.titulo}>
@@ -90,15 +90,15 @@ function Etiqueta({ a, activa }: { a: Ancla; activa: boolean }) {
       )
     case "banco":
       return (
-        <span className="flex -translate-x-1/2 -translate-y-full items-center gap-1 whitespace-nowrap rounded-[3px] bg-hierro/80 px-1 font-mono text-[10px] text-niebla" data-testid="banco-orden" title={NOMBRE_ESTADO_SERVICIO[a.banco.estado]}>
+        <span className="flex -translate-x-1/2 -translate-y-full items-center gap-1 whitespace-nowrap rounded-[3px] bg-negro/80 px-1 font-mono text-[10px] text-blanco" data-testid="banco-orden" title={NOMBRE_ESTADO_SERVICIO[a.banco.estado]}>
           <span className="size-1.5 rounded-full" style={{ background: LUZ_SERVICIO[a.banco.estado].color }} />
           {a.banco.numero}
-          {a.banco.prioridad === "urgente" && <span className="text-chispa">!</span>}
+          {a.banco.prioridad === "urgente" && <span className="text-alerta">!</span>}
         </span>
       )
     case "cola":
       return (
-        <span className="block -translate-x-1/2 -translate-y-full whitespace-nowrap rounded-[3px] border border-chispa/60 bg-hierro/85 px-1.5 py-0.5 font-mono text-[10px] text-chispa" data-testid="cola-sin-conexion">
+        <span className="block -translate-x-1/2 -translate-y-full whitespace-nowrap rounded-[3px] border border-alerta/60 bg-negro/85 px-1.5 py-0.5 font-mono text-[10px] text-alerta" data-testid="cola-sin-conexion">
           {a.n} sin sincronizar
         </span>
       )
@@ -118,7 +118,7 @@ function Etiqueta({ a, activa }: { a: Ancla; activa: boolean }) {
 function TooltipRack({ rack }: { rack: PlanoTaller["racks"][number]["rack"] }) {
   const productos = [...rack.productos].sort((a, b) => a.estante - b.estante)
   return (
-    <div className="w-64 -translate-x-1/2 -translate-y-full rounded-lg border border-white/10 bg-hierro/95 p-3 text-niebla shadow-2xl" data-testid="tooltip-rack" role="tooltip">
+    <div className="w-64 -translate-x-1/2 -translate-y-full rounded-lg border border-white/10 bg-negro/95 p-3 text-blanco shadow-2xl" data-testid="tooltip-rack" role="tooltip">
       <p className="flex items-baseline justify-between gap-2">
         <span className="font-heading text-sm font-bold">Rack {rack.id}</span>
         <span className="truncate font-mono text-[10px] text-acero">{rack.categoriaNombre}</span>
@@ -130,7 +130,7 @@ function TooltipRack({ rack }: { rack: PlanoTaller["racks"][number]["rack"] }) {
             <li key={p.productoId} className="flex items-baseline gap-2 text-[11px]">
               <span className="w-6 shrink-0 font-mono text-[10px] text-acero">E{p.estante}</span>
               <span className="min-w-0 flex-1 truncate">{p.nombre}</span>
-              <span className={cn("font-mono", p.cantidad <= 0 ? "text-brasa" : alerta ? "text-chispa" : "text-niebla")}>{p.cantidad <= 0 ? "sin stock" : formatoCantidad(p.cantidad)}</span>
+              <span className={cn("font-mono", p.cantidad <= 0 ? "text-brasa" : alerta ? "text-alerta" : "text-blanco")}>{p.cantidad <= 0 ? "sin stock" : formatoCantidad(p.cantidad)}</span>
             </li>
           )
         })}

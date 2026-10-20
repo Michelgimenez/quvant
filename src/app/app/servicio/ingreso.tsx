@@ -86,7 +86,7 @@ export function DialogoIngreso({ onCerrar, onCreada }: { onCerrar: () => void; o
             <SelectorCliente valor={clienteId} onCambio={setClienteId} permitirFinal={false} />
           </div>
           <fieldset>
-            <legend className="mb-1.5 text-sm font-medium">Tipo de equipo</legend>
+            <legend className="mb-1.5 t-texto-sm font-medium">Tipo de equipo</legend>
             <div className="grid grid-cols-4 gap-2">
               {TIPOS.map((t) => (
                 <button
@@ -94,7 +94,7 @@ export function DialogoIngreso({ onCerrar, onCreada }: { onCerrar: () => void; o
                   type="button"
                   onClick={() => setTipo(t.id)}
                   aria-pressed={tipo === t.id}
-                  className={cn("flex flex-col items-center gap-1 rounded-lg border p-2 text-[11px]", tipo === t.id ? "border-primary bg-primary/10" : "border-linea hover:border-acero/50")}
+                  className={cn("flex flex-col items-center gap-1 rounded-lg border p-2 t-texto-sm", tipo === t.id ? "border-primary bg-primary/10" : "border-linea hover:border-acero/50")}
                 >
                   <IlustracionProducto tipo={t.id} className="size-7" />
                   {t.nombre}

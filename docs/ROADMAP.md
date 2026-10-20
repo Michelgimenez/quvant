@@ -1,4 +1,4 @@
-# Yunque — hoja de ruta: de demo a producción
+# Quvant — hoja de ruta: de demo a producción
 
 > Fuente de las etapas: `src/config/hoja-de-ruta.ts` (la usan también la presentación para inversores y la
 > demo comercial). Estado de cada función: `src/showcase/features.ts`. Al terminar o cambiar una función,
@@ -14,10 +14,10 @@
 
 ## Quvant: el renombre y la identidad nueva (en curso, rama `quvant`)
 
-Yunque pasa a llamarse **Quvant** y se abre del kiosco a la empresa grande, con la identidad del manual (`referencias/Quvant-manual-de-identidad.pdf`). Son 10 tandas (`PROMPT-QUVANT.md`). No cambia ninguna funcionalidad: los estados de `src/showcase/features.ts` siguen iguales.
+El sistema que se llamaba Yunque pasa a llamarse **Quvant** y se abre del kiosco a la empresa grande, con la identidad del manual (`referencias/Quvant-manual-de-identidad.pdf`). Son 10 tandas (`PROMPT-QUVANT.md`). No cambia ninguna funcionalidad: los estados de `src/showcase/features.ts` siguen iguales.
 
 - **Tanda 1 · La marca en el sistema — hecha (20/10/2026).** Logos y sus versiones, tokens de color con modo claro y estados, Michroma e IBM Plex Mono con estilos cerrados, la grilla, el salto (que reemplaza a la chispa como recompensa) y la lámina del sistema aplicado. Logotipo QUVANT provisorio hasta el archivo oficial.
-- Tanda 2 · El renombre y la app — siguiente.
+- **Tanda 2 · El renombre y la app — hecha.** Quvant en todo lo visible, el titular A por defecto, los componentes base y la app con la identidad nueva; el material viejo de Forja, oculto.
 - Tandas 3 a 10: las cuatro empresas de la demo, el cambio de empresa, los recorridos por rubro, el sitio, las presentaciones y los videos, y Forja con la marca nueva.
 
 ## Etapas
@@ -44,11 +44,11 @@ Mercado Pago, Mercado Libre y WhatsApp Business conectados de verdad (hoy emulad
 
 ## Forja (extensión visual): lista en demo
 
-Forja convierte los datos de Yunque en un taller conectado: las sucursales en un mapa, cada una por dentro en 3D, y la jornada que se puede reproducir. Hecha por fases (detalle en [`docs/FORJA.md`](FORJA.md)):
+Forja convierte los datos de Quvant en un taller conectado: las sucursales en un mapa, cada una por dentro en 3D, y la jornada que se puede reproducir. Hecha por fases (detalle en [`docs/FORJA.md`](FORJA.md)):
 
 1. **Base** ✔︎ — token `--superficie`, paleta de calor, modelo de datos (ubicación de sucursales, transferencias en tránsito, extensiones por empresa, preferencias, permisos extra por persona), lecturas SQL con RLS, canales en vivo por sucursal, simulador para la demo y tests de aislamiento.
 2. **Red en el mapa** ✔︎ — MapLibre + deck.gl, nodos con calor y stock crítico, transferencias animadas, tarjetas y constelación.
-3. **Taller isométrico 3D por sucursal** ✔︎ — mostrador, depósito, servicio técnico y muelle desde los datos de Yunque, panel lateral con enlaces a cada módulo y transición de cámara desde el mapa.
+3. **Taller isométrico 3D por sucursal** ✔︎ — mostrador, depósito, servicio técnico y muelle desde los datos de Quvant, panel lateral con enlaces a cada módulo y transición de cámara desde el mapa.
 4. **Línea de tiempo del día y modo sala de control** ✔︎ — repetición a 1×, 60×, 600× o 1200× con la red reconstruida a cada hora, y recorrido de 20 s por sucursal con titulares para una TV.
 5. **Animación de activación y página de extensiones** ✔︎ — el yunque se convierte en forja (4,5 s, se puede saltar, queda guardada por persona) y versión quieta para movimiento reducido.
 6. **Recorrido de una pieza** ✔︎ — el camino de un SKU por las sucursales (arcos, stock y movimientos con saldo) y la historia de una máquina por número de serie, desde el buscador ⌘K o el taller.

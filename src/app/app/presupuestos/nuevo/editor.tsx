@@ -111,7 +111,7 @@ function Editor() {
             {!clienteId && <Input value={clienteNombre} onChange={(ev) => setClienteNombre(ev.target.value)} placeholder="Nombre del cliente (sin ficha)" aria-label="Nombre del cliente" />}
             <div className="grid grid-cols-2 gap-2">
               <div className="space-y-1">
-                <Label className="text-xs">Lista</Label>
+                <Label className="t-texto-sm">Lista</Label>
                 <Select value={listaId} onValueChange={setListaId}>
                   <SelectTrigger className="w-full" aria-label="Lista de precios">
                     <SelectValue />
@@ -126,14 +126,14 @@ function Editor() {
                 </Select>
               </div>
               <div className="space-y-1">
-                <Label className="text-xs" htmlFor="validez">
+                <Label className="t-texto-sm" htmlFor="validez">
                   Validez (días)
                 </Label>
                 <Input id="validez" type="number" min={1} max={90} value={dias} onChange={(ev) => setDias(ev.target.value)} className="num" />
               </div>
             </div>
             <div className="space-y-1">
-              <Label className="text-xs" htmlFor="notas">
+              <Label className="t-texto-sm" htmlFor="notas">
                 Notas para el cliente
               </Label>
               <Textarea id="notas" value={notas} onChange={(ev) => setNotas(ev.target.value)} rows={3} />
@@ -141,7 +141,7 @@ function Editor() {
           </div>
           <div className="space-y-3 rounded-xl border border-linea bg-card p-4">
             <div className="flex items-end justify-between">
-              <span className="text-sm font-semibold">Total</span>
+              <span className="t-texto-sm font-semibold">Total</span>
               <span className="text-3xl font-semibold tracking-tight">{formatoPesos(totalItems(items))}</span>
             </div>
             <Button size="lg" className="w-full" disabled={!valido || guardando} onClick={() => guardar("enviado")} data-testid="guardar-presupuesto">

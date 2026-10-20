@@ -23,13 +23,13 @@ export const NOMBRE_ESTADO_COMPRA: Record<EstadoCompra, string> = {
 }
 const TONO: Record<EstadoCompra, string> = {
   borrador: "bg-muted text-muted-foreground",
-  enviada: "bg-temple/15 text-enlace",
-  recibida_parcial: "bg-chispa/15 text-chispa-texto",
-  recibida: "bg-ok/15 text-ok-texto",
-  cancelada: "bg-error/15 text-error-texto",
+  enviada: "bg-foreground/15 text-foreground",
+  recibida_parcial: "bg-alerta/15 text-alerta",
+  recibida: "bg-ok/15 text-ok",
+  cancelada: "bg-error/15 text-error",
 }
 export function ChipCompra({ estado }: { estado: EstadoCompra }) {
-  return <span className={cn("rounded-full px-2 py-0.5 text-[11px] font-medium", TONO[estado])}>{NOMBRE_ESTADO_COMPRA[estado]}</span>
+  return <span className={cn("rounded-full px-2 py-0.5 t-texto-sm font-medium", TONO[estado])}>{NOMBRE_ESTADO_COMPRA[estado]}</span>
 }
 
 export function Compras() {
@@ -66,9 +66,9 @@ export function Compras() {
   const columnas: Columna<OrdenCompra>[] = [
     { id: "numero", encabezado: "Orden", ancho: "110px", orden: (o) => o.numero ?? 0, celda: (o) => <span className="ficha text-foreground">{o.numero ? `OC #${o.numero}` : o.numeroLocal}</span> },
     { id: "proveedor", encabezado: "Proveedor", ancho: "minmax(200px,2fr)", orden: (o) => e.proveedores.find((p) => p.id === o.proveedorId)?.nombre ?? "", celda: (o) => <span className="truncate">{e.proveedores.find((p) => p.id === o.proveedorId)?.nombre}</span> },
-    { id: "suc", encabezado: "Suc.", ancho: "56px", celda: (o) => <span className="num text-xs">{e.sucursales.find((s) => s.id === o.sucursalId)?.codigo}</span> },
-    { id: "fecha", encabezado: "Fecha", ancho: "100px", orden: (o) => o.fecha, celda: (o) => <span className="num text-xs text-muted-foreground">{new Date(o.fecha).toLocaleDateString("es-AR")}</span> },
-    { id: "items", encabezado: "Ítems", ancho: "60px", alinear: "der", celda: (o) => <span className="num text-xs">{o.items.length}</span> },
+    { id: "suc", encabezado: "Suc.", ancho: "56px", celda: (o) => <span className="num t-texto-sm">{e.sucursales.find((s) => s.id === o.sucursalId)?.codigo}</span> },
+    { id: "fecha", encabezado: "Fecha", ancho: "100px", orden: (o) => o.fecha, celda: (o) => <span className="num t-texto-sm text-muted-foreground">{new Date(o.fecha).toLocaleDateString("es-AR")}</span> },
+    { id: "items", encabezado: "Ítems", ancho: "60px", alinear: "der", celda: (o) => <span className="num t-texto-sm">{o.items.length}</span> },
     { id: "estado", encabezado: "Estado", ancho: "140px", orden: (o) => o.estado, celda: (o) => <ChipCompra estado={o.estado} /> },
     { id: "total", encabezado: "Total", ancho: "120px", alinear: "der", orden: (o) => o.total, celda: (o) => <span className="num">{formatoPesos(o.total, { sinDecimales: true })}</span> },
   ]
@@ -105,7 +105,7 @@ export function Compras() {
       <Tabs defaultValue="ordenes">
         <TabsList className="mb-3">
           <TabsTrigger value="ordenes">Órdenes</TabsTrigger>
-          <TabsTrigger value="sugerencias">Sugerencias {sugerencias.length > 0 && <span className="num ml-1 rounded bg-chispa/20 px-1 text-[10px]">{sugerencias.reduce((t, s) => t + s.items.length, 0)}</span>}</TabsTrigger>
+          <TabsTrigger value="sugerencias">Sugerencias {sugerencias.length > 0 && <span className="num ml-1 rounded bg-alerta/20 px-1 t-texto-sm">{sugerencias.reduce((t, s) => t + s.items.length, 0)}</span>}</TabsTrigger>
           <TabsTrigger value="proveedores">Proveedores</TabsTrigger>
         </TabsList>
         <TabsContent value="ordenes">
@@ -113,7 +113,7 @@ export function Compras() {
             tarjeta={(o) => (
               <div className="flex w-full items-center gap-3">
                 <div className="min-w-0 flex-1">
-                  <p className="truncate text-sm">{e.proveedores.find((p) => p.id === o.proveedorId)?.nombre}</p>
+                  <p className="truncate t-texto-sm">{e.proveedores.find((p) => p.id === o.proveedorId)?.nombre}</p>
                   <p className="ficha">{o.numero ? `OC #${o.numero}` : o.numeroLocal} · {new Date(o.fecha).toLocaleDateString("es-AR")}</p>
                 </div>
                 <ChipCompra estado={o.estado} />
@@ -132,7 +132,7 @@ export function Compras() {
                   <div className="mb-2 flex items-start justify-between gap-2">
                     <div>
                       <h3 className="font-semibold">{proveedor.nombre}</h3>
-                      <p className="text-xs text-muted-foreground">
+                      <p className="t-texto-sm text-muted-foreground">
                         {items.length} producto(s) · entrega en ~{proveedor.diasEntrega} días · {formatoPesosCorto(items.reduce((t, i) => t + i.cantidad * i.costoUnitario, 0))}
                       </p>
                     </div>
@@ -142,17 +142,17 @@ export function Compras() {
                       </Button>
                     )}
                   </div>
-                  <ul className="space-y-1 text-sm">
+                  <ul className="space-y-1 t-texto-sm">
                     {items.slice(0, 8).map((i) => (
                       <li key={i.productoId} className="flex items-center gap-2">
                         <span className="min-w-0 flex-1 truncate">{e.productos[i.productoId].nombre}</span>
-                        <span className="num text-xs text-muted-foreground">
+                        <span className="num t-texto-sm text-muted-foreground">
                           hay {formatoCantidad(i.stock)} / mín {formatoCantidad(i.minimo)}
                         </span>
                         <span className="num w-14 text-right font-medium">+{formatoCantidad(i.cantidad)}</span>
                       </li>
                     ))}
-                    {items.length > 8 && <li className="text-xs text-muted-foreground">y {items.length - 8} más…</li>}
+                    {items.length > 8 && <li className="t-texto-sm text-muted-foreground">y {items.length - 8} más…</li>}
                   </ul>
                 </section>
               ))}
@@ -162,12 +162,12 @@ export function Compras() {
         <TabsContent value="proveedores">
           <ul className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
             {e.proveedores.map((p) => (
-              <li key={p.id} className="rounded-xl border border-linea bg-card p-4 text-sm">
+              <li key={p.id} className="rounded-xl border border-linea bg-card p-4 t-texto-sm">
                 <p className="font-semibold">{p.nombre}</p>
                 <p className="ficha mt-0.5">CUIT {p.cuit}</p>
                 <p className="mt-2 text-muted-foreground">{p.contacto}</p>
-                <p className="num text-xs text-muted-foreground">{p.telefono} · {p.email}</p>
-                <p className="mt-2 text-xs">Entrega estimada: {p.diasEntrega} días · {Object.values(e.productos).filter((x) => x.proveedorId === p.id).length} productos</p>
+                <p className="num t-texto-sm text-muted-foreground">{p.telefono} · {p.email}</p>
+                <p className="mt-2 t-texto-sm">Entrega estimada: {p.diasEntrega} días · {Object.values(e.productos).filter((x) => x.proveedorId === p.id).length} productos</p>
               </li>
             ))}
           </ul>

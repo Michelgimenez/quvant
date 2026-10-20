@@ -81,7 +81,7 @@ export function topProductos(e: EstadoEmpresa, ventas: Venta[], desde: string, c
 
 export type Alerta = {
   id: string
-  tono: "error" | "chispa" | "acero" | "ok"
+  tono: "error" | "alerta" | "acero" | "ok"
   titulo: string
   detalle: string
   href: string
@@ -103,10 +103,10 @@ export function alertas(e: EstadoEmpresa, ahora: Date, sucursales: Id[] | null):
     else if (st.cantidad <= st.minimo) bajo++
   }
   if (sinStock) r.push({ id: "sin-stock", tono: "error", titulo: "Sin stock", detalle: "Productos agotados en alguna sucursal", href: "/app/inventario?stock=sin", cantidad: sinStock })
-  if (bajo) r.push({ id: "bajo-minimo", tono: "chispa", titulo: "Bajo el mínimo", detalle: "Reponer pronto", href: "/app/inventario?stock=bajo", cantidad: bajo })
+  if (bajo) r.push({ id: "bajo-minimo", tono: "alerta", titulo: "Bajo el mínimo", detalle: "Reponer pronto", href: "/app/inventario?stock=bajo", cantidad: bajo })
 
   const porVencer = Object.values(e.presupuestos).filter((p) => enAlcance(p.sucursalId) && (p.estado === "enviado" || p.estado === "aceptado") && diaDe(p.vencimiento) <= en3)
-  if (porVencer.length) r.push({ id: "presupuestos", tono: "chispa", titulo: "Presupuestos por vencer", detalle: "En los próximos 3 días", href: "/app/presupuestos?estado=abiertos", cantidad: porVencer.length })
+  if (porVencer.length) r.push({ id: "presupuestos", tono: "alerta", titulo: "Presupuestos por vencer", detalle: "En los próximos 3 días", href: "/app/presupuestos?estado=abiertos", cantidad: porVencer.length })
 
   const listos = Object.values(e.servicio).filter((o) => enAlcance(o.sucursalId) && o.estado === "listo")
   if (listos.length) r.push({ id: "listos", tono: "ok", titulo: "Equipos listos para retirar", detalle: "Servicio técnico", href: "/app/servicio?estado=listo", cantidad: listos.length })
@@ -121,7 +121,7 @@ export function alertas(e: EstadoEmpresa, ahora: Date, sucursales: Id[] | null):
   if (excedidos.length) r.push({ id: "limite", tono: "error", titulo: "Clientes sobre su límite", detalle: "Cuenta corriente", href: "/app/clientes?filtro=excedidos", cantidad: excedidos.length })
 
   const conAdvertencias = Object.values(e.ventas).filter((v) => enAlcance(v.sucursalId) && v.advertencias.length > 0 && v.estado === "confirmada")
-  if (conAdvertencias.length) r.push({ id: "advertencias", tono: "chispa", titulo: "Ventas para revisar", detalle: "Stock negativo o precio distinto de lista", href: "/app/reportes?vista=advertencias", cantidad: conAdvertencias.length })
+  if (conAdvertencias.length) r.push({ id: "advertencias", tono: "alerta", titulo: "Ventas para revisar", detalle: "Stock negativo o precio distinto de lista", href: "/app/reportes?vista=advertencias", cantidad: conAdvertencias.length })
 
   return r
 }

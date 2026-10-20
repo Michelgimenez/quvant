@@ -38,9 +38,9 @@ export const SelectorCliente = forwardRef<SelectorClienteRef, { valor: Id | null
             <span className="flex min-w-0 items-center gap-2">
               <UserRound className="size-4 shrink-0 text-muted-foreground" />
               <span className="min-w-0">
-                <span className="block truncate text-sm font-medium">{c ? c.nombre : "Consumidor final"}</span>
+                <span className="block truncate t-texto-sm font-medium">{c ? c.nombre : "Consumidor final"}</span>
                 {c && (
-                  <span className="block truncate text-[11px] text-muted-foreground">
+                  <span className="block truncate t-texto-sm text-muted-foreground">
                     {c.cuit || c.condicionIva} · {e.listas.find((l) => l.id === c.listaId)?.nombre}
                   </span>
                 )}
@@ -79,7 +79,7 @@ export const SelectorCliente = forwardRef<SelectorClienteRef, { valor: Id | null
                     >
                       <Check className={cn("size-4", valor === x.id ? "opacity-100" : "opacity-0")} />
                       <span className="min-w-0 flex-1 truncate">{x.nombre}</span>
-                      {x.limiteCredito > 0 && <span className="text-[10px] text-muted-foreground">Cta. cte.</span>}
+                      {x.limiteCredito > 0 && <span className="t-texto-sm text-muted-foreground">Cta. cte.</span>}
                     </CommandItem>
                   ))}
               </CommandGroup>
@@ -104,9 +104,9 @@ export const SelectorCliente = forwardRef<SelectorClienteRef, { valor: Id | null
         </PopoverContent>
       </Popover>
       {c && c.limiteCredito > 0 && (
-        <p className="flex justify-between px-1 text-[11px] text-muted-foreground">
+        <p className="flex justify-between px-1 t-texto-sm text-muted-foreground">
           <span>Saldo {formatoPesos(saldo, { sinDecimales: true })}</span>
-          <span className={cn(saldo > c.limiteCredito && "font-semibold text-error-texto")}>Disponible {formatoPesos(Math.max(0, c.limiteCredito - saldo), { sinDecimales: true })}</span>
+          <span className={cn(saldo > c.limiteCredito && "font-semibold text-error")}>Disponible {formatoPesos(Math.max(0, c.limiteCredito - saldo), { sinDecimales: true })}</span>
         </p>
       )}
       {alta && <AltaRapida onCerrar={() => setAlta(false)} onCreado={onCambio} />}

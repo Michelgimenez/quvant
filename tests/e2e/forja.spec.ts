@@ -39,7 +39,7 @@ test.describe("Forja · red", () => {
   test("la dueña activa Forja: mapa con toda la red, simulación viva y constelación", async ({ page }) => {
     // WebGL por software en el navegador de prueba + espera de eventos simulados
     test.setTimeout(150_000)
-    await ingresar(page, "dueno@demo.yunque.app")
+    await ingresar(page, "dueno@demo.quvant.app")
     await page.goto("/app/forja")
     await expect(page.getByText("Forja no está activada")).toBeVisible()
     await activarForja(page)
@@ -70,17 +70,17 @@ test.describe("Forja · red", () => {
   })
 
   test("con permiso extra, una persona de mostrador ve solo su sucursal; sin permiso, nada", async ({ page, context }) => {
-    await ingresar(page, "dueno@demo.yunque.app")
+    await ingresar(page, "dueno@demo.quvant.app")
     await activarForja(page)
     await context.clearCookies()
 
-    await ingresar(page, "mostrador.norte@demo.yunque.app")
+    await ingresar(page, "mostrador.norte@demo.quvant.app")
     await page.goto("/app/forja?simulacion=0")
     await expect(page.getByTestId("nodo-forja")).toHaveCount(1, { timeout: 30_000 })
     await expect(page.locator("[data-nodo=NO]")).toHaveCount(1)
     await context.clearCookies()
 
-    await ingresar(page, "mostrador@demo.yunque.app")
+    await ingresar(page, "mostrador@demo.quvant.app")
     await page.goto("/app/forja")
     await expect(page.getByRole("heading", { name: "Sin acceso" })).toBeVisible({ timeout: 30_000 })
     await expect(page.getByRole("link", { name: "Forja" })).toHaveCount(0)
@@ -89,7 +89,7 @@ test.describe("Forja · red", () => {
   test("MapLibre y deck.gl se cargan solo en Forja", async ({ page }) => {
     // Vuelve a bajar todos los scripts para leerlos: con la máquina cargada pasa del minuto
     test.setTimeout(150_000)
-    await ingresar(page, "dueno@demo.yunque.app")
+    await ingresar(page, "dueno@demo.quvant.app")
     const otros = registrarScripts(page)
     await page.goto("/app/inventario")
     await page.waitForSelector("#contenido h1")
@@ -109,7 +109,7 @@ test.describe("Forja · red", () => {
 test.describe("Forja · taller", () => {
   test("entrar a una sucursal: taller 3D, zonas, panel con enlaces y vuelta a la red", async ({ page }) => {
     test.setTimeout(180_000)
-    await ingresar(page, "dueno@demo.yunque.app")
+    await ingresar(page, "dueno@demo.quvant.app")
     await activarForja(page)
     // Segunda visita (sin la animación de activación, que también usa 3D): three.js baja recién al entrar a una sucursal
     const scripts = registrarScripts(page)
@@ -167,7 +167,7 @@ test.describe("Forja · taller", () => {
   test("@celular el taller entra en la pantalla con la barra de zonas a mano", async ({ page }) => {
     test.skip(test.info().project.name !== "celular", "Solo en el proyecto de celular")
     test.setTimeout(180_000)
-    await ingresar(page, "dueno@demo.yunque.app")
+    await ingresar(page, "dueno@demo.quvant.app")
     await activarForja(page)
     await expect(page.getByTestId("forja-red")).toHaveAttribute("data-listo", "true", { timeout: 60_000 })
     await page.locator("[data-nodo=CC] button").click({ force: true })
@@ -184,7 +184,7 @@ test.describe("Forja · taller", () => {
 test.describe("Forja · repetición del día y sala de control", () => {
   test("repetir el día a 1200×: arranca de cero, suma ventas y al llegar al presente vuelve a en vivo", async ({ page }) => {
     test.setTimeout(180_000)
-    await ingresar(page, "dueno@demo.yunque.app")
+    await ingresar(page, "dueno@demo.quvant.app")
     await activarForja(page)
     await expect(page.getByTestId("forja-red")).toHaveAttribute("data-listo", "true", { timeout: 60_000 })
     const linea = page.getByTestId("linea-tiempo")
@@ -211,7 +211,7 @@ test.describe("Forja · repetición del día y sala de control", () => {
 
   test("sala de control: recorre la red y cada sucursal cada 20 s, con titulares y sellos visibles", async ({ page }) => {
     test.setTimeout(150_000)
-    await ingresar(page, "dueno@demo.yunque.app")
+    await ingresar(page, "dueno@demo.quvant.app")
     await activarForja(page)
     await expect(page.getByTestId("forja-red")).toHaveAttribute("data-listo", "true", { timeout: 60_000 })
     await page.getByTestId("abrir-sala").click()
@@ -235,7 +235,7 @@ test.describe("Forja · repetición del día y sala de control", () => {
 test.describe("Forja · activación", () => {
   test("el yunque se convierte en forja: termina sola, enciende las sucursales y no vuelve a aparecer", async ({ page }) => {
     test.setTimeout(150_000)
-    await ingresar(page, "dueno@demo.yunque.app")
+    await ingresar(page, "dueno@demo.quvant.app")
     await page.goto("/app/extensiones")
     await page.getByTestId("activar-forja").click()
     await page.waitForURL(/\/app\/forja/)
@@ -268,7 +268,7 @@ test.describe("Forja · activación", () => {
 test.describe("Forja · pieza (nivel 3)", () => {
   test("⌘K abre el recorrido de un producto; desde el taller y por número de serie, la historia de una máquina", async ({ page }) => {
     test.setTimeout(180_000)
-    await ingresar(page, "dueno@demo.yunque.app")
+    await ingresar(page, "dueno@demo.quvant.app")
     await activarForja(page)
     await expect(page.getByTestId("forja-red")).toHaveAttribute("data-listo", "true", { timeout: 60_000 })
     const buscador = page.getByPlaceholder("Buscar productos, clientes o ir a…")
@@ -297,7 +297,7 @@ test.describe("Forja · pieza (nivel 3)", () => {
     await expect(panel).toHaveAttribute("data-tipo", "maquina", { timeout: 15_000 })
     await expect(page.getByTestId("forja-taller")).toHaveCount(0)
     await expect(panel.getByTestId("ordenes-maquina").locator("> li").first()).toBeVisible()
-    await expect(panel).toContainText("Yunque todavía no registra números de serie")
+    await expect(panel).toContainText("Quvant todavía no registra números de serie")
     const serie = (await panel.locator("header").innerText()).match(/SN\d+/)![0]
 
     // Y por número de serie desde el buscador
@@ -315,7 +315,7 @@ test.describe("Forja · versión 2D", () => {
 
   test("con movimiento reducido: mapa SVG y plano de planta, mismos paneles, sin MapLibre, deck.gl ni three.js", async ({ page }) => {
     test.setTimeout(180_000)
-    await ingresar(page, "dueno@demo.yunque.app")
+    await ingresar(page, "dueno@demo.quvant.app")
     const scripts = registrarScripts(page)
     await activarForja(page)
     const red = page.getByTestId("forja-red")
@@ -356,7 +356,7 @@ test.describe("Forja · versión 2D", () => {
 test.describe("Forja · interruptor 2D/3D", () => {
   test("se puede pasar a 2D a mano y queda recordado en el navegador", async ({ page }) => {
     test.setTimeout(150_000)
-    await ingresar(page, "dueno@demo.yunque.app")
+    await ingresar(page, "dueno@demo.quvant.app")
     await activarForja(page)
     const red = page.getByTestId("forja-red")
     await expect(red).toHaveAttribute("data-modo", "3d", { timeout: 60_000 })
@@ -372,7 +372,7 @@ test.describe("Forja · interruptor 2D/3D", () => {
 test.describe("Forja · teclado y robustez", () => {
   test("se recorre con el teclado: flechas entre sucursales y zonas, Enter para entrar, Esc para volver", async ({ page }) => {
     test.setTimeout(180_000)
-    await ingresar(page, "dueno@demo.yunque.app")
+    await ingresar(page, "dueno@demo.quvant.app")
     await activarForja(page)
     await expect(page.getByTestId("forja-red")).toHaveAttribute("data-listo", "true", { timeout: 60_000 })
     const nodos = page.getByTestId("nodo-forja").locator("button")
@@ -402,7 +402,7 @@ test.describe("Forja · teclado y robustez", () => {
 
   test("si el navegador pierde el contexto WebGL, el taller sigue en el plano 2D", async ({ page }) => {
     test.setTimeout(180_000)
-    await ingresar(page, "dueno@demo.yunque.app")
+    await ingresar(page, "dueno@demo.quvant.app")
     await activarForja(page)
     await expect(page.getByTestId("forja-red")).toHaveAttribute("data-listo", "true", { timeout: 60_000 })
     await page.locator("[data-nodo=CC] button").click({ force: true })

@@ -35,7 +35,7 @@ export const ETAPAS = [
   },
 ]
 
-/** Cómo empieza un negocio con Yunque (demo comercial). */
+/** Cómo empieza un negocio con Quvant (demo comercial). */
 export const IMPLEMENTACION = [
   { paso: "Relevamiento", detalle: "Vemos cómo trabajan hoy: sistema, precios, stock y sucursales." },
   { paso: "Migración", detalle: "Traemos productos, precios, clientes y saldos desde su sistema o planillas." },

@@ -73,7 +73,7 @@ test.describe("Forja · demos públicas", () => {
     await expect(anuncios).toContainText(/quedan|se quedó sin/, { timeout: 10_000 })
   })
 
-  test("el sitio presenta Yunque + Forja con la toma genérica y el botón a la demo", async ({ page }) => {
+  test("el sitio presenta Quvant + Forja con la toma genérica y el botón a la demo", async ({ page }) => {
     await page.goto("/")
     const seccion = page.locator("#forja")
     await seccion.scrollIntoViewIfNeeded()

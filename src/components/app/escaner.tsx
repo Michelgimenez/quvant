@@ -99,13 +99,13 @@ export function EscanerCodigo({
           </DialogTitle>
           <DialogDescription>Apuntá la cámara al código de barras.</DialogDescription>
         </DialogHeader>
-        <div className="relative aspect-[4/3] overflow-hidden rounded-lg bg-hierro">
+        <div className="relative aspect-[4/3] overflow-hidden rounded-lg bg-negro">
           <video ref={video} className="size-full object-cover" playsInline muted />
           {estado === "leyendo" && (
             <div className="pointer-events-none absolute inset-x-8 top-1/2 h-0.5 -translate-y-1/2 bg-error/80 shadow-[0_0_12px_2px_rgba(229,72,77,0.6)]" aria-hidden />
           )}
           {estado !== "leyendo" && (
-            <div className="absolute inset-0 flex flex-col items-center justify-center gap-2 p-6 text-center text-sm text-niebla/80">
+            <div className="absolute inset-0 flex flex-col items-center justify-center gap-2 p-6 text-center t-texto-sm text-blanco/80">
               {estado === "sin_camara" ? <CameraOff className="size-6" /> : <Camera className="size-6 animate-pulse" />}
               {estado === "sin_camara" ? "No hay cámara disponible o no se dio permiso. Cargá el código a mano." : "Abriendo la cámara…"}
             </div>
@@ -128,14 +128,14 @@ export function EscanerCodigo({
           </Button>
         </form>
         {ejemplos.length > 0 && (
-          <div className="space-y-1.5 rounded-md border border-dashed border-chispa/50 p-2.5">
+          <div className="space-y-1.5 rounded-md border border-dashed border-alerta/50 p-2.5">
             <p className="ficha">Demo · simular lectura</p>
             <div className="flex flex-wrap gap-1.5">
               {ejemplos.map((x) => (
                 <button
                   key={x.codigo}
                   type="button"
-                  className="rounded border border-linea bg-superficie-2 px-2 py-1 text-left text-[11px] hover:border-acero/50"
+                  className="rounded border border-linea bg-superficie-2 px-2 py-1 text-left t-texto-sm hover:border-acero/50"
                   onClick={() => {
                     onDetectar(x.codigo)
                     onAbierto(false)

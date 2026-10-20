@@ -50,7 +50,7 @@ class CobradorEmulado implements Cobrador {
   async crearCobroQR(monto: number, referencia: string) {
     await esperar(200)
     const id = `demo-${hashTexto(`${referencia}:${monto}`).toString(16)}`
-    return { id, qrTexto: `YUNQUE-DEMO|cobro-emulado|${id}|${monto}`, emulado: true }
+    return { id, qrTexto: `QUVANT-DEMO|cobro-emulado|${id}|${monto}`, emulado: true }
   }
   /** Solo demo: simula que el cliente pagó. */
   simularAprobacion(id: string) {

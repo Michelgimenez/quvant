@@ -2,7 +2,7 @@ import type { ClienteDemo } from "./tipos"
 
 /**
  * Ferremix · demo comercial (PROPUESTA). No es cliente activo: es el piloto
- * en negociación. Se muestra siempre como "Así se vería Yunque en Ferremix".
+ * en negociación. Se muestra siempre como "Así se vería Quvant en Ferremix".
  *
  * Logos y colores: archivos de su nueva identidad en public/clientes/ferremix/.
  * Categorías, problemas y sucursales: van a salir del relevamiento y de su

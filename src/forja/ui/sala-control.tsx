@@ -55,14 +55,14 @@ export function SalaControl({ red, eventos, control }: { red: RedForja; eventos:
         <div key={indice} className="h-full origin-left bg-brasa/70" style={{ animation: `forja-parada ${SEGUNDOS_POR_PARADA}s linear forwards` }} />
       </div>
 
-      <section className="absolute bottom-6 left-6 w-[min(560px,calc(100%-3rem))] rounded-2xl border border-white/10 bg-hierro/85 p-6 backdrop-blur" aria-live="polite" aria-label="Parada actual">
+      <section className="absolute bottom-6 left-6 w-[min(560px,calc(100%-3rem))] rounded-2xl border border-white/10 bg-negro/85 p-6 backdrop-blur" aria-live="polite" aria-label="Parada actual">
         <p className="font-mono text-xs uppercase tracking-[0.2em] text-acero">
           {indice % paradas.length === 0 ? "Red completa" : `Sucursal ${indice % paradas.length} de ${paradas.length - 1}`} · próxima: {nombre(siguiente)}
         </p>
         <h2 className="mt-1 flex items-center gap-3 font-heading text-4xl font-extrabold tracking-tight" data-testid="sala-parada">
           {nodo && <span className="size-4 rounded-full" style={{ background: colorCalor(nodo.calor) }} aria-hidden />}
           {nombre(actual)}
-          {nodo?.demo && <span className="rounded-[4px] border border-dashed border-chispa/80 px-1.5 font-mono text-xs font-bold text-chispa">DEMO</span>}
+          {nodo?.demo && <span className="rounded-[4px] border border-dashed border-alerta/80 px-1.5 font-mono text-xs font-bold text-alerta">DEMO</span>}
         </h2>
         {nodo ? <NumerosSucursal n={nodo} /> : <NumerosRed red={red} />}
       </section>
@@ -83,13 +83,13 @@ export function SalaControl({ red, eventos, control }: { red: RedForja; eventos:
 function FilaTitular({ t, principal }: { t: Titular; principal: boolean }) {
   return (
     <li
-      className={cn("flex gap-3 rounded-xl border border-white/10 bg-hierro/85 backdrop-blur motion-safe:animate-[forja-titular_0.6s_ease-out]", principal ? "p-4" : "px-4 py-2.5 opacity-80")}
+      className={cn("flex gap-3 rounded-xl border border-white/10 bg-negro/85 backdrop-blur motion-safe:animate-[forja-titular_0.6s_ease-out]", principal ? "p-4" : "px-4 py-2.5 opacity-80")}
       data-testid="titular"
     >
-      <span className={cn("mt-1.5 size-2 shrink-0 rounded-full", t.tono === "alerta" ? "bg-chispa" : t.tono === "logro" ? "bg-blanco-caliente" : "bg-acero")} aria-hidden />
+      <span className={cn("mt-1.5 size-2 shrink-0 rounded-full", t.tono === "alerta" ? "bg-alerta" : t.tono === "logro" ? "bg-blanco-caliente" : "bg-acero")} aria-hidden />
       <div className="min-w-0">
         <p className="font-mono text-[11px] text-acero">{hora(t.en)}</p>
-        <p className={cn("text-niebla", principal ? "text-xl font-semibold leading-snug" : "text-sm")}>{t.texto}</p>
+        <p className={cn("text-blanco", principal ? "text-xl font-semibold leading-snug" : "text-sm")}>{t.texto}</p>
       </div>
     </li>
   )
@@ -99,7 +99,7 @@ function Numero({ etiqueta, valor, alerta }: { etiqueta: string; valor: React.Re
   return (
     <div>
       <dt className="font-mono text-[11px] uppercase tracking-wider text-acero">{etiqueta}</dt>
-      <dd className={cn("mt-0.5 font-mono text-3xl", alerta ? "text-chispa" : "text-niebla")}>{valor}</dd>
+      <dd className={cn("mt-0.5 font-mono text-3xl", alerta ? "text-alerta" : "text-blanco")}>{valor}</dd>
     </div>
   )
 }

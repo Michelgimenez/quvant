@@ -75,17 +75,6 @@
   --color-marca: var(--marca);
   --color-marca-contraste: var(--marca-contraste);
 
-  /* Alias de transición (Yunque → Quvant). Apuntan a los tokens nuevos; se borran en la tanda 2. */
-  --color-hierro: var(--hierro);
-  --color-niebla: var(--niebla);
-  --color-temple: var(--temple);
-  --color-chispa: var(--chispa);
-  --color-superficie: var(--superficie);
-  --color-enlace: var(--enlace);
-  --color-chispa-texto: var(--chispa-texto);
-  --color-ok-texto: var(--ok-texto);
-  --color-error-texto: var(--error-texto);
-
   --color-sidebar-ring: var(--sidebar-ring);
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
@@ -158,11 +147,6 @@
   --brasa: #ff6a1f;
   --blanco-caliente: #fff4e0;
 
-  /* Alias fijos de Yunque (tanda 2: se reemplazan en los componentes y se borran) */
-  --hierro: var(--negro);
-  --niebla: var(--blanco);
-  --superficie: var(--gris-1);
-
   --radius: 0.25rem;
 }
 
@@ -224,15 +208,6 @@
   --sidebar-border: var(--gris-11);
   --sidebar-ring: var(--negro);
 
-  /* Alias de Yunque que dependen del tema */
-  --temple: var(--negro);
-  --temple-accion: var(--primary);
-  --chispa: var(--alerta);
-  --chispa-texto: var(--alerta);
-  --ok-texto: var(--ok);
-  --error-texto: var(--error);
-  --enlace: var(--negro);
-
   --seleccion: rgb(13 13 15 / 0.14);
 }
 
@@ -292,14 +267,6 @@
   --sidebar-accent-foreground: var(--blanco);
   --sidebar-border: var(--gris-3);
   --sidebar-ring: var(--blanco);
-
-  --temple: var(--blanco);
-  --temple-accion: var(--primary);
-  --chispa: var(--alerta);
-  --chispa-texto: var(--alerta);
-  --ok-texto: var(--ok);
-  --error-texto: var(--error);
-  --enlace: var(--blanco);
 
   --seleccion: rgb(236 236 238 / 0.22);
 }
@@ -465,13 +432,12 @@
 
   /* La grilla de puntos: gris profundo sobre negro. En claro no hay grilla (--grilla: transparent). */
   .grilla-puntos,
-  .grilla-tecnica {
+  .grilla-puntos {
     background-image: radial-gradient(circle at center, var(--grilla) 0 1.15px, transparent 1.35px);
     background-size: var(--grilla-paso, 28px) var(--grilla-paso, 28px);
     background-position: calc(var(--grilla-paso, 28px) / 2) calc(var(--grilla-paso, 28px) / 2);
   }
 
-  /* Alias de Yunque: .ficha es la etiqueta y .num el número tabular (tanda 2: pasan a .t-etiqueta y .t-dato) */
   .ficha {
     font-family: var(--font-sans);
     font-weight: 500;
@@ -556,88 +522,7 @@
   }
 }
 
-/* ───────── Héroe del sitio: el yunque se arma (solo CSS) ───────── */
-.pieza-yunque {
-  animation: pieza-entra 420ms cubic-bezier(0.2, 0.9, 0.25, 1) both;
-}
-.pieza-base {
-  --desde: 26px;
-}
-.pieza-cintura {
-  --desde: 18px;
-  animation-delay: 250ms;
-}
-.pieza-cara {
-  --desde: -30px;
-  animation-delay: 500ms;
-  animation-duration: 350ms;
-}
-@keyframes pieza-entra {
-  from {
-    opacity: 0;
-    transform: translateY(var(--desde));
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-.golpe-luz {
-  opacity: 0;
-  animation: golpe-luz 500ms ease-out 850ms both;
-}
-@keyframes golpe-luz {
-  0% {
-    opacity: 0;
-    transform: translateX(0);
-  }
-  40% {
-    opacity: 1;
-  }
-  100% {
-    opacity: 0;
-    transform: translateX(135px);
-  }
-}
-.chispa-hero {
-  transform-box: fill-box;
-  transform-origin: center;
-  animation: chispa-hero 550ms cubic-bezier(0.2, 0.9, 0.25, 1) 1050ms both;
-}
-@keyframes chispa-hero {
-  0% {
-    opacity: 0;
-    transform: scale(0.2) rotate(-60deg);
-  }
-  60% {
-    opacity: 1;
-    transform: scale(1.35) rotate(10deg);
-  }
-  100% {
-    opacity: 1;
-    transform: scale(1) rotate(0deg);
-  }
-}
-@keyframes rayo {
-  0% {
-    stroke-dashoffset: 1;
-    opacity: 1;
-  }
-  60% {
-    stroke-dashoffset: 0;
-    opacity: 1;
-  }
-  100% {
-    stroke-dashoffset: -1;
-    opacity: 0;
-  }
-}
-.rayo-hero {
-  stroke-dasharray: 1;
-  stroke-dashoffset: 1;
-  opacity: 0;
-  animation: rayo 600ms ease-out 1080ms both;
-}
+/* Entrada suave de los bloques del sitio */
 .aparecer {
   animation: aparecer 600ms cubic-bezier(0.2, 0.9, 0.25, 1) both;
 }
@@ -649,12 +534,6 @@
   to {
     opacity: 1;
     transform: translateY(0);
-  }
-}
-@media (prefers-reduced-motion: reduce) {
-  .golpe-luz,
-  .rayo-hero {
-    display: none;
   }
 }
 

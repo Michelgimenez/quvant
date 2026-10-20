@@ -24,7 +24,7 @@ const NOMBRE_MOVIMIENTO: Record<TipoMovimiento, string> = {
   inicial: "Carga inicial",
 }
 
-const COLOR_ESTADO = { normal: "bg-[#6b7684]", critico: "bg-chispa", sin_stock: "bg-brasa" } as const
+const COLOR_ESTADO = { normal: "bg-[#6b7684]", critico: "bg-alerta", sin_stock: "bg-brasa" } as const
 
 function dia(iso: string) {
   return new Date(iso).toLocaleDateString("es-AR", { weekday: "short", day: "2-digit", month: "2-digit", timeZone: "America/Argentina/Buenos_Aires" })
@@ -35,7 +35,7 @@ export function PanelPieza({ datos, red, enlaces, onCerrar }: { datos: DatosPiez
   const nombre = (id: Id | null) => red.nodos.find((n) => n.id === id)?.nombre ?? "Otra sucursal"
   return (
     <aside
-      className="pointer-events-auto absolute inset-x-0 bottom-0 z-20 flex max-h-[52%] flex-col rounded-t-2xl border border-white/10 bg-hierro/95 text-niebla shadow-2xl backdrop-blur md:inset-x-auto md:bottom-4 md:right-4 md:top-4 md:max-h-none md:w-[380px] md:rounded-2xl"
+      className="pointer-events-auto absolute inset-x-0 bottom-0 z-20 flex max-h-[52%] flex-col rounded-t-2xl border border-white/10 bg-negro/95 text-blanco shadow-2xl backdrop-blur md:inset-x-auto md:bottom-4 md:right-4 md:top-4 md:max-h-none md:w-[380px] md:rounded-2xl"
       aria-label={datos.tipo === "producto" ? `Recorrido de ${datos.recorrido.producto.nombre}` : `Historia de la máquina ${datos.historia.serie}`}
       data-testid="panel-pieza"
       data-tipo={datos.tipo}
@@ -50,7 +50,7 @@ export function PanelPieza({ datos, red, enlaces, onCerrar }: { datos: DatosPiez
             {datos.tipo === "producto" ? `${datos.recorrido.producto.sku} · ${datos.recorrido.producto.categoria}` : `Serie ${datos.historia.serie}${datos.historia.cliente ? ` · ${datos.historia.cliente.nombre}` : ""}`}
           </p>
         </div>
-        <button type="button" onClick={onCerrar} className="rounded-md p-1.5 text-acero hover:text-niebla focus-visible:outline focus-visible:outline-1 focus-visible:outline-temple" aria-label="Cerrar y volver a la red">
+        <button type="button" onClick={onCerrar} className="rounded-md p-1.5 text-acero hover:text-blanco focus-visible:outline focus-visible:outline-1 focus-visible:outline-foreground" aria-label="Cerrar y volver a la red">
           <X className="size-4" />
         </button>
       </header>
@@ -67,7 +67,7 @@ function Titulo({ children }: { children: React.ReactNode }) {
 
 function Enlace({ href, children }: { href: string; children: React.ReactNode }) {
   return (
-    <Link href={href} className="inline-flex items-center gap-1 rounded-md border border-white/15 px-2.5 py-1.5 text-xs font-medium text-niebla hover:border-white/30 focus-visible:outline focus-visible:outline-1 focus-visible:outline-temple" data-testid="enlace-modulo">
+    <Link href={href} className="inline-flex items-center gap-1 rounded-md border border-white/15 px-2.5 py-1.5 text-xs font-medium text-blanco hover:border-white/30 focus-visible:outline focus-visible:outline-1 focus-visible:outline-foreground" data-testid="enlace-modulo">
       {children}
       <ArrowUpRight className="size-3.5 text-acero" aria-hidden />
     </Link>
@@ -91,7 +91,7 @@ function Producto({ r, nombre, enlaces }: { r: RecorridoProducto; nombre: (id: I
               <span className={cn("size-1.5 shrink-0 rounded-full", COLOR_ESTADO[s.estado])} aria-hidden />
               <span className="truncate text-[13px]">{nombre(s.sucursalId)}</span>
             </span>
-            <span className={cn("text-right font-mono text-[12px]", s.estado === "sin_stock" ? "text-brasa" : s.estado === "critico" ? "text-chispa" : "text-niebla")}>
+            <span className={cn("text-right font-mono text-[12px]", s.estado === "sin_stock" ? "text-brasa" : s.estado === "critico" ? "text-alerta" : "text-blanco")}>
               {formatoCantidad(s.cantidad)}
               {s.minimo > 0 && <span className="text-acero"> / mín. {s.minimo}</span>}
             </span>
@@ -140,7 +140,7 @@ function Producto({ r, nombre, enlaces }: { r: RecorridoProducto; nombre: (id: I
                       </span>
                     </span>
                     <span className="text-right font-mono">
-                      <span className={m.cantidad < 0 ? "text-acero" : "text-niebla"}>{m.cantidad > 0 ? `+${formatoCantidad(m.cantidad)}` : formatoCantidad(m.cantidad)}</span>
+                      <span className={m.cantidad < 0 ? "text-acero" : "text-blanco"}>{m.cantidad > 0 ? `+${formatoCantidad(m.cantidad)}` : formatoCantidad(m.cantidad)}</span>
                       <span className="block text-[10px] text-acero">queda {formatoCantidad(m.saldo)}</span>
                     </span>
                   </li>
@@ -180,7 +180,7 @@ function Maquina({ h, nombre, enlaces }: { h: HistoriaMaquina; nombre: (id: Id |
       ) : (
         <p className="text-xs text-acero">No hay ventas a este cliente de un equipo de la misma marca y tipo antes del primer ingreso.</p>
       )}
-      <p className="mt-2 text-[11px] leading-snug text-acero">Yunque todavía no registra números de serie en compras y ventas: estas coincidencias son por cliente, marca y tipo de equipo.</p>
+      <p className="mt-2 text-[11px] leading-snug text-acero">Quvant todavía no registra números de serie en compras y ventas: estas coincidencias son por cliente, marca y tipo de equipo.</p>
 
       <Titulo>Reparaciones</Titulo>
       <ol className="space-y-3" data-testid="ordenes-maquina">
@@ -192,7 +192,7 @@ function Maquina({ h, nombre, enlaces }: { h: HistoriaMaquina; nombre: (id: Id |
                 {dia(o.fechaIngreso)} · {nombre(o.sucursalId)}
               </span>
             </p>
-            <p className="mt-1 text-[12px] text-niebla/90">{o.falla}</p>
+            <p className="mt-1 text-[12px] text-blanco/90">{o.falla}</p>
             {o.diagnostico && <p className="mt-0.5 text-[11px] text-acero">Diagnóstico: {o.diagnostico}</p>}
             <ol className="mt-2 space-y-0.5 border-l border-white/10 pl-3">
               {o.eventos.map((ev, i) => (
@@ -208,7 +208,7 @@ function Maquina({ h, nombre, enlaces }: { h: HistoriaMaquina; nombre: (id: Id |
             <div className="mt-2 flex items-center justify-between gap-2">
               <span className="font-mono text-[11px] text-acero">{o.presupuesto !== null ? `Presupuesto ${formatoPesosCorto(o.presupuesto)}` : "Sin presupuesto"}</span>
               {enlaces && (
-                <Link href={enlaces.servicio(o.id)} className="inline-flex items-center gap-1 text-[11px] text-niebla underline-offset-4 hover:underline focus-visible:outline focus-visible:outline-1 focus-visible:outline-temple">
+                <Link href={enlaces.servicio(o.id)} className="inline-flex items-center gap-1 text-[11px] text-blanco underline-offset-4 hover:underline focus-visible:outline focus-visible:outline-1 focus-visible:outline-foreground">
                   Abrir la orden <ArrowUpRight className="size-3" aria-hidden />
                 </Link>
               )}

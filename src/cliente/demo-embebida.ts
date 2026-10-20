@@ -32,7 +32,7 @@ export async function crearDemoEmbebida(opciones: OpcionesDemo & { email?: strin
     latenciaMs: opciones.latenciaMs ?? 220,
     disponible: hayRed,
   })
-  const u = semilla.usuarios.find((x) => x.email === (opciones.email ?? "mostrador@demo.yunque.app")) ?? semilla.usuarios[0]
+  const u = semilla.usuarios.find((x) => x.email === (opciones.email ?? "mostrador@demo.quvant.app")) ?? semilla.usuarios[0]
   const usuario: UsuarioContexto = { id: u.id, rol: u.rol, sucursalIds: u.sucursalIds }
   const motor = await new MotorSync({
     almacen: new AlmacenMemoria(),

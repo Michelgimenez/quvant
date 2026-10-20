@@ -76,18 +76,18 @@ export function accesoConClave(c: ConfigAcceso) {
 }
 
 export const ACCESO_INVERSORES = accesoConClave({
-  cookie: "yunque_inversores",
-  audiencia: "yunque-inversores",
+  cookie: "quvant_inversores",
+  audiencia: "quvant-inversores",
   ruta: "/inversores",
   variable: "INVERSORES_KEY",
-  claveDesarrollo: "yunque-demo",
+  claveDesarrollo: "quvant-demo",
 })
 
-/** Panel interno del equipo de Yunque (solicitudes de demo: datos personales). */
+/** Panel interno del equipo de Quvant (solicitudes de demo: datos personales). */
 export const ACCESO_PANEL = accesoConClave({
-  cookie: "yunque_panel",
-  audiencia: "yunque-panel",
+  cookie: "quvant_panel",
+  audiencia: "quvant-panel",
   ruta: "/panel",
   variable: "PANEL_KEY",
-  claveDesarrollo: "yunque-panel",
+  claveDesarrollo: "quvant-panel",
 })

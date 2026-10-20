@@ -37,7 +37,7 @@ export function contrasenaDemoValida(contrasena: string) {
 function totpDe(email: string) {
   const bytes = createHmac("sha256", claveFirma()).update(`totp:${email}`).digest().subarray(0, 20)
   return new TOTP({
-    issuer: "Yunque demo",
+    issuer: "Quvant demo",
     label: email,
     algorithm: "SHA1",
     digits: 6,

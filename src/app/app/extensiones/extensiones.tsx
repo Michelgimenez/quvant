@@ -22,7 +22,7 @@ const precargarActivacion = () => {
 export function Extensiones() {
   return (
     <Requiere permiso="extensiones.gestionar">
-      <EncabezadoPagina ficha="Extensiones" titulo="Extensiones" descripcion="Pantallas que se suman a Yunque sobre los mismos datos y los mismos permisos. Se activan por empresa." />
+      <EncabezadoPagina ficha="Extensiones" titulo="Extensiones" descripcion="Pantallas que se suman a Quvant sobre los mismos datos y los mismos permisos. Se activan por empresa." />
       <ul className="grid gap-4 lg:grid-cols-2">
         {REGISTRO_EXTENSIONES.map((x) => (
           <TarjetaExtension key={x.id} x={x} />
@@ -51,23 +51,23 @@ function TarjetaExtension({ x }: { x: DefinicionExtension }) {
   return (
     <li className="flex flex-col gap-4 rounded-xl border border-linea bg-card p-5" data-testid={`extension-${x.id}`}>
       <div className="flex items-start justify-between gap-3">
-        <div className="rounded-lg bg-hierro px-3 py-2">
+        <div className="rounded-lg bg-negro px-3 py-2">
           <MarcaForja tamano={22} />
         </div>
         <EstadoFeatureBadge estado={x.estado} />
       </div>
-      <p className="text-sm text-muted-foreground">{x.descripcion}</p>
-      <ul className="space-y-1.5 text-sm">
+      <p className="t-texto-sm text-muted-foreground">{x.descripcion}</p>
+      <ul className="space-y-1.5 t-texto-sm">
         {x.puntos.map((p) => (
           <li key={p} className="flex items-center gap-2">
-            <CheckCircle2 className="size-4 text-ok-texto" /> {p}
+            <CheckCircle2 className="size-4 text-ok" /> {p}
           </li>
         ))}
       </ul>
       <div className="mt-auto flex flex-wrap items-center justify-between gap-3 border-t border-linea pt-4">
-        <div className="text-sm">
+        <div className="t-texto-sm">
           <p className="font-semibold">{textoPrecioExtension(x.id)}</p>
-          <p className="text-xs text-muted-foreground">{activa ? `Activa desde ${new Date(estado!.activadaEn!).toLocaleDateString("es-AR")}` : "No activada"}</p>
+          <p className="t-texto-sm text-muted-foreground">{activa ? `Activa desde ${new Date(estado!.activadaEn!).toLocaleDateString("es-AR")}` : "No activada"}</p>
         </div>
         {activa ? (
           <div className="flex flex-wrap gap-2">

@@ -5,7 +5,7 @@ import { Table2, BarChart3 } from "lucide-react"
 import { cn } from "@/lib/utils"
 
 /**
- * Gráficos de Yunque (SVG propio, sin dependencias).
+ * Gráficos de Quvant (SVG propio, sin dependencias).
  * Specs de dataviz: barras ≤ 24 px con punta redondeada de 4 px y base recta,
  * 2 px de separación entre segmentos, grilla hairline sólida y recesiva,
  * leyenda para 2+ series, tooltip con todas las series, vista de tabla.
