@@ -2,6 +2,76 @@
 
 > Yunque pasa a ser Quvant (`PROMPT-QUVANT.md`), en 10 tandas, en la rama `quvant`. Arriba, lo último; abajo, el historial de Yunque.
 
+## Resumen · tanda 8 de 10 · Presentaciones y videos (20/10/2026)
+
+**`/inversores`** (`src/components/presentacion/escenas-inversores.tsx`), 12 escenas con Forja todavía oculta:
+- **El problema, por tamaño:** kioscos, comercios, distribuidoras y empresas con sucursales. Cada uno con su dato de mercado en `[COMPLETAR con dato y fuente]` (no se inventó ninguno) y sus dolores.
+- **La escena estrella es la demo que cambia de empresa, en vivo:** la misma escala del sitio, más grande, que avanza sola mientras la escena está activa.
+- **El modelo por plan:** los cuatro planes con su precio ("Consultá") y la fórmula: Σ por plan, negocios activos × licencia del plan, más la implementación. Mientras falte algún precio no hay números: un recuadro dice "Sin números todavía". Cuando se carguen los precios, aparece solo el escenario ilustrativo, con una mezcla de planes que es un supuesto editable (`src/config/proyecciones.ts`).
+- **Se fueron los USD 290 de Yunque:** no quedan en ninguna escena ni en la configuración. Un test lo controla.
+- **El estado actual:** "Demo funcional. Primer piloto en negociación", con el detalle del piloto en `[COMPLETAR]` (`src/config/inversores.ts`). La hoja de ruta y el equipo siguen como estaban, con sus `[COMPLETAR]`.
+- **Las transiciones:** el fundido entre escenas y, abajo a la izquierda, un índice de escenas donde el punto salta en arco de la escena vieja a la nueva. Fondo con la grilla de puntos.
+- El gráfico de la inversión pasa a la escala de grises (tenía azul, naranja, verde y amarillo, ajenos al manual).
+- Se fue la "Demo del producto" con la película vieja de la ferretería: su lugar lo toma la escena estrella.
+
+**El motor de las presentaciones** (`motor.tsx`, `kit.tsx`):
+- Sin `motion/react`: todo con GSAP, que es el único reloj de animación. Las entradas, los trazos, el fundido entre escenas, el cursor de la película del producto y el bucle del tablero de la demo comercial.
+- El paquete `motion` queda instalado pero sin uso; se puede desinstalar en el cierre.
+- Títulos en Plex Mono 700 (antes pedían un 800 que la fuente no tiene), esquinas de 6 px y marcos con cuadrados.
+
+**`/demo/ferremix`:** con Quvant, el sello PROPUESTA y su co-branding, como estaba. Lo que cambió: GSAP en lugar de `motion`, esquinas y viñetas de la marca, y el plan "Comercio" con su precio en "Consultá".
+
+**Los videos** (`public/videos/`), filmados cuadro por cuadro contra `next start`:
+- `quvant-60s.mp4`, horizontal, 1920 × 1080. En orden:
+  1. La firma se arma.
+  2. El kiosco vende sin conexión y la cola se sincroniza con el salto.
+  3. La caja cierra con diferencia cero.
+  4. El salto lleva a la ferretería (presupuesto → venta), a la distribuidora (un pedido llega desde la calle) y al grupo (aprobación en dos niveles).
+  5. "Probá la demo".
+  6. El cierre del manual: «Quvant.», una pausa y «Software a la vanguardia de cada nicho.».
+- `quvant-60s-vertical.mp4`, 1080 × 1920, compuesto para el vertical (no recortado):
+  - la app va entre los 260 y los 1160 px;
+  - los subtítulos van a 50 px, abajo de la app;
+  - nada importante en los 250 px de arriba ni en los 420 de abajo.
+- `quvant-cambio-de-empresa.mp4`, 1920 × 1080, un loop de 14 s con las cuatro transiciones: termina en el mismo cuadro en que empieza.
+
+**Cómo se filman** (`scripts/videos/filmar.mts`):
+- Cada video es una página (`/videos/<id>`) con una línea de tiempo maestra de GSAP que maneja la demo real: cambios de empresa, módulos y clics en sus botones.
+- Con `?film=1` expone `__ready`, `__duration` y `__seek(t)`. Por cada cuadro, a 30 fps: `__seek`, dos `requestAnimationFrame` y un JPEG por pipe a `ffmpeg-static`. La salida es libx264, `-crf 18`, BT.709 y `+faststart`.
+- Para que cada cuadro salga igual:
+  - la sincronización del kiosco y la lectura simulada usan `gsap.delayedCall` (antes, `setTimeout`);
+  - al filmar se congelan las animaciones de CSS;
+  - el reloj de la demo avanza con la línea de tiempo.
+- `--cuadros 0,12,30` guarda solo esos instantes como PNG, avanzando cuadro por cuadro igual que al filmar. Sirve para revisar sin codificar.
+
+**Verificación:**
+- Typecheck sin errores, lint limpio en lo tocado y tests unitarios: 119 de 119 (dos nuevos). Uno controla que sin precios no hay números. El otro, que no queda ningún "USD 290" en `src/`.
+- **`npm run build`, completo.** `/videos/*`, `/demo` e `/inversores` como prerender parcial; `/demo/ferremix`, estático.
+- **Los videos, verificados con `ffprobe`:** los tres en H.264, `yuv420p`, BT.709 (espacio, primarios y transferencia), rango `tv` y 30 fps.
+
+  | Video | Medidas | Duración | Cuadros | Peso |
+  |---|---|---|---|---|
+  | `quvant-60s.mp4` | 1920 × 1080 | 58,6 s | 1758 | 6,3 MB |
+  | `quvant-60s-vertical.mp4` | 1080 × 1920 | 58,6 s | 1758 | 4,5 MB |
+  | `quvant-cambio-de-empresa.mp4` | 1920 × 1080 | 14 s | 420 | 3,9 MB |
+
+  Se miraron 3 cuadros de cada uno, sacados del archivo final.
+- **Tests de punta a punta** (`npm run test:e2e`, contra el build): 39 pasan, 4 fallan y 2 quedan en pausa.
+  - Dos fallas se arreglaron en el test: el co-branding ya no es una barra arriba (se sacó en la tanda 2; ahora se controla el indicador del módulo activo) y la sección de Forja del sitio vuelve en la tanda 10.
+  - Las otras dos son de Forja y se resuelven en la tanda 9: la activación vieja (busca la frase de Yunque) y "Esc para volver del taller", que hay que volver a mirar ahí.
+  - Se corrieron en el puerto 3110 (`PUERTO_E2E=3110`): el 3100 lo tenía ocupado otro programa.
+- Capturas en `docs/capturas/quvant/tanda-8/` (11): seis escenas de `/inversores`, dos de `/demo/ferremix` y un cuadro de cada video.
+
+### Decisiones de la tanda 8
+
+| # | Decisión | Motivo |
+|---|---|---|
+| T8-1 | En el video horizontal la demo se dibuja a 1600 × 900 y se agranda 1,2 veces. | A tamaño de escritorio, la interfaz en un video de 1080p se lee chica. |
+| T8-2 | El dominio de "Probá la demo" es `[COMPLETAR: dominio del sitio]` (`SITIO.dominio`). | No hay dominio registrado. Cuando lo esté, se cambia una línea y se vuelve a filmar con un comando. |
+| T8-3 | La coreografía del cambio de empresa mide su propia escala (lo que se ve sobre lo que mide). La capa del salto va en un portal a `<body>`. | Así funciona igual en `/demo`, en la escala del sitio, en el escenario de inversores y en los videos, achicada o agrandada. |
+| T8-4 | En `/inversores`, la escala solo avanza cuando su escena está activa. | Si no, sus saltos (que se dibujan sobre la página) se verían encima de otras escenas. |
+| T8-5 | El paquete `motion` no se desinstaló. | Quedó sin uso; sacarlo cambia el lockfile y es tarea del cierre. |
+
 ## Resumen · tanda 7 de 10 · El sitio del producto (20/10/2026)
 
 **El hero con la escala** (`src/components/sitio/hero.tsx`, `escala.tsx`):
@@ -236,24 +306,35 @@
 
 ## Para Michel
 
-> Al día con la tanda 7. Lo que tenés que elegir, completar o mirar, de lo más nuevo a lo más viejo.
+> Al día con la tanda 8. Lo que tenés que elegir, completar o mirar, de lo más nuevo a lo más viejo.
 
-1. **Recorré el sitio de punta a punta** (`npm run dev -- -p 3010` → http://localhost:3010). Mové la escala del hero: tiene que sentirse como la demo, en chico.
-2. **Los precios de los planes:** completalos en `src/config/precios.ts` (`precioMensual` de cada plan). Mientras digan `[COMPLETAR]`, el sitio muestra "Consultá". Revisá también qué incluye cada plan: lo armé por tamaño, con lo que existe hoy.
-3. **El texto de desarrollo a medida** (sección 08, con el sello BORRADOR) está en `src/components/sitio/secciones.tsx` (`DesarrolloAMedida`). Confirmalo o cambialo. Cuando lo apruebes, se saca el sello.
-4. **Socios fundadores:** quedó sin cupos y con las condiciones que ya había (precio congelado 24 meses, implementación bonificada, línea directa). ¿Siguen valiendo?
-5. **El email y el WhatsApp de contacto** siguen en `[COMPLETAR]` (`src/config/sitio.ts`): se ven resaltados en el pie y en "Pedir una demo".
-6. **Mirá el recorrido guiado de punta a punta,** como si estuvieras en una reunión: `/demo?recorrido=1` (o "Recorrido guiado" en la barra). Dura ~60 s. Espacio pausa, las flechas cambian de paso y Esc sale. Los subtítulos están en `src/demo/recorrido.ts`. Si cambiás alguno, el test controla que se pueda leer en su tiempo. Es la base del video de 60 segundos (tanda 8): conviene ajustarlo antes de filmar.
-7. **Los nombres de las cuatro empresas:** Kiosco La Esquina, Ferretería Industrial Demo, Distribuidora Ruta Clara y Grupo Cordal. Si alguno no te gusta, se cambia en `src/demo/empresas.ts`.
-8. **El titular quedó en A** («Del kiosco a la empresa.») por defecto, porque pediste seguir sin frenar. Se cambia con una línea en `src/config/sitio.ts` (`TITULAR_ELEGIDO = "B"` o `"C"`). Ojo con la B: hoy las cuarenta sucursales existen solo en la demo, no en un cliente.
-9. **Mirá la lámina** contra tu manual: la Q, los colores y las letras. Revisá las piezas marcadas como **Extensión**: el modo claro, la escala de grises, los estados, Plex Mono 500 y 600, el salto como recompensa y la bajada en el pie del sitio.
-10. **El logo: faltan tus archivos.** En `marca/` solo estaban los de Yunque. Usé la Q que trae el manual (un PNG de 2000 px, tal cual) y armé QUVANT en Michroma como **provisorio**, con las proporciones de la firma del manual. Michroma es más extendida y más fina que la letra del PDF: la firma provisoria queda un poco más ancha que la del manual. Mandá a `marca/`:
+1. **Mirá los videos** en `public/videos/`:
+   - `quvant-60s.mp4`;
+   - `quvant-60s-vertical.mp4`;
+   - `quvant-cambio-de-empresa.mp4`.
+
+   Si cambiás un texto (`src/demo/peliculas.ts`) o un precio, se vuelven a filmar con `npm run build`, `npx next start -p 3020` y `BASE=http://localhost:3020 npx tsx scripts/videos/filmar.mts`.
+2. **El dominio:** "Probá la demo" muestra `[COMPLETAR: dominio del sitio]`. Cuando lo registres, cargalo en `src/config/sitio.ts` (`dominio`) y volvé a filmar.
+3. **Los `[COMPLETAR]` de `/inversores`:**
+   - en `src/config/inversores.ts`: los datos de mercado por tamaño (con fuente) y el estado del piloto;
+   - en `src/config/inversion.ts`: el monto, el equipo y el contacto;
+   - en `src/config/precios.ts`: los precios. Con ellos aparece el escenario numérico del modelo de negocio.
+4. **Recorré el sitio de punta a punta** (`npm run dev -- -p 3010` → http://localhost:3010). Mové la escala del hero: tiene que sentirse como la demo, en chico.
+5. **Los precios de los planes:** completalos en `src/config/precios.ts` (`precioMensual` de cada plan). Mientras digan `[COMPLETAR]`, el sitio muestra "Consultá". Revisá también qué incluye cada plan: lo armé por tamaño, con lo que existe hoy.
+6. **El texto de desarrollo a medida** (sección 08, con el sello BORRADOR) está en `src/components/sitio/secciones.tsx` (`DesarrolloAMedida`). Confirmalo o cambialo. Cuando lo apruebes, se saca el sello.
+7. **Socios fundadores:** quedó sin cupos y con las condiciones que ya había (precio congelado 24 meses, implementación bonificada, línea directa). ¿Siguen valiendo?
+8. **El email y el WhatsApp de contacto** siguen en `[COMPLETAR]` (`src/config/sitio.ts`): se ven resaltados en el pie y en "Pedir una demo".
+9. **Mirá el recorrido guiado de punta a punta,** como si estuvieras en una reunión: `/demo?recorrido=1` (o "Recorrido guiado" en la barra). Dura ~60 s. Espacio pausa, las flechas cambian de paso y Esc sale. Los subtítulos están en `src/demo/recorrido.ts`. Si cambiás alguno, el test controla que se pueda leer en su tiempo. Es la base del video de 60 segundos (tanda 8): conviene ajustarlo antes de filmar.
+10. **Los nombres de las cuatro empresas:** Kiosco La Esquina, Ferretería Industrial Demo, Distribuidora Ruta Clara y Grupo Cordal. Si alguno no te gusta, se cambia en `src/demo/empresas.ts`.
+11. **El titular quedó en A** («Del kiosco a la empresa.») por defecto, porque pediste seguir sin frenar. Se cambia con una línea en `src/config/sitio.ts` (`TITULAR_ELEGIDO = "B"` o `"C"`). Ojo con la B: hoy las cuarenta sucursales existen solo en la demo, no en un cliente.
+12. **Mirá la lámina** contra tu manual: la Q, los colores y las letras. Revisá las piezas marcadas como **Extensión**: el modo claro, la escala de grises, los estados, Plex Mono 500 y 600, el salto como recompensa y la bajada en el pie del sitio.
+13. **El logo: faltan tus archivos.** En `marca/` solo estaban los de Yunque. Usé la Q que trae el manual (un PNG de 2000 px, tal cual) y armé QUVANT en Michroma como **provisorio**, con las proporciones de la firma del manual. Michroma es más extendida y más fina que la letra del PDF: la firma provisoria queda un poco más ancha que la del manual. Mandá a `marca/`:
    - la firma principal y la negativa, mejor en SVG;
    - la Q en SVG, si existe. Con el aro, la cola y el punto como capas separadas, la animación se haría por capas (sin máscaras) y habría un favicon vectorial. Hoy solo hay PNG.
-11. **La página 4 del manual quedó vieja.** Dice que Yunque es un producto de Quvant ("Yunque · by Quvant", con Forja como "complemento de Yunque" y Ludus). Elegiste que Yunque pasa a ser Quvant: conviene actualizar esa página del manual.
-12. **El PDF del manual tiene texto viejo escondido.** Algunas páginas se corrigieron tapando el texto anterior. Al copiar o extraer texto del PDF sale la versión vieja (por ejemplo, "Versión 1" y una regla con "degradés" en la página 7). Yo seguí lo que se ve. Si lo vas a compartir, conviene reexportarlo limpio.
-13. **¿Se lee peor el texto largo en mono?** En los párrafos, no: se lee cómodo, como dice el manual. Lo que pasa es que la monoespaciada ocupa más ancho. En la app ya se resolvió (tanda 2); la navegación del sitio se resuelve en la tanda 7.
-14. **El puerto 3000** lo estaba usando otro proyecto tuyo (`firmamento-1-proyecto`), así que no lo toqué. Esta app corrió en el 3010: `npm run dev -- -p 3010`.
+14. **La página 4 del manual quedó vieja.** Dice que Yunque es un producto de Quvant ("Yunque · by Quvant", con Forja como "complemento de Yunque" y Ludus). Elegiste que Yunque pasa a ser Quvant: conviene actualizar esa página del manual.
+15. **El PDF del manual tiene texto viejo escondido.** Algunas páginas se corrigieron tapando el texto anterior. Al copiar o extraer texto del PDF sale la versión vieja (por ejemplo, "Versión 1" y una regla con "degradés" en la página 7). Yo seguí lo que se ve. Si lo vas a compartir, conviene reexportarlo limpio.
+16. **¿Se lee peor el texto largo en mono?** En los párrafos, no: se lee cómodo, como dice el manual. Lo que pasa es que la monoespaciada ocupa más ancho. En la app ya se resolvió (tanda 2); la navegación del sitio se resuelve en la tanda 7.
+17. **El puerto 3000** lo estaba usando otro proyecto tuyo (`firmamento-1-proyecto`), así que no lo toqué. Esta app corrió en el 3010: `npm run dev -- -p 3010`.
 
 ## Decisiones de la tanda 1
 

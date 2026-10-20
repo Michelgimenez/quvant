@@ -25,7 +25,7 @@ Lo que el modo boceto deja para después: celular, respaldos, accesibilidad fina
 ## De la tanda 2 · El renombre y la app
 
 - **Tamaños sueltos en módulos secundarios:** los textos chicos ya usan `.t-texto-sm`, pero quedan tamaños de Tailwind en títulos y números de inventario, compras, reportes, configuración y presupuestos. Hay que pasarlos a las clases cerradas, revisando cada pantalla.
-- **Tests de punta a punta:** no se corrieron en esta tanda. Cambiaron los usuarios de prueba (`@demo.quvant.app`), el testid del salto y la cantidad de escenas de `/inversores` (12 mientras Forja esté oculta). Correr `npm run build && npm run test:e2e` y ajustar.
+- **Tests de punta a punta:** se pusieron al día en la tanda 8 (ver el reporte).
 - **Claves de almacenamiento:** pasaron de `yunque:` a `quvant:` sin migración. En producción habría que leer las viejas como respaldo.
 - **El manifiesto:** no hay ícono vectorial porque la Q es PNG.
 
@@ -64,4 +64,12 @@ Lo que el modo boceto deja para después: celular, respaldos, accesibilidad fina
 - **Accesibilidad (fase 3):** la vista achicada es `inert` (es una representación); el control anuncia la empresa con `aria-valuetext`. Probar con NVDA y VoiceOver.
 - **El tamaño en el formulario:** hoy viaja dentro del rubro ("Ferretería · 2 a 5 cajas"). Si se quiere una columna propia, es una migración nueva y reversible (`alter table public.solicitudes_demo add column tamano text` y el `grant insert` de esa columna), aplicada en Supabase **antes** de publicar.
 - **SEO (fase 7):** el título para redes es «Quvant · Del kiosco a la empresa.» y la imagen sigue siendo la firma sobre la grilla. Revisar cómo se ve compartido.
+
+## De la tanda 8 · Presentaciones y videos
+
+- **Videos (fase 8):** hay que volver a filmarlos cuando estén el dominio y los precios. Falta una portada (póster) para cada video, y subtítulos en un archivo aparte (`.vtt`) para quien los mira sin sonido en el sitio.
+- **Movimiento reducido (fase 2):** el índice de escenas y el fundido respetan `prefers-reduced-motion`; la escala de la escena estrella también. Revisar la película del producto de la demo comercial.
+- **El paquete `motion`:** quedó sin uso. Desinstalarlo (`npm uninstall motion`) y verificar el build.
+- **Rendimiento (fase 4):** `/inversores` monta la demo de las cuatro empresas en la escena estrella. Medir la memoria en una notebook modesta.
+- **Peso del repositorio:** los videos viven en `public/videos/`. Si crecen, conviene un almacenamiento aparte (CDN) en lugar del repositorio.
 

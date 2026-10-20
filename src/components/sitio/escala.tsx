@@ -31,10 +31,11 @@ const PAUSA_AUTOMATICA = 4.6
 
 const menosMovimiento = () => typeof window !== "undefined" && window.matchMedia("(prefers-reduced-motion: reduce)").matches
 
-export function Escala({ quieta }: { quieta: React.ReactNode }) {
+/** `escenario`: dentro de una presentación de 1920 × 1080 (textos más grandes, sin el pie ni el encabezado). */
+export function Escala({ quieta, variante = "sitio", pausada = false }: { quieta: React.ReactNode; variante?: "sitio" | "escenario"; pausada?: boolean }) {
   return (
     <ProveedorDemo empresaInicial="kiosco" guardar={false} cargando={quieta}>
-      <EscalaViva />
+      <EscalaViva variante={variante} pausada={pausada} />
     </ProveedorDemo>
   )
 }
@@ -47,7 +48,8 @@ function Tablero({ empresa }: { empresa: IdEmpresa }) {
   return <TableroGrupo onModulo={nada} />
 }
 
-function EscalaViva() {
+function EscalaViva({ variante, pausada }: { variante: "sitio" | "escenario"; pausada: boolean }) {
+  const escenario = variante === "escenario"
   const empresa = useDemo((s) => s.empresa)
   const tienda = useTiendaDemo()
   const raiz = useRef<HTMLDivElement>(null)
@@ -119,7 +121,8 @@ function EscalaViva() {
         abrirSelector: () => {},
         cerrarSelector: () => {},
         aplicarCambio: () => flushSync(() => tienda.getState().elegirEmpresa(id)),
-        escala: kRef.current,
+        // La escala que se ve (la de la vista por la del contenedor, si está dentro de un escenario achicado).
+        escala: (marco.current?.getBoundingClientRect().width ?? ESCALA_ANCHO * kRef.current) / ESCALA_ANCHO,
       }).finally(() => {
         cambiando.current = false
         setSaltando(false)
@@ -130,12 +133,12 @@ function EscalaViva() {
 
   // El recorrido solo: un paso cada PAUSA_AUTOMATICA segundos, con el reloj de GSAP. Se corta al tocar el control.
   useEffect(() => {
-    if (!automatica || !visible || menosMovimiento()) return
+    if (!automatica || !visible || pausada || menosMovimiento()) return
     const llamada = gsap.delayedCall(PAUSA_AUTOMATICA, () => cambiar(EMPRESAS_ORDEN[(indice + 1) % EMPRESAS_ORDEN.length]))
     return () => {
       llamada.kill()
     }
-  }, [automatica, visible, indice, cambiar])
+  }, [automatica, visible, pausada, indice, cambiar])
 
   const elegirEnX = (x: number) => {
     const r = control.current?.getBoundingClientRect()
@@ -155,8 +158,8 @@ function EscalaViva() {
 
   const cfg = EMPRESAS[empresa]
   return (
-    <div ref={raiz} className="space-y-5" data-escala>
-      <div className="flex flex-wrap items-end justify-between gap-x-6 gap-y-2">
+    <div ref={raiz} className={cn(escenario ? "space-y-6" : "space-y-5")} data-escala>
+      <div className={cn("flex flex-wrap items-end justify-between gap-x-6 gap-y-2", escenario && "hidden")}>
         <p className="t-etiqueta text-acero">La escala · el mismo Quvant en cuatro negocios</p>
         <button type="button" onClick={() => setAutomatica((v) => !v)} className="t-etiqueta inline-flex items-center gap-1.5 text-acero transition-colors hover:text-blanco" aria-pressed={automatica}>
           {automatica ? <Pause className="size-3.5" /> : <Play className="size-3.5" />}
@@ -188,8 +191,8 @@ function EscalaViva() {
                 <span className={cn("block size-[6px] bg-gris-6", i < indice && "bg-gris-8")} />
                 {activa && <span className={cn("absolute block size-[11px] bg-blanco", saltando && "opacity-0")} />}
               </span>
-              <span className={cn("t-etiqueta transition-colors", activa ? "text-blanco" : "text-acero")}>{PARADAS[id]}</span>
-              <span className={cn("t-dato hidden sm:block", activa ? "text-acero" : "text-gris-6")}>{EMPRESAS[id].escalaTexto}</span>
+              <span className={cn("t-etiqueta transition-colors", escenario && "text-[20px]", activa ? "text-blanco" : "text-acero")}>{PARADAS[id]}</span>
+              <span className={cn("t-dato hidden sm:block", escenario && "text-[20px]", activa ? "text-acero" : "text-gris-6")}>{EMPRESAS[id].escalaTexto}</span>
             </span>
           )
         })}
@@ -214,7 +217,7 @@ function EscalaViva() {
         </div>
       </div>
 
-      <div className="flex flex-wrap items-center justify-between gap-3">
+      <div className={cn("flex flex-wrap items-center justify-between gap-3", escenario && "hidden")}>
         <p className="t-texto-sm text-acero" aria-live="polite">
           <span className="text-blanco">{cfg.nombre}</span> · {cfg.tamano}. Empresa ficticia, datos de demostración.
         </p>

@@ -41,12 +41,16 @@ test.describe("módulos", () => {
     await expect(page.getByRole("heading", { name: "Sin acceso" })).toBeVisible()
   })
 
-  test("co-branding: el color de la organización se aplica al encabezado", async ({ page }) => {
+  test("co-branding: el color de la organización marca el módulo activo", async ({ page }) => {
     await ingresar(page, "dueno@demo.quvant.app", "/app/configuracion")
     await page.getByLabel("Usar #FF5A1F").click()
     await page.getByRole("button", { name: "Guardar" }).first().click()
     await expect(page.getByText("Marca actualizada en todo el sistema")).toBeVisible()
-    const color = await page.locator("header [aria-hidden]").first().evaluate((el) => getComputedStyle(el).backgroundColor)
+    // Quvant: el color de la empresa va solo en su logo, el indicador del módulo activo y la serie principal (no en una barra).
+    const color = await page.evaluate(() => {
+      const el = [...document.querySelectorAll<HTMLElement>("[aria-hidden]")].find((x) => x.style.background === "var(--marca)")
+      return el ? getComputedStyle(el).backgroundColor : null
+    })
     expect(color).toBe("rgb(255, 90, 31)")
   })
 

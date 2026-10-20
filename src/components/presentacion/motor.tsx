@@ -1,9 +1,10 @@
 "use client"
 
-import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from "react"
+import { createContext, useCallback, useContext, useEffect, useLayoutEffect, useMemo, useRef, useState, useSyncExternalStore } from "react"
+import gsap from "gsap"
 import { ChevronLeft, ChevronRight, EyeOff, Maximize, Pause, Play, RotateCcw } from "lucide-react"
-import { useReducedMotion } from "motion/react"
 import { Isotipo } from "@/components/marca/quvant"
+import { arcoDeSalto, fasesDelSalto, puntoEnArco } from "@/components/marca/salto-geometria"
 import { cn } from "@/lib/utils"
 
 /**
@@ -12,11 +13,12 @@ import { cn } from "@/lib/utils"
  * - Escenario fijo de 1920×1080 escalado a la ventana (bandas en hierro).
  * - Cada escena ocupa de 100 a 150 vh de scroll; la escena activa se elige
  *   por la posición del scroll. Al cambiar, la saliente y la entrante se
- *   superponen en una transición de opacidad de 0,75 s (dentro de 0,6–0,9 s).
+ *   superponen en un fundido de 0,75 s y el punto salta en el índice de escenas
+ *   (abajo a la izquierda). Todo con GSAP: un solo reloj de animación.
  * - Teclado: P reproduce/pausa · H oculta controles y cursor · R reinicia ·
  *   1/2/3 velocidad 0,75×/1×/1,25× · ← → AvPág RePág Espacio · F pantalla completa.
  * - Enlace directo a una escena con #N (p. ej. /inversores#5); la URL sigue a la escena activa.
- * - Solo se anima transform, opacity y trazos SVG. Sin barras de scroll.
+ * - Solo se anima transform, opacity y trazos SVG. Sin barras de scroll. Fondo: la grilla de puntos.
  * - Precarga imágenes, fuentes y datos antes de empezar.
  */
 
@@ -54,6 +56,73 @@ function cargarImagen(src: string) {
   })
 }
 
+const consulta = "(prefers-reduced-motion: reduce)"
+/** ¿Pidió menos movimiento el sistema? (sin depender de otra biblioteca de animación). */
+function useMenosMovimiento() {
+  return useSyncExternalStore(
+    (cb) => {
+      const m = window.matchMedia(consulta)
+      m.addEventListener("change", cb)
+      return () => m.removeEventListener("change", cb)
+    },
+    () => window.matchMedia(consulta).matches,
+    () => false,
+  )
+}
+
+/**
+ * El índice de escenas, abajo a la izquierda del escenario: un cuadradito por escena. Al cambiar de escena,
+ * el punto salta en arco de la vieja a la nueva (la misma geometría que el salto de la marca).
+ */
+const PASO_INDICE = 26
+const Y_INDICE = 40
+const xIndice = (i: number) => 8 + i * PASO_INDICE
+
+function IndiceEscenas({ total, activa, velocidad, reducir }: { total: number; activa: number; velocidad: number; reducir: boolean }) {
+  const punto = useRef<SVGRectElement>(null)
+  const aro = useRef<SVGRectElement>(null)
+  const previa = useRef(activa)
+  useLayoutEffect(() => {
+    const el = punto.current
+    const marca = aro.current
+    if (!el || !marca) return
+    const desde = previa.current
+    previa.current = activa
+    if (desde === activa || reducir) {
+      gsap.set(el, { x: xIndice(activa), y: Y_INDICE })
+      return
+    }
+    const a = { x: xIndice(desde), y: Y_INDICE }
+    const b = { x: xIndice(activa), y: Y_INDICE }
+    const arco = arcoDeSalto(a, b, Math.min(0.45, 22 / Math.abs(b.x - a.x)))
+    const estado = { p: 0 }
+    gsap.set(marca, { x: a.x, y: a.y, opacity: 0 })
+    const t = gsap.to(estado, {
+      p: 1,
+      duration: 0.5 / velocidad,
+      ease: "none",
+      onUpdate: () => {
+        const { despegue, vuelo } = fasesDelSalto(estado.p)
+        const c = puntoEnArco(arco, vuelo)
+        gsap.set(el, { x: c.x, y: c.y })
+        gsap.set(marca, { opacity: estado.p < 0.9 ? despegue * 0.8 : (1 - estado.p) * 8 })
+      },
+    })
+    return () => {
+      t.kill()
+    }
+  }, [activa, velocidad, reducir])
+  return (
+    <svg className="pointer-events-none absolute bottom-[34px] left-[132px] z-10 overflow-visible" width={xIndice(total - 1) + 16} height={52} aria-hidden data-indice-escenas>
+      {Array.from({ length: total }, (_, i) => (
+        <rect key={i} x={xIndice(i) - 2.5} y={Y_INDICE - 2.5} width={5} height={5} className="fill-gris-5" />
+      ))}
+      <rect ref={aro} x={-5} y={-5} width={10} height={10} fill="none" className="stroke-acero" strokeWidth={1.2} opacity={0} />
+      <rect ref={punto} x={-5} y={-5} width={10} height={10} className="fill-blanco" />
+    </svg>
+  )
+}
+
 export function Presentacion({
   escenas,
   recursos = [],
@@ -68,7 +137,7 @@ export function Presentacion({
   /** Texto chico en la barra de controles (p. ej. "Confidencial"). */
   pie?: string
 }) {
-  const reducir = useReducedMotion() ?? false
+  const reducir = useMenosMovimiento()
   const [listo, setListo] = useState(false)
   const [avance, setAvance] = useState(0)
   const [activa, setActiva] = useState(0)
@@ -251,11 +320,23 @@ export function Presentacion({
 
   const montada = (i: number) => i === activa || i === saliente || i === activa + 1 || i === activa - 1
 
+  // El fundido entre escenas, con GSAP: la opacidad no la toca React (si no, saltaría sin transición).
+  // Antes de pintar, cada capa montada va a su opacidad: la activa entra, la saliente se va y las vecinas esperan en 0.
+  const escenario = useRef<HTMLDivElement>(null)
+  useLayoutEffect(() => {
+    const d = reducir ? 0 : TRANSICION_MS / 1000 / velocidad
+    escenario.current?.querySelectorAll<HTMLElement>("[data-capa]").forEach((el) => {
+      const i = Number(el.dataset.capa)
+      gsap.to(el, { opacity: i === activa ? 1 : 0, duration: i === activa || i === saliente ? d : 0, ease: "power2.inOut", overwrite: "auto" })
+    })
+  }, [activa, saliente, reducir, velocidad, reinicio, listo])
+
   return (
     <div className={cn("presentacion dark text-blanco", oculto && "cursor-none")} aria-label={nombre}>
       <div aria-hidden style={{ height: `${totalVh}vh` }} />
       <div className="fixed inset-0 overflow-hidden bg-negro" style={{ height: alto }}>
         <div
+          ref={escenario}
           className="absolute left-1/2 top-1/2 overflow-hidden bg-negro"
           style={{ width: 1920, height: 1080, transform: `translate(-50%, -50%) scale(${escala})`, transformOrigin: "center" }}
           role="region"
@@ -269,10 +350,9 @@ export function Presentacion({
               montada(i) ? (
                 <div
                   key={`${E.id}:${reinicio}`}
+                  data-capa={i}
                   className="absolute inset-0"
                   style={{
-                    opacity: i === activa ? 1 : 0,
-                    transition: `opacity ${reducir ? 1 : TRANSICION_MS / velocidad}ms cubic-bezier(0.4, 0, 0.2, 1)`,
                     zIndex: i === activa ? 2 : 1,
                     pointerEvents: i === activa ? "auto" : "none",
                   }}
@@ -286,6 +366,7 @@ export function Presentacion({
               ) : null,
             )
           )}
+          {listo && <IndiceEscenas total={escenas.length} activa={activa} velocidad={velocidad} reducir={reducir} />}
         </div>
 
         {listo && !oculto && alto > ancho && (
@@ -316,11 +397,11 @@ export function Presentacion({
 function Precarga({ avance }: { avance: number }) {
   return (
     <div className="flex size-full flex-col items-center justify-center gap-8" role="status" aria-live="polite">
-      <Isotipo className="h-24" version="principal" />
-      <div className="h-1 w-96 overflow-hidden rounded-full bg-white/10">
-        <div className="h-full w-full origin-left bg-foreground transition-transform duration-300" style={{ transform: `scaleX(${avance})` }} />
+      <Isotipo lado={96} version="principal" />
+      <div className="h-[2px] w-96 overflow-hidden bg-gris-3">
+        <div className="h-full w-full origin-left bg-blanco" style={{ transform: `scaleX(${avance})` }} />
       </div>
-      <p className="font-mono text-lg tracking-widest text-acero">PREPARANDO · {Math.round(avance * 100)} %</p>
+      <p className="font-sans text-lg uppercase tracking-[0.2em] text-acero">Preparando · {Math.round(avance * 100)} %</p>
     </div>
   )
 }
@@ -362,7 +443,7 @@ function Controles(p: {
         <div className="mx-1 hidden gap-1 md:flex" aria-label="Ir a escena">
           {Array.from({ length: p.total }, (_, i) => (
             <button key={i} type="button" onClick={() => p.onIr(i)} aria-label={`Escena ${i + 1}`} className="flex h-6 w-3 items-center justify-center">
-              <span className={cn("h-1.5 w-3 rounded-full transition-transform", i === p.activa ? "bg-alerta" : "scale-x-50 bg-white/25")} />
+              <span className={cn("size-[6px]", i === p.activa ? "bg-blanco" : "bg-gris-5")} />
             </button>
           ))}
         </div>

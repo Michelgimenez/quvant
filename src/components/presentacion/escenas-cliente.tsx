@@ -1,8 +1,8 @@
 "use client"
 
-import { createContext, useContext, useEffect, useMemo, useState } from "react"
-import { motion } from "motion/react"
-import { CheckCircle2, Search } from "lucide-react"
+import { createContext, useContext, useEffect, useLayoutEffect, useMemo, useRef, useState } from "react"
+import gsap from "gsap"
+import { Search } from "lucide-react"
 import { ProveedorApp } from "@/cliente/app-contexto"
 import { sesionDemo, type DemoEmbebida } from "@/cliente/demo-embebida"
 import { NAVEGACION } from "@/cliente/navegacion"
@@ -17,7 +17,7 @@ import { IMPLEMENTACION } from "@/config/hoja-de-ruta"
 import { PRECIOS, textoPrecioPlan } from "@/config/precios"
 import { textoSobre } from "@/lib/color"
 import { cn } from "@/lib/utils"
-import { Aparecer, Bajada, Lienzo, Titulo, TrazoAnimado } from "./kit"
+import { Aparecer, Bajada, Lienzo, Titulo, TrazoAnimado, useEntrada } from "./kit"
 import { useEscena, type DefinicionEscena } from "./motor"
 import { PeliculaProducto, type TextosPelicula } from "./pelicula-producto"
 
@@ -69,7 +69,7 @@ function Portada() {
           <LogoOrg org={orgDe(cliente)} alto="h-[120px]" />
         </Aparecer>
         <Aparecer demora={0.5}>
-          <p className="text-[88px] font-extrabold leading-[1.04] tracking-[-0.035em] text-blanco">
+          <p className="text-[88px] font-bold leading-[1.04] tracking-[-0.035em] text-blanco">
             Así se vería <span className="font-display">Quvant</span> en {cliente.nombre}
           </p>
         </Aparecer>
@@ -99,7 +99,7 @@ function SuProblema() {
       </Aparecer>
       <ul className="mt-14 grid grid-cols-2 gap-8">
         {cliente.problemas.map((p, i) => (
-          <Aparecer key={p.area} demora={0.5 + i * 0.18} className="rounded-3xl border border-white/10 bg-superficie-1/80 p-8" y={24}>
+          <Aparecer key={p.area} demora={0.5 + i * 0.18} className="rounded-[6px] border border-white/10 bg-superficie-1/80 p-8" y={24}>
             <p className="font-mono text-[20px] uppercase tracking-widest text-acero">{p.area}</p>
             <p className="mt-3 text-[30px] leading-snug text-blanco">
               <TextoConfig texto={p.detalle} />
@@ -117,8 +117,24 @@ function AppConSuMarca({ demo }: { demo: DemoEmbebida }) {
   const { activa, reducir, velocidad } = useEscena()
   const sesion = useMemo(() => sesionDemo(demo), [demo])
   const org = demo.motor.estado.org
+  // El tablero baja y vuelve, en bucle de 22 s mientras la escena está activa (GSAP).
+  const recorrer = useRef<HTMLDivElement>(null)
+  useLayoutEffect(() => {
+    const el = recorrer.current
+    if (!el) return
+    if (!activa || reducir) {
+      gsap.set(el, { y: 0 })
+      return
+    }
+    const d = 22 / velocidad
+    const tl = gsap.timeline({ repeat: -1 })
+    tl.to(el, { y: 0, duration: d * 0.15 }).to(el, { y: -420, duration: d * 0.35, ease: "power2.inOut" }).to(el, { y: -420, duration: d * 0.2 }).to(el, { y: 0, duration: d * 0.3, ease: "power2.inOut" })
+    return () => {
+      tl.kill()
+    }
+  }, [activa, reducir, velocidad])
   return (
-    <div className="light relative overflow-hidden rounded-[18px] border border-white/10 bg-background text-foreground shadow-[0_40px_120px_-20px_rgba(0,0,0,0.7)]" style={{ width: 1100, height: 690 }}>
+    <div className="light relative overflow-hidden rounded-[6px] border border-white/10 bg-background text-foreground shadow-[0_40px_120px_-20px_rgba(0,0,0,0.7)]" style={{ width: 1100, height: 690 }}>
       <Sello texto="DATOS DE EJEMPLO" className="absolute bottom-5 right-5 z-20 h-8 bg-background px-3 text-[14px]" titulo="Productos, ventas y personas ficticios de la empresa demo" />
       {/* Pantalla de 1440×900 reducida: la app tal cual, sin interacción */}
       <div inert className="pointer-events-none origin-top-left select-none" style={{ width: 1440, height: 903, transform: `scale(${1100 / 1440})`, "--marca": cliente.color, "--marca-contraste": textoSobre(cliente.color) } as React.CSSProperties}>
@@ -149,20 +165,15 @@ function AppConSuMarca({ demo }: { demo: DemoEmbebida }) {
               <span className="flex h-9 w-72 items-center gap-2 rounded-lg border border-linea bg-superficie-2 px-3 text-sm text-muted-foreground">
                 <Search className="size-4" /> Buscar productos, clientes…
               </span>
-              <span className="ml-auto inline-flex h-8 items-center gap-2 rounded-full border border-linea px-3 text-[13px]">
-                <span className="size-2 rounded-full bg-ok" /> Sincronizado
+              <span className="ml-auto inline-flex h-8 items-center gap-2 border border-linea px-3 text-[13px]">
+                <span className="size-2 bg-ok" /> Sincronizado
               </span>
             </div>
-            <motion.div
-              className="px-5 pt-6"
-              initial={{ y: 0 }}
-              animate={activa && !reducir ? { y: [0, 0, -420, -420, 0] } : { y: 0 }}
-              transition={{ duration: 22 / velocidad, times: [0, 0.15, 0.5, 0.7, 1], ease: "easeInOut", repeat: Infinity }}
-            >
+            <div ref={recorrer} className="px-5 pt-6">
               <ProveedorApp motor={demo.motor} servidor={demo.servidor} sesion={sesion}>
                 <Tablero />
               </ProveedorApp>
-            </motion.div>
+            </div>
           </div>
         </div>
       </div>
@@ -174,7 +185,7 @@ function AppConSuMarca({ demo }: { demo: DemoEmbebida }) {
 function IngresoCelular() {
   const { cliente } = useCliente()
   return (
-    <div className="dark flex h-[470px] w-[250px] flex-col overflow-hidden rounded-[36px] border-[9px] border-[#22272f] bg-background px-5 pb-5 pt-10 text-foreground shadow-2xl">
+    <div className="dark flex h-[470px] w-[250px] flex-col overflow-hidden rounded-[36px] border-[9px] border-gris-3 bg-background px-5 pb-5 pt-10 text-foreground shadow-2xl">
       <LogoOrg org={orgDe(cliente)} alto="h-6" />
       <p className="mt-8 text-[17px] font-bold">Ingresá</p>
       <div className="mt-4 space-y-3" aria-hidden>
@@ -214,7 +225,7 @@ function SuMarca() {
             <p className="font-mono text-[18px] uppercase tracking-widest text-acero">Sus categorías</p>
             <ul className="mt-3 flex flex-wrap gap-2">
               {cliente.categorias.map((c) => (
-                <li key={c} className="rounded-full border border-white/10 bg-superficie-1 px-4 py-2 text-[18px] text-blanco">
+                <li key={c} className="border border-gris-3 px-4 py-2 font-sans text-[18px] text-blanco">
                   <TextoConfig texto={c} />
                 </li>
               ))}
@@ -276,7 +287,6 @@ function Corte() {
 
 function ComoEmpezamos() {
   const { cliente } = useCliente()
-  const { activa, velocidad, reducir } = useEscena()
   return (
     <LienzoCliente numero="06" etiqueta="Cómo empezamos">
       <Aparecer>
@@ -291,15 +301,7 @@ function ComoEmpezamos() {
         <ol className="relative grid grid-cols-4 gap-10">
           {IMPLEMENTACION.map((p, i) => (
             <li key={p.paso}>
-              <motion.span
-                className="flex size-[44px] items-center justify-center rounded-full border-4 bg-negro font-mono text-[18px] font-bold text-blanco"
-                style={{ borderColor: cliente.color }}
-                initial={{ scale: 0 }}
-                animate={{ scale: activa ? 1 : 0 }}
-                transition={{ duration: reducir ? 0 : 0.4 / velocidad, delay: activa && !reducir ? (0.6 + i * 0.35) / velocidad : 0 }}
-              >
-                {i + 1}
-              </motion.span>
+              <MarcaPaso numero={i + 1} color={cliente.color} demora={0.6 + i * 0.35} />
               <Aparecer demora={0.8 + i * 0.35} y={16} className="mt-8 pr-6">
                 <p className="text-[36px] font-bold leading-tight text-blanco">{p.paso}</p>
                 <p className="mt-3 text-[24px] leading-snug text-acero">{p.detalle}</p>
@@ -340,7 +342,7 @@ function SocioFundador() {
           <ul className="mt-12 space-y-6">
             {socios.condiciones.map((c, i) => (
               <Aparecer key={c} demora={0.5 + i * 0.2} x={-16} y={0} className="flex items-start gap-4 text-[30px] text-blanco">
-                <CheckCircle2 className="mt-1 size-8 shrink-0 text-ok" /> {c}
+                <span className="mt-[14px] size-[10px] shrink-0 bg-blanco" aria-hidden /> {c}
               </Aparecer>
             ))}
           </ul>
@@ -348,7 +350,7 @@ function SocioFundador() {
             A cambio: {socios.aCambio.charAt(0).toLowerCase() + socios.aCambio.slice(1)}
           </Aparecer>
         </div>
-        <Aparecer demora={0.8} className="flex flex-col self-start rounded-3xl border border-white/10 bg-superficie-1/80 p-10">
+        <Aparecer demora={0.8} className="flex flex-col self-start rounded-[6px] border border-white/10 bg-superficie-1/80 p-10">
           <p className="font-mono text-[20px] uppercase tracking-widest text-acero">Plan {plan.nombre}</p>
           <p className="mt-4 text-[80px] font-bold leading-none tracking-tight text-blanco">{textoPrecioPlan(plan).precio}</p>
           {textoPrecioPlan(plan).unidad && <p className="mt-2 text-[26px] text-acero">{textoPrecioPlan(plan).unidad}</p>}
@@ -368,6 +370,17 @@ function SocioFundador() {
         </Aparecer>
       </div>
     </LienzoCliente>
+  )
+}
+
+/** El número de un paso, que aparece en su turno (GSAP). */
+function MarcaPaso({ numero, color, demora }: { numero: number; color: string; demora: number }) {
+  const { activa } = useEscena()
+  const ref = useEntrada<HTMLSpanElement>({ scale: 0 }, { activo: activa, demora, duracion: 0.4 })
+  return (
+    <span ref={ref} className="flex size-[44px] items-center justify-center border-2 bg-negro font-sans text-[18px] font-bold text-blanco" style={{ borderColor: color, transform: "scale(0)" }}>
+      {numero}
+    </span>
   )
 }
 

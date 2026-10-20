@@ -4,19 +4,34 @@
  * dato real queda [COMPLETAR ...] visible en la presentación.
  */
 
+/** El problema, contado para cada tamaño de negocio (del kiosco a la empresa). */
 export const MERCADO = {
-  titular: "Miles de negocios en Argentina gestionan millones en stock con sistemas antiguos.",
-  datos: [
-    { valor: "[COMPLETAR con dato y fuente]", etiqueta: "Ferreterías, corralones y casas de repuestos en Argentina" },
-    { valor: "[COMPLETAR con dato y fuente]", etiqueta: "Distribuidores de maquinaria y herramientas" },
-    { valor: "[COMPLETAR con dato y fuente]", etiqueta: "Negocios del rubro que todavía usan sistemas de escritorio o planillas" },
-  ],
-  dolores: [
-    "Sistemas de escritorio instalados en una sola PC",
-    "Si se corta internet o el servidor, se frena la venta",
-    "Actualizar precios lleva un día entero",
-    "Presupuestos sin seguimiento, perdidos en WhatsApp",
-    "Cada sucursal y cada negocio por separado",
+  titular: "Del kiosco a la empresa, la gestión sigue en sistemas viejos, planillas y cuadernos.",
+  tamanos: [
+    {
+      id: "kiosco",
+      nombre: "Kioscos y almacenes",
+      dato: "[COMPLETAR con dato y fuente: cantidad de kioscos y almacenes en Argentina]",
+      dolores: ["El fiado en un cuaderno", "La caja que no cierra", "Precios a mano cada semana"],
+    },
+    {
+      id: "comercio",
+      nombre: "Comercios con stock",
+      dato: "[COMPLETAR con dato y fuente: ferreterías, corralones y repuestos en Argentina]",
+      dolores: ["Sistemas de escritorio que se traban", "Actualizar precios lleva un día", "Presupuestos perdidos en WhatsApp"],
+    },
+    {
+      id: "distribuidora",
+      nombre: "Distribuidoras y mayoristas",
+      dato: "[COMPLETAR con dato y fuente: distribuidoras mayoristas en Argentina]",
+      dolores: ["Pedidos en papel y audios", "Deuda en la calle sin control", "Reparto por teléfono"],
+    },
+    {
+      id: "empresa",
+      nombre: "Empresas con sucursales",
+      dato: "[COMPLETAR con dato y fuente: cadenas con 10 o más sucursales]",
+      dolores: ["Cada sucursal con su planilla", "Compras sin aprobación clara", "Números a fin de mes"],
+    },
   ],
 }
 
@@ -38,10 +53,9 @@ export const TERRENO = {
   conclusion: "[COMPLETAR: conclusión del diagnóstico en una frase]",
 }
 
-export const PILARES = [
-  { id: "stock", nombre: "Stock", frase: "Cada sucursal, en tiempo real. Conteos con el celular." },
-  { id: "ventas", nombre: "Ventas", frase: "Mostrador rápido que no se cae y presupuestos que pasan a venta." },
-  { id: "precios", nombre: "Precios", frase: "Miles de precios actualizados en minutos, con vista previa." },
-  { id: "servicio", nombre: "Servicio técnico", frase: "Cada equipo en el taller, con su estado y el aviso al cliente." },
-  { id: "multinegocio", nombre: "Multinegocio", frase: "Todos los negocios y sucursales en un tablero." },
-] as const
+/** El estado actual, con honestidad: lo que se sabe y lo que falta contar del piloto. */
+export const ESTADO = {
+  titular: "Demo funcional. Primer piloto en negociación.",
+  bajada: "Todavía no hay clientes pagando. Esto es lo que funciona hoy, lo que se ve con partes emuladas y lo que viene.",
+  piloto: "[COMPLETAR: estado del piloto — con quién, desde cuándo y qué se va a probar]",
+}

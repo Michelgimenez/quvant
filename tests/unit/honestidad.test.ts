@@ -30,6 +30,13 @@ describe("regla de honestidad", () => {
     }
   })
 
+  it("no quedan los USD 290 de Yunque: los precios salen de src/config/precios.ts", () => {
+    const con = archivos(RAIZ)
+      .filter((p) => /USD\s*290\b|licenciaMensualUSD:\s*290/.test(readFileSync(p, "utf8")))
+      .map(relativo)
+    expect(con).toEqual([])
+  })
+
   it("cada función del registro tiene un estado válido", () => {
     for (const f of FEATURES) expect(["disponible", "demo", "próximamente"]).toContain(f.estado)
   })

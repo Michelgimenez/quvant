@@ -1,7 +1,7 @@
 "use client"
 
-import { useEffect, useMemo, useRef, useState } from "react"
-import { motion } from "motion/react"
+import { useEffect, useLayoutEffect, useMemo, useRef, useState } from "react"
+import gsap from "gsap"
 import { CheckCircle2, ScanBarcode, Search, ShoppingCart } from "lucide-react"
 import { ProveedorApp, useConexion, useDatos } from "@/cliente/app-contexto"
 import { sesionDemo, type DemoEmbebida } from "@/cliente/demo-embebida"
@@ -16,6 +16,7 @@ import { claveStock, listaDefault } from "@/dominio/estado"
 import type { ItemComercial, Producto } from "@/dominio/tipos"
 import { itemDesdeProducto, totalItems } from "@/dominio/ventas"
 import { cn } from "@/lib/utils"
+import { useEntrada } from "./kit"
 import { useEscena } from "./motor"
 
 type Paso = "mostrador" | "escaneo" | "presupuesto"
@@ -83,6 +84,21 @@ function Pelicula({ demo, textos, bucle }: { demo: DemoEmbebida; textos: TextosP
   const [presupuestoId, setPresupuestoId] = useState(() => elegirPresupuesto().id)
   const presupuesto = e.presupuestos[presupuestoId]
   const productoEscaneo = useMemo(() => Object.values(demo.semilla.productos).find((p) => p.nombre.startsWith("Soldadora inverter 200")) ?? Object.values(demo.semilla.productos)[0], [demo])
+
+  // El cursor, el clic y el teléfono se mueven con GSAP (el único reloj de animación).
+  const refCursor = useRef<SVGSVGElement>(null)
+  const refClic = useRef<HTMLSpanElement>(null)
+  useLayoutEffect(() => {
+    if (refCursor.current) gsap.to(refCursor.current, { x: cursor.x, y: cursor.y, duration: reducir ? 0 : 0.55 / velocidad, ease: "power3.out", overwrite: "auto" })
+  }, [cursor.x, cursor.y, reducir, velocidad])
+  useLayoutEffect(() => {
+    if (!refClic.current || !cursor.clic) return
+    gsap.fromTo(refClic.current, { x: cursor.x - 14, y: cursor.y - 14, scale: 0.2, opacity: 0.9 }, { scale: 1.4, opacity: 0, duration: 0.5 / velocidad, ease: "power2.out" })
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [cursor.clic])
+  useLayoutEffect(() => {
+    if (refTelefono.current) gsap.to(refTelefono.current, paso === "escaneo" ? { opacity: 1, y: 0, duration: 0.6 / velocidad } : { opacity: 0, y: 80, duration: 0.6 / velocidad })
+  }, [paso, velocidad])
 
   const moverA = (r: React.RefObject<HTMLElement | null>, clic = false) => {
     const el = r.current
@@ -256,9 +272,9 @@ function Pelicula({ demo, textos, bucle }: { demo: DemoEmbebida; textos: TextosP
                       <ShoppingCart className="size-4" /> Cobrar
                     </button>
                     {venta && (
-                      <motion.p initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} className="flex items-center gap-2 rounded-lg border border-ok/40 bg-ok/10 p-3 text-sm">
+                      <Entra className="flex items-center gap-2 rounded-md border border-ok/40 p-3 text-sm">
                         <CheckCircle2 className="size-5 text-ok" /> Venta {venta.numero ? `#${venta.numero}` : venta.numeroLocal}
-                      </motion.p>
+                      </Entra>
                     )}
                   </div>
                 </div>
@@ -285,13 +301,10 @@ function Pelicula({ demo, textos, bucle }: { demo: DemoEmbebida; textos: TextosP
           </div>
 
           {/* Celular para el escaneo */}
-          <motion.div
+          <div
             ref={refTelefono}
-            className="dark absolute -bottom-10 right-10 z-30 w-[330px] overflow-hidden rounded-[42px] border-[10px] border-[#22272f] bg-background text-foreground shadow-2xl"
-            initial={{ opacity: 0, y: 80 }}
-            animate={paso === "escaneo" ? { opacity: 1, y: 0 } : { opacity: 0, y: 80 }}
-            transition={{ duration: 0.6 / velocidad }}
-            style={{ height: 520 }}
+            className="dark absolute -bottom-10 right-10 z-30 w-[330px] overflow-hidden rounded-[42px] border-[10px] border-gris-3 bg-background text-foreground shadow-2xl"
+            style={{ height: 520, opacity: 0, transform: "translateY(80px)" }}
           >
             <div className="relative h-[250px] bg-[#05070a]">
               <div className="absolute inset-x-10 top-1/2 h-[3px] -translate-y-1/2 bg-error/90 shadow-[0_0_14px_3px_rgba(229,72,77,0.6)]" />
@@ -303,7 +316,7 @@ function Pelicula({ demo, textos, bucle }: { demo: DemoEmbebida; textos: TextosP
               <p className="absolute bottom-3 left-0 right-0 text-center font-mono text-[11px] text-acero">{escaneado ? escaneado.codigoBarras : "Apuntá al código…"}</p>
             </div>
             {escaneado && (
-              <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="space-y-3 p-4">
+              <Entra className="space-y-3 p-4">
                 <div className="flex items-center gap-3">
                   <MiniaturaProducto tipo={escaneado.ilustracion} className="size-11" />
                   <p className="text-sm font-semibold leading-snug">{escaneado.nombre}</p>
@@ -318,30 +331,17 @@ function Pelicula({ demo, textos, bucle }: { demo: DemoEmbebida; textos: TextosP
                     </li>
                   ))}
                 </ul>
-              </motion.div>
+              </Entra>
             )}
-          </motion.div>
+          </div>
         </div>
       </div>
 
       {/* Cursor animado */}
-      <motion.svg
-        viewBox="0 0 24 24"
-        className="pointer-events-none absolute left-0 top-0 z-50 size-9 drop-shadow-[0_2px_6px_rgba(0,0,0,0.6)]"
-        animate={{ x: cursor.x, y: cursor.y }}
-        transition={{ duration: reducir ? 0 : 0.55 / velocidad, ease: [0.3, 0.7, 0.2, 1] }}
-        aria-hidden
-      >
-        <path d="M4 2l15 10-7 1.5L9 21z" fill="#eef1f4" stroke="#0e1116" strokeWidth="1.4" strokeLinejoin="round" />
-      </motion.svg>
-      <motion.span
-        key={cursor.clic}
-        className="pointer-events-none absolute left-0 top-0 z-40 size-10 rounded-full border-2 border-alerta"
-        initial={{ x: cursor.x - 14, y: cursor.y - 14, scale: 0.2, opacity: cursor.clic ? 0.9 : 0 }}
-        animate={{ x: cursor.x - 14, y: cursor.y - 14, scale: 1.4, opacity: 0 }}
-        transition={{ duration: 0.5 / velocidad }}
-        aria-hidden
-      />
+      <svg ref={refCursor} viewBox="0 0 24 24" className="pointer-events-none absolute left-0 top-0 z-50 size-9 drop-shadow-[0_2px_6px_rgba(0,0,0,0.6)]" aria-hidden>
+        <path d="M4 2l15 10-7 1.5L9 21z" fill="#ececee" stroke="#0d0d0f" strokeWidth="1.4" strokeLinejoin="round" />
+      </svg>
+      <span ref={refClic} className="pointer-events-none absolute left-0 top-0 z-40 size-10 border-2 border-blanco" style={{ opacity: 0 }} aria-hidden />
     </div>
   )
 }
@@ -376,6 +376,16 @@ function TarjetaPresupuesto({ presupuesto, botonRef, venta }: { presupuesto: imp
           <ShoppingCart className="size-4" /> Convertir en venta
         </button>
       )}
+    </div>
+  )
+}
+
+/** Al montarse, sube un poco y aparece (GSAP). */
+function Entra({ className, children }: { className?: string; children: React.ReactNode }) {
+  const ref = useEntrada<HTMLDivElement>({ opacity: 0, y: 8 }, { duracion: 0.4 })
+  return (
+    <div ref={ref} className={className} style={{ opacity: 0 }}>
+      {children}
     </div>
   )
 }

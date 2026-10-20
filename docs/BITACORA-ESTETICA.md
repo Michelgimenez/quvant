@@ -128,3 +128,18 @@ Se compone a 1600×1000 y se captura a 1,5× (2400×1500). Así los estilos de t
 - Los rótulos del formulario, todos iguales; "Sistema actual (opcional)" ya no se parte.
 - En el estado real, cada nota se abre con un clic ("Nota"): la lista se lee de un vistazo y la aclaración sigue a mano.
 
+## Tanda 8 · Presentaciones y videos (`docs/capturas/quvant/tanda-8/`)
+
+**Vuelta 1**
+- `/inversores` sobre la grilla de puntos, con el índice de escenas abajo a la izquierda (el punto salta de una escena a la otra). La escena estrella es la escala del sitio, grande. El modelo de negocio sin números lo dice en un recuadro punteado, sin esconderlo.
+- Los videos: la firma se arma (la Q se dibuja, el logotipo aparece de izquierda a derecha y después la bajada), la demo a 1,2× con un subtítulo abajo y el cierre del manual en blanco sobre negro.
+- Quedaba:
+  - el mensaje "Cola sincronizada" se cortaba contra el borde derecho (el interruptor está pegado al borde);
+  - en el vertical, la demo dibujada a 1280 px cortaba la columna del cobro del mostrador;
+  - el gráfico de la inversión usaba cuatro colores ajenos al manual.
+
+**Vuelta 2**
+- El salto arranca un poco antes cuando está cerca del borde derecho: el mensaje entra en la pantalla.
+- En el vertical, la demo se dibuja a 1440 × 1200 y se achica a 0,75: entra todo y queda entre las zonas seguras.
+- La inversión, en la escala de grises: blanco, acero y dos grises.
+

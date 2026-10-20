@@ -6,6 +6,7 @@ import gsap from "gsap"
 import { Toaster } from "@/components/ui/sonner"
 import { CapaSaltos } from "@/components/marca/salto"
 import { EMPRESAS, EMPRESAS_ORDEN, type IdEmpresa, type ModuloDemo } from "@/demo/empresas"
+import { cn } from "@/lib/utils"
 import { BarraDemo } from "./barra-demo"
 import { cambiarEmpresa } from "./coreografia"
 import { ProveedorDemo, useDemo, useTiendaDemo } from "./contexto"
@@ -22,15 +23,34 @@ import { VistaPrecios } from "./vistas/precios"
 import { CobranzasDistribuidora, PreventaDistribuidora, RepartoDistribuidora } from "./vistas/distribuidora"
 import { AprobacionesGrupo, AuditoriaGrupo, ComparacionGrupo, IntegracionesGrupo, PermisosGrupo, SucursalesGrupo } from "./vistas/grupo"
 import { Recorrido } from "./recorrido"
+import { Pelicula } from "./pelicula"
+import type { IdVideo } from "@/demo/peliculas"
 
 /**
  * La demo que cambia de empresa (/demo): pública, sin login y sin tocar la base. El mismo Quvant en un kiosco,
  * una ferretería, una distribuidora y un grupo de 40 sucursales. La empresa elegida queda en la dirección
  * (/demo?empresa=kiosco) con history.replaceState, sin navegar.
  */
-export function DemoQuvant({ empresaInicial, filmando = false, recorrido = false }: { empresaInicial: IdEmpresa | null; filmando?: boolean; recorrido?: boolean }) {
+export function DemoQuvant({
+  empresaInicial,
+  filmando = false,
+  recorrido = false,
+  pelicula,
+  capaVideo = null,
+  alListo,
+}: {
+  empresaInicial: IdEmpresa | null
+  filmando?: boolean
+  recorrido?: boolean
+  /** Un video (/videos/<id>): la demo la maneja su guion y no guarda nada del visitante. */
+  pelicula?: IdVideo
+  /** La capa del escenario del video (pantallas y subtítulos). */
+  capaVideo?: HTMLElement | null
+  alListo?: (tl: gsap.core.Timeline) => void
+}) {
   useEffect(() => {
-    if (!filmando) return
+    // En los videos, la filmación la prepara la página del video.
+    if (!filmando || pelicula) return
     // Modo filmación (?film=1): el reloj global de GSAP se pausa y lo mueve quien filma, solo hacia adelante.
     const w = window as unknown as { __gsap?: typeof gsap; __seek?: (t: number) => void; __ready?: boolean }
     gsap.globalTimeline.pause()
@@ -40,10 +60,10 @@ export function DemoQuvant({ empresaInicial, filmando = false, recorrido = false
       gsap.globalTimeline.totalTime(t)
     }
     w.__ready = true
-  }, [filmando])
+  }, [filmando, pelicula])
   return (
-    <ProveedorDemo empresaInicial={empresaInicial} filmando={filmando}>
-      <AppDemo filmando={filmando} recorridoInicial={recorrido} />
+    <ProveedorDemo empresaInicial={empresaInicial} filmando={filmando} guardar={!pelicula}>
+      <AppDemo filmando={filmando} recorridoInicial={recorrido} pelicula={pelicula} capaVideo={capaVideo} alListo={alListo} />
     </ProveedorDemo>
   )
 }
@@ -55,7 +75,19 @@ function tecladoLibre() {
   return !document.querySelector("[data-lector-activo]")
 }
 
-function AppDemo({ filmando, recorridoInicial }: { filmando: boolean; recorridoInicial: boolean }) {
+function AppDemo({
+  filmando,
+  recorridoInicial,
+  pelicula,
+  capaVideo,
+  alListo,
+}: {
+  filmando: boolean
+  recorridoInicial: boolean
+  pelicula?: IdVideo
+  capaVideo: HTMLElement | null
+  alListo?: (tl: gsap.core.Timeline) => void
+}) {
   const empresa = useDemo((s) => s.empresa)
   const tienda = useTiendaDemo()
   const [modulo, setModulo] = useState<ModuloDemo>("tablero")
@@ -65,14 +97,15 @@ function AppDemo({ filmando, recorridoInicial }: { filmando: boolean; recorridoI
   const selectorRef = useRef<HTMLDivElement>(null)
   const cambiando = useRef(false)
 
-  // La dirección refleja la empresa elegida (sin navegar).
+  // La dirección refleja la empresa elegida (sin navegar). En los videos, no.
   useEffect(() => {
+    if (pelicula) return
     const u = new URL(window.location.href)
     if (u.searchParams.get("empresa") !== empresa) {
       u.searchParams.set("empresa", empresa)
       window.history.replaceState(window.history.state, "", u)
     }
-  }, [empresa])
+  }, [empresa, pelicula])
 
   // El selector se abre y se cierra con GSAP (un solo reloj de animación). El estado inicial se fija sin animar.
   const primeraVez = useRef(true)
@@ -121,6 +154,8 @@ function AppDemo({ filmando, recorridoInicial }: { filmando: boolean; recorridoI
             tienda.getState().elegirEmpresa(id)
             setModulo("tablero")
           }),
+        // Si la demo se ve achicada o agrandada (un video, un escenario), la coreografía corrige sus medidas.
+        escala: escena.current.getBoundingClientRect().width / (escena.current.offsetWidth || 1),
       }).finally(() => (cambiando.current = false))
     },
     [tienda],
@@ -152,8 +187,8 @@ function AppDemo({ filmando, recorridoInicial }: { filmando: boolean; recorridoI
   }
 
   return (
-    <div ref={raiz} className="dark flex h-dvh flex-col overflow-hidden bg-background text-foreground" data-demo data-empresa={empresa}>
-      <BarraDemo empresa={empresa} selectorAbierto={selector} onSelector={() => setSelector((v) => !v)} onRecorrido={() => setRecorrido((v) => !v)} onReiniciar={reiniciar} recorridoActivo={recorrido} />
+    <div ref={raiz} className={cn("dark flex flex-col overflow-hidden bg-background text-foreground", pelicula ? "h-full" : "h-dvh")} data-demo data-empresa={empresa} data-filmando={filmando || undefined}>
+      <BarraDemo empresa={empresa} selectorAbierto={selector} onSelector={() => setSelector((v) => !v)} onRecorrido={() => setRecorrido((v) => !v)} onReiniciar={reiniciar} recorridoActivo={recorrido} video={Boolean(pelicula)} />
       <div className="relative flex min-h-0 flex-1">
         <div ref={selectorRef} className="pointer-events-none absolute inset-x-0 top-0 z-30 [&>[data-abierto]]:pointer-events-auto">
           <SelectorEmpresas empresa={empresa} abierto={selector} onElegir={cambiar} />
@@ -170,9 +205,10 @@ function AppDemo({ filmando, recorridoInicial }: { filmando: boolean; recorridoI
           </main>
         </div>
       </div>
-      {recorrido && <Recorrido empresaActual={empresa} onCambiarEmpresa={cambiar} onModulo={setModulo} onSalir={() => setRecorrido(false)} filmando={filmando} />}
+      {recorrido && !pelicula && <Recorrido empresaActual={empresa} onCambiarEmpresa={cambiar} onModulo={setModulo} onSalir={() => setRecorrido(false)} filmando={filmando} />}
+      {pelicula && <Pelicula video={pelicula} capa={capaVideo} onCambiarEmpresa={cambiar} onModulo={setModulo} alListo={alListo} />}
       <CapaSaltos />
-      <Toaster position="bottom-right" />
+      {!pelicula && <Toaster position="bottom-right" />}
     </div>
   )
 }

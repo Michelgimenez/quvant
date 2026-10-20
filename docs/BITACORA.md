@@ -101,3 +101,15 @@ foto.style.width = `${rEscena.width / k}px`                     // la foto del e
 
 Lo que vive afuera de la escena (el salto del punto y los logos que vuelan, que se dibujan en una capa fija sobre la página) no se corrige: ya está en coordenadas de pantalla. Flip también se las arregla solo, porque compone las matrices de los padres.
 
+## Tanda 8 · Filmar con un reloj que no corre
+
+Un video de una interfaz grabado "en vivo" sale con saltos: el navegador no llega a pintar 30 cuadros por segundo mientras graba. Por eso acá el tiempo no corre: lo mueve quien filma.
+
+```ts
+gsap.globalTimeline.pause()                                     // nadie avanza solo
+window.__seek = (t) => gsap.globalTimeline.totalTime(base + t)  // el script pide el instante exacto
+// por cada cuadro: __seek(i / 30) → dos requestAnimationFrame → screenshot JPEG → ffmpeg
+```
+
+Funciona porque todo lo que se mueve depende de ese reloj: la coreografía del cambio de empresa, los números que ruedan, el salto, incluso la cola del kiosco que se sincroniza (era un `setTimeout`, pasó a `gsap.delayedCall`). La trampa: si el script salta muchos segundos de una vez, los clics del guion llegan antes de que React pinte el módulo donde están sus botones. Por eso el modo de revisión también avanza cuadro por cuadro, aunque solo guarde algunos.
+

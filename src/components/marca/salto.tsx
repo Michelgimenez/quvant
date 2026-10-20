@@ -1,6 +1,7 @@
 "use client"
 
-import { useEffect, useRef, useState } from "react"
+import { useEffect, useRef, useState, useSyncExternalStore } from "react"
+import { createPortal } from "react-dom"
 import gsap from "gsap"
 import { arcoDeSalto, fasesDelSalto, largoRecorrido, puntoEnArco, trazoDeArco } from "./salto-geometria"
 
@@ -28,7 +29,8 @@ export function lanzarSalto(opciones: Opciones = {}) {
   }
   const momento: Momento = {
     id: siguiente++,
-    x: x ?? window.innerWidth / 2 - 36,
+    // Cerca del borde derecho, el salto arranca un poco antes: el mensaje tiene que entrar en la pantalla.
+    x: Math.min(x ?? window.innerWidth / 2 - 36, window.innerWidth - 380),
     y: y ?? Math.min(220, window.innerHeight / 3),
     mensaje: opciones.mensaje,
   }
@@ -115,6 +117,12 @@ function UnSalto({ momento, alTerminar }: { momento: Momento; alTerminar: () => 
 export function CapaSaltos() {
   const [momentos, setMomentos] = useState<Momento[]>([])
   const [anuncio, setAnuncio] = useState("")
+  // <body> recién en el cliente (en el servidor y al hidratar no hay portal).
+  const cuerpo = useSyncExternalStore(
+    () => () => {},
+    () => document.body,
+    () => null,
+  )
 
   useEffect(() => {
     const oyente = (m: Momento) => {
@@ -132,11 +140,16 @@ export function CapaSaltos() {
       <div aria-live="polite" className="sr-only">
         {anuncio}
       </div>
-      <div className="pointer-events-none fixed inset-0 z-[200]" aria-hidden>
-        {momentos.map((m) => (
-          <UnSalto key={m.id} momento={m} alTerminar={() => setMomentos((prev) => prev.filter((p) => p.id !== m.id))} />
-        ))}
-      </div>
+      {cuerpo &&
+        createPortal(
+          // En un portal a <body>: con position: fixed dentro de algo achicado (transform), las coordenadas no coincidirían.
+          <div className="pointer-events-none fixed inset-0 z-[200]" aria-hidden>
+            {momentos.map((m) => (
+              <UnSalto key={m.id} momento={m} alTerminar={() => setMomentos((prev) => prev.filter((p) => p.id !== m.id))} />
+            ))}
+          </div>,
+          cuerpo,
+        )}
     </>
   )
 }

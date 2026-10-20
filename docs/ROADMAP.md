@@ -23,7 +23,8 @@ El sistema que se llamaba Yunque pasa a llamarse **Quvant** y se abre del kiosco
 - **Tanda 5 · El kiosco y la ferretería por dentro — hecha.** Mostrador táctil con favoritos y lector, sin conexión, fiado, cierre de caja con el salto; presupuesto → venta, transferencias y servicio técnico.
 - **Tanda 6 · La distribuidora, el grupo y el recorrido guiado — hecha.** Preventa, reparto en el mapa y cobranzas; sucursales en el mapa, comparación, aprobaciones en dos niveles, auditoría y permisos; el recorrido automático de ~60 s por las cuatro empresas. Nuevas en el registro (estado `demo`): preventa, hoja de ruta en el mapa, cobranzas en la calle, comparación de sucursales y aprobaciones por niveles.
 - **Tanda 7 · El sitio — hecha.** El hero con la escala (de kiosco a empresa, en vivo, con el salto), las secciones del punto 6, cuatro planes desde la configuración ("Consultá" mientras no haya precio), desarrollo a medida (borrador) y el formulario con rubro y tamaño.
-- Tandas 8 a 10: las presentaciones y los videos; Forja con la marca nueva.
+- **Tanda 8 · Presentaciones y videos — hecha.** `/inversores` con el problema por tamaño, la demo que cambia de empresa como escena estrella, el modelo por plan (fórmula sin números mientras no haya precios) y transiciones con el salto. `/demo/ferremix` con la marca nueva. Los videos de 60 s (horizontal y vertical) y el loop del cambio de empresa, filmados cuadro por cuadro.
+- Tandas 9 y 10: Forja con la marca nueva.
 
 ## Etapas
 

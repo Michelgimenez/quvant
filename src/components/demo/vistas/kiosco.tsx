@@ -1,6 +1,7 @@
 "use client"
 
 import { useEffect, useMemo, useRef, useState } from "react"
+import gsap from "gsap"
 import { toast } from "sonner"
 import { Banknote, Check, CreditCard, Minus, NotebookPen, Plus, QrCode, ScanBarcode, Send, Smartphone, Trash2, Wifi, WifiOff } from "lucide-react"
 import { Button } from "@/components/ui/button"
@@ -27,12 +28,14 @@ export function useConexionKiosco() {
   const indicador = useRef<HTMLButtonElement>(null)
   useEffect(() => {
     if (sinConexion || !enCola) return
-    // Volvió internet: la cola se sincroniza sola.
-    const t = setTimeout(() => {
+    // Volvió internet: la cola se sincroniza sola (con el reloj de GSAP: la filmación lo reproduce igual).
+    const t = gsap.delayedCall(1.3, () => {
       tienda.getState().actualizar("kiosco", (a) => ({ ...a, ventas: a.ventas.map((v) => ({ ...v, sincronizada: true })) }))
       lanzarSalto({ desde: indicador.current, mensaje: `Cola sincronizada · ${enCola} ${enCola === 1 ? "venta" : "ventas"}` })
-    }, 1300)
-    return () => clearTimeout(t)
+    })
+    return () => {
+      t.kill()
+    }
   }, [sinConexion, enCola, tienda])
   return { sinConexion, enCola, indicador, alternar: () => tienda.getState().setSinConexion(!sinConexion) }
 }
@@ -113,8 +116,8 @@ export function MostradorKiosco() {
     const paso = () => {
       i += 3
       setBusqueda(p.codigo.slice(0, i))
-      if (i < p.codigo.length) setTimeout(paso, 18)
-      else setTimeout(() => leer(p.codigo), 90)
+      if (i < p.codigo.length) gsap.delayedCall(0.018, paso)
+      else gsap.delayedCall(0.09, () => leer(p.codigo))
     }
     lector.current?.focus()
     paso()

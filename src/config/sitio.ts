@@ -36,6 +36,8 @@ const TITULAR_ELEGIDO: "A" | "B" | "C" = "A"
 export const SITIO = {
   nombre: "Quvant",
   url: process.env.NEXT_PUBLIC_SITIO_URL ?? "http://localhost:3000",
+  /** El dominio público, como se dice en voz alta y se muestra en los videos ("quvant.com.ar"). */
+  dominio: "[COMPLETAR: dominio del sitio]",
   /** La bajada de la marca (manual, pág. 2): mayúscula al inicio y punto final, nunca abreviada ni traducida. */
   tagline: "Software a la vanguardia de cada nicho.",
   /**

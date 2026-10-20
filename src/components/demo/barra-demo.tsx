@@ -21,6 +21,7 @@ export function BarraDemo({
   onRecorrido,
   onReiniciar,
   recorridoActivo,
+  video = false,
 }: {
   empresa: IdEmpresa
   selectorAbierto: boolean
@@ -28,6 +29,8 @@ export function BarraDemo({
   onRecorrido: () => void
   onReiniciar: () => void
   recorridoActivo: boolean
+  /** En los videos no van el recorrido, reiniciar ni el atajo. */
+  video?: boolean
 }) {
   const cfg = EMPRESAS[empresa]
   return (
@@ -56,15 +59,19 @@ export function BarraDemo({
           ))}
         </span>
         <ChevronDown className={cn("size-4 text-acero transition-transform", selectorAbierto && "rotate-180")} />
-        <Kbd className="hidden lg:inline-flex">⌘E</Kbd>
+        {!video && <Kbd className="hidden lg:inline-flex">⌘E</Kbd>}
       </button>
       <span className="ml-auto" />
-      <Button size="sm" variant="ghost" onClick={onRecorrido} aria-pressed={recorridoActivo} data-testid="recorrido-guiado">
-        <Play /> {recorridoActivo ? "Recorriendo…" : "Recorrido guiado"}
-      </Button>
-      <Button size="sm" variant="ghost" onClick={onReiniciar} data-testid="reiniciar-demo">
-        <RotateCcw /> Reiniciar
-      </Button>
+      {!video && (
+        <>
+          <Button size="sm" variant="ghost" onClick={onRecorrido} aria-pressed={recorridoActivo} data-testid="recorrido-guiado">
+            <Play /> {recorridoActivo ? "Recorriendo…" : "Recorrido guiado"}
+          </Button>
+          <Button size="sm" variant="ghost" onClick={onReiniciar} data-testid="reiniciar-demo">
+            <RotateCcw /> Reiniciar
+          </Button>
+        </>
+      )}
     </header>
   )
 }
